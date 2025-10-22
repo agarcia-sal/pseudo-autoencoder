@@ -1,16 +1,9 @@
 # Pseudo-Autoencoder: Large Language Models for Examining Pseudocode Validity
 
-# CO-Bench: Benchmarking Language Model Agents in Algorithm Search for Combinatorial Optimization
-
-
-![example](https://github.com/user-attachments/assets/faf29c44-4904-4d74-9a15-37a038b14e77)
-
-**Paper:** [CO-Bench: Benchmarking Language Model Agents in Algorithm Search for Combinatorial Optimization](https://arxiv.org/abs/2504.04310)
-
 **Data:** [LeetCodeDataset](https://github.com/newfacade/LeetCodeDataset) and [HumanEval](https://github.com/openai/human-eval)
 
 # Download Data
-Download the raw data from [HumanEval](https://github.com/openai/human-eval) to the local directory `data/human_eval` and LeetCodeDataset-v0.3.0-train.jsonl and LeetCodeDataset-v0.3.0-test.jsonl from [LeetCodeDataset](https://github.com/newfacade/LeetCodeDataset)
+Download the raw data from [HumanEval](https://github.com/openai/human-eval) to the local directory `data/human_eval` and LeetCodeDataset-v0.3.0-train.jsonl and LeetCodeDataset-v0.3.0-test.jsonl from [LeetCodeDataset](https://github.com/newfacade/LeetCodeDataset) to the local directory `data/leet_code`
 
 # Agent Implementations
 
@@ -27,7 +20,7 @@ Each agent implements the following functions:
 
 There are 3 pipelines available to run: Autoencoder, Cosmetic, and Classifier
 
-Set the `evolving_encoding`, `evolving_decoding`, `evolving_cosmetic`, `evolving_classifier` flag to True depending on which pipeline you want to run. For the autoencoder pipeline, set the `evolving_encoding` to True and `evolving_decoding` flag to False to start off with. The flags will toggle as the autoencoder switches between these two stages.
+Set the `evolving_encoding`, `evolving_decoding`, `evolving_cosmetic`, `evolving_classifier` flag to True depending on which pipeline you want to run. For the autoencoder pipeline, set the `evolving_encoding` flag to True and `evolving_decoding` flag to False to start off with. The flags will toggle as the autoencoder switches between these two stages.
 
 Depending on which pipeline you are running, set the correct `problems_dir_name` under which you will be operating. For the autoencoder, choose either `problems_dir_name = leet_code` or `problems_dir_name = human_eval`
 
