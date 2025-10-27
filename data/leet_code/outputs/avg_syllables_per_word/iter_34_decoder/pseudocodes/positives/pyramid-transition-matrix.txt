@@ -1,0 +1,33 @@
+CLASS Solution  
+    FUNCTION pyramidTransition(bottom, allowed)  
+        SET allowed_map TO a default dictionary where each key maps to a default dictionary that maps to a list  
+        FOR each rule IN allowed  
+            SET left TO the element at position zero of rule  
+            SET right TO the element at position one of rule  
+            SET top TO the element at position two of rule  
+            APPEND top TO the list at allowed_map at key left at key right  
+        END FOR  
+        
+        FUNCTION can_build_pyramid(current_bottom, current_top)  
+            IF the length of current_bottom EQUALS one  
+                RETURN True  
+            END IF  
+            IF the length of current_top EQUALS the length of current_bottom MINUS one  
+                RETURN the result of calling can_build_pyramid with current_top and an empty list  
+            END IF  
+            
+            SET left TO the element at position the length of current_top of current_bottom  
+            SET right TO the element at position the length of current_top PLUS one of current_bottom  
+            IF left EXISTS as a key in allowed_map AND right EXISTS as a key in allowed_map at key left  
+                FOR each top IN the list at allowed_map at key left at key right  
+                    IF the result of calling can_build_pyramid with current_bottom and current_top concatenated with top is True  
+                        RETURN True  
+                    END IF  
+                END FOR  
+            END IF  
+            RETURN False  
+        END FUNCTION  
+        
+        RETURN the result of calling can_build_pyramid with bottom and an empty list  
+    END FUNCTION  
+END CLASS

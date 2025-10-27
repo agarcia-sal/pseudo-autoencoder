@@ -1,0 +1,37 @@
+CLASS Solution  
+    FUNCTION maximalPathQuality(values PARAMETER values OF TYPE List OF Integer, edges PARAMETER edges OF TYPE List OF List OF Integer, maxTime PARAMETER maxTime OF TYPE Integer) RETURNS Integer  
+        SET graph TO a new mapping from integer to list initialized with empty list for each key  
+        FOR each element comprised of u comma v comma time IN edges  
+            APPEND pair of element neighbor v and element time TO the list corresponding to element u in graph  
+            APPEND pair of element neighbor u and element time TO the list corresponding to element v in graph  
+        END FOR  
+        
+        SET visited TO a new empty set  
+        SET max_quality TO zero  
+        
+        FUNCTION dfs(node PARAMETER node OF TYPE Integer, current_time PARAMETER current_time OF TYPE Integer, current_quality PARAMETER current_quality OF TYPE Integer)  
+            NONLOCAL max_quality  
+            
+            IF node EQUALS zero THEN  
+                SET max_quality TO maximum of max_quality AND current_quality  
+            END IF  
+            
+            FOR each pair neighbor comma time IN the list corresponding to element node in graph  
+                IF time LESS THAN OR EQUAL TO current_time THEN  
+                    IF neighbor NOT IN visited THEN  
+                        ADD neighbor TO visited  
+                        CALL dfs WITH neighbor AND current_time MINUS time AND current_quality PLUS the element at position neighbor of values  
+                        REMOVE neighbor FROM visited  
+                    ELSE  
+                        CALL dfs WITH neighbor AND current_time MINUS time AND current_quality  
+                    END IF  
+                END IF  
+            END FOR  
+        END FUNCTION  
+        
+        ADD zero TO visited  
+        CALL dfs WITH zero AND maxTime AND the element at position zero of values  
+        
+        RETURN max_quality  
+    END FUNCTION  
+END CLASS

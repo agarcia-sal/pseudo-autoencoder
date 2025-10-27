@@ -1,0 +1,45 @@
+CLASS Solution  
+    FUNCTION openLock(deadends LIST OF STRING, target STRING) RETURNS INTEGER  
+        SET deadends_set TO the SET of elements IN deadends  
+        
+        IF the STRING zero zero zero zero IS IN deadends_set THEN  
+            RETURN the INTEGER negative one  
+        END IF  
+        
+        IF target EQUALS the STRING zero zero zero zero THEN  
+            RETURN the INTEGER zero  
+        END IF  
+        
+        SET queue TO a new deque CONTAINING the PAIR of the STRING zero zero zero zero AND the INTEGER zero  
+        SET visited TO the SET CONTAINING the STRING zero zero zero zero  
+        
+        FUNCTION neighbors(state STRING)  
+            SET result TO an empty LIST  
+            FOR index FROM the INTEGER zero TO the INTEGER three  
+                SET digit TO the INTEGER value OF the CHARACTER at position index OF state  
+                FOR move IN the LIST containing the INTEGER negative one AND the INTEGER one  
+                    SET new_digit TO the remainder after dividing the SUM of digit AND move BY the INTEGER ten  
+                    SET new_state TO the CONCATENATION of the substring from position zero TO position index MINUS one OF state WITH the STRING representation OF new_digit WITH the substring from position index PLUS one TO the end OF state  
+                    APPEND new_state TO result  
+                END FOR  
+            END FOR  
+            RETURN result  
+        END FUNCTION  
+        
+        WHILE the LENGTH OF queue IS GREATER THAN zero  
+            REMOVE AND RETURN the LEFTMOST element FROM queue AS the PAIR current_state AND steps  
+            
+            FOR each neighbor IN neighbors(current_state)  
+                IF neighbor NOT IN visited AND neighbor NOT IN deadends_set THEN  
+                    IF neighbor EQUALS target THEN  
+                        RETURN the SUM of steps AND the INTEGER one  
+                    END IF  
+                    ADD neighbor TO visited  
+                    APPEND the PAIR neighbor AND the SUM of steps AND the INTEGER one TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN the INTEGER negative one  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,75 @@
+CLASS Solution  
+    FUNCTION countCombinations(pieces PARAMETERS pieces AND positions PARAMETERS positions)  
+        SET directions TO a mapping from piece types TO lists of pairs of direction increments AS follows  
+            rook maps TO a list of pairs representing one step downward one step upward one step rightward one step leftward  
+            queen maps TO a list of pairs representing one step downward one step upward one step rightward one step leftward plus one step diagonal downward rightward one step diagonal upward rightward one step diagonal downward leftward one step diagonal upward leftward  
+            bishop maps TO a list of pairs representing one step diagonal downward rightward one step diagonal upward rightward one step diagonal downward leftward one step diagonal upward leftward  
+        SET positions TO the list constructed by subtracting one from the row and one from the column of each pair in the original positions list  
+        
+        FUNCTION get_destinations(start PARAMETERS start AND piece_type PARAMETERS piece_type)  
+            SET row TO the first element of start  
+            SET column TO the second element of start  
+            SET dests TO a list containing the start position  
+            FOR each pair of direction row increment and direction column increment IN the directions for the given piece_type  
+                SET next_row TO row PLUS direction row increment  
+                SET next_column TO column PLUS direction column increment  
+                WHILE next_row is greater than or equal to zero AND next_row is less than eight AND next_column is greater than or equal to zero AND next_column is less than eight  
+                    APPEND the pair of next_row and next_column TO dests  
+                    INCREMENT next_row BY direction row increment  
+                    INCREMENT next_column BY direction column increment  
+                END WHILE  
+            END FOR  
+            RETURN dests  
+        END FUNCTION  
+        
+        SET all_destinations TO the list constructed by applying get_destinations to each pair of corresponding elements of positions and pieces using pairing by position AND piece  
+        
+        FUNCTION is_valid_combination(combination PARAMETERS combination)  
+            SET current_positions TO a new list copying the positions list  
+            SET number_of_pieces TO the length of current_positions  
+            WHILE true  
+                IF the length of the set constructed from current_positions is less than number_of_pieces  
+                    RETURN false  
+                END IF  
+                SET all_reached TO true  
+                FOR index FROM zero TO number_of_pieces MINUS one  
+                    IF element at position index of current_positions EQUALS element at position index of combination  
+                        CONTINUE TO the next iteration of the loop  
+                    END IF  
+                    SET all_reached TO false  
+                    SET row TO element at position zero of element at position index of current_positions  
+                    SET column TO element at position one of element at position index of current_positions  
+                    SET target_row TO element at position zero of element at position index of combination  
+                    SET target_column TO element at position one of element at position index of combination  
+                    IF target_row GREATER THAN row  
+                        SET direction_row TO one  
+                    ELSE IF target_row LESS THAN row  
+                        SET direction_row TO negative one  
+                    ELSE  
+                        SET direction_row TO zero  
+                    END IF  
+                    IF target_column GREATER THAN column  
+                        SET direction_column TO one  
+                    ELSE IF target_column LESS THAN column  
+                        SET direction_column TO negative one  
+                    ELSE  
+                        SET direction_column TO zero  
+                    END IF  
+                    SET element at position index of current_positions TO the pair of row PLUS direction_row AND column PLUS direction_column  
+                END FOR  
+                IF all_reached IS true  
+                    RETURN true  
+                END IF  
+            END WHILE  
+        END FUNCTION  
+        
+        SET valid_count TO zero  
+        FOR each combination IN the cartesian product of all_destinations unpacked  
+            IF is_valid_combination with combination as argument  
+                INCREMENT valid_count BY one  
+            END IF  
+        END FOR  
+        
+        RETURN valid_count  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,58 @@
+CLASS Trie  
+    FUNCTION __init__(self)  
+        SET self.children TO a list of twenty-six elements all set to None  
+        SET self.ref TO negative one  
+    END FUNCTION  
+
+    FUNCTION insert(self, w, ref)  
+        SET node TO self  
+        FOR each character c IN w  
+            SET idx TO the Unicode code point of character c MINUS the Unicode code point of the lowercase letter a  
+            IF element at position idx of node.children EQUALS None THEN  
+                SET element at position idx of node.children TO a new Trie object  
+            END IF  
+            SET node TO element at position idx of node.children  
+        END FOR  
+        SET node.ref TO ref  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION findWords(self, board, words)  
+        FUNCTION dfs(node, i, j)  
+            SET idx TO the Unicode code point of the element at position j of the element at position i of board MINUS the Unicode code point of the lowercase letter a  
+            IF element at position idx of node.children EQUALS None THEN  
+                RETURN  
+            END IF  
+            SET node TO element at position idx of node.children  
+            IF node.ref GREATER THAN OR EQUAL TO zero THEN  
+                APPEND element at position node.ref of words TO ans  
+                SET node.ref TO negative one  
+            END IF  
+            SET c TO the element at position j of the element at position i of board  
+            SET the element at position j of the element at position i of board TO the special marker  
+            FOR each consecutive pair a and b IN the sequence of integers negative one zero one zero negative one  
+                SET x TO i PLUS a  
+                SET y TO j PLUS b  
+                IF x GREATER THAN OR EQUAL TO zero AND x LESS THAN m AND y GREATER THAN OR EQUAL TO zero AND y LESS THAN n AND the element at position y of the element at position x of board NOT EQUALS the special marker THEN  
+                    CALL dfs(node, x, y)  
+                END IF  
+            END FOR  
+            SET the element at position j of the element at position i of board TO c  
+        END FUNCTION  
+
+        SET tree TO a new Trie object  
+        FOR each index i AND element w IN words WITH indices  
+            CALL insert method of tree WITH parameters w AND i  
+        END FOR  
+        SET m TO the length of board  
+        SET n TO the length of the element at position zero of board  
+        SET ans TO an empty list  
+        FOR i FROM zero TO m MINUS one  
+            FOR j FROM zero TO n MINUS one  
+                CALL dfs(tree, i, j)  
+            END FOR  
+        END FOR  
+        RETURN ans  
+    END FUNCTION  
+END CLASS

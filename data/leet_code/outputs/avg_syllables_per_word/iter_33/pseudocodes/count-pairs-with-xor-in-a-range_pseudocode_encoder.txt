@@ -1,0 +1,56 @@
+CLASS TrieNode  
+    FUNCTION __init__()  
+        SET children TO an empty mapping from bits to TrieNode  
+        SET count TO zero  
+    END FUNCTION  
+END CLASS  
+
+CLASS Trie  
+    FUNCTION __init__(bit_length)  
+        ASSIGN reference TO a new TrieNode and SET root TO this reference  
+        SET bit_length TO the value of bit_length parameter  
+    END FUNCTION  
+
+    FUNCTION insert(num)  
+        SET node TO root  
+        FOR integer i FROM bit_length DOWN TO zero  
+            SET bit TO the result of obtaining the bit at position i from num by shifting num right by i positions AND extracting value one  
+            IF bit NOT IN the keys of node's children mapping THEN  
+                ASSIGN reference TO a new TrieNode and ASSIGN it to node's children at key bit  
+            END IF  
+            SET node TO the element at key bit in node's children mapping  
+            INCREMENT node's count BY one  
+        END FOR  
+    END FUNCTION  
+
+    FUNCTION count_less_than(num, threshold)  
+        SET count TO zero  
+        SET node TO root  
+        FOR integer i FROM bit_length DOWN TO zero  
+            IF node IS NOT a valid reference THEN  
+                BREAK the loop  
+            END IF  
+            SET bit TO the result of obtaining the bit at position i from num by shifting num right by i positions AND extracting value one  
+            SET threshold_bit TO the result of obtaining the bit at position i from threshold by shifting threshold right by i positions AND extracting value one  
+            IF threshold_bit EQUALS one THEN  
+                INCREMENT count BY count of the element at key bit in node's children mapping IF such exists OTHERWISE zero  
+                SET node TO the element at key opposite bit of bit in node's children mapping  
+            ELSE  
+                SET node TO the element at key bit in node's children mapping  
+            END IF  
+        END FOR  
+        RETURN count  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION countPairs(nums, low, high)  
+        ASSIGN reference TO a new Trie and SET trie TO this reference  
+        SET nice_pairs TO zero  
+        FOR each num IN nums  
+            INCREMENT nice_pairs BY the result of trie.count_less_than with num and high PLUS one MINUS the result of trie.count_less_than with num and low  
+            CALL trie.insert with num  
+        END FOR  
+        RETURN nice_pairs  
+    END FUNCTION  
+END CLASS

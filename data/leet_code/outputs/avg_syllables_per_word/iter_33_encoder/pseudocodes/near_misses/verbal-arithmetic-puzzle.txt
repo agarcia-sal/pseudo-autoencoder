@@ -1,0 +1,91 @@
+CLASS Solution  
+    FUNCTION isSolvable(words, result)  
+        SET unique_chars TO the SET OF all characters IN concatenation OF all elements IN words PLUS all characters IN result  
+        IF the SIZE OF unique_chars GREATER THAN ten  
+            RETURN False  
+        END IF  
+        
+        SET non_zero_chars TO the SET OF element at position zero OF each word IN words WHERE the LENGTH OF word GREATER THAN one  
+        IF the LENGTH OF result GREATER THAN one  
+            ADD element at position zero OF result TO non_zero_chars  
+        END IF  
+        
+        SET char_to_digit TO an empty MAPPING  
+        SET digit_to_char TO an empty MAPPING  
+        
+        FUNCTION can_assign(char, digit)  
+            RETURN char NOT IN char_to_digit AND (digit NOT IN digit_to_char OR element at key digit OF digit_to_char EQUALS char)  
+        END FUNCTION  
+        
+        FUNCTION assign(char, digit)  
+            SET element at key char OF char_to_digit TO digit  
+            SET element at key digit OF digit_to_char TO char  
+        END FUNCTION  
+        
+        FUNCTION unassign(char, digit)  
+            REMOVE element at key char FROM char_to_digit  
+            REMOVE element at key digit FROM digit_to_char  
+        END FUNCTION  
+        
+        FUNCTION word_value(word)  
+            SET total_value TO zero  
+            FOR each index i AND character char IN the REVERSE ORDER of characters IN word  
+                INCREMENT total_value BY element at key char OF char_to_digit MULTIPLIED BY ten RAISED TO the power of i  
+            END FOR  
+            RETURN total_value  
+        END FUNCTION  
+        
+        FUNCTION backtrack(index, col, sum_col)  
+            SET max_word_length TO the MAXIMUM LENGTH OF each word IN words  
+            IF col GREATER THAN OR EQUAL TO max_word_length AND col GREATER THAN OR EQUAL TO the LENGTH OF result  
+                RETURN sum_col EQUALS zero  
+            END IF  
+            
+            IF index EQUALS the LENGTH OF words  
+                IF col LESS THAN the LENGTH OF result  
+                    SET digit_char TO element at position LENGTH OF result MINUS one MINUS col OF result  
+                    IF digit_char IN char_to_digit  
+                        IF element at key digit_char OF char_to_digit EQUALS sum_col MODULO ten  
+                            RETURN backtrack zero col PLUS one sum_col DIVIDED BY ten  
+                        ELSE  
+                            RETURN False  
+                        END IF  
+                    ELSE IF can_assign digit_char sum_col MODULO ten AND (sum_col MODULO ten NOT EQUALS zero OR digit_char NOT IN non_zero_chars)  
+                        assign digit_char sum_col MODULO ten  
+                        IF backtrack zero col PLUS one sum_col DIVIDED BY ten  
+                            RETURN True  
+                        END IF  
+                        unassign digit_char sum_col MODULO ten  
+                    END IF  
+                ELSE  
+                    RETURN sum_col EQUALS zero  
+                END IF  
+                RETURN False  
+            END IF  
+            
+            SET current_word TO element at position index OF words  
+            IF col GREATER THAN OR EQUAL TO the LENGTH OF current_word  
+                RETURN backtrack index PLUS one col sum_col  
+            END IF  
+            
+            SET current_char TO element at position LENGTH OF current_word MINUS one MINUS col OF current_word  
+            IF current_char IN char_to_digit  
+                RETURN backtrack index PLUS one col sum_col PLUS element at key current_char OF char_to_digit  
+            END IF  
+            
+            FOR digit FROM zero TO nine  
+                IF can_assign current_char digit AND (digit NOT EQUALS zero OR current_char NOT IN non_zero_chars)  
+                    assign current_char digit  
+                    IF backtrack index PLUS one col sum_col PLUS digit  
+                        RETURN True  
+                    END IF  
+                    unassign current_char digit  
+                END IF  
+            END FOR  
+            
+            RETURN False  
+        END FUNCTION  
+        
+        RETURN backtrack zero zero zero  
+    END FUNCTION  
+END CLASS

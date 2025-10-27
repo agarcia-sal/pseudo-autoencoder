@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION closestNode(n, edges, query)  
+        SET graph TO a new mapping with default empty list for each key  
+        FOR each element u and element v IN edges  
+            APPEND element v TO the list at key u in graph  
+            APPEND element u TO the list at key v in graph  
+        END FOR  
+      
+        FUNCTION find_path(start, end)  
+            SET queue TO a new double-ended queue containing a tuple consisting of start and a list containing start  
+            SET visited TO a new set containing start  
+          
+            WHILE the queue is not empty  
+                REMOVE and ASSIGN the first element of queue TO node and path respectively  
+                IF node EQUALS end  
+                    RETURN path  
+                END IF  
+                FOR each neighbor IN the list at key node in graph  
+                    IF neighbor NOT IN visited  
+                        ADD neighbor TO visited  
+                        APPEND a tuple consisting of neighbor and a new list formed by concatenating path and neighbor TO queue  
+                    END IF  
+                END FOR  
+            END WHILE  
+        END FUNCTION  
+      
+        FUNCTION closest_node_on_path(path, node)  
+            SET min_distance TO positive infinity  
+            SET closest_node TO no value  
+            FOR each element p IN path  
+                SET distance TO the length of the result of find_path called with p and node MINUS one  
+                IF distance LESS THAN min_distance  
+                    SET min_distance TO distance  
+                    SET closest_node TO p  
+                END IF  
+            END FOR  
+            RETURN closest_node  
+        END FUNCTION  
+      
+        SET answer TO an empty list  
+        FOR each element start and element end and element node IN query  
+            SET path TO the result of find_path called with start and end  
+            APPEND the result of closest_node_on_path called with path and node TO answer  
+        END FOR  
+      
+        RETURN answer  
+    END FUNCTION  
+END CLASS

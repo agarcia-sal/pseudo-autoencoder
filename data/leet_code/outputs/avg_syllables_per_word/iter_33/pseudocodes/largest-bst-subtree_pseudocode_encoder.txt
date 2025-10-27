@@ -1,0 +1,60 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values EQUALS none OR the LENGTH OF values EQUALS zero  
+        RETURN none  
+    END IF  
+    SET root TO A NEW TreeNode WITH the element at position one of values  
+    SET i TO one  
+    SET queue TO A NEW deque COLLECTION  
+    APPEND root TO queue  
+    WHILE the LENGTH OF queue IS GREATER THAN zero  
+        SET node TO the element REMOVED FROM the FRONT OF queue  
+        IF i LESS THAN the LENGTH OF values AND the element at position i of values IS NOT none  
+            SET node.left TO A NEW TreeNode WITH the element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN the LENGTH OF values AND the element at position i of values IS NOT none  
+            SET node.right TO A NEW TreeNode WITH the element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p EQUALS none AND q EQUALS none  
+        RETURN true  
+    ELSE IF p EQUALS none OR q EQUALS none  
+        RETURN false  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN false  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION largestBSTSubtree(self, root)  
+        FUNCTION dfs(node)  
+            IF node EQUALS none  
+                RETURN positive infinity, negative infinity, zero  
+            END IF  
+            SET left_min, left_max, left_size TO dfs(node.left)  
+            SET right_min, right_max, right_size TO dfs(node.right)  
+            IF left_max LESS THAN node.val AND node.val LESS THAN right_min  
+                RETURN the smaller VALUE BETWEEN node.val AND left_min, the greater VALUE BETWEEN node.val AND right_max, left_size PLUS right_size PLUS one  
+            END IF  
+            RETURN negative infinity, positive infinity, THE GREATER VALUE BETWEEN left_size AND right_size  
+        END FUNCTION  
+        RETURN the element at position three of dfs(root)  
+    END FUNCTION  
+END CLASS

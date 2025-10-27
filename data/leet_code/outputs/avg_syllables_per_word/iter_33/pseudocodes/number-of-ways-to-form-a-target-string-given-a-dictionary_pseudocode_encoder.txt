@@ -1,0 +1,39 @@
+CLASS Solution  
+    FUNCTION numWays(words WITH TYPE List of strings, target WITH TYPE string) RETURNS integer  
+        SET MODULO_VALUE TO ten raised to the power of nine PLUS one  
+        SET number_of_positions TO the LENGTH OF the element at position zero of words  
+        SET target_length TO the LENGTH OF target  
+        
+        SET frequency_list TO a new list of size number_of_positions  
+        FOR index FROM zero TO number_of_positions MINUS one  
+            SET the element at position index of frequency_list TO an empty frequency dictionary mapping characters to integers  
+        END FOR  
+        
+        FOR each word IN words  
+            FOR character_index FROM zero TO the LENGTH OF word MINUS one  
+                SET character TO the element at position character_index of word  
+                INCREMENT the value at key character in the dictionary at position character_index of frequency_list BY one  
+            END FOR  
+        END FOR  
+        
+        SET dp_table TO a new two dimensional list with dimensions target_length PLUS one by number_of_positions PLUS one filled with zeros  
+        
+        FOR column_index FROM zero TO number_of_positions  
+            SET the element at row zero and column column_index of dp_table TO one  
+        END FOR  
+        
+        FOR target_index FROM one TO target_length  
+            FOR position_index FROM one TO number_of_positions  
+                SET the element at row target_index and column position_index of dp_table TO the element at row target_index and column position_index MINUS one of dp_table  
+                
+                SET current_target_character TO the element at position target_index MINUS one of target  
+                IF the value at key current_target_character in the dictionary at position position_index MINUS one of frequency_list GREATER THAN zero  
+                    INCREMENT the element at row target_index and column position_index of dp_table BY the element at row target_index MINUS one and column position_index MINUS one of dp_table MULTIPLIED BY the value at key current_target_character in the dictionary at position position_index MINUS one of frequency_list  
+                    SET the element at row target_index and column position_index of dp_table TO the element at row target_index and column position_index of dp_table MODULO MODULO_VALUE  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        RETURN the element at row target_length and column number_of_positions of dp_table  
+    END FUNCTION  
+END CLASS
