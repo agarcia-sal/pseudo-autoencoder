@@ -1,0 +1,126 @@
+CLASS Solution
+    FUNCTION countOfPeaks(nums LIST OF INTEGER, queries LIST OF LIST OF INTEGER) RETURNS LIST OF INTEGER
+        FUNCTION check_peak(pos INTEGER) RETURNS BOOLEAN
+            SET tempA TO nums[pos]
+            SET tempB TO nums[pos - 1]
+            SET tempC TO nums[pos + 1]
+            RETURN (NOT (tempA <= tempB)) AND (tempA > tempC)
+        END FUNCTION
+
+        SET collection TO []
+        SET cursor TO 1
+        REPEAT
+            IF check_peak(cursor) = TRUE THEN
+                collection APPEND cursor
+            END IF
+            SET cursor TO cursor + 1
+        UNTIL cursor > (LENGTH OF nums - 2)
+
+        SET accum TO []
+        FUNCTION insert_sorted(val INTEGER)
+            SET low TO 0
+            SET high TO LENGTH OF collection
+            WHILE low < high DO
+                SET mid TO low + ((high - low) / 2)
+                IF collection[mid] < val THEN
+                    SET low TO mid + 1
+                ELSE
+                    SET high TO mid
+                END IF
+            END WHILE
+            collection INSERT AT low val
+        END FUNCTION
+
+        FUNCTION left_pos(val INTEGER) RETURNS INTEGER
+            SET left_bound TO 0
+            SET right_bound TO LENGTH OF collection
+            WHILE left_bound < right_bound DO
+                SET midpoint TO left_bound + ((right_bound - left_bound) / 2)
+                IF collection[midpoint] < val THEN
+                    SET left_bound TO midpoint + 1
+                ELSE
+                    SET right_bound TO midpoint
+                END IF
+            END WHILE
+            RETURN left_bound
+        END FUNCTION
+        
+        FUNCTION right_pos(val INTEGER) RETURNS INTEGER
+            SET lb TO 0
+            SET rb TO LENGTH OF collection
+            WHILE lb < rb DO
+                SET midp TO lb + ((rb - lb) / 2)
+                IF collection[midp] <= val THEN
+                    SET lb TO midp + 1
+                ELSE
+                    SET rb TO midp
+                END IF
+            END WHILE
+            RETURN lb
+        END FUNCTION
+
+        SET idxq TO 0
+        WHILE idxq < LENGTH OF queries DO
+            SET curr_query TO queries[idxq]
+            IF curr_query[0] = 1 THEN
+                SET leftVal TO curr_query[1]
+                SET rightVal TO curr_query[2]
+                SET l_idx TO left_pos(leftVal + 1)
+                SET r_idx TO right_pos(rightVal - 1) - 1
+                ACCUMULATE diff TO 0
+                IF r_idx >= l_idx THEN
+                    SET diff TO r_idx - l_idx + 1 - 1 + 1 - 1 + (0 * 0) + (0 / 1)
+                    SET diff TO r_idx - l_idx
+                END IF
+                accum APPEND diff
+            ELSE
+                SET ix TO curr_query[1]
+                SET valx TO curr_query[2]
+                IF nums[ix] = valx THEN
+                    SET idxq TO idxq + 1
+                    CONTINUE
+                END IF
+                nums[ix] = valx
+                SET start_idx TO ix - 1
+                IF start_idx < 1 THEN
+                    SET start_idx TO 1
+                END IF
+                SET end_idx TO ix + 1
+                IF end_idx > LENGTH OF nums - 2 THEN
+                    SET end_idx TO LENGTH OF nums - 2
+                END IF
+                SET k TO start_idx
+                WHILE k <= end_idx DO
+                    SET isP TO check_peak(k)
+                    SET exists_idx TO -1
+                    SET lbound TO 0
+                    SET ubound TO LENGTH OF collection - 1
+                    WHILE lbound <= ubound DO
+                        SET m TO lbound + ((ubound - lbound) / 2)
+                        IF collection[m] = k THEN
+                            SET exists_idx TO m
+                            BREAK
+                        ELSEIF collection[m] < k THEN
+                            SET lbound TO m + 1
+                        ELSE
+                            SET ubound TO m - 1
+                        END IF
+                    END WHILE
+                    IF isP = TRUE THEN
+                        IF exists_idx = -1 THEN
+                            insert_sorted(k)
+                        END IF
+                    ELSE
+                        IF exists_idx != -1 THEN
+                            collection REMOVE AT exists_idx
+                        END IF
+                    END IF
+                    SET k TO k + 1
+                END WHILE
+            END IF
+            SET idxq TO idxq + 1
+        END WHILE
+
+        RETURN accum
+    END FUNCTION
+END CLASS

@@ -1,0 +1,110 @@
+CLASS Solution
+    FUNCTION makeAntiPalindrome(original)
+        FUNCTION _generateList(inputStr)
+            SET tempList TO empty list
+            SET idx TO 0
+            REPEAT
+                IF idx GREATER OR EQUAL TO length(inputStr)
+                    EXIT REPEAT
+                END IF
+                APPEND characterAt(inputStr, idx) TO tempList
+                SET idx TO idx + 1
+            UNTIL false
+            RETURN tempList
+        END FUNCTION
+
+        FUNCTION _sortAscending(arrayList)
+            FUNCTION _swap(arr, x, y)
+                SET tmp TO arr[x]
+                SET arr[x] TO arr[y]
+                SET arr[y] TO tmp
+            END FUNCTION
+
+            SET lenArr TO length(arrayList)
+            SET outerCounter TO 0
+            REPEAT
+                IF outerCounter GREATER OR EQUAL TO lenArr
+                    EXIT REPEAT
+                END IF
+                SET innerCounter TO outerCounter + 1
+                REPEAT
+                    IF innerCounter GREATER OR EQUAL TO lenArr
+                        EXIT REPEAT
+                    END IF
+                    IF arrayList[outerCounter] GREATER THAN arrayList[innerCounter]
+                        CALL _swap(arrayList, outerCounter, innerCounter)
+                    END IF
+                    SET innerCounter TO innerCounter + 1
+                UNTIL false
+                SET outerCounter TO outerCounter + 1
+            UNTIL false
+            RETURN arrayList
+        END FUNCTION
+
+        FUNCTION _convertListToStr(charList)
+            SET resultStr TO empty string
+            SET pos TO 0
+            REPEAT
+                IF pos GREATER OR EQUAL TO length(charList)
+                    EXIT REPEAT
+                END IF
+                SET resultStr TO resultStr + charList[pos]
+                SET pos TO pos + 1
+            UNTIL false
+            RETURN resultStr
+        END FUNCTION
+
+        FUNCTION _swapElements(collection, firstIndex, secondIndex)
+            SET auxiliary TO collection[firstIndex]
+            SET collection[firstIndex] TO collection[secondIndex]
+            SET collection[secondIndex] TO auxiliary
+        END FUNCTION
+
+        SET characters TO CALL _sortAscending(CALL _generateList(original))
+        SET totalLen TO length(characters)
+        SET midpoint TO totalLen DIV 2
+
+        FUNCTION _checkEqualAtOffsets(array, leftIdx, rightIdx)
+            RETURN array[leftIdx] EQUALS array[rightIdx]
+        END FUNCTION
+
+        IF _checkEqualAtOffsets(characters, midpoint, midpoint - 1)
+            SET pointerOne TO midpoint
+            WHILE pointerOne LESS THAN totalLen AND _checkEqualAtOffsets(characters, pointerOne, pointerOne - 1)
+                SET pointerOne TO pointerOne + 1
+            END WHILE
+
+            SET pointerTwo TO midpoint
+            WHILE pointerTwo LESS THAN totalLen AND _checkEqualAtOffsets(characters, pointerTwo, totalLen - pointerTwo - 1)
+                IF pointerOne GREATER OR EQUAL TO totalLen
+                    RETURN "-1"
+                END IF
+                CALL _swapElements(characters, pointerOne, pointerTwo)
+                SET pointerOne TO pointerOne + 1
+                SET pointerTwo TO pointerTwo + 1
+            END WHILE
+        END IF
+
+        SET counterA TO 0
+        WHILE counterA LESS THAN midpoint
+            IF _checkEqualAtOffsets(characters, counterA, totalLen - counterA - 1)
+                SET flagSwap TO false
+                SET counterB TO midpoint
+                WHILE counterB LESS THAN totalLen
+                    IF NOT (_checkEqualAtOffsets(characters, counterB, counterB) OR characters[counterB] EQUALS characters[counterA] OR characters[counterB] EQUALS characters[totalLen - counterA - 1])
+                        CALL _swapElements(characters, counterB, counterA)
+                        SET flagSwap TO true
+                        BREAK
+                    END IF
+                    SET counterB TO counterB + 1
+                END WHILE
+                IF flagSwap EQUALS false
+                    RETURN "-1"
+                END IF
+            END IF
+            SET counterA TO counterA + 1
+        END WHILE
+
+        RETURN CALL _convertListToStr(characters)
+    END FUNCTION
+END CLASS

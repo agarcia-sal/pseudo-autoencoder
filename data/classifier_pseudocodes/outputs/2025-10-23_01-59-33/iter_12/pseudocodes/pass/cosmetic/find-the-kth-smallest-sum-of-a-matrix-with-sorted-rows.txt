@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION kthSmallest(mat AS List OF List OF Integer k AS Integer) RETURNS Integer  
+        LET rowCount BE LENGTH OF mat  
+        LET colCount BE LENGTH OF FIRST ELEMENT IN mat  
+        LET baseSum BE 0  
+        LET accumulator BE 0  
+        WHILE accumulator < rowCount  
+            baseSum ← baseSum + mat[accumulator][0]  
+            accumulator ← accumulator + 1  
+        END WHILE  
+        
+        LET startIndices BE A TUPLE WITH rowCount COPIES OF 0  
+        LET heapList BE A LIST CONTAINING (baseSum, startIndices)  
+        LET seenIndices BE A SET CONTAINING startIndices  
+        
+        LOOP UNTIL k IS 0  
+            EXTRACT (currentSum, currentIndices) FROM heapList BY REMOVING SMALLEST ELEMENT  
+            k ← k - 1  
+            
+            IF k = 0 THEN RETURN currentSum END IF  
+            
+            LET position BE 0  
+            WHILE position < rowCount DO  
+                LET currentIndexValue BE currentIndices[position]  
+                IF currentIndexValue + 1 < colCount THEN  
+                    LET tempIndices BE CONVERT_TO_LIST(currentIndices)  
+                    LET tempIndexValue BE tempIndices[position] + 1  
+                    tempIndices[position] ← tempIndexValue  
+                    LET nextIndices BE CONVERT_TO_TUPLE(tempIndices)  
+                    
+                    LET replacedSumPart BE mat[position][currentIndexValue]  
+                    LET newSumPart BE mat[position][tempIndexValue]  
+                    LET updatedSum BE currentSum - replacedSumPart + newSumPart  
+                    
+                    IF nextIndices NOT IN seenIndices THEN  
+                        ADD nextIndices TO seenIndices  
+                        ADD (updatedSum, nextIndices) TO heapList  
+                    END IF  
+                END IF  
+                position ← position + 1  
+            END WHILE  
+        END LOOP  
+        
+        RETURN -1  
+    END FUNCTION  
+END CLASS

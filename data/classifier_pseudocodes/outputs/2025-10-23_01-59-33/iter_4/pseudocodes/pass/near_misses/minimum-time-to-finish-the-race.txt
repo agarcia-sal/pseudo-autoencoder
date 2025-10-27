@@ -1,0 +1,65 @@
+CLASS Solution
+    FUNCTION minimumFinishTime(tires, changeTime, numLaps)
+        INITIALIZE aggregate_min WITH a queue CONTAINING positive_infinity REPEATED 15 times
+        
+        FUNCTION explore_laps(tire_idx)
+            IF tire_idx >= LENGTH(tires)
+                RETURN
+            END IF
+
+            LET base_time, factor BE tires[tire_idx]
+            LET acc_time BE 0
+
+            FUNCTION lap_recursion(step)
+                IF step > 14
+                    RETURN
+                END IF
+                
+                LET lap_duration BE base_time * (factor ^ step)
+                IF lap_duration > changeTime + base_time
+                    RETURN
+                END IF
+                
+                acc_time = acc_time + lap_duration
+                IF acc_time < aggregate_min[step]
+                    aggregate_min[step] = acc_time
+                END IF
+                
+                lap_recursion(step + 1)
+            END FUNCTION
+
+            lap_recursion(0)
+            explore_laps(tire_idx + 1)
+        END FUNCTION
+
+        CALL explore_laps(0)
+
+        INITIALIZE dp_array WITH a list of length (numLaps + 1) FILLED WITH positive_infinity
+        dp_array[0] = 0
+
+        FUNCTION fill_dp(current_lap)
+            IF current_lap > numLaps
+                RETURN
+            END IF
+            
+            FUNCTION try_segments(segment)
+                IF segment > MIN(current_lap - 1, 14)
+                    fill_dp(current_lap + 1)
+                    RETURN
+                END IF
+                
+                LET trial_time BE dp_array[current_lap - segment - 1] + aggregate_min[segment] + changeTime
+                IF trial_time < dp_array[current_lap]
+                    dp_array[current_lap] = trial_time
+                END IF
+                
+                try_segments(segment + 1)
+            END FUNCTION
+            
+            try_segments(0)
+        END FUNCTION
+        
+        fill_dp(1)
+        RETURN dp_array[numLaps] - changeTime
+    END FUNCTION
+END CLASS

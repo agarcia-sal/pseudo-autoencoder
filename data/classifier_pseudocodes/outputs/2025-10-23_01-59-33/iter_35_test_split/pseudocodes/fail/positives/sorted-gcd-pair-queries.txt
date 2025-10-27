@@ -1,0 +1,61 @@
+CLASS Solution  
+    FUNCTION gcdValues(nums, queries)  
+        SET highest TO 0  
+        FOR idx FROM 1 TO LENGTH(nums)  
+            IF nums[idx] > highest THEN  
+                SET highest TO nums[idx]  
+            END IF  
+        END FOR  
+  
+        SET accumulator TO EMPTY MAP  
+        FOR pos FROM 1 TO LENGTH(nums)  
+            IF accumulator HAS KEY nums[pos] THEN  
+                SET accumulator[nums[pos]] TO accumulator[nums[pos]] + 1  
+            ELSE  
+                SET accumulator[nums[pos]] TO 1  
+            END IF  
+        END FOR  
+  
+        SET distribution TO NEW LIST OF ZEROS OF SIZE highest + 1  
+  
+        SET k TO highest  
+        WHILE k >= 1 DO  
+            SET tempVar TO 0  
+            SET m TO k  
+            WHILE m <= highest DO  
+                IF accumulator HAS KEY m THEN  
+                    SET tempVar TO tempVar + accumulator[m]  
+                END IF  
+                SET distribution[k] TO distribution[k] - distribution[m]  
+                SET m TO m + k  
+            END WHILE  
+            SET distribution[k] TO distribution[k] + tempVar * (tempVar - 1) / 2  
+            SET k TO k - 1  
+        END WHILE  
+  
+        SET prefixSum TO NEW LIST OF ZEROS OF SIZE highest + 1  
+        SET prefixSum[0] TO distribution[0]  
+        SET index TO 1  
+        WHILE index <= highest DO  
+            SET prefixSum[index] TO prefixSum[index - 1] + distribution[index]  
+            SET index TO index + 1  
+        END WHILE  
+  
+        SET output TO EMPTY LIST  
+        FOR elt IN queries DO  
+            SET low TO 0  
+            SET high TO LENGTH(prefixSum)  
+            WHILE low < high DO  
+                SET middle TO (low + high) / 2  
+                IF prefixSum[middle] <= elt THEN  
+                    SET low TO middle + 1  
+                ELSE  
+                    SET high TO middle  
+                END IF  
+            END WHILE  
+            APPEND low TO output  
+        END FOR  
+  
+        RETURN output  
+    END FUNCTION  
+END CLASS

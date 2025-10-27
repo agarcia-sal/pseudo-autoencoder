@@ -1,0 +1,60 @@
+CLASS Solution
+    FUNCTION maxProduct(words)
+        SET sets_collection TO empty list
+        SET index_outer TO 0
+        WHILE index_outer LESS THAN LENGTH(words)
+            SET current_word TO words[index_outer]
+            SET char_set TO empty set
+            SET pos_char TO 0
+            WHILE pos_char LESS THAN LENGTH(current_word)
+                ADD current_word[pos_char] TO char_set
+                SET pos_char TO pos_char PLUS 1
+            END WHILE
+            APPEND char_set TO sets_collection
+            SET index_outer TO index_outer PLUS 1
+        END WHILE
+
+        SET max_area TO 0
+
+        FUNCTION check_pairs(i, j)
+            IF i GREATER OR EQUAL LENGTH(words)
+                RETURN
+            END IF
+            IF j GREATER OR EQUAL LENGTH(words)
+                CALL check_pairs(i PLUS 1, i PLUS 2)
+                RETURN
+            END IF
+
+            SET set_i TO sets_collection[i]
+            SET set_j TO sets_collection[j]
+
+            SET intersect_found TO FALSE
+            SET iter_i TO 0
+            SET elements_i TO LIST(set_i)
+            WHILE iter_i LESS THAN LENGTH(elements_i) AND NOT intersect_found
+                SET iter_j TO 0
+                SET elements_j TO LIST(set_j)
+                WHILE iter_j LESS THAN LENGTH(elements_j) AND NOT intersect_found
+                    IF elements_i[iter_i] EQUALS elements_j[iter_j]
+                        SET intersect_found TO TRUE
+                    END IF
+                    SET iter_j TO iter_j PLUS 1
+                END WHILE
+                SET iter_i TO iter_i PLUS 1
+            END WHILE
+
+            IF intersect_found EQUALS FALSE
+                SET length_product TO LENGTH(words[i]) MULTIPLIED BY LENGTH(words[j])
+                IF length_product GREATER THAN max_area
+                    SET max_area TO length_product
+                END IF
+            END IF
+
+            CALL check_pairs(i, j PLUS 1)
+        END FUNCTION
+
+        CALL check_pairs(0, 1)
+
+        RETURN max_area
+    END FUNCTION
+END CLASS

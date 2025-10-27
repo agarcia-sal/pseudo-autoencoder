@@ -1,0 +1,82 @@
+CLASS Solution
+	TYPE Pair IS ARRAY OF CHAR[2]
+
+	FUNCTION largestVariance(s)
+		VAR max_var ← 0
+		VAR unique_arr ← []
+		VAR char_map ← {}
+
+		FOR i FROM 0 TO LENGTH(s) - 1
+			IF NOT char_map CONTAINS_KEY s[i]
+				char_map[s[i]] ← true
+				APPEND s[i] TO unique_arr
+			END IF
+		END FOR
+
+		VAR pairs ← []
+		FUNCTION generate_pairs(idx1, idx2)
+			IF idx1 = LENGTH(unique_arr)
+				RETURN
+			ELSE IF idx2 = LENGTH(unique_arr)
+				CALL generate_pairs(idx1 + 1, idx1 + 2)
+			ELSE
+				IF unique_arr[idx1] ≠ unique_arr[idx2]
+					APPEND [unique_arr[idx1], unique_arr[idx2]] TO pairs
+				END IF
+				CALL generate_pairs(idx1, idx2 + 1)
+			END IF
+		END FUNCTION
+
+		CALL generate_pairs(0,1)
+
+		FOR p_idx FROM 0 TO LENGTH(pairs) - 1
+			VAR chars ← pairs[p_idx]
+			VAR current_var ← calculate_variance(s, chars[0], chars[1])
+			IF current_var > max_var
+				max_var ← current_var
+			END IF
+		END FOR
+
+		RETURN max_var
+	END FUNCTION
+
+	FUNCTION calculate_variance(substring, char_a, char_b)
+		VAR max_val ← 0
+		VAR countA ← 0
+		VAR countB ← 0
+		VAR hasB ← false
+		VAR firstBOccurred ← false
+
+		VAR idx ← 0
+		WHILE idx < LENGTH(substring)
+			VAR curr_char ← substring[idx]
+
+			IF curr_char = char_a
+				countA ← countA + 1
+			ELSE IF curr_char = char_b
+				countB ← countB + 1
+				hasB ← true
+			END IF
+
+			IF countB > 0
+				IF max_val < countA - countB
+					max_val ← countA - countB
+				END IF
+			ELSE IF countB = 0 AND firstBOccurred = true
+				IF max_val < countA - 1
+					max_val ← countA - 1
+				END IF
+			END IF
+
+			IF countB > countA
+				countA ← 0
+				countB ← 0
+				firstBOccurred ← hasB
+			END IF
+
+			idx ← idx + 1
+		END WHILE
+
+		RETURN max_val
+	END FUNCTION
+END CLASS

@@ -1,0 +1,63 @@
+```pseudocode
+CLASS Solution
+    FUNCTION minLargest(nums1 nums1 AS list OF integers nums2 nums2 AS list OF integers) RETURNS integer
+        FUNCTION nxt(a alpha AS integer b beta AS integer) RETURNS integer
+            IF ((a BITWISE_AND (1 XOR beta)) EQUALS 1) THEN
+                RETURN (a PLUS 1)
+            ELSE
+                RETURN (a PLUS (1 PLUS 1))
+            END IF
+        END FUNCTION
+
+        SET p TO LENGTH OF nums1
+        SET q TO LENGTH OF nums2
+        SET table TO list OF list OF integer with (p PLUS 1) rows and (q PLUS 1) columns; FILL all WITH 0
+
+        FUNCTION fillRow(r currentRow AS integer)
+            IF r GREATER_THAN p THEN
+                RETURN
+            END IF
+            SET val TO nums1 AT r
+            SET temp TO nxt(table AT (r MINUS 1) 0, val)
+            SET table AT r 0 TO temp
+            CALL fillRow(r PLUS 1)
+        END FUNCTION
+
+        FUNCTION fillCol(c currentCol AS integer)
+            IF c GREATER_THAN q THEN
+                RETURN
+            END IF
+            SET val TO nums2 AT c
+            SET temp TO nxt(table AT 0 (c MINUS 1), val)
+            SET table AT 0 c TO temp
+            CALL fillCol(c PLUS 1)
+        END FUNCTION
+
+        FUNCTION fillCells(i rowIndex AS integer j colIndex AS integer)
+            IF i GREATER_THAN p THEN
+                RETURN
+            END IF
+            IF j GREATER_THAN q THEN
+                CALL fillCells(i PLUS 1, 1)
+                RETURN
+            END IF
+            SET a_val TO nums1 AT i
+            SET b_val TO nums2 AT j
+            SET v1 TO nxt(table AT (i MINUS 1) j, a_val)
+            SET v2 TO nxt(table AT i (j MINUS 1), b_val)
+            IF v1 LESS_THAN v2 THEN
+                SET table AT i j TO v1
+            ELSE
+                SET table AT i j TO v2
+            END IF
+            CALL fillCells(i, j PLUS 1)
+        END FUNCTION
+
+        CALL fillRow(1)
+        CALL fillCol(1)
+        CALL fillCells(1, 1)
+
+        RETURN table AT p q
+    END FUNCTION
+END CLASS
+```

@@ -1,0 +1,57 @@
+CLASS Solution
+    FUNCTION minimumSubarrayLength(nums LIST OF integers k integer) RETURNS integer
+        FUNCTION update_count(count LIST OF integers num integer add integer)
+            SET bit_mask TO integer 1
+            SET idx TO integer 0
+            WHILE idx LESS THAN integer 32
+                IF (num BITWISE_AND bit_mask) NOT_EQUALS integer 0 THEN
+                    SET temp_val TO count at idx
+                    SET count at idx TO temp_val PLUS add
+                END IF
+                SET bit_mask TO bit_mask MULTIPLY integer 2
+                SET idx TO idx PLUS integer 1
+            END WHILE
+        END FUNCTION
+
+        FUNCTION compute_current_or(count LIST OF integers) RETURNS integer
+            SET res TO integer 0
+            SET pos TO integer 0
+            WHILE pos LESS_THAN integer 32
+                IF count at pos GREATER_THAN integer 0 THEN
+                    SET res TO res BITWISE_OR (integer 1 LEFT_SHIFT pos)
+                END IF
+                SET pos TO pos PLUS integer 1
+            END WHILE
+            RETURN res
+        END FUNCTION
+
+        SET size TO LENGTH_OF nums
+        SET tally TO LIST OF integer 32 ELEMENTS EACH integer 0
+        SET overall_or TO integer 0
+        SET start_idx TO integer 0
+        SET best_len TO positive_infinity
+
+        SET curr_idx TO integer 0
+        WHILE curr_idx LESS_THAN size
+            CALL update_count WITH tally nums at curr_idx integer 1
+            SET overall_or TO overall_or BITWISE_OR nums at curr_idx
+
+            WHILE overall_or GREATER_THAN_OR_EQUAL k AND start_idx LESS_OR_EQUAL curr_idx
+                IF best_len GREATER_THAN (curr_idx MINUS start_idx PLUS integer 1) THEN
+                    SET best_len TO (curr_idx MINUS start_idx PLUS integer 1)
+                END IF
+                CALL update_count WITH tally nums at start_idx MINUS integer 1
+                SET overall_or TO CALL compute_current_or WITH tally
+                SET start_idx TO start_idx PLUS integer 1
+            END WHILE
+
+            SET curr_idx TO curr_idx PLUS integer 1
+        END WHILE
+
+        IF best_len EQUALS positive_infinity THEN
+            RETURN integer -1
+        ELSE
+            RETURN best_len
+        END IF
+    END FUNCTION
+END CLASS

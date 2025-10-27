@@ -1,0 +1,49 @@
+CLASS Solution
+    FUNCTION shoppingOffers(price_list, special_offers, needs_list)
+        SET filtered_special_offers TO empty list
+        FOR each offer IN special_offers
+            SET sum_of_offer_items TO zero
+            FOR each element EXCEPT last IN offer
+                INCREMENT sum_of_offer_items BY element
+            END FOR
+            SET sum_of_price_times_needs TO zero
+            FOR each pair of price_element AND corresponding offer_element IN price_list AND all elements EXCEPT last IN offer
+                INCREMENT sum_of_price_times_needs BY price_element MULTIPLIED BY offer_element
+            END FOR
+            IF sum_of_offer_items GREATER THAN zero AND last element of offer LESS THAN sum_of_price_times_needs
+                APPEND offer TO filtered_special_offers
+            END IF
+        END FOR
+        SET special_OFFERS TO filtered_special_offers
+
+        FUNCTION dfs(needs_tuple)
+            SET min_cost TO zero
+            FOR each pair of price_element AND need_element IN price_list AND needs_tuple
+                INCREMENT min_cost BY price_element MULTIPLIED BY need_element
+            END FOR
+
+            FOR each offer IN special_OFFERS
+                SET new_needs_list TO empty list
+                FOR each pair of need_element AND corresponding offer_element IN needs_tuple AND all elements EXCEPT last IN offer
+                    SET difference TO need_element MINUS offer_element
+                    APPEND difference TO new_needs_list
+                END FOR
+                SET can_use_offer TO true
+                FOR each need IN new_needs_list
+                    IF need LESS THAN zero
+                        SET can_use_offer TO false
+                    END IF
+                END FOR
+                IF can_use_offer IS true
+                    SET cost_with_offer TO last element of offer PLUS CALL dfs WITH Tuple converted FROM new_needs_list
+                    IF cost_with_offer LESS THAN min_cost
+                        SET min_cost TO cost_with_offer
+                    END IF
+                END IF
+            END FOR
+            RETURN min_cost
+        END FUNCTION
+
+        RETURN CALL dfs WITH Tuple converted FROM needs_list
+    END FUNCTION
+END CLASS

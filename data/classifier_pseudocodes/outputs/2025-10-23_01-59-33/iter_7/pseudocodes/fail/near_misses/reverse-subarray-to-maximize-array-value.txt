@@ -1,0 +1,47 @@
+CLASS Solution  
+    FUNCTION maxValueAfterReverse(nums)  
+        LET length = LENGTH OF nums  
+        IF length EQUALS 2 THEN  
+            RETURN ABS(nums[0] - nums[1])  
+        END IF  
+        
+        LET total_diff = 0  
+        LET index = 1  
+        WHILE index < length  
+            SET total_diff = total_diff + ABS(nums[index] - nums[index - 1])  
+            SET index = index + 1  
+        END WHILE  
+        
+        LET highest_edge_improvement = 0  
+        FOR j IN RANGE(1, length) DO  
+            LET gain_candidate = ABS(nums[0] - nums[j]) - ABS(nums[j] - nums[j - 1])  
+            IF gain_candidate > highest_edge_improvement THEN  
+                SET highest_edge_improvement = gain_candidate  
+            END IF  
+        END FOR  
+        
+        FOR k IN RANGE(0, length - 1) DO  
+            LET alt_gain = ABS(nums[length - 1] - nums[k]) - ABS(nums[k + 1] - nums[k])  
+            IF alt_gain > highest_edge_improvement THEN  
+                SET highest_edge_improvement = alt_gain  
+            END IF  
+        END FOR  
+        
+        LET minima_across_pairs = nums[0] + nums[1]  
+        LET maxima_across_pairs = nums[0]  
+        FOR m FROM 0 TO length - 2 DO  
+            LET current_max = MAX(nums[m], nums[m+1])  
+            LET current_min = MIN(nums[m], nums[m+1])  
+            IF current_max < minima_across_pairs THEN  
+                SET minima_across_pairs = current_max  
+            END IF  
+            IF current_min > maxima_across_pairs THEN  
+                SET maxima_across_pairs = current_min  
+            END IF  
+        END FOR  
+        
+        LET calculated_gain = MAX(0, 2 * (maxima_across_pairs - minima_across_pairs))  
+        
+        RETURN total_diff + MAX(highest_edge_improvement, calculated_gain)  
+    END FUNCTION  
+END CLASS

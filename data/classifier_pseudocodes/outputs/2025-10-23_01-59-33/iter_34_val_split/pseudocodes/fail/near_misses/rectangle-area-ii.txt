@@ -1,0 +1,66 @@
+CLASS Solution
+    FUNCTION rectangleArea(rectangles)
+        ASSIGN (10^9 + 1) TO MOD
+
+        ASSIGN an empty collection to vertical_points_set
+        FOR each quadruple x_start y_start x_end y_end IN rectangles
+            INSERT y_start INTO vertical_points_set
+            INSERT y_end INTO vertical_points_set
+        END FOR
+
+        ASSIGN a sorted array from vertical_points_set TO sorted_vertical_points
+        ASSIGN an empty map to vertical_indices_map
+        FOR index idx AND value coord IN enumeration of sorted_vertical_points
+            ASSIGN idx TO vertical_indices_map[coord]
+        END FOR
+
+        ASSIGN a list named coverage_counts filled with zeros, sized to LENGTH of sorted_vertical_points
+
+        ASSIGN an empty list named sweep_events
+        FOR each quadruple x_start y_start x_end y_end IN rectangles
+            ADD (x_start, 1, y_start, y_end) TO sweep_events
+            ADD (x_end, -1, y_start, y_end) TO sweep_events
+        END FOR
+
+        SORT sweep_events IN ascending order BY the first element of each tuple
+
+        ASSIGN 0 TO last_processed_x
+        ASSIGN 0 TO total_area
+
+        SET index_k TO 0
+        WHILE index_k < LENGTH of sweep_events
+            ASSIGN current_x, event_flag, y_lower, y_upper FROM sweep_events[index_k]
+
+            ASSIGN 0 TO covered_segment_size
+            SET index_j TO 1
+            WHILE index_j < LENGTH of coverage_counts
+                IF coverage_counts[index_j - 1] > 0 THEN
+                    ASSIGN covered_segment_size + (sorted_vertical_points[index_j] - sorted_vertical_points[index_j - 1]) TO covered_segment_size
+                END IF
+                INCREMENT index_j BY 1
+            END WHILE
+
+            ASSIGN total_area + covered_segment_size * (current_x - last_processed_x) TO total_area
+            ASSIGN total_area MOD MOD TO total_area
+
+            IF event_flag == 1 THEN
+                SET pos FROM vertical_indices_map[y_lower] TO vertical_indices_map[y_upper] - 1
+                WHILE pos <= vertical_indices_map[y_upper] - 1
+                    ASSIGN coverage_counts[pos] + 1 TO coverage_counts[pos]
+                    INCREMENT pos BY 1
+                END WHILE
+            ELSE
+                SET pos FROM vertical_indices_map[y_lower] TO vertical_indices_map[y_upper] - 1
+                WHILE pos <= vertical_indices_map[y_upper] - 1
+                    ASSIGN coverage_counts[pos] - 1 TO coverage_counts[pos]
+                    INCREMENT pos BY 1
+                END WHILE
+            END IF
+
+            ASSIGN current_x TO last_processed_x
+            INCREMENT index_k BY 1
+        END WHILE
+
+        RETURN total_area
+    END FUNCTION
+END CLASS

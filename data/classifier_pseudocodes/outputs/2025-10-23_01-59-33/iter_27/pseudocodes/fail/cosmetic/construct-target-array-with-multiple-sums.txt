@@ -1,0 +1,42 @@
+CLASS Solution
+    FUNCTION isPossible(target)
+        SET heapData AS an empty list
+        DEFINE helper_add_negatives(index)
+            IF index GREATER OR EQUAL TO LENGTH of target THEN
+                RETURN
+            END IF
+            APPEND NEGATION of target[index] TO heapData
+            CALL helper_add_negatives(index PLUS 1)
+        END FUNCTION
+        CALL helper_add_negatives(0)
+
+        TRANSFORM heapData INTO a heap
+
+        SET sumTotal AS 0
+        FOR idx FROM 0 TO LENGTH of target MINUS 1
+            SET sumTotal TO sumTotal PLUS target[idx]
+        END FOR
+
+        WHILE heapData[0] GREATER THAN NEGATION of 1 DO
+            SET maxValue TO NEGATION of EXTRACT from heapData
+            SET remaining AS sumTotal MINUS maxValue
+
+            SWITCH TRUE
+                CASE maxValue LESS OR EQUAL TO remaining:
+                CASE remaining EQUALS 0:
+                    RETURN False
+            END SWITCH
+
+            SET modResult AS maxValue MINUS (remaining MULTIPLY (maxValue DIVIDED BY remaining))
+
+            IF NOT (modResult NOT EQUAL 0 OR remaining EQUAL 1) THEN
+                RETURN False
+            END IF
+
+            SET sumTotal TO remaining PLUS modResult
+            INSERT NEGATION of modResult INTO heapData AS a heap element
+        END WHILE
+
+        RETURN True
+    END FUNCTION
+END CLASS

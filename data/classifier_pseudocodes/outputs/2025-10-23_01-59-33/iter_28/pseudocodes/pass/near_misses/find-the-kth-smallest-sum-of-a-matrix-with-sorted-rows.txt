@@ -1,0 +1,55 @@
+CLASS Solution
+    FUNCTION kthSmallest(mat AS List OF List OF Integer, k AS Integer) RETURNS Integer
+        SET a TO LENGTH(mat)
+        SET b TO LENGTH(mat[0])
+        
+        FUNCTION sumFirstElements(rows, idx, acc)
+            IF idx EQUALS LENGTH(rows)
+                RETURN acc
+            ELSE
+                RETURN sumFirstElements(rows, idx + 1, acc + rows[idx][0])
+            END IF
+        END FUNCTION
+        
+        SET c TO sumFirstElements(mat, 0, 0)
+        SET d TO tuple_repeat(0, a)
+        SET e TO [(c, d)]
+        SET f TO {d}
+        
+        FUNCTION processHeap(heap, visitedSet, remainingK)
+            IF remainingK EQUALS 0
+                RETURN heap[0][0]
+            END IF
+            
+            SET g, h TO heap_pop_min(heap)
+            SET j TO remainingK - 1
+            
+            SET l TO 0
+            FUNCTION loopIndex(i)
+                IF i EQUALS a
+                    RETURN
+                END IF
+                
+                IF h[i] + 1 < b
+                    SET m TO list_from_tuple(h)
+                    SET m[i] TO m[i] + 1
+                    SET n TO tuple_from_list(m)
+                    
+                    SET o TO g - mat[i][h[i]] + mat[i][n[i]]
+                    
+                    IF n NOT IN visitedSet
+                        SET visitedSet TO visitedSet UNION {n}
+                        heap_insert_min(heap, (o, n))
+                    END IF
+                END IF
+                
+                loopIndex(i + 1)
+            END FUNCTION
+            
+            loopIndex(l)
+            RETURN processHeap(heap, visitedSet, j)
+        END FUNCTION
+        
+        RETURN processHeap(e, f, k)
+    END FUNCTION
+END CLASS

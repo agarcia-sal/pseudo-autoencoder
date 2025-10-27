@@ -1,0 +1,44 @@
+CLASS Solution
+    FUNCTION waysToPartition(nums parameter of list of integers k parameter of integer) RETURNS integer
+        ASSIGN totalSum ← 0
+        FOR each element val IN nums DO
+            totalSum ← totalSum + val
+        END FOR
+
+        ASSIGN length ← SIZE OF nums
+
+        INITIALIZE leftMap AS dictionary with default 0
+        INITIALIZE rightMap AS dictionary with default 0
+
+        ASSIGN prefixSum ← 0
+        ASSIGN upperBound ← length - 1
+        ASSIGN pos ← 0
+        WHILE pos < upperBound DO
+            prefixSum ← prefixSum + nums[pos]
+            ASSIGN difference ← totalSum - 2 * prefixSum
+            rightMap[difference] ← rightMap[difference] + 1
+            pos ← pos + 1
+        END WHILE
+
+        ASSIGN maximumWays ← rightMap[0]
+
+        ASSIGN prefixSum ← 0
+        FOR idx FROM 0 TO length - 1 DO
+            prefixSum ← prefixSum + nums[idx]
+
+            ASSIGN delta ← k - nums[idx]
+
+            ASSIGN candidateWays ← leftMap[-delta] + rightMap[delta]
+
+            IF candidateWays > maximumWays THEN
+                maximumWays ← candidateWays
+            END IF
+
+            ASSIGN currentDiff ← totalSum - 2 * prefixSum
+            rightMap[currentDiff] ← rightMap[currentDiff] - 1
+            leftMap[currentDiff] ← leftMap[currentDiff] + 1
+        END FOR
+
+        RETURN maximumWays
+    END FUNCTION
+END CLASS

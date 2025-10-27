@@ -1,0 +1,64 @@
+CLASS Solution
+    FUNCTION maximizeXor(nums PARAMETER, queries PARAMETER)
+        CALL sort on nums to arrange numbers in ascending order
+
+        SET indexed_queries TO list created by enumerating queries
+        CALL sort on indexed_queries with sorting key as the second element of each query sublist
+        ASSIGN sorted_queries TO indexed_queries
+
+        ASSIGN answers TO list of length equal to length of queries, each element set to -1
+
+        INITIALIZE root AS empty dictionary
+
+        ASSIGN pointer TO 0
+
+        ASSIGN idx TO 0
+        WHILE idx LESS THAN length of sorted_queries
+            ASSIGN q_index, (val_x, val_m) TO sorted_queries[idx]
+
+            WHILE pointer LESS THAN length of nums AND nums[pointer] LESS THAN OR EQUAL TO val_m
+                ASSIGN current_num TO nums[pointer]
+                ASSIGN current_node TO root
+
+                ASSIGN bit_pos TO 31
+                WHILE bit_pos GREATER THAN OR EQUAL TO 0
+                    ASSIGN bit_val TO (current_num DIVIDE BY (2 TO THE POWER bit_pos)) MODULO 2
+                    IF NOT bit_val IS A KEY IN current_node
+                        ASSIGN current_node[bit_val] TO empty dictionary
+                    END IF
+                    ASSIGN current_node TO current_node[bit_val]
+                    DECREASE bit_pos BY 1
+                END WHILE
+
+                INCREMENT pointer BY 1
+            END WHILE
+
+            IF root IS EMPTY
+                INCREMENT idx BY 1
+                CONTINUE
+            END IF
+
+            ASSIGN current_node TO root
+            ASSIGN xor_max TO 0
+            ASSIGN bit_pos TO 31
+
+            WHILE bit_pos GREATER THAN OR EQUAL TO 0
+                ASSIGN bit_val TO (val_x DIVIDE BY (2 TO THE POWER bit_pos)) MODULO 2
+                ASSIGN flipped_bit TO (1 - bit_val)
+
+                IF flipped_bit IS A KEY IN current_node
+                    SET xor_max TO xor_max PLUS (2 TO THE POWER bit_pos)
+                    ASSIGN current_node TO current_node[flipped_bit]
+                ELSE
+                    ASSIGN current_node TO current_node[bit_val]
+                END IF
+                DECREASE bit_pos BY 1
+            END WHILE
+
+            ASSIGN answers[q_index] TO xor_max
+            INCREMENT idx BY 1
+        END WHILE
+
+        RETURN answers
+    END FUNCTION
+END CLASS

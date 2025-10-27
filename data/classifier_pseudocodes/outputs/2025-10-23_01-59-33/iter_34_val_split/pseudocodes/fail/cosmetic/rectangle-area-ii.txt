@@ -1,0 +1,59 @@
+CLASS Solution
+    FUNCTION rectangleArea(rectangles)
+        ASSIGN MOD TO (1_000_000_000 PLUS 1)
+        CREATE unique_ys AS empty associative array
+        FOR EACH quartet left_x bottom_y right_x top_y IN rectangles
+            INSERT bottom_y INTO unique_ys WITH VALUE true
+            INSERT top_y INTO unique_ys WITH VALUE true
+        END FOR
+        ASSIGN sorted_ys TO LIST OF KEYS FROM unique_ys
+        SORT sorted_ys IN ascending order
+        CREATE index_map AS empty map
+        SET idx_counter TO 0
+        WHILE idx_counter LESS THAN LENGTH OF sorted_ys
+            ASSIGN index_map[sorted_ys[idx_counter]] TO idx_counter
+            INCREMENT idx_counter BY 1
+        END WHILE
+        CREATE coverage AS ARRAY OF ZEROS WITH LENGTH EQUAL TO LENGTH OF sorted_ys
+        CREATE line_events AS empty array
+        SET k TO 0
+        WHILE k LESS THAN LENGTH OF rectangles
+            DESTRUCTURE rectangles[k] INTO left_x bottom_y right_x top_y
+            APPEND (left_x, 1, bottom_y, top_y) TO line_events
+            APPEND (right_x, -1, bottom_y, top_y) TO line_events
+            INCREMENT k BY 1
+        END WHILE
+        SORT line_events BY FIRST ELEMENT IN ascending order
+        ASSIGN previous_x TO 0
+        ASSIGN total_area TO 0
+        SET pointer TO 0
+        WHILE pointer LESS THAN LENGTH OF line_events
+            ASSIGN (curr_x, ev_type, y_start, y_end) TO line_events[pointer]
+            ASSIGN segment_length TO 0
+            SET pos TO 1
+            WHILE pos LESS THAN LENGTH OF coverage
+                WHEN coverage[pos - 1] GREATER THAN 0:
+                    ASSIGN segment_length TO segment_length PLUS (sorted_ys[pos] MINUS sorted_ys[pos - 1])
+                INCREMENT pos BY 1
+            END WHILE
+            ASSIGN total_area TO (total_area PLUS segment_length TIMES (curr_x MINUS previous_x)) MODULO MOD
+            ASSIGN start_i TO index_map[y_start]
+            ASSIGN end_i TO index_map[y_end] MINUS 1
+            SET iterator TO start_i
+            IF ev_type EQUALS 1
+                WHILE iterator LESS THAN OR EQUAL TO end_i
+                    ASSIGN coverage[iterator] TO coverage[iterator] PLUS 1
+                    INCREMENT iterator BY 1
+                END WHILE
+            ELSE
+                WHILE iterator LESS THAN OR EQUAL TO end_i
+                    ASSIGN coverage[iterator] TO coverage[iterator] MINUS 1
+                    INCREMENT iterator BY 1
+                END WHILE
+            END IF
+            ASSIGN previous_x TO curr_x
+            INCREMENT pointer BY 1
+        END WHILE
+        RETURN total_area
+    END FUNCTION
+END CLASS

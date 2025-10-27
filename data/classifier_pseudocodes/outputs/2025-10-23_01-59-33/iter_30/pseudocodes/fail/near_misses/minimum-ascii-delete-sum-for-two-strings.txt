@@ -1,0 +1,42 @@
+CLASS Solution
+    FUNCTION minimumDeleteSum(s1, s2)
+        DEFINE length_s1 AS LENGTH OF s1
+        DEFINE length_s2 AS LENGTH OF s2
+
+        DEFINE matrix dp WITH size [length_s1 + 1][length_s2 + 1], FILLED WITH 0
+
+        INDEX j := 0
+        WHILE j < length_s2
+            LET dp[0][j + 1] BE dp[0][j] + ASCII_CODE OF s2[j]
+            j := j + 1
+        END WHILE
+
+        INDEX i := 0
+        WHILE i < length_s1
+            LET dp[i + 1][0] BE dp[i][0] + ASCII_CODE OF s1[i]
+            i := i + 1
+        END WHILE
+
+        PROCEDURE fill_matrix(i, j)
+            IF i > length_s1 THEN RETURN
+            IF j > length_s2 THEN
+                fill_matrix(i + 1, 1)
+                RETURN
+            END IF
+
+            IF s1[i - 1] EQUALS s2[j - 1] THEN
+                LET dp[i][j] BE dp[i - 1][j - 1]
+            ELSE
+                LET left_option BE dp[i - 1][j] + ASCII_CODE OF s1[i - 1]
+                LET top_option BE dp[i][j - 1] + ASCII_CODE OF s2[j - 1]
+                LET dp[i][j] BE MINIMUM OF left_option, top_option
+            END IF
+
+            fill_matrix(i, j + 1)
+        END PROCEDURE
+
+        fill_matrix(1, 1)
+
+        RETURN dp[length_s1][length_s2]
+    END FUNCTION
+END CLASS

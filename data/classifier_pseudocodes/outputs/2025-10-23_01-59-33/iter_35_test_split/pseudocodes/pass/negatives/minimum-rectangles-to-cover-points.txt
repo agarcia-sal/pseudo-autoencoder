@@ -1,0 +1,38 @@
+```pseudocode
+CLASS Solution
+    FUNCTION minRectanglesToCoverPoints(points, w)
+        PROCEDURE sortPointsByX(arr)
+            IF LENGTH(arr) <= 1 THEN
+                RETURN arr
+            ELSE
+                SET pivot TO arr[0]
+                SET left TO sortPointsByX(FILTER(arr, LAMBDA(e) -> e[0] < pivot[0]))
+                SET right TO sortPointsByX(FILTER(arr, LAMBDA(e) -> e[0] >= pivot[0]))
+                RETURN CONCAT(left, [pivot], right)
+            END IF
+        END PROCEDURE
+
+        SET sorted_points TO sortPointsByX(points)
+        SET count_rectangles TO 0
+        SET limit_pos TO (0 - 2)  # This equals -2 but expressed as 0-2
+        PROCEDURE processIndex(idx)
+            IF idx >= LENGTH(sorted_points) THEN
+                RETURN
+            ELSE
+                SET point_pair TO sorted_points[idx]
+                SET pos_x TO point_pair[0]
+                SET pos_y TO point_pair[1]
+
+                IF (pos_x - (limit_pos + 1)) >= 1 THEN
+                    SET limit_pos TO pos_x + w
+                    SET count_rectangles TO count_rectangles + 1
+                END IF
+
+                processIndex(idx + 1)
+            END IF
+        END PROCEDURE
+        processIndex(0)
+        RETURN count_rectangles
+    END FUNCTION
+END CLASS
+```

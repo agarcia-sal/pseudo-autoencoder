@@ -1,0 +1,60 @@
+CLASS Solution  
+    FUNCTION parseBoolExpr(expression)  
+        INITIALIZE container AS empty list  
+        SET pointer TO 0  
+        WHILE pointer LESS THAN length of expression  
+            LET symbol BE element at position pointer in expression  
+            
+            SWITCH symbol  
+                CASE 't', 'f', '!', '&', '|'  
+                    ADD symbol TO container  
+                    INCREMENT pointer BY 1  
+                    CONTINUE  
+                CASE ')'  
+                    DECLARE tally_true AS 0  
+                    DECLARE tally_false AS 0  
+                    
+                    WHILE container[last element] IS 't' OR container[last element] IS 'f'  
+                        LET current_char BE container[last element]  
+                        
+                        IF current_char IS 't'  
+                            SET tally_true TO tally_true + 1  
+                        END IF  
+                        IF current_char IS 'f'  
+                            SET tally_false TO tally_false + 1  
+                        END IF  
+                        REMOVE last element FROM container  
+                    END WHILE  
+                    
+                    LET operator_char BE container[last element]  
+                    REMOVE last element FROM container  
+                    
+                    IF operator_char IS '!'  
+                        IF tally_false NOT EQUAL TO 0  
+                            SET symbol TO 't'  
+                        ELSE  
+                            SET symbol TO 'f'  
+                        END IF  
+                    ELSE IF operator_char IS '&'  
+                        IF tally_false NOT EQUAL TO 0  
+                            SET symbol TO 'f'  
+                        ELSE  
+                            SET symbol TO 't'  
+                        END IF  
+                    ELSE IF operator_char IS '|'  
+                        IF tally_true NOT EQUAL TO 0  
+                            SET symbol TO 't'  
+                        ELSE  
+                            SET symbol TO 'f'  
+                        END IF  
+                    END IF  
+                    ADD symbol TO container  
+                    INCREMENT pointer BY 1  
+                DEFAULT  
+                    INCREMENT pointer BY 1  
+            END SWITCH  
+        END WHILE  
+        
+        RETURN (container[0] IS 't')  
+    END FUNCTION  
+END CLASS

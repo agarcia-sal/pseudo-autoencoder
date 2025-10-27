@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION findMaxForm(strs, m, n)  
+        INITIALIZE matrix AS a list of lists with (m + 1) rows AND (n + 1) columns FILLED with zeros  
+        
+        FOR EACH element current_string IN strs DO  
+            SET zero_counter TO 0  
+            SET one_counter TO 0  
+            FOR EACH character char IN current_string DO  
+                IF char == '0' THEN  
+                    INCREMENT zero_counter BY 1  
+                ELSE IF char == '1' THEN  
+                    INCREMENT one_counter BY 1  
+                END IF  
+            END FOR  
+            
+            DEFINE procedure update_dp(row, col)   
+                IF row < zero_counter OR col < one_counter THEN  
+                    RETURN  
+                ELSE  
+                    SET potential_value TO matrix[row - zero_counter][col - one_counter] + 1  
+                    IF potential_value > matrix[row][col] THEN  
+                        ASSIGN potential_value TO matrix[row][col]  
+                    END IF  
+                END IF  
+                
+                IF col > one_counter THEN  
+                    CALL update_dp(row, col - 1)  
+                END IF  
+                
+                IF row > zero_counter THEN  
+                    CALL update_dp(row - 1, col)  
+                END IF  
+            END PROCEDURE  
+            
+            CALL update_dp(m, n)  
+        END FOR  
+        
+        RETURN matrix[m][n]  
+    END FUNCTION  
+END CLASS

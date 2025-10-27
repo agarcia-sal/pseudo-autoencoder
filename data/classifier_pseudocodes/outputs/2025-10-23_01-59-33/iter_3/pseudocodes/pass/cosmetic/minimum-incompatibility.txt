@@ -1,0 +1,64 @@
+CLASS Solution  
+    FUNCTION minimumIncompatibility(nums k)  
+        LET totalElements ← LENGTH nums  
+        LET sizePerSubset ← totalElements DIV k  
+        LET elementCounts ← COUNT ELEMENTS IN nums  
+        
+        FOR countValue IN elementCounts.VALUES  
+            IF countValue > k THEN RETURN -1  
+        END FOR  
+        
+        LET incompatibilityMap ← EMPTY DICTIONARY  
+        LET maxMask ← (2 POWER totalElements) - 1  
+        LET currentMask ← 0  
+        
+        WHILE currentMask <= maxMask DO  
+            LET bitsSet ← COUNT OF BITS SET IN currentMask  
+            
+            IF bitsSet = sizePerSubset THEN  
+                LET collected ← EMPTY LIST  
+                LET index ← 0  
+                
+                WHILE index < totalElements DO  
+                    IF (currentMask BITWISE-AND (2 POWER index)) ≠ 0 THEN  
+                        collected.APPEND(nums[index])  
+                    END IF  
+                    index ← index + 1  
+                END WHILE  
+                
+                LET uniqueElements ← SET OF collected  
+                IF LENGTH uniqueElements = sizePerSubset THEN  
+                    LET maxVal ← MAX OF collected  
+                    LET minVal ← MIN OF collected  
+                    LET diff ← maxVal - minVal  
+                    incompatibilityMap[currentMask] ← diff  
+                END IF  
+            END IF  
+            
+            currentMask ← currentMask + 1  
+        END WHILE  
+        
+        LET dpArray ← ARRAY OF SIZE (2 POWER totalElements) FILLED WITH INFINITY  
+        dpArray[0] ← 0  
+        
+        FOR maskValue FROM 0 TO maxMask DO  
+            IF (COUNT OF BITS SET IN maskValue) MOD sizePerSubset ≠ 0 THEN CONTINUE  
+            
+            FOR each candidateSubset IN incompatibilityMap.KEYS DO  
+                IF (maskValue BITWISE-AND candidateSubset) = candidateSubset THEN  
+                    LET attempt ← dpArray[maskValue - candidateSubset] + incompatibilityMap[candidateSubset]  
+                    IF attempt < dpArray[maskValue] THEN  
+                        dpArray[maskValue] ← attempt  
+                    END IF  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        LET fullSetMask ← maxMask  
+        IF dpArray[fullSetMask] ≠ INFINITY THEN  
+            RETURN dpArray[fullSetMask]  
+        ELSE  
+            RETURN -1  
+        END IF  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,72 @@
+CLASS DSU
+    FUNCTION __init__(self, n)
+        SET index_value TO 0
+        SET temp_map_parent TO empty mapping
+        SET temp_map_rank TO empty mapping
+        WHILE index_value LESS THAN n DO
+            SET temp_map_parent[index_value] TO index_value
+            SET temp_map_rank[index_value] TO 0
+            INCREMENT index_value BY 1
+        END WHILE
+        SET self.parent TO temp_map_parent
+        SET self.rank TO temp_map_rank
+    END FUNCTION
+
+    FUNCTION find(self, x)
+        DEFINE FUNCTION recur_find(y)
+            IF self.parent[y] EQUALS y THEN
+                RETURN y
+            ELSE
+                SET recursive_result TO recur_find(self.parent[y])
+                SET self.parent[y] TO recursive_result
+                RETURN recursive_result
+            END IF
+        END FUNCTION
+        RETURN recur_find(x)
+    END FUNCTION
+
+    FUNCTION union_set(self, u, v)
+        SET set_u TO self.find(u)
+        SET set_v TO self.find(v)
+        IF NOT (set_u EQUALS set_v) THEN
+            IF self.rank[set_u] GREATER THAN OR EQUAL TO self.rank[set_v] THEN
+                SET self.parent[set_v] TO set_u
+                IF self.rank[set_u] EQUALS self.rank[set_v] THEN
+                    SET self.rank[set_u] TO self.rank[set_u] PLUS 1
+                END IF
+            ELSE
+                SET self.parent[set_u] TO set_v
+            END IF
+        END IF
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION countComponents(self, nums, threshold)
+        SET dsu_instance TO DSU(threshold PLUS 1)
+        SET _i TO 0
+        WHILE _i LESS THAN LENGTH(nums) DO
+            SET current_num TO nums[_i]
+            SET multiple_tracker TO current_num TIMES 2
+            WHILE multiple_tracker LESS THAN OR EQUAL TO threshold DO
+                CALL dsu_instance.union_set(current_num, multiple_tracker)
+                SET multiple_tracker TO multiple_tracker PLUS current_num
+            END WHILE
+            SET _i TO _i PLUS 1
+        END WHILE
+
+        SET parent_collection TO empty set
+        SET _j TO 0
+        WHILE _j LESS THAN LENGTH(nums) DO
+            SET element TO nums[_j]
+            IF element LESS THAN OR EQUAL TO threshold THEN
+                CALL parent_collection.insert(dsu_instance.find(element))
+            ELSE
+                CALL parent_collection.insert(element)
+            END IF
+            SET _j TO _j PLUS 1
+        END WHILE
+
+        RETURN SIZE(parent_collection)
+    END FUNCTION
+END CLASS

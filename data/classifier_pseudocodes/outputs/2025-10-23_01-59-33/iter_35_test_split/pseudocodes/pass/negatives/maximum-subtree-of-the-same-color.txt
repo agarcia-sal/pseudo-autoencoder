@@ -1,0 +1,60 @@
+CLASS Solution
+    FUNCTION maximumSubtreeSize WITH PARAMETERS edges colors
+        CREATE graph AS empty map from keys to empty list
+        DEFINE FUNCTION insert_edge WITH PARAMETERS x y
+            IF x NOT IN graph THEN
+                SET graph[x] TO empty list
+            END IF
+            IF y NOT IN graph THEN
+                SET graph[y] TO empty list
+            END IF
+            APPEND y TO graph[x]
+            APPEND x TO graph[y]
+        END FUNCTION
+
+        FOR EACH pair a b IN edges
+            CALL insert_edge WITH a b
+        END FOR
+
+        SET result TO 1
+
+        FUNCTION depth_search WITH PARAMETERS p q
+            SET alpha TO 1
+            SET flag TO true
+
+            DEFINE FUNCTION iter_neighbors WITH PARAMETERS index listN
+                IF index >= LENGTH(listN) THEN
+                    RETURN
+                END IF
+                SET neighbor_node TO listN[index]
+                IF neighbor_node != q THEN
+                    SET count_subtree TO depth_search(neighbor_node, p)
+                    IF count_subtree == 0 THEN
+                        SET flag TO false
+                    ELSE
+                        IF colors[neighbor_node] == colors[p] THEN
+                            SET alpha TO alpha + count_subtree
+                        ELSE
+                            SET flag TO false
+                        END IF
+                    END IF
+                END IF
+
+                CALL iter_neighbors(index + 1, listN)
+            END FUNCTION
+
+            CALL iter_neighbors(0, graph[p])
+
+            IF flag == true THEN
+                IF result < alpha THEN
+                    SET result TO alpha
+                END IF
+                RETURN alpha
+            ELSE
+                RETURN 0
+            END IF
+        END FUNCTION
+
+        RETURN depth_search(0, -1)
+    END FUNCTION
+END CLASS

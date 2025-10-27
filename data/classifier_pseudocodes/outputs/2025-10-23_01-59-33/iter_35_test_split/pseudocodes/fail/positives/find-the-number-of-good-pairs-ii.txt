@@ -1,0 +1,47 @@
+CLASS Solution
+    FUNCTION numberOfPairs(nums1, nums2, k)
+        FUNCTION tally(collection)
+            SET accumulator TO empty map
+            SET index TO zero
+            WHILE index IS LESS THAN length of collection
+                SET element TO collection[index]
+                IF accumulator DOES NOT CONTAIN KEY element
+                    SET accumulator[element] TO 1
+                ELSE
+                    SET accumulator[element] TO accumulator[element] PLUS 1
+                END IF
+                SET index TO index PLUS 1
+            END WHILE
+            RETURN accumulator
+        END FUNCTION
+
+        SET aggregate_counts TO tally(nums2)
+        SET accumulator TO 0
+        SET outer_cursor TO 0
+        REPEAT
+            IF outer_cursor IS GREATER OR EQUAL TO length of nums1 THEN BREAK END IF
+            SET current_outer_element TO nums1[outer_cursor]
+
+            FUNCTION iterate_pairs(keys, counts, position, result_accumulator)
+                IF position IS GREATER OR EQUAL TO length of keys THEN
+                    RETURN result_accumulator
+                ELSE
+                    SET key_element TO keys[position]
+                    SET count_value TO counts[position]
+                    IF (current_outer_element MODULO (key_element TIMES k)) IS EQUAL TO 0
+                        SET result_accumulator TO result_accumulator PLUS count_value
+                    END IF
+                    RETURN iterate_pairs(keys, counts, position PLUS 1, result_accumulator)
+                END IF
+            END FUNCTION
+
+            SET keys_list TO list of keys in aggregate_counts
+            SET counts_list TO list of values in aggregate_counts
+            SET accumulator TO iterate_pairs(keys_list, counts_list, 0, accumulator)
+
+            SET outer_cursor TO outer_cursor PLUS 1
+        UNTIL false
+
+        RETURN accumulator
+    END FUNCTION
+END CLASS

@@ -1,0 +1,49 @@
+CLASS Solution
+    FUNCTION encode(s)
+        FUNCTION get_encoded_length(count, substring)
+            ASSIGN LENGTH(TO_STRING(count)) + LENGTH(substring) + 2 TO result
+            GIVE BACK result
+        END FUNCTION
+
+        FUNCTION dp(i, j)
+            ASSIGN SUBSTRING(s; i; j + 1) TO segment
+            ASSIGN j + 1 - i TO segment_length
+            IF NOT(segment_length >= 5) THEN
+                GIVE BACK segment
+            END IF
+
+            ASSIGN segment TO minimal_encoding
+            ASSIGN 1 TO index_var
+            WHILE index_var <= (segment_length // 2 + 1)
+                IF segment_length MOD index_var = 0 THEN
+                    ASSIGN segment_length // index_var TO repetition_times
+                    ASSIGN TRUE TO matches_pattern
+                    ASSIGN SUBSTRING(segment; 0; index_var) TO pattern_piece
+
+                    IF segment = REPEAT(pattern_piece; repetition_times) THEN
+                        ASSIGN TO_STRING(repetition_times) + "[" + dp(i; i + index_var - 1) + "]" TO candidate_encoding
+                        IF LENGTH(candidate_encoding) < LENGTH(minimal_encoding) THEN
+                            ASSIGN candidate_encoding TO minimal_encoding
+                        END IF
+                    END IF
+                END IF
+                ASSIGN index_var + 1 TO index_var
+            END WHILE
+
+            ASSIGN i TO left_pointer
+            WHILE left_pointer <= j - 1
+                ASSIGN dp(i; left_pointer) TO left_part
+                ASSIGN dp(left_pointer + 1; j) TO right_part
+                ASSIGN left_part + right_part TO combined_candidate
+                IF LENGTH(combined_candidate) < LENGTH(minimal_encoding) THEN
+                    ASSIGN combined_candidate TO minimal_encoding
+                END IF
+                ASSIGN left_pointer + 1 TO left_pointer
+            END WHILE
+
+            GIVE BACK minimal_encoding
+        END FUNCTION
+
+        GIVE BACK dp(0; LENGTH(s) - 1)
+    END FUNCTION
+END CLASS

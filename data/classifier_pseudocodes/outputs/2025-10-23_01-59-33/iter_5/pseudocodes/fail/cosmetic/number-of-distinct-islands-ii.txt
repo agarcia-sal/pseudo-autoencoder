@@ -1,0 +1,87 @@
+CLASS Solution  
+    FUNCTION numDistinctIslands2(grid)  
+        FUNCTION dfs(x, y, island)  
+            IF NOT (0 <= x AND x < LENGTH of grid AND 0 <= y AND y < LENGTH of grid at 0) OR grid at x, y EQUALS 0 THEN  
+                EXIT FUNCTION  
+            END IF  
+            ASSIGN 0 TO grid at x, y  
+            INSERT (x, y) INTO island  
+            CALL dfs(x + 1, y, island)  
+            CALL dfs(x - 1, y, island)  
+            CALL dfs(x, y + 1, island)  
+            CALL dfs(x, y - 1, island)  
+        END FUNCTION  
+
+        FUNCTION normalize(island)  
+            ASSIGN empty array TO shapes  
+            DEFINE transforms AS [(1, 1), (1, -1), (-1, 1), (-1, -1)]  
+            SET idx TO 0  
+            WHILE idx < LENGTH of transforms DO  
+                ASSIGN empty array TO temp_island  
+                LET dx, dy BE transforms at idx  
+                LET v TO 0  
+                WHILE v < LENGTH of island DO  
+                    LET px, py BE island at v  
+                    INSERT (px * dx, py * dy) INTO temp_island  
+                    INCREMENT v BY 1  
+                END WHILE  
+                SORT temp_island by ascending order  
+                LET min_x BE temp_island at 0, 0  
+                LET min_y BE temp_island at 0, 1  
+                LET k BE 1  
+                WHILE k < LENGTH of temp_island DO  
+                    IF temp_island at k, 0 < min_x THEN  
+                        ASSIGN temp_island at k, 0 TO min_x  
+                    END IF  
+                    IF temp_island at k, 1 < min_y THEN  
+                        ASSIGN temp_island at k, 1 TO min_y  
+                    END IF  
+                    INCREMENT k BY 1  
+                END WHILE  
+                LET normalized_shape BE empty list  
+                LET m TO 0  
+                WHILE m < LENGTH of temp_island DO  
+                    LET cx, cy BE temp_island at m  
+                    INSERT (cx - min_x, cy - min_y) INTO normalized_shape  
+                    INCREMENT m BY 1  
+                END WHILE  
+                INSERT TUPLE OF normalized_shape INTO shapes  
+                INCREMENT idx BY 1  
+            END WHILE  
+
+            LET original_cnt BE LENGTH of shapes  
+            LET r TO 0  
+            WHILE r < original_cnt DO  
+                LET shape BE shapes at r  
+                LET rotated_shape BE empty list  
+                LET s TO 0  
+                WHILE s < LENGTH of shape DO  
+                    LET ox, oy BE shape at s  
+                    INSERT (oy, -ox) INTO rotated_shape  
+                    INCREMENT s BY 1  
+                END WHILE  
+                INSERT TUPLE OF rotated_shape INTO shapes  
+                INCREMENT r BY 1  
+            END WHILE  
+
+            RETURN MINIMUM element IN shapes by lex order  
+        END FUNCTION  
+
+        ASSIGN empty set TO islands  
+        LET i_iter BE 0  
+        WHILE i_iter < LENGTH of grid DO  
+            LET j_iter BE 0  
+            WHILE j_iter < LENGTH of grid at 0 DO  
+                IF grid at i_iter, j_iter EQUALS 1 THEN  
+                    ASSIGN empty array TO island  
+                    CALL dfs(i_iter, j_iter, island)  
+                    ADD normalize(island) TO islands  
+                END IF  
+                INCREMENT j_iter BY 1  
+            END WHILE  
+            INCREMENT i_iter BY 1  
+        END WHILE  
+
+        RETURN LENGTH of islands  
+    END FUNCTION  
+END CLASS

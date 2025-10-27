@@ -1,0 +1,74 @@
+CLASS Solution
+    FUNCTION longestCommonPrefix(arr1 arr1 OF integers arr2 arr2 OF integers) RETURNS integer
+        FUNCTION toString(number integer) RETURNS string
+            SET digits TO an empty list
+            SET temp TO number
+            WHILE temp GREATER THAN zero
+                SET remainder TO temp MODULO 10
+                INSERT character(remainder + 48) AT THE BEGINNING OF digits
+                SET temp TO temp DIVIDED BY 10
+            END WHILE
+            IF digits IS EMPTY THEN
+                RETURN character(48)
+            ELSE
+                SET result_str TO empty string
+                SET index TO 1
+                REPEAT
+                    SET result_str TO result_str + digits[index]
+                    SET index TO index + 1
+                UNTIL index GREATER THAN LENGTH OF digits
+                RETURN result_str
+            END IF
+        END FUNCTION
+
+        FUNCTION insertPrefixes(number_str string, prefix_collection SET OF string)
+            SET length_val TO LENGTH OF number_str
+            FUNCTION addPrefixesRec(pos integer)
+                IF pos GREATER THAN length_val THEN RETURN
+                SET current_substr TO EMPTY STRING
+                SET i TO 1
+                WHILE i LESS OR EQUAL pos
+                    SET current_substr TO current_substr + number_str[i]
+                    SET i TO i + 1
+                END WHILE
+                ADD current_substr TO prefix_collection
+                CALL addPrefixesRec(pos + 1)
+            END FUNCTION
+            CALL addPrefixesRec(1)
+        END FUNCTION
+
+        SET prefixes1 TO EMPTY SET
+        FUNCTION processArr1(index integer)
+            IF index GREATER THAN LENGTH OF arr1 THEN RETURN
+            SET num_str TO toString(arr1[index])
+            CALL insertPrefixes(num_str, prefixes1)
+            CALL processArr1(index + 1)
+        END FUNCTION
+        CALL processArr1(1)
+
+        SET prefixes2 TO EMPTY SET
+        SET idx_tracker TO 1
+        WHILE idx_tracker LESS OR EQUAL LENGTH OF arr2
+            SET num_str TO toString(arr2[idx_tracker])
+            CALL insertPrefixes(num_str, prefixes2)
+            SET idx_tracker TO idx_tracker + 1
+        END WHILE
+
+        SET max_common_len TO 0
+        FUNCTION checkPrefixes(iterator SET OF string)
+            SET iterator_list TO LIST OF iterator
+            FUNCTION innerCheck(pos integer)
+                IF pos GREATER THAN LENGTH OF iterator_list THEN RETURN
+                SET element TO iterator_list[pos]
+                IF element IN prefixes2 AND LENGTH OF element GREATER THAN max_common_len THEN
+                    SET max_common_len TO LENGTH OF element
+                END IF
+                CALL innerCheck(pos + 1)
+            END FUNCTION
+            CALL innerCheck(1)
+        END FUNCTION
+        CALL checkPrefixes(prefixes1)
+
+        RETURN max_common_len
+    END FUNCTION
+END CLASS

@@ -1,0 +1,63 @@
+CLASS Solution  
+    FUNCTION minOperationsToMakeMedianK(nums k)  
+        PROCEDURE ascendingSort(arr)  
+            SET i TO 0  
+            WHILE i < LENGTH(arr) - 1  
+                SET j TO 0  
+                WHILE j < LENGTH(arr) - i - 1  
+                    IF arr[j] > arr[j + 1]  
+                        SET temp TO arr[j]  
+                        SET arr[j] TO arr[j + 1]  
+                        SET arr[j + 1] TO temp  
+                    END IF  
+                    SET j TO j + 1  
+                END WHILE  
+                SET i TO i + 1  
+            END WHILE  
+        END PROCEDURE  
+
+        CALL ascendingSort(nums)  
+
+        SET lengthVal TO LENGTH(nums)  
+        SET medIndex TO 0  
+        REPEAT  
+            EXIT WHEN medIndex * 2 >= lengthVal  
+            SET medIndex TO medIndex + 1  
+        UNTIL FALSE  
+        SET medIndex TO medIndex - 1  
+
+        IF nums[medIndex] = k THEN  
+            RETURN 0  
+        END IF  
+
+        SET countOps TO 0  
+
+        IF nums[medIndex] < k THEN  
+            FUNCTION incrementComparator(index limit) RETURNS INTEGER  
+                IF index >= limit THEN  
+                    RETURN index  
+                ELSEIF nums[index] < k THEN  
+                    SET countOps TO countOps + (k - nums[index])  
+                    RETURN incrementComparator(index + 1, limit)  
+                ELSE  
+                    RETURN index  
+                END IF  
+            END FUNCTION  
+            CALL incrementComparator(medIndex, lengthVal)  
+        ELSE  
+            FUNCTION decrementComparator(index) RETURNS INTEGER  
+                IF index < 0 THEN  
+                    RETURN index  
+                ELSEIF nums[index] > k THEN  
+                    SET countOps TO countOps + (nums[index] - k)  
+                    RETURN decrementComparator(index - 1)  
+                ELSE  
+                    RETURN index  
+                END IF  
+            END FUNCTION  
+            CALL decrementComparator(medIndex)  
+        END IF  
+
+        RETURN countOps  
+    END FUNCTION  
+END CLASS

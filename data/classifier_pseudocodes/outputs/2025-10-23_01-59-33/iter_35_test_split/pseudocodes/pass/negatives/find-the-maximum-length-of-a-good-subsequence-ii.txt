@@ -1,0 +1,58 @@
+CLASS Solution  
+    FUNCTION maximumLength(nums PARAMETER, k PARAMETER)  
+        SET totalCount TO LENGTH OF nums  
+        SET matrix TO a list where each element is a list of zeros of length k PLUS one, with totalCount elements  
+        SET defaultMaps TO a list of dictionaries with default value zero, length k PLUS one  
+        SET trackers TO a list of lists containing three zeros each, length k PLUS one  
+        SET resultVal TO zero  
+        SET outerIndex TO zero  
+        WHILE outerIndex LESS THAN totalCount  
+            SET currentNum TO nums at outerIndex  
+            SET innerCounter TO zero  
+            WHILE innerCounter LESS THAN OR EQUAL TO k  
+                SET matrixRow TO matrix at outerIndex  
+                SET defaultMap TO defaultMaps at innerCounter  
+                SET trackerElements TO trackers at innerCounter  
+                SET accessValue TO defaultMap value at key currentNum, or zero if key absent  
+                SET matrixRow at innerCounter TO accessValue  
+                IF innerCounter GREATER THAN zero THEN  
+                    IF trackerElements at zero NOT EQUAL TO nums at outerIndex THEN  
+                        IF matrixRow at innerCounter LESS THAN trackerElements at one THEN  
+                            SET matrixRow at innerCounter TO trackerElements at one  
+                        END IF  
+                    ELSE  
+                        IF matrixRow at innerCounter LESS THAN trackerElements at two THEN  
+                            SET matrixRow at innerCounter TO trackerElements at two  
+                        END IF  
+                    END IF  
+                END IF  
+                SET matrixRow at innerCounter TO matrixRow at innerCounter PLUS one  
+                SET currentFValue TO matrixRow at innerCounter  
+                IF defaultMap at nums at outerIndex LESS THAN currentFValue THEN  
+                    SET defaultMap at nums at outerIndex TO currentFValue  
+                END IF  
+                IF trackerElements at zero NOT EQUAL TO currentNum THEN  
+                    IF currentFValue GREATER THAN OR EQUAL TO trackerElements at one THEN  
+                        SET trackerElements at two TO trackerElements at one  
+                        SET trackerElements at one TO currentFValue  
+                        SET trackerElements at zero TO currentNum  
+                    ELSE  
+                        IF trackerElements at two LESS THAN currentFValue THEN  
+                            SET trackerElements at two TO currentFValue  
+                        END IF  
+                    END IF  
+                ELSE  
+                    IF trackerElements at one LESS THAN currentFValue THEN  
+                        SET trackerElements at one TO currentFValue  
+                    END IF  
+                END IF  
+                IF resultVal LESS THAN currentFValue THEN  
+                    SET resultVal TO currentFValue  
+                END IF  
+                SET innerCounter TO innerCounter PLUS one  
+            END WHILE  
+            SET outerIndex TO outerIndex PLUS one  
+        END WHILE  
+        RETURN resultVal  
+    END FUNCTION  
+END CLASS

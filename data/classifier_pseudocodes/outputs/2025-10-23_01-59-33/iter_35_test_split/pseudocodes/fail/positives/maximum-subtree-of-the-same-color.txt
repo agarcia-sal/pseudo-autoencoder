@@ -1,0 +1,63 @@
+```pseudocode
+CLASS Solution
+    FUNCTION maximumSubtreeSize WITH PARAMETERS edges colors
+        CREATE alpha AS new empty map from keys to empty lists
+        PROCEDURE buildTree AT INDEX k WITH LIMIT n
+            IF k LESS THAN n THEN
+                LET x BE the element at position k and 0 in edges
+                LET y BE the element at position k and 1 in edges
+                LET mapX BE the element at key x in alpha
+                LET mapY BE the element at key y in alpha
+                APPEND y TO mapX
+                APPEND x TO mapY
+                SET element at key x in alpha TO mapX
+                SET element at key y in alpha TO mapY
+                CALL buildTree WITH k+1 n
+            END IF
+        END PROCEDURE
+
+        SET counterResult TO 1
+
+        FUNCTION walker WITH PARAMETERS node prev
+            LET localCount BE 1
+            LET allSiblingsMatch BE true
+
+            FUNCTION iterateChildren ON INDEX idx IN LIST children
+                IF idx LESS THAN LENGTH(children) THEN
+                    LET nbr BE element at position idx in children
+                    IF nbr NOT EQUAL prev THEN
+                        LET retVal BE CALL walker WITH nbr node
+                        IF retVal EQUAL 0 THEN
+                            SET allSiblingsMatch TO false
+                        ELSE IF EQUAL(colors[nbr], colors[node]) THEN
+                            LET localCount BE localCount + retVal
+                        ELSE
+                            SET allSiblingsMatch TO false
+                        END IF
+                    END IF
+                    CALL iterateChildren WITH idx+1
+                END IF
+            END FUNCTION
+
+            LET children BE element at key node in alpha
+            CALL iterateChildren WITH 0
+
+            IF allSiblingsMatch EQUAL true THEN
+                LET tempMax BE counterResult
+                IF tempMax LESS THAN localCount THEN
+                    SET counterResult TO localCount
+                END IF
+                RETURN localCount
+            ELSE
+                RETURN 0
+            END IF
+        END FUNCTION
+
+        LET edgeCount BE LENGTH(edges)
+        CALL buildTree WITH 0 edgeCount
+
+        LET r BE CALL walker WITH 0 (-1)
+        RETURN counterResult
+    END FUNCTION
+END CLASS
+```

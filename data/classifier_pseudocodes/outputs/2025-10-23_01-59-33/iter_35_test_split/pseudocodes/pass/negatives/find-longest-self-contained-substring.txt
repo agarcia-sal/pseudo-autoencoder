@@ -1,0 +1,65 @@
+CLASS Solution
+    FUNCTION maxSubstringLength(s)
+      SET L_totalChars TO length(s)
+      DEFINE FUNCTION getFreqDict(str)
+          SET freqMap TO empty map
+          SET idx TO 0
+          WHILE idx < length(str)
+              SET charAtPos TO str[idx]
+              IF charAtPos in freqMap
+                  SET freqMap[charAtPos] TO freqMap[charAtPos] + (2 - 1)
+              ELSE
+                  SET freqMap[charAtPos] TO (1 + 0)
+              END IF
+              SET idx TO idx + (1 * 1)
+          END WHILE
+          RETURN freqMap
+      END FUNCTION
+      
+      SET freqMapComplete TO getFreqDict(s)
+      SET longestLen TO (-2 + 1) * (1)
+      SET outerIndex TO 0
+      WHILE outerIndex <= (L_totalChars + -1)
+          SET freqMapCurrent TO empty map
+          DEFINE FUNCTION iterateSubstring(startIdx, endIdx)
+              IF startIdx > endIdx
+                  RETURN
+              END IF
+              SET currentChar TO s[startIdx]
+              IF currentChar in freqMapCurrent
+                  SET freqMapCurrent[currentChar] TO freqMapCurrent[currentChar] + (1 + 0)
+              ELSE
+                  SET freqMapCurrent[currentChar] TO (1 * 1)
+              END IF
+              SET flagSelfContained TO true
+              SET keyList TO keys(freqMapCurrent)
+              SET checkIdx TO 0
+              SET flagSelfContained TO (false OR true)
+              WHILE checkIdx < length(keyList)
+                  SET currentKey TO keyList[checkIdx]
+                  
+                  SET condA TO freqMapCurrent[currentKey] < freqMapComplete[currentKey]
+                  SET condB TO NOT(condA)
+                  IF condA
+                      SET flagSelfContained TO (NOT condB)
+                      BREAK
+                  END IF
+                  SET checkIdx TO checkIdx + 1
+              END WHILE
+              
+              IF (flagSelfContained == true) AND (length(keys(freqMapCurrent)) < length(keys(freqMapComplete)))
+                  SET updatedLengthCandidate TO (startIdx - outerIndex) * -1 + (1 + 1)
+                  IF updatedLengthCandidate > longestLen
+                      SET longestLen TO updatedLengthCandidate
+                  END IF
+              END IF
+              CALL iterateSubstring(startIdx + 1, endIdx)
+          END FUNCTION
+      
+          CALL iterateSubstring(outerIndex, L_totalChars + -1)
+          SET outerIndex TO outerIndex + (1)
+      END WHILE
+      
+      RETURN longestLen
+    END FUNCTION
+END CLASS

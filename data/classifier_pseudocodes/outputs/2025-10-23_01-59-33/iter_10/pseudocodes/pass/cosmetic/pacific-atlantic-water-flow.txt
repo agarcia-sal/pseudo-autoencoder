@@ -1,0 +1,81 @@
+CLASS Solution
+    FUNCTION pacificAtlantic WITH PARAMETER heights
+        FUNCTION bfs WITH PARAMETERS q AND vis
+            ASSIGN m TO LENGTH OF heights
+            ASSIGN n TO LENGTH OF heights[0]
+            DEFINE directions AS LIST OF PAIRS: (-1, 0), (1, 0), (0, 1), (0, -1)
+            
+            WHILE LENGTH OF q IS GREATER THAN 0
+                ASSIGN count TO LENGTH OF q
+                ASSIGN idx TO 0
+                WHILE idx IS LESS THAN count
+                    REMOVE THE LEFTMOST ELEMENT FROM q AND ASSIGN IT TO pos
+                    ASSIGN i TO pos[0]
+                    ASSIGN j TO pos[1]
+                    
+                    ASSIGN d_idx TO 0
+                    WHILE d_idx IS LESS THAN LENGTH OF directions
+                        ASSIGN delta TO directions[d_idx]
+                        ASSIGN x TO i + delta[0]
+                        ASSIGN y TO j + delta[1]
+                        
+                        IF x >= 0 AND x < m AND y >= 0 AND y < n AND NOT (x, y) IN vis AND heights[x][y] >= heights[i][j]
+                            ADD (x, y) TO vis
+                            ADD (x, y) TO RIGHT OF q
+                        ENDIF
+                        
+                        INCREMENT d_idx BY 1
+                    END WHILE
+                    
+                    INCREMENT idx BY 1
+                END WHILE
+            END WHILE
+        END FUNCTION
+        
+        ASSIGN m TO LENGTH OF heights
+        ASSIGN n TO LENGTH OF heights[0]
+        INITIALIZE vis1 TO AN EMPTY SET
+        INITIALIZE vis2 TO AN EMPTY SET
+        INITIALIZE q1 TO AN EMPTY DEQUE
+        INITIALIZE q2 TO AN EMPTY DEQUE
+        
+        ASSIGN row TO 0
+        WHILE row < m
+            ASSIGN col TO 0
+            WHILE col < n
+                IF row = 0 OR col = 0
+                    ADD (row, col) TO vis1
+                    ADD (row, col) TO RIGHT OF q1
+                ENDIF
+                
+                IF row = m - 1 OR col = n - 1
+                    ADD (row, col) TO vis2
+                    ADD (row, col) TO RIGHT OF q2
+                ENDIF
+                
+                INCREMENT col BY 1
+            END WHILE
+            INCREMENT row BY 1
+        END WHILE
+        
+        CALL bfs WITH q1 AND vis1
+        CALL bfs WITH q2 AND vis2
+        
+        INITIALIZE result TO AN EMPTY LIST
+        
+        ASSIGN r_idx TO 0
+        WHILE r_idx < m
+            ASSIGN c_idx TO 0
+            WHILE c_idx < n
+                ASSIGN pos TO (r_idx, c_idx)
+                IF pos IN vis1 AND pos IN vis2
+                    ADD pos TO result
+                ENDIF
+                INCREMENT c_idx BY 1
+            END WHILE
+            INCREMENT r_idx BY 1
+        END WHILE
+        
+        RETURN result
+    END FUNCTION
+END CLASS

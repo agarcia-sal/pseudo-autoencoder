@@ -1,0 +1,71 @@
+CLASS Solution
+    FUNCTION rectangleArea(rectangles)
+        DEFINE CONSTANT MOD AS (1000000000 + 1)
+        INITIALIZE accumulatorSet AS an empty set
+
+        SET iteratorRectangles TO iterator over rectangles
+        WHILE TRUE
+            TRY
+                EXTRACT xStart, yBottom, xEnd, yTop FROM next element of iteratorRectangles
+                ADD yBottom TO accumulatorSet
+                ADD yTop TO accumulatorSet
+            CATCH StopIterationException
+                BREAK
+            END TRY
+        END WHILE
+
+        SET sortedYs TO sorted list derived from accumulatorSet
+        CREATE mappingDict AS empty dictionary
+
+        SET sequenceIndex TO 0
+        WHILE sequenceIndex LESS THAN length of sortedYs
+            ASSIGN mappingDict[sortedYs[sequenceIndex]] AS sequenceIndex
+            INCREMENT sequenceIndex BY 1
+        END WHILE
+
+        INITIALIZE coverageCounts AS list of zeros with size equal to length of sortedYs
+        CREATE eventList AS empty list
+
+        FOR EACH rectangle IN rectangles
+            DESTRUCTURE rectangle INTO xStart, yBottom, xEnd, yTop
+            APPEND (xStart, 1, yBottom, yTop) TO eventList
+            APPEND (xEnd, -1, yBottom, yTop) TO eventList
+        END FOR
+
+        SORT eventList BY first element of each tuple in ascending order
+
+        SET previousX AS 0
+        SET totalArea AS 0
+
+        SET idxEvent TO 0
+        WHILE idxEvent LESS THAN length of eventList
+            DESTRUCTURE eventList[idxEvent] INTO currX, eventSign, currY1, currY2
+
+            SET activeLength TO 0
+            SET idxCoverage TO 1
+            WHILE idxCoverage LESS THAN length of coverageCounts
+                IF coverageCounts[idxCoverage - 1] GREATER THAN 0 THEN
+                    SET heightSegment TO sortedYs[idxCoverage] MINUS sortedYs[idxCoverage - 1]
+                    INCREMENT activeLength BY heightSegment
+                END IF
+                INCREMENT idxCoverage BY 1
+            END WHILE
+
+            SET totalArea TO totalArea PLUS (activeLength TIMES (currX MINUS previousX))
+            SET totalArea TO totalArea MODULO MOD
+
+            SET startIdx TO mappingDict[currY1]
+            SET endIdx TO mappingDict[currY2] MINUS 1
+            SET updateIdx TO startIdx
+            WHILE updateIdx LESS THAN OR EQUAL TO endIdx
+                SET coverageCounts[updateIdx] TO coverageCounts[updateIdx] PLUS eventSign
+                INCREMENT updateIdx BY 1
+            END WHILE
+
+            SET previousX TO currX
+            INCREMENT idxEvent BY 1
+        END WHILE
+
+        RETURN totalArea
+    END FUNCTION
+END CLASS

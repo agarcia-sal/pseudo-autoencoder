@@ -1,0 +1,56 @@
+CLASS TrieNode  
+    FUNCTION __init__(self)  
+        SET self.children TO a new default dictionary that creates TrieNode objects  
+        SET self.deleted TO False  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION deleteDuplicateFolder(self, paths)  
+        SET ans TO an empty list  
+        SET root TO a new TrieNode object  
+        SET subtreeToNodes TO a new default dictionary with list as default value  
+
+        FOR each path IN the sorted order of paths  
+            SET node TO root  
+            FOR each s IN path  
+                SET node TO the child node of node.children corresponding to the element s  
+            END FOR  
+        END FOR  
+
+        FUNCTION buildSubtreeToRoots(node)  
+            SET subtree TO the concatenation of an opening parenthesis WITH  
+                the concatenation FOR each s IN the children of node OF  
+                    the element s concatenated WITH buildSubtreeToRoots called with the child node corresponding to s  
+                AND THEN a closing parenthesis  
+            IF subtree NOT EQUALS the string consisting of opening and closing parenthesis with nothing in between  
+                APPEND node TO the list in subtreeToNodes corresponding to the key subtree  
+            END IF  
+            RETURN subtree  
+        END FUNCTION  
+
+        CALL buildSubtreeToRoots with root as argument  
+
+        FOR each nodes IN the values of subtreeToNodes  
+            IF the length of nodes GREATER THAN one  
+                FOR each node IN nodes  
+                    SET node.deleted TO True  
+                END FOR  
+            END IF  
+        END FOR  
+
+        FUNCTION constructPath(node, path)  
+            FOR each pair of s and child IN the items of node.children  
+                IF child.deleted EQUALS False  
+                    CALL constructPath with child and the concatenation of path WITH the element s as a new list  
+                END IF  
+            END FOR  
+            IF the length of path GREATER THAN zero  
+                APPEND path TO ans  
+            END IF  
+        END FUNCTION  
+
+        CALL constructPath with root and an empty list as arguments  
+        RETURN ans  
+    END FUNCTION  
+END CLASS

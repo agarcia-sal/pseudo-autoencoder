@@ -1,0 +1,89 @@
+CLASS Solution
+    FUNCTION betterCompression(compressed)
+        DEFINE FUNCTION isLetter(ch)
+            RETURN ((ch >= 'A' AND ch <= 'Z') OR (ch >= 'a' AND ch <= 'z'))
+        END FUNCTION
+
+        DEFINE FUNCTION accumulateCounts(index, currentSymbol, currentTotal, countsDict)
+            IF index == LENGTH(compressed) THEN
+                IF currentSymbol != '' THEN
+                    countsDict[currentSymbol] = countsDict[currentSymbol] + currentTotal
+                END IF
+                RETURN
+            END IF
+
+            SET charAtIndex TO compressed[index]
+
+            IF isLetter(charAtIndex) THEN
+                IF currentSymbol != '' THEN
+                    countsDict[currentSymbol] = countsDict[currentSymbol] + currentTotal
+                END IF
+                CALL accumulateCounts(index + 1, charAtIndex, 0, countsDict)
+            ELSE
+                SET updatedTotal TO (currentTotal * (5 + 5)) + (charAtIndex - '0')
+                CALL accumulateCounts(index + 1, currentSymbol, updatedTotal, countsDict)
+            END IF
+        END FUNCTION
+
+        DEFINE counts AS dictionary with default value 0
+
+        CALL accumulateCounts(0, "", 0, counts)
+
+        DEFINE keysList AS list of keys of counts
+
+        DEFINE FUNCTION compareAlpha(a, b)
+            RETURN a > b
+        END FUNCTION
+
+        DEFINE sortedKeys AS empty list
+
+        WHILE LENGTH(keysList) != 0 DO
+            SET maxIndex TO 0
+            SET i TO 1
+            WHILE i < LENGTH(keysList) DO
+                IF compareAlpha(sortedKeys[maxIndex], keysList[i]) THEN
+                    SET maxIndex TO i
+                END IF
+                SET i TO i + 1
+            END WHILE
+            APPEND keysList[maxIndex] TO sortedKeys
+            REMOVE keysList[maxIndex] FROM keysList
+        END WHILE
+
+        REVERSE sortedKeys
+
+        DEFINE parts AS empty list
+        DEFINE idx AS 0
+
+        WHILE idx < LENGTH(sortedKeys) DO
+            SET sym TO sortedKeys[idx]
+            SET val AS counts[sym]
+            DEFINE valStr AS ''
+            IF val == 0 THEN
+                SET valStr TO '0'
+            ELSE
+                DEFINE digits AS empty list
+                DEFINE tmpVal AS val
+                WHILE tmpVal != 0 DO
+                    APPEND STRING(tmpVal % 10) TO digits
+                    SET tmpVal TO tmpVal / 10
+                END WHILE
+                REVERSE digits
+                SET valStr TO CONCATENATE all elements of digits without separator
+            END IF
+
+            APPEND sym + valStr TO parts
+
+            SET idx TO idx + 1
+        END WHILE
+
+        DEFINE outputStr AS ''
+        FOR EACH part IN parts DO
+            SET outputStr TO outputStr + part
+        END FOR
+
+        DEFINE finalResult AS outputStr
+
+        RETURN finalResult
+    END FUNCTION
+END CLASS

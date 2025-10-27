@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION loudAndRich(richer, quiet)  
+        DECLARE graph AS a default dictionary mapping integer keys to sets  
+        
+        FOR index j FROM 0 TO LENGTH(richer) - 1  
+            LET richOne = richer[j][0]  
+            LET poorOne = richer[j][1]  
+            IF poorOne NOT IN graph THEN  
+                graph[poorOne] = EMPTY SET  
+            END IF  
+            ADD richOne TO graph[poorOne]  
+        END FOR  
+        
+        LET numPersons = LENGTH(quiet)  
+        LET res = AN ARRAY OF size numPersons FILLED WITH -1  
+        
+        FUNCTION traverse(person) RETURNS integer  
+            IF res[person] != -1 THEN  
+                RETURN res[person]  
+            END IF  
+            
+            res[person] = person  
+            IF graph CONTAINS person THEN  
+                FOR each adj IN graph[person]  
+                    LET contender = traverse(adj)  
+                    IF quiet[contender] < quiet[res[person]] THEN  
+                        res[person] = contender  
+                    END IF  
+                END FOR  
+            END IF  
+            RETURN res[person]  
+        END FUNCTION  
+        
+        FOR k FROM 0 TO numPersons - 1  
+            _ = traverse(k)  
+        END FOR  
+        
+        RETURN res  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,85 @@
+```  
+CLASS Solution
+    FUNCTION minimumArea(grid)
+        IF NOT (grid IS EMPTY) AND NOT (grid[0] IS EMPTY)
+            // proceed
+        ELSE
+            RETURN 0
+        END IF
+
+        PROCEDURE traverseRows(indexRow, limitRow, curMinRow, curMaxRow, traverseColsProc)
+            IF indexRow > limitRow THEN
+                CALL traverseColsProc()
+                RETURN curMinRow, curMaxRow
+            ELSE
+                PROCEDURE traverseCols(indexCol, limitCol, curMinC, curMaxC, updatedMinR, updatedMaxR)
+                    IF indexCol > limitCol THEN
+                        RETURN updatedMinR, updatedMaxR, curMinC, curMaxC
+                    ELSE
+                        IF grid[indexRow][indexCol] = 1 THEN
+                            SET updatedMinR TO (IF updatedMinR < indexRow THEN updatedMinR ELSE indexRow)
+                            SET updatedMaxR TO (IF updatedMaxR > indexRow THEN updatedMaxR ELSE indexRow)
+                            SET curMinC TO (IF curMinC < indexCol THEN curMinC ELSE indexCol)
+                            SET curMaxC TO (IF curMaxC > indexCol THEN curMaxC ELSE indexCol)
+                        END IF
+                        RETURN traverseCols(indexCol + 1, limitCol, curMinC, curMaxC, updatedMinR, updatedMaxR)
+                    END IF
+                END PROCEDURE
+
+                SET newMinRow TO curMinRow
+                SET newMaxRow TO curMaxRow
+
+                SET colResult TO traverseCols(0, LENGTH(grid[0]) - 1, positive infinity, negative infinity, newMinRow, newMaxRow)
+                SET newMinRow TO colResult[0]
+                SET newMaxRow TO colResult[1]
+                SET minColLocal TO colResult[2]
+                SET maxColLocal TO colResult[3]
+
+                // Because minCol and maxCol are global accums, combine accordingly outside
+
+                SET nextResult TO traverseRows(indexRow + 1, limitRow, newMinRow, newMaxRow, PROCEDURE() RETURN ())
+                RETURN nextResult[0], nextResult[1], minColLocal, maxColLocal
+            END IF
+        END PROCEDURE
+
+        FUNCTION findBounds()
+            RETURN traverseRows(0, LENGTH(grid) - 1, positive infinity, negative infinity, PROCEDURE() RETURN ())
+        END FUNCTION
+
+        SET minRowGlobal TO positive infinity
+        SET maxRowGlobal TO negative infinity
+        SET minColGlobal TO positive infinity
+        SET maxColGlobal TO negative infinity
+
+        // Flatten loop over rows and columns recursively and update min/max rows and cols accordingly
+
+        PROCEDURE updateBounds(i, j, currMinRow, currMaxRow, currMinCol, currMaxCol)
+            IF i > LENGTH(grid) - 1 THEN
+                RETURN currMinRow, currMaxRow, currMinCol, currMaxCol
+            ELSE
+                IF j > LENGTH(grid[0]) - 1 THEN
+                    RETURN updateBounds(i + 1, 0, currMinRow, currMaxRow, currMinCol, currMaxCol)
+                ELSE
+                    IF grid[i][j] = 1 THEN
+                        SET currMinRow TO (IF currMinRow < i THEN currMinRow ELSE i)
+                        SET currMaxRow TO (IF currMaxRow > i THEN currMaxRow ELSE i)
+                        SET currMinCol TO (IF currMinCol < j THEN currMinCol ELSE j)
+                        SET currMaxCol TO (IF currMaxCol > j THEN currMaxCol ELSE j)
+                    END IF
+                    RETURN updateBounds(i, j + 1, currMinRow, currMaxRow, currMinCol, currMaxCol)
+                END IF
+            END IF
+        END PROCEDURE
+
+        SET minRowGlobal, maxRowGlobal, minColGlobal, maxColGlobal TO updateBounds(0, 0, positive infinity, negative infinity, positive infinity, negative infinity)
+
+        IF minRowGlobal = positive infinity THEN
+            RETURN 0
+        ELSE
+            SET heightVal TO (maxRowGlobal - minRowGlobal + 1)
+            SET widthVal TO (maxColGlobal - minColGlobal + 1)
+            RETURN heightVal * widthVal
+        END IF
+    END FUNCTION
+END CLASS
+```

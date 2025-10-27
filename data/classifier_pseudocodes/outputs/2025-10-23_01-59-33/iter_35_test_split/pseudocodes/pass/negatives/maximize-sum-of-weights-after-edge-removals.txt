@@ -1,0 +1,137 @@
+CLASS UnionFind
+    FUNCTION __init__(self, p)
+      SET self.parent TO empty list
+      SET self.rank TO empty list
+      SET t TO 0
+      REPEAT
+          SET self.parent[t] TO t
+          SET self.rank[t] TO 0
+          SET t TO t + 1
+      UNTIL t GREATER_THAN_OR_EQUAL_TO p
+    END FUNCTION
+
+    FUNCTION find(self, a)
+        FUNCTION recurse(x)
+            IF NOT (self.parent[x] EQUALS x)
+                SET self.parent[x] TO recurse(self.parent[x])
+            END IF
+            RETURN self.parent[x]
+        END FUNCTION
+        SET result TO recurse(a)
+        RETURN result
+    END FUNCTION
+
+    FUNCTION union(self, x, y)
+        SET xRoot TO self.find(x)
+        SET yRoot TO self.find(y)
+        IF (xRoot EQUALS yRoot)
+            RETURN
+        END IF
+
+        IF (NOT NOT (self.rank[xRoot] GREATER_THAN self.rank[yRoot]))
+            IF (self.rank[xRoot] LESS_THAN self.rank[yRoot]) THEN
+                SET self.parent[xRoot] TO yRoot
+            ELSE
+                SET self.parent[yRoot] TO xRoot
+                SET self.rank[xRoot] TO (self.rank[xRoot] PLUS 1)
+            END IF
+        ELSE
+            SET self.parent[yRoot] TO xRoot
+        END IF
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION maximizeSumOfWeights(self, list, x)
+        SET a TO LENGTH_OF(list)
+        SET n TO a PLUS 1
+
+        FUNCTION createZeroList(length)
+            IF length LESS_THAN 1 THEN
+                RETURN empty list
+            ELSE
+                SET res TO createZeroList(length MINUS 1)
+                SET res[length MINUS 1] TO 0 PLUS 0
+                RETURN res
+            END IF
+        END FUNCTION
+
+        SET deg TO createZeroList(n)
+        SET uf TO UnionFind(n)
+
+        FUNCTION sortDesc(l)
+            IF LENGTH_OF(l) LESS_THAN_OR_EQUAL_TO 1 THEN
+                RETURN l
+            ELSE
+                SET pivot TO l[0]
+                SET rest TO l[1 TO LENGTH_OF(l) MINUS 1]
+
+                FUNCTION filterGreaterEqual(lst, val)
+                    IF LENGTH_OF(lst) EQUALS 0 THEN
+                        RETURN empty list
+                    ELSE
+                      SET head TO lst[0]
+                      SET tail TO lst[1 TO LENGTH_OF(lst) MINUS 1]
+                      IF head[2] GREATER_THAN_OR_EQUAL_TO val THEN
+                          RETURN [head] PLUS filterGreaterEqual(tail,val)
+                      ELSE
+                          RETURN filterGreaterEqual(tail,val)
+                      END IF
+                    END IF
+                END FUNCTION
+
+                FUNCTION filterLess(lst, val)
+                    IF LENGTH_OF(lst) EQUALS 0 THEN
+                        RETURN empty list
+                    ELSE
+                      SET head TO lst[0]
+                      SET tail TO lst[1 TO LENGTH_OF(lst) MINUS 1]
+                      IF head[2] LESS_THAN val THEN
+                          RETURN [head] PLUS filterLess(tail,val)
+                      ELSE
+                          RETURN filterLess(tail,val)
+                      END IF
+                    END IF
+                END FUNCTION
+
+                SET left TO sortDesc(filterGreaterEqual(rest, pivot[2]))
+                SET right TO sortDesc(filterLess(rest, pivot[2]))
+
+                RETURN left PLUS [pivot] PLUS right
+            END IF
+        END FUNCTION
+
+        SET edges TO sortDesc(list)
+        SET total TO 0 PLUS 0
+
+        FUNCTION incrementAt(lst, idx)
+            SET lst[idx] TO lst[idx] PLUS 1
+        END FUNCTION
+
+        FUNCTION canAdd(edge)
+            SET i TO edge[0]
+            SET j TO edge[1]
+            RETURN NOT (deg[i] GREATER_OR_EQUAL_TO x OR deg[j] GREATER_OR_EQUAL_TO x OR uf.find(i) EQUALS uf.find(j))
+        END FUNCTION
+
+        FUNCTION processEdges(idx)
+            IF idx GREATER_OR_EQUAL_TO LENGTH_OF(edges) THEN
+                RETURN 0
+            ELSE
+                SET e TO edges[idx]
+                IF canAdd(e) THEN
+                    CALL uf.union(e[0], e[1])
+                    incrementAt(deg, e[0])
+                    incrementAt(deg, e[1])
+                    RETURN e[2] PLUS processEdges(idx PLUS 1)
+                ELSE
+                    RETURN processEdges(idx PLUS 1)
+                END IF
+            END IF
+        END FUNCTION
+
+        SET total TO processEdges(0)
+
+        RETURN total
+    END FUNCTION
+END CLASS

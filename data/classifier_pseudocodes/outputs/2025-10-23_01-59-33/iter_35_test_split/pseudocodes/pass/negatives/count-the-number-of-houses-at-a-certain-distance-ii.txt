@@ -1,0 +1,118 @@
+CLASS Solution
+    FUNCTION countOfPairs(n, x, y)
+        FUNCTION helperBFS(startNode)
+            PROCEDURE initializeLists(size, initVal)
+                SET arr TO empty list
+                SET idx TO zero
+                REPEAT
+                    IF idx GREATER THAN OR EQUAL TO size
+                        BREAK
+                    END IF
+                    ADD initVal TO arr
+                    SET idx TO idx PLUS one
+                UNTIL FALSE
+                RETURN arr
+            END PROCEDURE
+            
+            SET visitedNodes TO initializeLists(n PLUS one, False)
+            SET distValues TO initializeLists(n PLUS one, 0)
+            PROCEDURE enqueue(queueRef, value)
+                ADD value TO END OF queueRef
+            END PROCEDURE
+            
+            SET q TO empty list
+            enqueue(q, startNode)
+            SET visitedNodes[startNode] TO True
+            
+            FUNCTION dequeue(queueRef)
+                SET firstElem TO queueRef[0]
+                REMOVE first element FROM queueRef
+                RETURN firstElem
+            END FUNCTION
+            
+            PROCEDURE processNeighbor(neighb, curr)
+                IF neighb GREATER THAN OR EQUAL TO 1 AND neighb LESS THAN OR EQUAL TO n AND visitedNodes[neighb] EQUALS False
+                    SET visitedNodes[neighb] TO True
+                    SET distValues[neighb] TO distValues[curr] PLUS 1
+                    enqueue(q, neighb)
+                END IF
+            END PROCEDURE
+            
+            WHILE TRUE
+                IF LENGTH OF q EQUALS 0
+                    BREAK
+                END IF
+                SET currNode TO dequeue(q)
+                
+                SET neighborsList TO [currNode MINUS 1, currNode PLUS 1]
+                FOR each nb IN neighborsList
+                    processNeighbor(nb, currNode)
+                END FOR
+                
+                IF currNode EQUALS x AND visitedNodes[y] EQUALS False
+                    SET visitedNodes[y] TO True
+                    SET distValues[y] TO distValues[currNode] PLUS 1
+                    enqueue(q, y)
+                ELSE 
+                    IF currNode EQUALS y AND visitedNodes[x] EQUALS False
+                        SET visitedNodes[x] TO True
+                        SET distValues[x] TO distValues[currNode] PLUS 1
+                        enqueue(q, x)
+                    END IF
+                END IF
+            END WHILE
+            
+            FUNCTION sliceList(fullList, startIndex)
+                SET sliced TO empty list
+                SET idx2 TO startIndex
+                REPEAT
+                    IF idx2 GREATER THAN LENGTH OF fullList
+                        BREAK
+                    END IF
+                    ADD fullList[idx2] TO sliced
+                    SET idx2 TO idx2 PLUS 1
+                UNTIL FALSE
+                RETURN sliced
+            END FUNCTION
+            
+            RETURN sliceList(distValues, 1)
+        END FUNCTION
+        
+        PROCEDURE swapIfGT(refA, refB)
+            IF refA GREATER THAN refB
+                SET tempVal TO refA
+                SET refA TO refB
+                SET refB TO tempVal
+            END IF
+        END PROCEDURE
+        
+        CALL swapIfGT(x, y)
+        
+        SET resultsList TO empty list
+        SET iCounter TO 1
+        REPEAT
+            IF iCounter GREATER THAN n
+                BREAK
+            END IF
+            
+            SET distList TO helperBFS(iCounter)
+            FOR each distItem IN distList
+                IF distItem GREATER THAN 0
+                    IF LENGTH OF resultsList LESS THAN distItem
+                        REPEAT
+                            IF LENGTH OF resultsList GREATER THAN OR EQUAL TO distItem
+                                BREAK
+                            END IF
+                            ADD 0 TO resultsList
+                        UNTIL FALSE
+                    END IF
+                    SET resultsList[distItem MINUS 1] TO resultsList[distItem MINUS 1] PLUS 1
+                END IF
+            END FOR
+            
+            SET iCounter TO iCounter PLUS 1
+        UNTIL FALSE
+        
+        RETURN resultsList
+    END FUNCTION
+END CLASS

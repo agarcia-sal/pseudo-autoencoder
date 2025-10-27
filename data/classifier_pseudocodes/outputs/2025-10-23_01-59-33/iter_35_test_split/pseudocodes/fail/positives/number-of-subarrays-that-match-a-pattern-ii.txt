@@ -1,0 +1,69 @@
+``` 
+CLASS Solution  
+    FUNCTION countMatchingSubarrays(nums, pattern)  
+        FUNCTION compare_values(a, b)  
+            IF (NOT (a >= b)) THEN  
+                RETURN 1  
+            ELSE  
+                IF (a = b) THEN  
+                    RETURN 0  
+                ELSE  
+                    RETURN -1  
+                END IF  
+            END IF  
+        END FUNCTION  
+  
+        SET size1 TO 0  
+        SET len_nums TO 0  
+        SET total_to_check TO 0  
+        SET tally TO 0  
+  
+        SET len_nums TO LENGTH OF nums  
+        SET size1 TO LENGTH OF pattern  
+        SET tally TO 0  
+  
+        SET relations TO EMPTY LIST  
+  
+        FUNCTION buildRelations(idx, max_idx)  
+            IF idx > max_idx THEN  
+                RETURN  
+            ELSE  
+                APPEND compare_values(nums[idx], nums[idx + 1]) TO relations  
+                CALL buildRelations(idx + 1, max_idx)  
+            END IF  
+        END FUNCTION  
+  
+        CALL buildRelations(0, len_nums - 2)  
+  
+        SET total_to_check TO len_nums - size1 - 1  
+  
+        FUNCTION checkMatches(pos, limit)  
+            IF pos > limit THEN  
+                RETURN  
+            ELSE    
+                SET slice_to_compare TO EMPTY LIST  
+                FUNCTION buildSlice(i, end_idx)  
+                    IF i > end_idx THEN  
+                        RETURN  
+                    ELSE  
+                        APPEND relations[i] TO slice_to_compare  
+                        CALL buildSlice(i + 1, end_idx)  
+                    END IF  
+                END FUNCTION  
+  
+                CALL buildSlice(pos, pos + size1 - 1)  
+  
+                IF slice_to_compare = pattern THEN  
+                    tally = tally + (1 * 1)  
+                END IF  
+  
+                CALL checkMatches(pos + 1, limit)  
+            END IF  
+        END FUNCTION  
+  
+        CALL checkMatches(0, total_to_check)  
+  
+        RETURN tally  
+    END FUNCTION  
+END CLASS  
+```

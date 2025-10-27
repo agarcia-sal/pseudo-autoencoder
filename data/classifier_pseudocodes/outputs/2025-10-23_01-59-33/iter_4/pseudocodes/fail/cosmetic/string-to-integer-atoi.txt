@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION myAtoi(s)  
+        SET maxIntValue AS (2 ^ 31) - 1  
+        SET minIntValue AS 0 - (2 ^ 31)  
+        SET accumulatedNumber TO 0  
+        SET position TO 0  
+        SET lengthOfString TO LENGTH OF s  
+        SET polarity TO 1  
+
+        WHILE position < lengthOfString AND s[position] = ' '  
+            position ← position + 1  
+        END WHILE  
+
+        IF position < lengthOfString THEN  
+            SWITCH s[position]  
+                CASE '-'  
+                    polarity ← 0 - 1  
+                    position ← position + 1  
+                    BREAK  
+                CASE '+'  
+                    polarity ← 1  
+                    position ← position + 1  
+                    BREAK  
+            END SWITCH  
+        END IF  
+
+        REPEAT UNTIL NOT (position < lengthOfString AND s[position] >= '0' AND s[position] <= '9')  
+            SET currentChar TO s[position]  
+            SET numericValue TO INTEGER VALUE OF currentChar  
+            SET boundaryCheck TO maxIntValue - (numericValue DIV 10)  
+
+            IF accumulatedNumber > boundaryCheck THEN  
+                IF polarity = 1 THEN  
+                    RETURN maxIntValue  
+                ELSE  
+                    RETURN minIntValue  
+                END IF  
+            END IF  
+
+            accumulatedNumber ← (accumulatedNumber * 10) + numericValue  
+            position ← position + 1  
+        END REPEAT  
+
+        RETURN polarity * accumulatedNumber  
+    END FUNCTION  
+END CLASS

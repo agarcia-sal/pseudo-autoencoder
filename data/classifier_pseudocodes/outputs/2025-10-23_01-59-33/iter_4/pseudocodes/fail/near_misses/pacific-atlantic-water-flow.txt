@@ -1,0 +1,142 @@
+CLASS Solution
+    FUNCTION pacificAtlantic WITH PARAMETER heights
+        FUNCTION bfs WITH PARAMETERS queue_structure AND visited_set
+            SET directions TO list of tuples: (-1, 0), (0, 1), (1, 0), (0, -1)
+            
+            FUNCTION process_next
+                IF LENGTH(queue_structure) EQUALS 0
+                    RETURN
+                END IF
+                
+                SET current_pair TO REMOVE_FRONT(queue_structure)
+                SET row_index TO current_pair[0]
+                SET col_index TO current_pair[1]
+                
+                FUNCTION check_direction AT INDEX idx
+                    IF idx EQUALS LENGTH(directions)
+                        RETURN
+                    END IF
+                    
+                    SET delta_row TO directions[idx][0]
+                    SET delta_col TO directions[idx][1]
+                    
+                    SET new_row TO row_index + delta_row
+                    SET new_col TO col_index + delta_col
+                    
+                    IF new_row >= 0 AND new_row < m AND new_col >= 0 AND new_col < n THEN
+                        IF (new_row, new_col) NOT IN visited_set THEN
+                            IF heights[new_row][new_col] >= heights[row_index][col_index] THEN
+                                ADD (new_row, new_col) TO visited_set
+                                APPEND (new_row, new_col) TO queue_structure
+                            END IF
+                        END IF
+                    END IF
+                    
+                    CALL check_direction WITH idx + 1
+                END FUNCTION
+                
+                CALL check_direction WITH 0
+                CALL process_next
+            END FUNCTION
+            
+            CALL process_next
+        END FUNCTION
+        
+        SET m TO LENGTH(heights)
+        SET n TO LENGTH(heights[0])
+        SET visited_pacific TO empty set
+        SET visited_atlantic TO empty set
+        SET queue_pacific TO empty list
+        SET queue_atlantic TO empty list
+        
+        FUNCTION enqueue_edges_row AT INDEX x
+            IF x EQUALS 0 OR x EQUALS m - 1 THEN
+                SET index_a TO 0
+                FUNCTION add_col_a
+                    IF index_a EQUALS n
+                        RETURN
+                    END IF
+                    SET coord TO (x, index_a)
+                    IF x EQUALS 0
+                        ADD coord TO visited_pacific
+                        APPEND coord TO queue_pacific
+                    ELSE
+                        ADD coord TO visited_atlantic
+                        APPEND coord TO queue_atlantic
+                    END IF
+                    SET index_a TO index_a + 1
+                    CALL add_col_a
+                END FUNCTION
+                CALL add_col_a
+            END IF
+        END FUNCTION
+        
+        FUNCTION enqueue_edges_col AT INDEX y
+            IF y EQUALS 0 OR y EQUALS n - 1 THEN
+                SET index_b TO 0
+                FUNCTION add_row_b
+                    IF index_b EQUALS m
+                        RETURN
+                    END IF
+                    SET coord_b TO (index_b, y)
+                    IF y EQUALS 0
+                        ADD coord_b TO visited_pacific
+                        APPEND coord_b TO queue_pacific
+                    ELSE
+                        ADD coord_b TO visited_atlantic
+                        APPEND coord_b TO queue_atlantic
+                    END IF
+                    SET index_b TO index_b + 1
+                    CALL add_row_b
+                END FUNCTION
+                CALL add_row_b
+            END IF
+        END FUNCTION
+        
+        SET row_counter TO 0
+        FUNCTION loop_rows
+            IF row_counter = m THEN
+                RETURN
+            END IF
+            CALL enqueue_edges_row WITH row_counter
+            SET col_counter TO 0
+            FUNCTION loop_cols
+                IF col_counter = n THEN
+                    RETURN
+                END IF
+                IF row_counter != 0 AND row_counter != m - 1 THEN
+                    CALL enqueue_edges_col WITH col_counter
+                END IF
+                SET col_counter TO col_counter + 1
+                CALL loop_cols
+            END FUNCTION
+            CALL loop_cols
+            SET row_counter TO row_counter + 1
+            CALL loop_rows
+        END FUNCTION
+        CALL loop_rows
+        
+        CALL bfs WITH queue_pacific AND visited_pacific
+        CALL bfs WITH queue_atlantic AND visited_atlantic
+        
+        SET output_collection TO empty list
+        
+        FUNCTION collect_coords IN ROW r, COL c
+            IF r EQUALS m THEN
+                RETURN
+            END IF
+            IF c EQUALS n THEN
+                CALL collect_coords WITH r + 1 AND 0
+                RETURN
+            END IF
+            IF (r, c) IN visited_pacific AND (r, c) IN visited_atlantic THEN
+                APPEND (r, c) TO output_collection
+            END IF
+            CALL collect_coords WITH r AND c + 1
+        END FUNCTION
+        
+        CALL collect_coords WITH 0 AND 0
+        
+        RETURN output_collection
+    END FUNCTION
+END CLASS

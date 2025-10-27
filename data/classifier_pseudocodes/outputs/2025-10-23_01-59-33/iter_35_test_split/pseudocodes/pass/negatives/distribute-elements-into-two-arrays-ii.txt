@@ -1,0 +1,67 @@
+CLASS Solution  
+    FUNCTION resultArray(nums)  
+  	    FUNCTION locateInsertIndex(targetList, targetValue)  
+  	        SET lowBound TO 0  
+  	        SET highBound TO LENGTH OF targetList  
+  	        WHILE lowBound < highBound  
+  	            SET midPos TO (lowBound + highBound) DIV 2  
+  	            IF targetValue < targetList[midPos] OR targetValue = targetList[midPos]  
+  	                SET highBound TO midPos  
+  	            ELSE  
+  	                SET lowBound TO midPos + 1  
+  	            END IF  
+  	        END WHILE  
+  	        RETURN lowBound  
+  	    END FUNCTION
+
+        FUNCTION greaterCount(arr, val)  
+            SET insertIndex TO locateInsertIndex(arr, val)  
+            RETURN LENGTH OF arr - insertIndex  
+        END FUNCTION
+
+        SET sequenceA TO list with single element nums[0]  
+        SET sequenceB TO list with single element nums[1]  
+        SET sortedA TO list with single element nums[0]  
+        SET sortedB TO list with single element nums[1]  
+
+        SET position TO 2  
+        WHILE position < LENGTH OF nums  
+            SET currentVal TO nums[position]  
+            SET countA TO greaterCount(sortedA, currentVal)  
+            SET countB TO greaterCount(sortedB, currentVal)
+
+            IF countA > countB THEN
+                CALL appendAndInsert(currentVal, sequenceA, sortedA)
+            ELSE IF countA < countB THEN
+                CALL appendAndInsert(currentVal, sequenceB, sortedB)
+            ELSE
+                IF LENGTH OF sequenceA <= LENGTH OF sequenceB THEN
+                    CALL appendAndInsert(currentVal, sequenceA, sortedA)
+                ELSE
+                    CALL appendAndInsert(currentVal, sequenceB, sortedB)
+                END IF
+            END IF
+            SET position TO position + 1
+        END WHILE
+
+        RETURN sequenceA + sequenceB
+    END FUNCTION
+
+    FUNCTION appendAndInsert(value, unsortedList, sortedList)
+        APPEND value TO unsortedList
+
+        SET inserted TO FALSE
+        SET idx TO 0
+        WHILE (idx < LENGTH OF sortedList) AND (NOT inserted)
+            IF value <= sortedList[idx] THEN
+                INSERT value AT idx IN sortedList
+                SET inserted TO TRUE
+            ELSE
+                SET idx TO idx + 1
+            END IF
+        END WHILE
+        IF NOT inserted THEN
+            APPEND value TO sortedList
+        END IF
+    END FUNCTION
+END CLASS

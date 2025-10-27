@@ -1,0 +1,84 @@
+CLASS Solution
+    FUNCTION movesToStamp(stamp string, target string) RETURNS list of integers
+        LET alpha = LENGTH(stamp)
+        LET beta = LENGTH(target)
+        LET degree = ARRAY(alpha = 0) FILLED WITH (alpha FOR _ FROM 1 TO beta - alpha + 1)
+        LET buffer = LINKEDLIST()
+        LET graph = ARRAY(alpha = 0) FILLED WITH (EMPTY ARRAY FOR _ FROM 1 TO beta)
+
+        PROCEDURE fill_structure(pos integer, idx integer)
+            LET st_char = stamp[idx]
+            IF target[pos + idx] = st_char THEN
+                degree[pos] = degree[pos] - 1
+                IF degree[pos] = 0 THEN buffer.APPEND(pos)
+            ELSE
+                graph[pos + idx].APPEND(pos)
+            END IF
+        END PROCEDURE
+
+        PROCEDURE loop_j(pos integer, limit integer)
+            IF limit < 0 THEN RETURN
+            fill_structure(pos, limit)
+            loop_j(pos, limit - 1)
+        END PROCEDURE
+
+        PROCEDURE loop_i(pos integer, limit integer)
+            IF pos > limit THEN RETURN
+            loop_j(pos, alpha - 1)
+            loop_i(pos + 1, limit)
+        END PROCEDURE
+
+        loop_i(0, beta - alpha)
+
+        LET answer = QUEUE()
+        LET seen = ARRAY(beta) FILLED WITH FALSE
+
+        FUNCTION process_queue()
+            IF buffer.IS_EMPTY() THEN RETURN
+            LET current = buffer.POP_FIRST()
+            answer.ENQUEUE(current)
+
+            FUNCTION loop_j_inner(offset integer)
+                IF offset < 0 THEN RETURN
+                LET idx = current + offset
+                IF NOT seen[idx] THEN
+                    seen[idx] = TRUE
+                    FUNCTION process_k(k_index integer, length integer)
+                        IF k_index >= length THEN RETURN
+                        LET value = graph[idx][k_index]
+                        degree[value] = degree[value] - 1
+                        IF degree[value] = 0 THEN buffer.APPEND(value)
+                        process_k(k_index + 1, length)
+                    END FUNCTION
+                    process_k(0, LENGTH(graph[idx]))
+                END IF
+                loop_j_inner(offset - 1)
+            END FUNCTION
+
+            loop_j_inner(alpha - 1)
+            process_queue()
+        END FUNCTION
+
+        process_queue()
+
+        FUNCTION all_true(arr array, current integer, length integer) RETURNS boolean
+            IF current = length THEN RETURN TRUE
+            IF arr[current] = FALSE THEN RETURN FALSE
+            RETURN all_true(arr, current + 1, length)
+        END FUNCTION
+
+        IF all_true(seen, 0, beta) THEN
+            LET result = STACK()
+            WHILE NOT answer.IS_EMPTY()
+                result.PUSH(answer.DEQUEUE())
+            END WHILE
+            LET final = ARRAY()
+            WHILE NOT result.IS_EMPTY()
+                final.APPEND(result.POP())
+            END WHILE
+            RETURN final
+        ELSE
+            RETURN ARRAY()
+        END IF
+    END FUNCTION
+END CLASS

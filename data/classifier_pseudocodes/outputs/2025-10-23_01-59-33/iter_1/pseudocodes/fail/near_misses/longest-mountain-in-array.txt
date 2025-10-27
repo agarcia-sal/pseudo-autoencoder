@@ -1,0 +1,59 @@
+CLASS Solution
+    FUNCTION longestMountain(arr)
+        ASSIGN countLength TO 0
+        ASSIGN size TO LENGTH(arr)
+        ASSIGN index TO 1
+
+        FUNCTION findPeak(pos)
+            IF pos >= size - 1 THEN
+                RETURN pos
+            ELSEIF arr[pos] > arr[pos - 1] AND arr[pos] > arr[pos + 1] THEN
+                RETURN pos
+            ELSE
+                RETURN findPeak(pos + 1)
+            ENDIF
+        END FUNCTION
+
+        FUNCTION expandLeft(bound)
+            IF bound <= 0 THEN
+                RETURN bound
+            ELSEIF arr[bound - 1] < arr[bound] THEN
+                RETURN expandLeft(bound - 1)
+            ELSE
+                RETURN bound
+            ENDIF
+        END FUNCTION
+
+        FUNCTION expandRight(bound)
+            IF bound >= size - 1 THEN
+                RETURN bound
+            ELSEIF arr[bound] > arr[bound + 1] THEN
+                RETURN expandRight(bound + 1)
+            ELSE
+                RETURN bound
+            ENDIF
+        END FUNCTION
+
+        WHILE index < size - 1 DO
+            ASSIGN peak TO findPeak(index)
+            
+            IF (peak == index) THEN
+                index = index + 1
+                CONTINUE WHILE
+            ENDIF
+
+            ASSIGN leftEdge TO expandLeft(peak - 1)
+            ASSIGN rightEdge TO expandRight(peak + 1)
+
+            ASSIGN currentLength TO rightEdge - leftEdge + 1
+
+            IF currentLength > countLength THEN
+                countLength = currentLength
+            ENDIF
+
+            index = rightEdge + 1
+        END WHILE
+
+        RETURN countLength
+    END FUNCTION
+END CLASS

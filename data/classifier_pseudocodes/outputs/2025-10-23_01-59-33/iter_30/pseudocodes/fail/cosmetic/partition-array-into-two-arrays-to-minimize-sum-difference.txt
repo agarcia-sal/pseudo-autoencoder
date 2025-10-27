@@ -1,0 +1,67 @@
+CLASS Solution
+    FUNCTION minimumDifference(nums)
+        ASSIGN (LENGTH OF nums) DIV 2 TO half_length
+        ASSIGN ADD ALL ELEMENTS IN nums TO sum_total
+        ASSIGN sum_total DIV 2 TO half_target
+        ASSIGN positive infinity TO minimal_difference
+
+        ASSIGN SUBARRAY OF nums FROM INDEX 0 TO half_length EXCLUSIVE TO left_segment
+        ASSIGN SUBARRAY OF nums FROM INDEX half_length TO END TO right_segment
+
+        ASSIGN A LIST OF (half_length + 1) EMPTY MAPS TO sums_left
+        ASSIGN A LIST OF (half_length + 1) EMPTY MAPS TO sums_right
+
+        ASSIGN 0 TO idx_i
+        WHILE idx_i <= half_length
+            FOR EACH grouping IN COMBINATIONS(left_segment, idx_i) DO
+                ASSIGN SUM OF grouping TO curr_sum
+                IF curr_sum NOT IN sums_left[idx_i] THEN
+                    ASSIGN 0 TO sums_left[idx_i][curr_sum]
+                END IF
+                ASSIGN sums_left[idx_i][curr_sum] + 1 TO sums_left[idx_i][curr_sum]
+            END FOR
+
+            FOR EACH grouping IN COMBINATIONS(right_segment, idx_i) DO
+                ASSIGN SUM OF grouping TO curr_sum
+                IF curr_sum NOT IN sums_right[idx_i] THEN
+                    ASSIGN 0 TO sums_right[idx_i][curr_sum]
+                END IF
+                ASSIGN sums_right[idx_i][curr_sum] + 1 TO sums_right[idx_i][curr_sum]
+            END FOR
+            ASSIGN idx_i + 1 TO idx_i
+        END WHILE
+
+        ASSIGN 0 TO idx_i
+        WHILE idx_i <= half_length
+            ASSIGN SORTED KEYS OF sums_left[idx_i] TO left_keys_sorted
+            ASSIGN SORTED KEYS OF sums_right[half_length - idx_i] TO right_keys_sorted
+
+            ASSIGN 0 TO ptr_left
+            ASSIGN LENGTH OF right_keys_sorted - 1 TO ptr_right
+
+            WHILE ptr_left < LENGTH OF left_keys_sorted AND ptr_right >= 0
+                ASSIGN left_keys_sorted[ptr_left] + right_keys_sorted[ptr_right] TO combined_sum
+                ASSIGN sum_total - 2 * combined_sum TO candidate_diff
+
+                IF candidate_diff < 0 THEN
+                    ASSIGN -candidate_diff TO candidate_diff
+                END IF
+
+                IF candidate_diff < minimal_difference THEN
+                    ASSIGN candidate_diff TO minimal_difference
+                END IF
+
+                IF combined_sum < half_target THEN
+                    INCREMENT ptr_left BY 1
+                ELSE IF combined_sum > half_target THEN
+                    DECREMENT ptr_right BY 1
+                ELSE
+                    RETURN 0
+                END IF
+            END WHILE
+            INCREMENT idx_i BY 1
+        END WHILE
+
+        RETURN minimal_difference
+    END FUNCTION
+END CLASS

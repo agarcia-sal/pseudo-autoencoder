@@ -1,0 +1,56 @@
+CLASS Solution
+    FUNCTION minOperationsToFlip(expression)
+        INITIALIZE container AS empty array
+        INITIALIZE idx AS 0
+        WHILE idx < LENGTH(expression)
+            ASSIGN expression[idx] TO currentChar
+
+            IF NOT (currentChar == "(" OR currentChar == "&" OR currentChar == "|")
+                IF currentChar == ")"
+                    ASSIGN container.REMOVE_LAST() TO removedPair
+                    container.REMOVE_LAST()  // remove opening parenthesis
+                ELSE
+                    ASSIGN (currentChar, 1) TO removedPair
+                END IF
+            ELSE
+                APPEND (currentChar, 0) TO container
+                INCREMENT idx BY 1
+                CONTINUE WHILE
+            END IF
+
+            IF LENGTH(container) > 0 AND (container[-1][0] == "&" OR container[-1][0] == "|")
+                ASSIGN container.REMOVE_LAST()[0] TO operatorSymbol
+                ASSIGN container.REMOVE_LAST() TO (valA, costA)
+                ASSIGN removedPair TO (valB, costB)
+
+                IF operatorSymbol == "&"
+                    IF valA == 0 AND valB == 0
+                        ASSIGN (0, 1 + MIN(costA, costB)) TO removedPair
+                    ELSE IF valA == 0 AND valB == 1
+                        ASSIGN (0, 1) TO removedPair
+                    ELSE IF valA == 1 AND valB == 0
+                        ASSIGN (0, 1) TO removedPair
+                    ELSE
+                        ASSIGN (1, MIN(costA, costB)) TO removedPair
+                    END IF
+                ELSE
+                    IF valA == 0 AND valB == 0
+                        ASSIGN (0, MIN(costA, costB)) TO removedPair
+                    ELSE IF valA == 0 AND valB == 1
+                        ASSIGN (1, 1) TO removedPair
+                    ELSE IF valA == 1 AND valB == 0
+                        ASSIGN (1, 1) TO removedPair
+                    ELSE
+                        ASSIGN (1, 1 + MIN(costA, costB)) TO removedPair
+                    END IF
+                END IF
+            END IF
+
+            APPEND removedPair TO container
+
+            INCREMENT idx BY 1
+        END WHILE
+
+        RETURN container[-1][1]
+    END FUNCTION
+END CLASS

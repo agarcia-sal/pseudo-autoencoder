@@ -1,0 +1,74 @@
+CLASS Solution  
+    FUNCTION isRectangleCover(rectangles)  
+        SET A TO 0  
+        SET B TO 0  
+        SET C TO 0  
+        SET D TO 0  
+        
+        SET V TO 0  
+        SET U TO empty set  
+        
+        FUNCTION processRectangle(L)  
+            IF L IS EMPTY THEN  
+                RETURN  
+            END IF  
+            
+            SET M TO head of L  
+            SET N TO tail of L  
+            
+            SET x TO M[0]  
+            SET y TO M[1]  
+            SET z TO M[2]  
+            SET w TO M[3]  
+            
+            IF x LESS THAN A OR A EQUALS 0 THEN  
+                SET A TO x  
+            END IF  
+            IF y LESS THAN B OR B EQUALS 0 THEN  
+                SET B TO y  
+            END IF  
+            IF z GREATER THAN C OR C EQUALS 0 THEN  
+                SET C TO z  
+            END IF  
+            IF w GREATER THAN D OR D EQUALS 0 THEN  
+                SET D TO w  
+            END IF  
+            
+            SET area_current TO (z MINUS x) MULTIPLIED BY (w MINUS y)  
+            SET V TO V PLUS area_current  
+            
+            FUNCTION togglePoint(point, pointSet)  
+                IF pointSet CONTAINS point THEN  
+                    REMOVE point FROM pointSet  
+                ELSE  
+                    ADD point TO pointSet  
+                END IF  
+            END FUNCTION  
+            
+            SET corner_points TO list of (x, y), (x, w), (z, y), (z, w)  
+            SET idx TO 0  
+            
+            WHILE idx LESS THAN length of corner_points  
+                SET pt TO corner_points[idx]  
+                CALL togglePoint(pt, U)  
+                SET idx TO idx PLUS 1  
+            END WHILE  
+            
+            CALL processRectangle(N)  
+        END FUNCTION  
+        
+        CALL processRectangle(rectangles)  
+        
+        SET total_expected_area TO (C MINUS A) MULTIPLIED BY (D MINUS B)  
+        IF V NOT EQUAL TO total_expected_area THEN  
+            RETURN False  
+        END IF  
+        
+        SET final_points TO set of (A, B), (A, D), (C, B), (C, D)  
+        IF U NOT EQUAL TO final_points THEN  
+            RETURN False  
+        END IF  
+        
+        RETURN True  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,107 @@
+CLASS Solution  
+    FUNCTION scoreOfStudents(s STRING, answers LIST OF INT)  
+        FUNCTION evaluate_expression(expression STRING)  
+            DECLARE fragments AS LIST OF INT OR CHAR ← EMPTY LIST  
+            DECLARE temp_number AS INT ← 0  
+            
+            DECLARE idx AS INT ← 0  
+            WHILE idx LESS THAN LENGTH(expression) DO  
+                DECLARE current_char AS CHAR ← expression[idx]  
+                IF current_char IN ['0','1','2','3','4','5','6','7','8','9'] THEN  
+                    SET temp_number ← (temp_number * 10) + (current_char - '0')  
+                ELSE  
+                    APPEND temp_number TO fragments  
+                    APPEND current_char TO fragments  
+                    SET temp_number ← 0  
+                END IF  
+                INCREMENT idx BY 1  
+            END WHILE  
+            APPEND temp_number TO fragments  
+            
+            DECLARE pos AS INT ← 1  
+            WHILE pos LESS THAN LENGTH(fragments) DO  
+                SWITCH fragments[pos]  
+                    CASE '*':  
+                        DECLARE multiplied_value AS INT ← fragments[pos - 1] * fragments[pos + 1]  
+                        SET fragments[pos - 1] ← multiplied_value  
+                        REMOVE elements from fragments at indices pos and pos + 1  
+                    DEFAULT:  
+                        INCREMENT pos BY 1  
+                END SWITCH  
+            END WHILE  
+            
+            DECLARE final_result AS INT ← fragments[0]  
+            DECLARE iterator AS INT ← 1  
+            WHILE iterator LESS THAN LENGTH(fragments) DO  
+                IF fragments[iterator] = '+' THEN  
+                    SET final_result ← final_result + fragments[iterator + 1]  
+                END IF  
+                SET iterator ← iterator + 2  
+            END WHILE  
+            
+            RETURN final_result  
+        END FUNCTION  
+        
+        FUNCTION get_possible_answers(expression STRING)  
+            DECLARE all_digits_flag AS BOOLEAN ← TRUE  
+            DECLARE pos_check AS INT ← 0  
+            WHILE pos_check LESS THAN LENGTH(expression) DO  
+                IF NOT (expression[pos_check] IN ['0','1','2','3','4','5','6','7','8','9']) THEN  
+                    SET all_digits_flag ← FALSE  
+                    BREAK  
+                END IF  
+                INCREMENT pos_check BY 1  
+            END WHILE  
+            IF all_digits_flag THEN  
+                DECLARE numeric_val AS INT ← 0  
+                DECLARE digit_index AS INT ← 0  
+                WHILE digit_index LESS THAN LENGTH(expression) DO  
+                    SET numeric_val ← (numeric_val * 10) + (expression[digit_index] - '0')  
+                    INCREMENT digit_index BY 1  
+                END WHILE  
+                RETURN SET WITH ELEMENT numeric_val  
+            END IF  
+            
+            DECLARE answer_set AS SET OF INT ← EMPTY SET  
+            DECLARE split_pos AS INT ← 1  
+            WHILE split_pos LESS THAN LENGTH(expression) - 1 DO  
+                IF split_pos MOD 2 = 1 THEN  
+                    DECLARE left_side AS SET OF INT ← get_possible_answers(expression[0 : split_pos])  
+                    DECLARE right_side AS SET OF INT ← get_possible_answers(expression[split_pos + 1 : LENGTH(expression)])  
+                    FOR EACH left_val IN left_side DO  
+                        FOR EACH right_val IN right_side DO  
+                            DECLARE combined_val AS INT  
+                            IF expression[split_pos] = '+' THEN  
+                                SET combined_val ← left_val + right_val  
+                            ELSE  
+                                SET combined_val ← left_val * right_val  
+                            END IF  
+                            IF combined_val <= 1000 THEN  
+                                INSERT combined_val INTO answer_set  
+                            END IF  
+                        END FOR  
+                    END FOR  
+                END IF  
+                INCREMENT split_pos BY 1  
+            END WHILE  
+            
+            RETURN answer_set  
+        END FUNCTION  
+        
+        DECLARE evaluation_result AS INT ← evaluate_expression(s)  
+        DECLARE all_possible_answers AS SET OF INT ← get_possible_answers(s)  
+        
+        DECLARE total_points AS INT ← 0  
+        FOR EACH submitted_answer IN answers DO  
+            IF submitted_answer = evaluation_result THEN  
+                SET total_points ← total_points + 5  
+            ELSE  
+                IF submitted_answer IN all_possible_answers THEN  
+                    SET total_points ← total_points + 2  
+                END IF  
+            END IF  
+        END FOR  
+        
+        RETURN total_points  
+    END FUNCTION  
+END CLASS

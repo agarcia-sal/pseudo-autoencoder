@@ -1,0 +1,111 @@
+CLASS Solution  
+    FUNCTION minimumIncompatibility(nums, k)  
+        SET total_length TO the LENGTH OF nums  
+        SET subset_size TO total_length DIVIDED BY k  
+        
+        FUNCTION count_occurrences(collection)  
+            SET count_map TO an empty mapping  
+            FOR each element IN collection  
+                IF element IS NOT IN count_map  
+                    SET count_map[element] TO zero  
+                END IF  
+                INCREMENT count_map[element] BY one  
+            END FOR  
+            RETURN count_map  
+        END FUNCTION
+        
+        SET occurrences TO count_occurrences(nums)  
+        FOR each value IN the VALUES OF occurrences  
+            IF value GREATER THAN k  
+                RETURN negative one  
+            END IF  
+        END FOR  
+        
+        SET subset_incompatibility TO an empty mapping  
+        
+        FUNCTION count_bits(number)  
+            SET count TO zero  
+            WHILE number GREATER THAN zero  
+                IF number MODULO two EQUALS one  
+                    INCREMENT count BY one  
+                END IF  
+                SET number TO number DIVIDED BY two  
+            END WHILE  
+            RETURN count  
+        END FUNCTION
+        
+        FOR mask FROM zero TO two RAISED TO total_length MINUS one  
+            IF count_bits(mask) EQUALS subset_size  
+                SET elements TO an empty list  
+                FOR index FROM zero TO total_length MINUS one  
+                    IF the bit at position index OF mask IS one  
+                        APPEND element at position index OF nums TO elements  
+                    END IF  
+                END FOR  
+                FUNCTION elements_are_unique(list_of_elements)  
+                    SET seen TO an empty set  
+                    FOR each item IN list_of_elements  
+                        IF item IN seen  
+                            RETURN false  
+                        END IF  
+                        ADD item TO seen  
+                    END FOR  
+                    RETURN true  
+                END FUNCTION  
+                IF elements_are_unique(elements)  
+                    FUNCTION find_maximum(list_of_elements)  
+                        SET max_element TO negative infinity  
+                        FOR each item IN list_of_elements  
+                            IF item GREATER THAN max_element  
+                                SET max_element TO item  
+                            END IF  
+                        END FOR  
+                        RETURN max_element  
+                    END FUNCTION  
+                    FUNCTION find_minimum(list_of_elements)  
+                        SET min_element TO positive infinity  
+                        FOR each item IN list_of_elements  
+                            IF item LESS THAN min_element  
+                                SET min_element TO item  
+                            END IF  
+                        END FOR  
+                        RETURN min_element  
+                    END FUNCTION  
+                    SET incompatibility_value TO find_maximum(elements) MINUS find_minimum(elements)  
+                    SET subset_incompatibility[mask] TO incompatibility_value  
+                END IF  
+            END IF  
+        END FOR  
+        
+        SET dp TO a list with two RAISED TO total_length elements each initialized to positive infinity  
+        SET the first element OF dp TO zero  
+        
+        FUNCTION bitwise_and(a, b)  
+            RETURN the bitwise and of a and b  
+        END FUNCTION  
+        
+        FUNCTION bitwise_xor(a, b)  
+            RETURN the bitwise xor of a and b  
+        END FUNCTION  
+        
+        FOR mask FROM zero TO two RAISED TO total_length MINUS one  
+            IF count_bits(mask) MODULO subset_size NOT EQUALS zero  
+                CONTINUE  
+            END IF  
+            FOR each subset_mask IN the KEYS OF subset_incompatibility  
+                IF bitwise_and(mask, subset_mask) EQUALS subset_mask  
+                    SET candidate TO dp[bitwise_xor(mask, subset_mask)] PLUS subset_incompatibility[subset_mask]  
+                    IF candidate LESS THAN dp[mask]  
+                        SET dp[mask] TO candidate  
+                    END IF  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        IF dp[two RAISED TO total_length MINUS one] EQUALS positive infinity  
+            RETURN negative one  
+        ELSE  
+            RETURN dp[two RAISED TO total_length MINUS one]  
+        END IF  
+    END FUNCTION  
+END CLASS

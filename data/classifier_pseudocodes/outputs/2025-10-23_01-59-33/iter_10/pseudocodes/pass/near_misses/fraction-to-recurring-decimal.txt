@@ -1,0 +1,50 @@
+CLASS Solution
+    FUNCTION fractionToDecimal(numerator, denominator)
+        DECLARE isNegative AS BOOLEAN
+        IF (numerator < 0 AND denominator >= 0) OR NOT (numerator < 0 OR denominator < 0)
+            isNegative ← false
+        ELSE
+            isNegative ← true
+        END IF
+        IF isNegative
+            sign ← "-"
+        ELSE
+            sign ← ""
+        END IF
+
+        ASSIGN abs(numerator) TO numAbs
+        ASSIGN abs(denominator) TO denomAbs
+
+        LET wholePart ← numAbs DIV denomAbs
+        LET remndr ← numAbs MOD denomAbs
+        LET wholeStr ← CONVERT wholePart TO STRING
+
+        IF remndr = 0
+            RETURN sign CONCAT wholeStr
+        END IF
+
+        DECLARE remainderIndices AS EMPTY DICTIONARY
+        DECLARE fractDigits AS EMPTY SEQUENCE
+
+        WHILE TRUE
+            IF remndr IS IN remainderIndices
+                LET startIndex ← remainderIndices[remndr]
+                LET nonCycle ← JOIN fractDigits[0 TO startIndex - 1] WITH ""
+                LET cycle ← JOIN fractDigits[startIndex TO LENGTH OF fractDigits - 1] WITH ""
+                RETURN sign CONCAT wholeStr CONCAT "." CONCAT nonCycle CONCAT "(" CONCAT cycle CONCAT ")"
+            END IF
+
+            remainderIndices[remndr] ← LENGTH(ffractDigits)
+
+            remndr ← remndr * 10
+            LET currDigit ← remndr DIV denomAbs
+            remndr ← remndr MOD denomAbs
+
+            APPEND CONVERT currDigit TO STRING TO fractDigits
+
+            IF remndr = 0
+                RETURN sign CONCAT wholeStr CONCAT "." CONCAT JOIN fractDigits WITH ""
+            END IF
+        END WHILE
+    END FUNCTION
+END CLASS

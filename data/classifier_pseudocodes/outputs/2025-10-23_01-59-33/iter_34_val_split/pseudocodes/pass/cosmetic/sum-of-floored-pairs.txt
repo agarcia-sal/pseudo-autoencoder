@@ -1,0 +1,51 @@
+CLASS Solution  
+    FUNCTION sumOfFlooredPairs(nums)  
+        ASSIGN (10^9)+1 TO MOD  
+        ASSIGN the largest value in nums TO max_val  
+        ASSIGN a dictionary mapping elements of nums to their counts TO freq_map  
+        ASSIGN an array of zeroes with length max_val+1 TO cumulative_freq  
+        
+        SET iterator1 TO an iterator over keys in freq_map  
+        WHILE true  
+            TRY  
+                ASSIGN next element from iterator1 TO elem  
+            CATCH StopIteration  
+                BREAK  
+            END TRY  
+            INCREASE cumulative_freq[elem] BY freq_map[elem]  
+        END WHILE  
+        
+        SET idx TO 1  
+        WHILE idx <= max_val  
+            INCREASE cumulative_freq[idx] BY cumulative_freq[idx - 1]  
+            INCREMENT idx BY 1  
+        END WHILE  
+        
+        ASSIGN 0 TO total_sum  
+        
+        SET iterator2 TO an iterator over keys in freq_map  
+        WHILE true  
+            TRY  
+                ASSIGN next element from iterator2 TO base_num  
+            CATCH StopIteration  
+                BREAK  
+            END TRY  
+            SET multiplier TO 1  
+            WHILE multiplier <= FLOOR(max_val / base_num)  
+                ASSIGN base_num * multiplier TO start_pos  
+                ASSIGN base_num * (multiplier + 1) - 1 TO potential_end  
+                IF potential_end > max_val THEN  
+                    ASSIGN max_val TO end_pos  
+                ELSE  
+                    ASSIGN potential_end TO end_pos  
+                END IF  
+                ASSIGN cumulative_freq[end_pos] - cumulative_freq[start_pos - 1] TO segment_freq  
+                INCREASE total_sum BY segment_freq * multiplier * freq_map[base_num]  
+                ASSIGN total_sum MOD MOD TO total_sum  
+                INCREMENT multiplier BY 1  
+            END WHILE  
+        END WHILE  
+        
+        GIVE BACK total_sum  
+    END FUNCTION  
+END CLASS

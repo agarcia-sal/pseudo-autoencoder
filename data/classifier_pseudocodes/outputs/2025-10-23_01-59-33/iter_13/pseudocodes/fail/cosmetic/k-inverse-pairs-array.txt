@@ -1,0 +1,30 @@
+CLASS Solution
+    FUNCTION kInversePairs(n, k)
+        ASSIGN 1000000007 TO MOD
+        ASSIGN LIST containing (k + 1) zeros TO dp_row_template
+        ASSIGN LIST containing (n + 1) copies of dp_row_template TO dp
+        ASSIGN 1 TO dp[0][0]
+
+        ASSIGN 1 TO outer_counter
+        WHILE outer_counter <= n
+            ASSIGN 0 TO cumulative_total
+            ASSIGN 0 TO inner_index
+            WHILE inner_index <= k
+                ASSIGN cumulative_total + dp[outer_counter - 1][inner_index] TO cumulative_total
+                IF cumulative_total >= MOD THEN
+                    ASSIGN cumulative_total - MOD TO cumulative_total
+                END IF
+                IF inner_index >= outer_counter THEN
+                    ASSIGN cumulative_total - dp[outer_counter - 1][inner_index - outer_counter] + MOD TO cumulative_total
+                    IF cumulative_total >= MOD THEN
+                        ASSIGN cumulative_total - MOD TO cumulative_total
+                    END IF
+                END IF
+                ASSIGN cumulative_total TO dp[outer_counter][inner_index]
+                ADD 1 TO inner_index
+            END WHILE
+            ADD 1 TO outer_counter
+        END WHILE
+        RETURN dp[n][k]
+    END FUNCTION
+END CLASS

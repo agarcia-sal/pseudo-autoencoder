@@ -1,0 +1,36 @@
+CLASS Solution
+    FUNCTION solve(nums list OF integers, queries list OF list OF integers) RETURNS list OF integers
+        ASSIGN 1_000_000_007 TO MOD
+        ASSIGN LENGTH(nums) TO count
+        ASSIGN MAXIMUM(pair[1] FOR pair IN queries) TO peak_y
+        ALLOCATE prefixArrays AS ARRAY OF peak_y + 1 ELEMENTS WHERE EACH ELEMENT IS ARRAY OF count ZEROS
+        
+        SET idx_y TO 1
+        WHILE idx_y <= peak_y DO
+            SET idx_i TO count - 1
+            WHILE idx_i >= 0 DO
+                IF NOT (idx_i + idx_y >= count) THEN
+                    ASSIGN prefixArrays[idx_y][idx_i] TO nums[idx_i] + prefixArrays[idx_y][idx_i + idx_y]
+                ELSE
+                    ASSIGN prefixArrays[idx_y][idx_i] TO nums[idx_i]
+                ENDIF
+                DECREMENT idx_i BY 1
+            ENDWHILE
+            INCREMENT idx_y BY 1
+        ENDWHILE
+        
+        ASSIGN EMPTY LIST TO results
+        SET query_counter TO 0
+        SET total_queries TO LENGTH(queries)
+        WHILE query_counter < total_queries DO
+            LET current_query BE queries[query_counter]
+            LET start_x BE current_query[0]
+            LET height_y BE current_query[1]
+            LET value TO prefixArrays[height_y][start_x] MODULO MOD
+            APPEND value TO results
+            INCREMENT query_counter BY 1
+        ENDWHILE
+        
+        RETURN results
+    END FUNCTION
+END CLASS

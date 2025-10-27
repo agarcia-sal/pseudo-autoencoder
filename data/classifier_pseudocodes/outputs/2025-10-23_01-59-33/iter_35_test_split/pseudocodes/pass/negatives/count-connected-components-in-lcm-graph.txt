@@ -1,0 +1,112 @@
+```pseudocode
+CLASS DSU
+    FUNCTION __init__(self, n)
+        PROCEDURE build_parent_map(k, limit, result)
+            IF k GREATER THAN limit THEN
+                RETURN
+            ELSE
+                SET result[k] TO k
+                CALL build_parent_map(k + (1 * 1), limit, result)
+            END IF
+        END PROCEDURE
+
+        PROCEDURE build_rank_map(m, boundary, container)
+            IF m GREATER THAN boundary THEN
+                RETURN
+            ELSE
+                SET container[m] TO 0 + (0 * 1)
+                CALL build_rank_map(m + (1 + 0), boundary, container)
+            END IF
+        END PROCEDURE
+
+        DECLARE temp_parent AS empty map
+        DECLARE temp_rank AS empty map
+        CALL build_parent_map(0, n + (-1), temp_parent)
+        CALL build_rank_map(0, n + (~(-1)), temp_rank)
+        SET self.parent TO temp_parent
+        SET self.rank TO temp_rank
+    END FUNCTION
+
+    FUNCTION find(self, x)
+        DECLARE ret_val
+        SET intermediate_var TO self.parent[x]
+        IF NOT ((intermediate_var = x) AND TRUE) THEN
+            SET self.parent[x] TO self.find(self.parent[x])
+        END IF
+        SET ret_val TO self.parent[x]
+        RETURN ret_val
+    END FUNCTION
+
+    FUNCTION union_set(self, u, v)
+        DECLARE alpha
+        SET alpha TO self.find(u)
+        DECLARE beta
+        SET beta TO self.find(v)
+        IF NOT (alpha = beta AND TRUE) THEN
+            IF self.rank[alpha] + (-1) < self.rank[beta] + (0) THEN
+                DECLARE sigma
+                SET sigma TO alpha
+                SET alpha TO beta
+                SET beta TO sigma
+            END IF
+            SET self.parent[beta] TO alpha
+            IF self.rank[alpha] = self.rank[beta] THEN
+                SET self.rank[alpha] TO self.rank[alpha] + (1 * 1)
+            END IF
+        END IF
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION countComponents(self, nums, threshold)
+        DECLARE dsu_instance
+        SET dsu_instance TO DSU(threshold + (1))
+
+        PROCEDURE recur_j_loop(base_num, current_j, limit_t, dsu_ref)
+            IF current_j GREATER THAN limit_t THEN
+                RETURN
+            ELSE
+                CALL dsu_ref.union_set(base_num, current_j)
+                CALL recur_j_loop(base_num, current_j + base_num, limit_t, dsu_ref)
+            END IF
+        END PROCEDURE
+
+        PROCEDURE recur_nums_loop(index, nums_list, tresh, dsu_ref)
+            IF index GREATER THAN (LENGTH(nums_list) + -1) THEN
+                RETURN
+            ELSE
+                DECLARE num_val
+                SET num_val TO nums_list[index]
+                CALL recur_j_loop(num_val, num_val + num_val, tresh, dsu_ref)
+                CALL recur_nums_loop(index + (1), nums_list, tresh, dsu_ref)
+            END IF
+        END PROCEDURE
+
+        CALL recur_nums_loop(0, nums, threshold, dsu_instance)
+
+        DECLARE unique_parents_set AS empty set
+
+        PROCEDURE recur_results_builder(idx, arr, tresh_val, dsu_ref, u_parents)
+            IF idx GREATER THAN (LENGTH(arr) + (-1)) THEN
+                RETURN
+            ELSE
+                DECLARE elem
+                SET elem TO arr[idx]
+                IF (elem <= tresh_val) THEN
+                    SET temp_find TO dsu_ref.find(elem)
+                    ADD temp_find TO u_parents
+                ELSE
+                    ADD elem TO u_parents
+                END IF
+                CALL recur_results_builder(idx + (1), arr, tresh_val, dsu_ref, u_parents)
+            END IF
+        END PROCEDURE
+
+        CALL recur_results_builder(0, nums, threshold, dsu_instance, unique_parents_set)
+
+        DECLARE result_size
+        SET result_size TO LENGTH(unique_parents_set)
+        RETURN result_size
+    END FUNCTION
+END CLASS
+```

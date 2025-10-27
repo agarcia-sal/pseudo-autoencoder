@@ -1,0 +1,48 @@
+CLASS Solution
+    FUNCTION diffWaysToCompute(expression)
+        FUNCTION compute(left, right, operator)
+            ASSIGN [] TO outcomes
+            SET l_index TO 0
+            WHILE l_index < LENGTH of left
+                SET r_pos TO 0
+                WHILE r_pos < LENGTH of right
+                    SET current_left TO left[l_index]
+                    SET current_right TO right[r_pos]
+                    IF NOT (operator != "+") THEN
+                        outcomes := outcomes + [current_left + current_right]
+                    ELSE IF NOT (operator != "-") THEN
+                        outcomes := outcomes + [current_left - current_right]
+                    ELSE IF NOT (operator != "*") THEN
+                        outcomes := outcomes + [current_left * current_right]
+                    END IF
+                    r_pos = r_pos + 1
+                END WHILE
+                l_index = l_index + 1
+            END WHILE
+            RETURN outcomes
+        END FUNCTION
+
+        FUNCTION helper(sub_expr)
+            IF sub_expr CONTAINS ONLY digits THEN
+                RETURN [TO_INTEGER(sub_expr)]
+            END IF
+
+            SET collected TO []
+            SET pointer TO 0
+            WHILE pointer < LENGTH(sub_expr)
+                SET ch TO sub_expr[pointer]
+                IF ch EQUALS "+" OR ch EQUALS "-" OR ch EQUALS "*" THEN
+                    ASSIGN helper(SUBSTRING(sub_expr, 0, pointer)) TO left_group
+                    ASSIGN helper(SUBSTRING(sub_expr, pointer+1, LENGTH(sub_expr)-1)) TO right_group
+                    FOR each val IN compute(left_group, right_group, ch)
+                        collected := collected + [val]
+                    END FOR
+                END IF
+                POINTER_INCREMENT pointer BY 1
+            END WHILE
+            RETURN collected
+        END FUNCTION
+
+        RETURN helper(expression)
+    END FUNCTION
+END CLASS

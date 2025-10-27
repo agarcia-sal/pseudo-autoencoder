@@ -1,0 +1,98 @@
+CLASS Solution
+    FUNCTION maxPotholes(road STRING inputRoad, INTEGER budget) RETURNS INTEGER
+        FUNCTION countLength(s STRING) RETURNS INTEGER
+            SET count_acc TO 0
+            SET index_cursor TO 0
+            REPEAT
+                IF index_cursor EQUALS LENGTH(s) THEN
+                    EXIT REPEAT
+                END IF
+                INCREMENT count_acc BY 1
+                INCREMENT index_cursor BY 1
+            UNTIL FALSE
+            RETURN count_acc
+        END FUNCTION
+
+        FUNCTION splitByDot(text STRING) RETURNS LIST OF STRING
+            SET result_list TO empty list
+            SET start_pos TO 0
+            SET i_pos TO 0
+            REPEAT
+                IF i_pos EQUALS LENGTH(text) THEN
+                    APPEND SUBSTRING(text, start_pos, i_pos) TO result_list
+                    BREAK
+                END IF
+                IF text[i_pos] EQUALS '.' THEN
+                    APPEND SUBSTRING(text, start_pos, i_pos) TO result_list
+                    SET start_pos TO i_pos + 1
+                END IF
+                INCREMENT i_pos BY 1
+            UNTIL FALSE
+            RETURN result_list
+        END FUNCTION
+
+        FUNCTION ascendingLengthSort(lst LIST OF STRING) RETURNS LIST OF STRING
+            FUNCTION lengthOfString(x STRING) RETURNS INTEGER
+                RETURN countLength(x)
+            END FUNCTION
+
+            SET sorted_list TO lst
+            SET swapped_flag TO TRUE
+            WHILE swapped_flag DO
+                SET swapped_flag TO FALSE
+                SET idx TO 0
+                WHILE idx LESS THAN LENGTH(sorted_list) - 1 DO
+                    IF lengthOfString(sorted_list[idx]) GREATER THAN lengthOfString(sorted_list[idx + 1]) THEN
+                        SET temp_val TO sorted_list[idx]
+                        SET sorted_list[idx] TO sorted_list[idx + 1]
+                        SET sorted_list[idx + 1] TO temp_val
+                        SET swapped_flag TO TRUE
+                    END IF
+                    INCREMENT idx BY 1
+                END WHILE
+            END WHILE
+            RETURN sorted_list
+        END FUNCTION
+
+        SET pieces TO splitByDot(inputRoad)
+        SET ordered_segments TO ascendingLengthSort(pieces)
+        SET total_fixed TO 0
+        SET current_budget TO budget
+
+        FUNCTION attemptFix(segment_str STRING, available_budget INTEGER) RETURNS (INTEGER, INTEGER)
+            SET segment_len TO countLength(segment_str)
+            SET fixed_count TO 0
+            SET length_remaining TO segment_len
+
+            REPEAT
+                SET total_needed TO length_remaining PLUS 1
+                IF available_budget GREATER THAN OR EQUAL TO total_needed THEN
+                    SET fixed_count TO length_remaining
+                    SET available_budget TO available_budget - total_needed
+                    BREAK
+                END IF
+                SET length_remaining TO length_remaining - 1
+            UNTIL length_remaining EQUALS 0 OR available_budget EQUALS 0
+
+            RETURN fixed_count, available_budget
+        END FUNCTION
+
+        FOR EACH segment_var IN ordered_segments DO
+            SET len_s TO countLength(segment_var)
+            IF len_s EQUALS 0 THEN
+                CONTINUE
+            END IF
+            SET cost_required TO len_s + 1
+            IF cost_required LESS THAN OR EQUAL TO current_budget THEN
+                SET total_fixed TO total_fixed + len_s
+                SET current_budget TO current_budget - cost_required
+            ELSE
+                SET fixed_part, new_budget TO attemptFix(segment_var, current_budget)
+                SET total_fixed TO total_fixed + fixed_part
+                SET current_budget TO new_budget
+            END IF
+        END FOR
+
+        RETURN total_fixed
+    END FUNCTION
+END CLASS

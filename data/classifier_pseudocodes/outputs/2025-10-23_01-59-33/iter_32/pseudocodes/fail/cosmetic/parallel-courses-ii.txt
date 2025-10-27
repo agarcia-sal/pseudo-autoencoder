@@ -1,0 +1,56 @@
+CLASS Solution
+    FUNCTION minNumberOfSemesters(n k relations)
+        INITIALIZE graph AS a mapping with default empty list for unseen keys
+        INITIALIZE in_degree AS a list containing (n + 1) zeros
+        
+        SET edgeIndex TO 0
+        WHILE edgeIndex < LENGTH(relations)
+            SET fromNode TO relations[edgeIndex][0]
+            SET toNode TO relations[edgeIndex][1]
+            ADD toNode TO graph[fromNode]
+            SET in_degree[toNode] TO in_degree[toNode] + 1
+            INCREMENT edgeIndex BY 1
+        END WHILE
+        
+        INITIALIZE pendingCourses AS empty deque
+        SET courseID TO 1
+        LOOP
+            IF courseID > n THEN BREAK
+            IF in_degree[courseID] = 0 THEN
+                APPEND courseID TO pendingCourses
+            END IF
+            INCREMENT courseID BY 1
+        END LOOP
+        
+        SET semesterCount TO 0
+        
+        WHILE LENGTH(pendingCourses) > 0
+            SET maxCoursesThisRound TO k
+            IF maxCoursesThisRound > LENGTH(pendingCourses) THEN
+                SET maxCoursesThisRound TO LENGTH(pendingCourses)
+            END IF
+            
+            SET counter TO 0
+            RECURSIVE_PROCESS:
+                IF counter >= maxCoursesThisRound THEN
+                    GOTO FINISH_PROCESS
+                END IF
+                
+                SET currentCourse TO REMOVE_LEFT(pendingCourses)
+                FOR every adjacentCourse IN graph[currentCourse]
+                    SET in_degree[adjacentCourse] TO in_degree[adjacentCourse] - 1
+                    IF in_degree[adjacentCourse] = 0 THEN
+                        APPEND adjacentCourse TO pendingCourses
+                    END IF
+                END FOR
+                
+                SET counter TO counter + 1
+                GOTO RECURSIVE_PROCESS
+            FINISH_PROCESS:
+            
+            SET semesterCount TO semesterCount + 1
+        END WHILE
+        
+        RETURN semesterCount
+    END FUNCTION
+END CLASS

@@ -1,0 +1,100 @@
+CLASS Solution  
+    FUNCTION colorTheGrid(m PARAMETER n PARAMETER)  
+        SET MOD ← 10^9 + 7  
+        
+        FUNCTION generate_valid_columns(prev_col PARAMETER)  
+            SET palette ← [2, 1, 3]  
+            SET valid_columns ← []  
+            
+            FUNCTION backtrack(col PARAMETER row PARAMETER)  
+                IF (m = row) THEN  
+                    SET valid_columns ← valid_columns + [(col)]  
+                    RETURN  
+                END IF  
+                
+                SET index ← 0  
+                WHILE index < LENGTH(palette) DO  
+                    SET current_color ← palette[index]  
+                    
+                    IF (LENGTH(col) = 0 OR col[-1] ≠ current_color) THEN  
+                        IF (prev_col ≠ null AND prev_col[row] = current_color) THEN  
+                            SET index ← index + 1  
+                            CONTINUE  
+                        END IF  
+                        
+                        SET col ← col + [current_color]  
+                        CALL backtrack(col, row + 1)  
+                        SET col ← col[0 : LENGTH(col) - 1]  
+                    END IF  
+                    SET index ← index + 1  
+                END WHILE  
+            END FUNCTION  
+            
+            CALL backtrack([], 0)  
+            RETURN valid_columns  
+        END FUNCTION  
+        
+        SET all_valid_cols ← generate_valid_columns(null)  
+        SET total_valid_cols ← LENGTH(all_valid_cols)  
+        
+        SET compatible_cols ← DICTIONARY()  
+        SET pos_i ← 0  
+        WHILE pos_i < total_valid_cols DO  
+            SET compatible_cols[pos_i] ← []  
+            SET pos_j ← 0  
+            WHILE pos_j < total_valid_cols DO  
+                SET compatible ← true  
+                SET pos_k ← 0  
+                WHILE pos_k < m DO  
+                    IF all_valid_cols[pos_i][pos_k] = all_valid_cols[pos_j][pos_k] THEN  
+                        SET compatible ← false  
+                        BREAK  
+                    END IF  
+                    SET pos_k ← pos_k + 1  
+                END WHILE  
+                
+                IF compatible THEN  
+                    SET compatible_cols[pos_i] ← compatible_cols[pos_i] + [pos_j]  
+                END IF  
+                SET pos_j ← pos_j + 1  
+            END WHILE  
+            SET pos_i ← pos_i + 1  
+        END WHILE  
+        
+        SET dp ← []  
+        SET idx ← 0  
+        WHILE idx < total_valid_cols DO  
+            SET dp ← dp + [1]  
+            SET idx ← idx + 1  
+        END WHILE  
+        
+        SET iteration ← 1  
+        WHILE iteration < n DO  
+            SET next_dp ← []  
+            SET jdx ← 0  
+            WHILE jdx < total_valid_cols DO  
+                SET next_dp ← next_dp + [0]  
+                SET jdx ← jdx + 1  
+            END WHILE  
+            
+            SET idx ← 0  
+            WHILE idx < total_valid_cols DO  
+                FOR each compatible_index IN compatible_cols[idx] DO  
+                    SET next_dp[compatible_index] ← (next_dp[compatible_index] + dp[idx]) MOD MOD  
+                END FOR  
+                SET idx ← idx + 1  
+            END WHILE  
+            
+            SET dp ← next_dp  
+            SET iteration ← iteration + 1  
+        END WHILE  
+        
+        SET sum_ways ← 0  
+        FOR each val IN dp DO  
+            SET sum_ways ← sum_ways + val  
+        END FOR  
+        SET sum_ways ← sum_ways MOD MOD  
+        
+        RETURN sum_ways  
+    END FUNCTION  
+END CLASS

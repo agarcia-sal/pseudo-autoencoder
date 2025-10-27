@@ -1,0 +1,49 @@
+CLASS Solution
+    FUNCTION maximumGood(statements)
+        ASSIGN n AS LENGTH(statements)
+        LET maximumCount BE 0
+        LET mask BE 0
+        WHILE mask < (1 << n)
+            DECLARE truthful AS ARRAY OF n ELEMENTS FILLED WITH FALSE
+            DECLARE deceitful AS ARRAY OF n ELEMENTS FILLED WITH FALSE
+            LET position BE 0
+            REPEAT UNTIL position = n
+                LET bitmask BE (1 << position)
+                IF (mask & bitmask) = bitmask THEN
+                    truthful[position] ← TRUE
+                ELSE
+                    deceitful[position] ← TRUE
+                END IF
+                position ← position + 1
+            END REPEAT
+            LET isConsistent BE TRUE
+            LET idx BE 0
+            WHILE idx < n AND isConsistent
+                IF truthful[idx] = TRUE THEN
+                    LET innerIdx BE 0
+                    REPEAT UNTIL innerIdx = n OR NOT isConsistent
+                        LET statementValue BE statements[idx][innerIdx]
+                        IF (statementValue = 0 AND truthful[innerIdx] = TRUE) OR (statementValue = 1 AND deceitful[innerIdx] = TRUE) THEN
+                            isConsistent ← FALSE
+                        END IF
+                        innerIdx ← innerIdx + 1
+                    END REPEAT
+                END IF
+                idx ← idx + 1
+            END WHILE
+            IF isConsistent THEN
+                LET countTruthful BE 0
+                FOR countIdx FROM 0 TO n - 1
+                    IF truthful[countIdx] = TRUE THEN
+                        countTruthful ← countTruthful + 1
+                    END IF
+                END FOR
+                IF countTruthful > maximumCount THEN
+                    maximumCount ← countTruthful
+                END IF
+            END IF
+            mask ← mask + 1
+        END WHILE
+        RETURN maximumCount
+    END FUNCTION
+END CLASS

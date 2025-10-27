@@ -1,0 +1,74 @@
+CLASS Solution  
+    FUNCTION minLargest(nums1 nums1 AS list OF integers nums2 nums2 AS list OF integers) RETURNS integer  
+        FUNCTION nxt(a a AS integer b b AS integer) RETURNS integer  
+            DECLARE r AS integer  
+            IF ((a BITWISE-AND 1) XOR b) EQUALS 1 THEN  
+                r = a + 1  
+            ELSE  
+                r = a + 2  
+            END IF  
+            RETURN r  
+        END FUNCTION  
+
+        DECLARE U AS integer  
+        DECLARE V AS integer  
+        DECLARE Q AS list OF list OF integers  
+        DECLARE z1 AS integer  
+        DECLARE z2 AS integer  
+        DECLARE p1 AS integer  
+        DECLARE p2 AS integer  
+        DECLARE i AS integer  
+        DECLARE j AS integer  
+
+        U = LENGTH(nums1)  
+        V = LENGTH(nums2)  
+
+        Q = NEW list OF list OF integers WITH SIZE (U + 1)  
+        SET k TO 0  
+        WHILE k <= U  
+            Q[k] = NEW list OF integers WITH SIZE (V + 1)  
+            l = 0  
+            WHILE l <= V  
+                Q[k][l] = 0  
+                l = l + 1  
+            END WHILE  
+            k = k + 1  
+        END WHILE  
+
+        i = 1  
+        WHILE i <= U  
+            z1 = nums1[i]  
+            p1 = nxt(Q[i - 1][0], z1)  
+            Q[i][0] = p1  
+            i = i + 1  
+        END WHILE  
+
+        j = 1  
+        WHILE j <= V  
+            z2 = nums2[j]  
+            p2 = nxt(Q[0][j - 1], z2)  
+            Q[0][j] = p2  
+            j = j + 1  
+        END WHILE  
+
+        i = 1  
+        WHILE i <= U  
+            z1 = nums1[i]  
+            j = 1  
+            WHILE j <= V  
+                z2 = nums2[j]  
+                p1 = nxt(Q[i - 1][j], z1)  
+                p2 = nxt(Q[i][j - 1], z2)  
+                IF p1 <= p2 THEN  
+                    Q[i][j] = p1  
+                ELSE  
+                    Q[i][j] = p2  
+                END IF  
+                j = j + 1  
+            END WHILE  
+            i = i + 1  
+        END WHILE  
+
+        RETURN Q[U][V]  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,50 @@
+CLASS Solution
+    FUNCTION parseBoolExpr(expression)
+        INITIALIZE pile AS empty array
+        INITIALIZE idx AS 0
+        WHILE idx < LENGTH(expression)
+            SET sym TO expression[idx]
+            IF sym == 't' OR sym == 'f' OR sym == '!' OR sym == '&' OR sym == '|'
+                ADD sym TO END OF pile
+            ELSE IF sym == ')'
+                SET tallyTrue TO 0
+                SET tallyFalse TO 0
+                WHILE pile[LAST_INDEX(pile)] == 't' OR pile[LAST_INDEX(pile)] == 'f'
+                    IF pile[LAST_INDEX(pile)] == 't'
+                        tallyTrue <- tallyTrue + 1
+                    END IF
+                    IF pile[LAST_INDEX(pile)] == 'f'
+                        tallyFalse <- tallyFalse + 1
+                    END IF
+                    REMOVE LAST ELEMENT FROM pile
+                END WHILE
+
+                SET operatorSym TO pile[LAST_INDEX(pile)]
+                REMOVE LAST ELEMENT FROM pile
+
+                IF operatorSym == '!'
+                    IF tallyFalse > 0
+                        SET sym TO 't'
+                    ELSE
+                        SET sym TO 'f'
+                    END IF
+                ELSE IF operatorSym == '&'
+                    IF tallyFalse > 0
+                        SET sym TO 'f'
+                    ELSE
+                        SET sym TO 't'
+                    END IF
+                ELSE IF operatorSym == '|'
+                    IF tallyTrue > 0
+                        SET sym TO 't'
+                    ELSE
+                        SET sym TO 'f'
+                    END IF
+                END IF
+                ADD sym TO END OF pile
+            END IF
+            SET idx TO idx + 1
+        END WHILE
+        RETURN pile[0] == 't'
+    END FUNCTION
+END CLASS

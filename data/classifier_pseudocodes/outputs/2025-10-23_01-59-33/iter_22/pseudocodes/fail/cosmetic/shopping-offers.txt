@@ -1,0 +1,60 @@
+CLASS Solution
+    FUNCTION shoppingOffers(price, special, needs)
+        SET filtered_special TO empty collection
+        SET idx TO 0
+        WHILE idx < LENGTH(special)
+            SET bundle TO special[idx]
+            SET sum_items TO 0
+            SET total_value TO 0
+            SET pos TO 0
+            WHILE pos < LENGTH(bundle) - 1
+                SET sum_items TO sum_items + bundle[pos]
+                SET total_value TO total_value + bundle[pos] * price[pos]
+                INCREMENT pos BY 1
+            END WHILE
+            IF sum_items > 0 AND bundle[LENGTH(bundle) - 1] < total_value THEN
+                APPEND bundle TO filtered_special
+            END IF
+            INCREMENT idx BY 1
+        END WHILE
+        
+        FUNCTION dfs(current_needs)
+            SET minimal_cost TO 0
+            DECLARE counter AS 0
+            WHILE counter < LENGTH(price)
+                SET minimal_cost TO minimal_cost + price[counter] * current_needs[counter]
+                INCREMENT counter BY 1
+            END WHILE
+            
+            SET offer_index TO 0
+            WHILE offer_index < LENGTH(filtered_special)
+                SET offer_bundle TO filtered_special[offer_index]
+                SET updated_needs TO empty collection
+                FOR position IN 0 TO LENGTH(current_needs) - 1
+                    APPEND current_needs[position] - offer_bundle[position] TO updated_needs
+                END FOR
+                
+                SET eligible TO TRUE
+                FOR demand IN updated_needs
+                    IF demand < 0 THEN
+                        SET eligible TO FALSE
+                        EXIT FOR
+                    END IF
+                END FOR
+                
+                IF eligible THEN
+                    SET cost_if_used TO offer_bundle[LENGTH(offer_bundle) - 1] + dfs(CONVERT_TO_TUPLE(updated_needs))
+                    IF cost_if_used < minimal_cost THEN
+                        SET minimal_cost TO cost_if_used
+                    END IF
+                END IF
+                
+                INCREMENT offer_index BY 1
+            END WHILE
+            
+            RETURN minimal_cost
+        END FUNCTION
+        
+        RETURN dfs(CONVERT_TO_TUPLE(needs))
+    END FUNCTION
+END CLASS

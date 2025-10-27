@@ -1,0 +1,44 @@
+CLASS Solution  
+    FUNCTION predictPartyVictory(senate)  
+        DECLARE radiantQueue AS new deque  
+        DECLARE direQueue AS new deque  
+        DECLARE pos AS INTEGER  
+        DECLARE senator AS CHARACTER  
+
+        pos ← 0  
+        REPEAT UNTIL pos EQUALS LENGTH(senate)  
+            senator ← senate[pos]  
+            SWITCH senator  
+                CASE 'R':  
+                    radiantQueue.ADD_TO_BACK(pos)  
+                CASE 'D':  
+                    direQueue.ADD_TO_BACK(pos)  
+            END SWITCH  
+            pos ← pos PLUS 1  
+        END REPEAT  
+
+        FUNCTION battle(rList, dList, lenSenate)  
+            RETURN FUNCTION ()  
+                IF rList.IS_EMPTY() OR dList.IS_EMPTY() THEN  
+                    RETURN  
+                END IF  
+                DECLARE rPos AS INTEGER ← rList.REMOVE_FRONT()  
+                DECLARE dPos AS INTEGER ← dList.REMOVE_FRONT()  
+                IF NOT (rPos GREATER_OR_EQUAL dPos) THEN  
+                    rList.ADD_TO_BACK(rPos PLUS lenSenate)  
+                ELSE  
+                    dList.ADD_TO_BACK(dPos PLUS lenSenate)  
+                END IF  
+                CALL battle(rList, dList, lenSenate)()  
+            END FUNCTION  
+        END FUNCTION  
+
+        CALL battle(radiantQueue, direQueue, LENGTH(senate))()  
+
+        IF radiantQueue.IS_EMPTY() THEN  
+            RETURN "Dire"  
+        ELSE  
+            RETURN "Radiant"  
+        END IF  
+    END FUNCTION  
+END CLASS
