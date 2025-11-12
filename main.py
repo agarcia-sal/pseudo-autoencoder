@@ -58,7 +58,9 @@ def main(cfg):
     if cfg.algorithm == "reevo":
         from reevo import ReEvo as ga
     elif cfg.algorithm == "greedy":
-        from agents.greedy_refine import GreedyRefine as ga # [TO DO]: change ga as agent; figure out how to blend the two
+        from agents.greedy_refine import GreedyRefine as ga
+    elif cfg.algorithm == "direct-answer":
+        from agents.direct_answer import DirectAnswer as ga
 #         agent = GreedyRefine(
 #         timeout=10,
 #         model='openai/o3-mini', # We use LiteLLM to call API
@@ -102,12 +104,13 @@ def main(cfg):
         data = get_data(problems_dir_name, problems_filename, src_dir=f'{ROOT_DIR}/data')
 
 
-    print('problems_filename:')
-    print(problems_filename)
+    starting_iteration = cfg.starting_iteration
+    iterations = cgf.num_iterations
+    rounds = cfg.rounds
 
-    starting_iteration = 1
-    iterations = 32# [TO DO]: CO-Bench paper uses 64
-    rounds = 2# [TO DO]: this is a hyperparameter i need to tune; am using 10 for now
+    # starting_iteration = 1
+    # iterations = 32
+    # rounds = 2
     timestamp = hydra.core.hydra_config.HydraConfig.get().run.dir.split("/")[-1] # this should syncronize with hydra's timestamp
     
 
