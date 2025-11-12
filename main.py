@@ -200,27 +200,14 @@ def main(cfg):
     # prev_decoder_prompt = file_to_string(f"{ROOT_DIR}/outputs/prompts/{previous_timestamp}/prompt_iter_{final_iter}_decoder.txt")
     prev_decoder_prompt = file_to_string(f"{ROOT_DIR}/prompts/greedy_refine/trivial_decoder_prompt.txt")
 
-    # Run for 20/64 iterations
     for it in range(starting_iteration, iterations + 1):
         # Encoding:
         if evolving_encoding:
             stage = 'encoder'
-            try: # may hit an LLM rate limite
-                # reevo = ga(cfg, ROOT_DIR, stage, round, timestamp, client) # maybe i should have different clients for generating and for reflecting
-                # best_prompt_overall, best_prompt_path_overall = reevo.evolve()
-                # run_results(best_prompt_overall, best_prompt_path_overall, stage, problems_dir_name, timestamp, round)
-                # for round in range(rounds):
-                print('right before calling agent.step()')
-                final_iter = 33
-                prompt = file_to_string(f"{ROOT_DIR}/outputs/prompts/{previous_timestamp}/prompt_iter_{final_iter}_encoder.txt")
-                # prompt = file_to_string(f"{ROOT_DIR}/prompts/common/trivial_encoder_prompt.txt")
-                # prompt = encoding_agent.step()
-                # print('right after calling agent.step()')
-                prompt = file_to_string(f"{ROOT_DIR}/prompts/greedy_refine/trivial_encoder_prompt.txt")
-
-                # print('prompt from agent.step() looks like: ', prompt)
-                if prompt is None:  # agent decides to terminate
-                    # print('prompt is none')
+            try: 
+                prompt = encoding_agent.step()
+                
+                if prompt is None:  
                     break
                 print('right before calling evaluate()')
                 feedback = evaluator.evaluate(prompt, prev_decoder_prompt, stage, timestamp, it, client)  # Run evaluation
@@ -229,23 +216,16 @@ def main(cfg):
                 save_prompt(str(generated_prompts_path), prompt, it, stage)
                 
                 
-                # UNCOMMENT BELOW:
-                # encoding_agent.feedback(feedback.dev_score, feedback.dev_feedback, it)  # Use dev set score as feedback
-                # previous_best_path = os.path.join(ROOT_DIR, "data", problems_dir_name, "outputs", timestamp, f"iter_{it}", "previous_best", "previous_best.json")
-                # previous_best_prompt, previous_best_score, previous_best_feedback, previous_best_iter = encoding_agent.get_previous_best()
-                # record_previous_best_solution(previous_best_path, previous_best_prompt, previous_best_score, previous_best_feedback, previous_best_iter)
+                encoding_agent.feedback(feedback.dev_score, feedback.dev_feedback, it)  # Use dev set score as feedback
+                previous_best_path = os.path.join(ROOT_DIR, "data", problems_dir_name, "outputs", timestamp, f"iter_{it}", "previous_best", "previous_best.json")
+                previous_best_prompt, previous_best_score, previous_best_feedback, previous_best_iter = encoding_agent.get_previous_best()
+                record_previous_best_solution(previous_best_path, previous_best_prompt, previous_best_score, previous_best_feedback, previous_best_iter)
                 
-                # UNCOMMENT BELOW:
                 # Get the final solution
-                # if it % rounds == 0: # about to switch over to the next stage
-                #     best_prompt_so_far = encoding_agent.finalize()
-                #     prev_encoder_prompt = best_prompt_so_far
+                if it % rounds == 0: # about to switch over to the next stage
+                    best_prompt_so_far = encoding_agent.finalize()
+                    prev_encoder_prompt = best_prompt_so_far
 
-                # print('right after calling fnalize()')
-                # if feedback.dev_score == 1.0:
-                #     print('prompt: ')
-                #     print(prompt)
-                #     break
             except Exception as e:
                 print(f"Error in iteration {it} for stage {stage}: {e}")
                 traceback.print_exc()
@@ -253,20 +233,15 @@ def main(cfg):
         if evolving_decoding:
             stage = 'decoder'
             try:
-                # reevo = ga(cfg, ROOT_DIR, stage, round, timestamp, client) # maybe i should have different clients for generating and for reflecting
-                # best_prompt_overall, best_prompt_path_overall = reevo.evolve()
-                # run_results(best_prompt_overall, best_prompt_path_overall, stage, problems_dir_name, timestamp, round)
-                # for round in range(rounds):
-                # print('in decoding round:', round)
+                
                 prompt = decoding_agent.step()
-                if prompt is None:  # agent decides to terminate
-                    break # [TO DO]: or should this be 'continue'??
+                if prompt is None:  
+                    break 
                 feedback = evaluator.evaluate(prompt, prev_encoder_prompt, stage, timestamp, it, client)  # Run evaluation
                 avg_metrics = feedback.avg_metrics
                 save_metrics(avg_metrics, metrics_path, timestamp, stage, it)
                 save_prompt(str(generated_prompts_path), prompt, it, stage)
                 
-                # [TO DO]: add a try except or catch error when there is not an encoder prompt returned
                 decoding_agent.feedback(feedback.dev_score, feedback.dev_feedback, it)  # Use dev set score as feedback
                 # Record Previous best
                 previous_best_path = os.path.join(ROOT_DIR, "data", problems_dir_name, "outputs", timestamp, f"iter_{it}", "previous_best", "previous_best.json")
@@ -302,27 +277,6 @@ def main(cfg):
         feedback = evaluator.evaluate(prompt, prev_encoder_prompt, 'decoder', timestamp, iterations + 2, client)
         avg_metrics = feedback.avg_metrics
         save_metrics(avg_metrics, metrics_path, timestamp, 'decoder', iterations + 2)
-
-
-    # run final encoding and decoding prompts on the direct answer pipeline to get labels
-    trivial_decoder_prompt = file_to_string(f"{ROOT_DIR}/prompts/common/trivial_decoder_prompt.txt")
-    trivial_encoder_prompt = file_to_string(f"{ROOT_DIR}/prompts/common/trivial_encoder_prompt.txt")
-
-    # run_direct_answer_pipeline(encoding_prompt, decoding_prompt, file_name)
-    # print(feedback.test_feedback)  # Test set score < this is maybe where i can get the metrics [TO DO]!
-
-    # profiler.disable()
-
-    # Save results to file
-    # stats = pstats.Stats(profiler)
-    # stats.dump_stats('profile_results.prof')
-    # stats.print_stats()
-    # stats.sort_stats('time').print_stats(20)
-
-    # print('best encoding prompt: ')
-    # print(prev_encoder_prompt)
-    # print('best decoder prompt:')
-    # print(prev_decoder_prompt)
 
     ######################## Store pseudocode in a pandas dataframe: ################################
     problems_dir = f"{ROOT_DIR}/data/{problems_dir_name}"
