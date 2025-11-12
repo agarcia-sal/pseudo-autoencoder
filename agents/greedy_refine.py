@@ -75,15 +75,6 @@ class GreedyRefine:
         # print(self.solution)
         self.iteration += 1
         return prompt
-    
-    def step_direct_answer(self):
-        prompt = file_to_string(f"{self.src_dir}/prompts/greedy_refine/trivial_classifier.txt")
-        response = call_llm(prompt, self.client, self.model, reasoning_effort=self.reasoning_effort)
-        prompt = response
-        self.solution.append(Solution(prompt=prompt, response=response))
-        self.iteration += 1
-        return prompt
-
 
     def feedback(self, score, feedback, iter):
         # print('in feedback() of greedy_define agent')
