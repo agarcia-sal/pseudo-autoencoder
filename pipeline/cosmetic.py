@@ -1,4 +1,7 @@
 import os
+import traceback
+from pathlib import Path
+from evaluation.utils import save_metrics, save_prompt, record_previous_best_solution, file_to_string
 from .base_pipeline import BasePipeline
 
 # @dataclass
@@ -14,19 +17,22 @@ class Cosmetic(BasePipeline):
     def __str__(self):
         return f"BasePipeline"
 
-    def __init__(self, client, src_dir, timeout=10, model='openai/o3-mini', stage='encoder', max_iter=64, reasoning_effort='medium'):
+    def __init__(self, client, src_dir, cfg, agent, evaluator, timestamp, final_iter=None, previous_timestamp=None, timeout=10, model='openai/o3-mini', max_iter=64, reasoning_effort='medium'):
         self.client=client
         self.src_dir=src_dir
+        self.cfg=cfg
+        self.agent=agent
+        self.evaluator=evaluator
+        self.timestamp=timestamp
+        self.final_iter=final_iter
+        self.previous_timestamp=previous_timestamp
         self.timeout = timeout
         self.model = model
-        self.stage = stage
-        self.solution = []
+        self.stage = 'cosmetic'
         self.max_iter = max_iter
         self.reasoning_effort = reasoning_effort
         self.iteration = 0
-
-        # started adding here:
-        self.timestamp = timestamp
+        self.pipeline_name = 'cosmetic'
 
         self.setup_pipeline()
 
@@ -35,58 +41,44 @@ class Cosmetic(BasePipeline):
         generated_prompts_path.mkdir(parents=True, exist_ok=True)
         self.generated_prompts_path = str(generated_prompts_path)
 
-        metrics_path = os.path.join(self.src_dir, "data", pipeline_name, dataset, "metrics") # TO DO: fill in the variable names
+        # [TO DO]: modify the data folder to have human_eval and leet_code folders for the cosmetic folder
+        metrics_path = os.path.join(self.src_dir, "data", self.pipeline_name, self.cfg.dataset, "metrics") # TO DO: fill in the variable names
         self.metrics_path = metrics_path
+        
+        if self.final_iter is not None and self.previous_timestamp is not None:
+            self.decoder_prompt = file_to_string(os.path.join(self.src_dir, "outputs", "prompts", self.previous_timestamp, f"prompt_iter_{self.final_iter}_decoder.txt"))
+        else:
+            self.decoder_prompt = file_to_string(os.path.join(self.src_dir, "prompts", "common", "trivial_decoder_prompt.txt"))
 
         
 
     def run(self):
-        stage = 'encoder'
+        for it in range(self.cfg.starting_iteration, self.cfg.num_iterations + 1):
             try: 
-                prompt = encoding_agent.step()
-                
-                if prompt is None: 
-                    break
+                prompt = self.agent.step()
 
-                feedback = evaluator.evaluate(prompt, prev_decoder_prompt, stage, timestamp, it, client)  # Run evaluation
+                if prompt is None:  
+                    break
+                feedback = self.evaluator.evaluate_cosmetic(prompt, self.decoder_prompt, self.stage, self.timestamp, it, self.client)
 
                 self._save_iteration_results(feedback.avg_metrics, prompt, it)
                 
-                
-                encoding_agent.feedback(feedback.dev_score, feedback.dev_feedback, it)  # Use dev set score as feedback
-
-                self._record_previous_best(encoding_agent, it)
-                
-                # Get the final solution
-                if it % rounds == 0: # about to switch over to the next stage
-                    best_prompt_so_far = encoding_agent.finalize()
-                    prev_encoder_prompt = best_prompt_so_far
-
+                self.agent.feedback(feedback.dev_score, feedback.dev_feedback, it)  # Use dev set score as feedback
+                # Record Previous best:
+                self._record_previous_best(self.agent, it)
+                              
             except Exception as e:
-                print(f"Error in iteration {it} for stage {stage}: {e}")
-                traceback.print_exc()
-                continue  # Skip to the next round
+                print(f"Error in iteration {it} for stage {self.stage}: {e}")
+                continue 
         
 
-    def finalize(self):
-        # print('len self.solution in finalize()')
-        # print(len(self.solution))
-        previous_best = sorted(self.solution, key=lambda x: x.score)[-1]
-        # if self.stage == 'decoder':
-        #     previous_best = sorted(self.solution, key=lambda x: x.score)[-1]
-        # else:
-        #     previous_best = sorted(self.solution, key=lambda x: x.score)[0]
-        return previous_best.prompt
-
     def _save_iteration_results(self, avg_metrics, prompt, it):
-        save_metrics(avg_metrics, self.metrics_path, self.timestamp, self.stage, it) # [TO DO]: import save_metrics and maybe change self.stage
-        save_prompt(self.generated_prompts_path, prompt, it, self.stage) # [TO DO]: import save_prompt and maybe change self.stage
+        save_metrics(avg_metrics, self.metrics_path, self.timestamp, self.stage, it)
+        save_prompt(self.generated_prompts_path, prompt, it, self.stage)
 
     def _record_previous_best(self, agent, it):
-        # [TO DO]: fill in pipeline_name and dataset
-        previous_best_path = os.path.join(self.src_dir, "data", pipeline_name, dataset, "outputs", self.timestamp, f"iter_{it}", "previous_best", "previous_best.json")
+        previous_best_path = os.path.join(self.src_dir, "data", self.pipeline_name, self.cfg.dataset, "outputs", self.timestamp, f"iter_{it}", "previous_best", "previous_best.json")
         previous_best_prompt, previous_best_score, previous_best_feedback, previous_best_iter = agent.get_previous_best()
-        # [TO DO]: import record_previous_best_solution:
         record_previous_best_solution(previous_best_path, previous_best_prompt, previous_best_score, previous_best_feedback, previous_best_iter)
                 
 

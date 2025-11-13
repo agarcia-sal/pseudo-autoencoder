@@ -68,14 +68,7 @@ class BasePipeline:
         
 
     def finalize(self):
-        # print('len self.solution in finalize()')
-        # print(len(self.solution))
-        previous_best = sorted(self.solution, key=lambda x: x.score)[-1]
-        # if self.stage == 'decoder':
-        #     previous_best = sorted(self.solution, key=lambda x: x.score)[-1]
-        # else:
-        #     previous_best = sorted(self.solution, key=lambda x: x.score)[0]
-        return previous_best.prompt
+        raise NotImplemented
 
     def _save_iteration_results(self, avg_metrics, prompt, it):
         save_metrics(avg_metrics, self.metrics_path, self.timestamp, self.stage, it) # [TO DO]: import save_metrics and maybe change self.stage

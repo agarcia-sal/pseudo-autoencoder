@@ -16,6 +16,9 @@ from evaluation.utils import save_metrics, save_prompt, get_pseudocode_dataset, 
 from evaluation import Evaluator, get_data
 from openai import OpenAI
 
+from pipeline.autoencoder import AutoEncoder
+from pipeline.cosmetic import Cosmetic
+
 
 ROOT_DIR = os.getcwd()
 logging.basicConfig(level=logging.INFO)
@@ -123,8 +126,9 @@ def main(cfg):
     evolving_cosmetic = False
     evolving_classifier = False
 
-    if (evolving_encoding or evolving_decoding or evolving_cosmetic or evolving_classifier) and not load_previous: 
-        setup_dataset(timestamp, f"{ROOT_DIR}/data/{problems_dir_name}", iterations + 2) # plus 2 because of the final encoder and decoder verification at the end
+    # if (evolving_encoding or evolving_decoding or evolving_cosmetic or evolving_classifier) and not load_previous: 
+    #     setup_dataset(timestamp, f"{ROOT_DIR}/data/{problems_dir_name}", iterations + 2) # plus 2 because of the final encoder and decoder verification at the end
+    setup_dataset(timestamp, f"{ROOT_DIR}/data/{cfg.pipeline}/{cfg.dataset}", iterations + 3) # plus 2 because of the final encoder and decoder verification at the end with train, val, and test splits
 
     generated_prompts_path = Path(f"{ROOT_DIR}/outputs/prompts/{timestamp}") # [TO DO]: decide if i still need this
     generated_prompts_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
@@ -334,6 +338,13 @@ def main(cfg):
 
     ######################## Create cosmetic changes for the positive labels: ################################
 
+    if load_previous and evolving_cosmetic:
+        prev_iter = 0
+        cosmetic_previous_best_path = os.path.join(ROOT_DIR, "data", problems_dir_name, "outputs", timestamp, f"iter_{prev_iter}", "previous_best", "previous_best.json")
+        cosmetic_agent.load_previous(cosmetic_previous_best_path)
+
+    evaluator_cosmetic = Evaluator(data, timeout=5) 
+
     cosmetic_agent = ga(
         client=client,
         src_dir=ROOT_DIR,
@@ -341,66 +352,22 @@ def main(cfg):
         model='gpt-4.1-mini', # We use LiteLLM to call API; was previously 'openai/o3-mini'; im assuming to fit in with LiteLLM api
         stage='cosmetic'
     )
-    # evolving_cosmetic = True
-    cosmetic_iterations = 16
 
-    if load_previous and evolving_cosmetic:
-        prev_iter = 0
-        cosmetic_previous_best_path = os.path.join(ROOT_DIR, "data", problems_dir_name, "outputs", timestamp, f"iter_{prev_iter}", "previous_best", "previous_best.json")
-        cosmetic_agent.load_previous(cosmetic_previous_best_path)
+    if cfg.evolving_cosmetic:
+        cosmetic = Cosmetic(
+            client=client, 
+            src_dir=ROOT_DIR, 
+            cfg=cfg,
+            agent=cosmetic_agent, 
+            evaluator=evaluator_cosmetic,
+            timestamp=timestamp,
+            final_iter=34,
+            previous_timestamp='2025-09-18_21-00-18',
+            timeout=5, 
+            model='gpt-4.1-mini',         
+        )
 
-    evaluator_cosmetic = Evaluator(data, timeout=5) # [TO DO]: change timeout
-    # positive_examples_file_name = os.path.join(ROOT_DIR, "outputs", "pseudocodes", f"positive_labels_{timestamp}.jsonl")
-    
-    # previous_timestamp = '2025-09-18_21-00-18'
-    # previous_timestamp = '2025-09-18_04-55-13'
-    # previous_timestamp = '2025-09-24_15-05-02'
-    # previous_timestamp = '2025-09-25_22-10-58'
-    previous_timestamp = '2025-09-26_19-55-20'
-    # positive_examples_file_name = f"positive_labels_{previous_timestamp}.jsonl"
-
-    final_iter = 34
-    previous_timestamp = '2025-09-18_21-00-18'
-
-    decoder_prompt = file_to_string(f"{ROOT_DIR}/prompts/greedy_refine/trivial_decoder_prompt.txt")
-
-    # decoder_prompt = file_to_string(f"{ROOT_DIR}/outputs/prompts/{previous_timestamp}/prompt_iter_{final_iter}_decoder.txt")
-
-    #[TO DO]: set up dataset and metrics path and everything else.
-
-    for it in range(1, cosmetic_iterations+1):
-        # Encoding:
-        if evolving_cosmetic:
-            stage = 'cosmetic'
-            try: # may hit an LLM rate limite
-                
-                # print('right before calling agent.step()')
-                prompt = cosmetic_agent.step()
-                # print('step:', 0)
-                # print('right after calling agent.step()')
-                # print('prompt from agent.step() looks like: ', prompt)
-                if prompt is None:  # agent decides to terminate
-                    print('prompt is none')
-                    break
-                print('right before calling evaluate() within the round')
-                feedback = evaluator_cosmetic.evaluate_cosmetic(prompt, decoder_prompt, stage, timestamp, it, client)
-                avg_metrics = feedback.avg_metrics
-                save_metrics(avg_metrics, metrics_path, timestamp, stage, it)
-                save_prompt(str(generated_prompts_path), prompt, it, stage)
-                
-                # [TO DO]: add a try except or catch error when there is not an encoder prompt returned
-                cosmetic_agent.feedback(feedback.dev_score, feedback.dev_feedback, it)  # Use dev set score as feedback
-                # Record Previous best:
-                previous_best_path = os.path.join(ROOT_DIR, "data", problems_dir_name, "outputs", timestamp, f"iter_{it}", "previous_best", "previous_best.json")
-                previous_best_prompt, previous_best_score, previous_best_feedback, previous_best_iter = cosmetic_agent.get_previous_best()
-                record_previous_best_solution(previous_best_path, previous_best_prompt, previous_best_score, previous_best_feedback, previous_best_iter)
-
-                #######################################################################
-              
-            except Exception as e:
-                print(f"Error in iteration {it} for stage {stage}: {e}")
-                continue  # Skip to the next round
-
+        cosmetic.run()
     ######################## Run the classifier: ####################################################
     generated_prompts_path = Path(f"{ROOT_DIR}/outputs/prompts/{timestamp}")
     generated_prompts_path.mkdir(parents=True, exist_ok=True)

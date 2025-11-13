@@ -18,17 +18,17 @@ class AutoEncoder(BasePipeline):
     def __str__(self):
         return f"BasePipeline"
 
-    def __init__(self, client, src_dir, cfg, encoding_agent, decoding_agent, evaluator, timeout=10, model='openai/o3-mini', stage='encoder', timestamp='', max_iter=64, reasoning_effort='medium'):
+    def __init__(self, client, src_dir, cfg, encoding_agent, decoding_agent, evaluator, timestamp, timeout=10, model='openai/o3-mini', stage='encoder', max_iter=64, reasoning_effort='medium'):
         self.client=client
         self.src_dir=src_dir
         self.cfg = cfg
         self.encoding_agent = encoding_agent
         self.decoding_agent = decoding_agent
         self.evaluator = evaluator
+        self.timestamp = timestamp
         self.timeout = timeout
         self.model = model
         self.stage = stage
-        self.timestamp = timestamp
         self.max_iter = max_iter
         self.reasoning_effort = reasoning_effort
         self.iteration = 0
@@ -101,7 +101,7 @@ class AutoEncoder(BasePipeline):
                         self.prev_decoder_prompt = best_prompt_so_far
 
                 except Exception as e:
-                    print(f"Error in iteration {it} for stage {stage}: {e}")
+                    print(f"Error in iteration {it} for stage {self.stage}: {e}")
                     continue  
 
             if it % self.cfg.rounds == 0: 
