@@ -59,7 +59,7 @@ def main(cfg):
         from reevo import ReEvo as ga
     elif cfg.algorithm == "greedy":
         from agents.greedy_refine import GreedyRefine as ga
-    elif cfg.algorithm == "direct-answer":
+    elif cfg.algorithm == "direct_answer":
         from agents.direct_answer import DirectAnswer as ga
 #         agent = GreedyRefine(
 #         timeout=10,
@@ -185,98 +185,23 @@ def main(cfg):
         prev_cosmetic_iter = 0 
 
     evaluator = Evaluator(data, timeout=5) # [TO DO]: change timeout
-        
-    prev_decoder_prompt = file_to_string(f"{ROOT_DIR}/prompts/greedy_refine/trivial_decoder_prompt.txt")
-    # profiler = cProfile.Profile()
-    # profiler.enable()
-    prev_decoder_prompt = file_to_string(f"{ROOT_DIR}/prompts/common/trivial_decoder_prompt.txt")
-    prev_encoder_prompt = file_to_string(f"{ROOT_DIR}/prompts/common/trivial_encoder_prompt.txt")
 
-    # previous_timestamp = '2025-09-18_21-00-18'
-    # # previous_timestamp = '2025-09-18_04-55-13'
+    autoencoder = AutoEncoder(
+        client=client, 
+        src_dir=ROOT_DIR, 
+        cfg=cfg,
+        encoding_agent=encoding_agent, 
+        decoding_agent=decoding_agent, 
+        evaluator=evaluator,
+        timeout=5, 
+        model='gpt-4.1-mini', 
+        stage='encoder', 
+        timestamp=timestamp
+    )
 
-    # previous_timestamp = '2025-09-24_15-05-02'
-    # final_iter = 34
-    # prev_decoder_prompt = file_to_string(f"{ROOT_DIR}/outputs/prompts/{previous_timestamp}/prompt_iter_{final_iter}_decoder.txt")
-    prev_decoder_prompt = file_to_string(f"{ROOT_DIR}/prompts/greedy_refine/trivial_decoder_prompt.txt")
+    autoencoder.run()
+    autoencoder.finalize()
 
-    for it in range(starting_iteration, iterations + 1):
-        # Encoding:
-        if evolving_encoding:
-            stage = 'encoder'
-            try: 
-                prompt = encoding_agent.step()
-                
-                if prompt is None:  
-                    break
-                print('right before calling evaluate()')
-                feedback = evaluator.evaluate(prompt, prev_decoder_prompt, stage, timestamp, it, client)  # Run evaluation
-                avg_metrics = feedback.avg_metrics
-                save_metrics(avg_metrics, metrics_path, timestamp, stage, it)
-                save_prompt(str(generated_prompts_path), prompt, it, stage)
-                
-                
-                encoding_agent.feedback(feedback.dev_score, feedback.dev_feedback, it)  # Use dev set score as feedback
-                previous_best_path = os.path.join(ROOT_DIR, "data", problems_dir_name, "outputs", timestamp, f"iter_{it}", "previous_best", "previous_best.json")
-                previous_best_prompt, previous_best_score, previous_best_feedback, previous_best_iter = encoding_agent.get_previous_best()
-                record_previous_best_solution(previous_best_path, previous_best_prompt, previous_best_score, previous_best_feedback, previous_best_iter)
-                
-                # Get the final solution
-                if it % rounds == 0: # about to switch over to the next stage
-                    best_prompt_so_far = encoding_agent.finalize()
-                    prev_encoder_prompt = best_prompt_so_far
-
-            except Exception as e:
-                print(f"Error in iteration {it} for stage {stage}: {e}")
-                traceback.print_exc()
-                continue  # Skip to the next round
-        if evolving_decoding:
-            stage = 'decoder'
-            try:
-                
-                prompt = decoding_agent.step()
-                if prompt is None:  
-                    break 
-                feedback = evaluator.evaluate(prompt, prev_encoder_prompt, stage, timestamp, it, client)  # Run evaluation
-                avg_metrics = feedback.avg_metrics
-                save_metrics(avg_metrics, metrics_path, timestamp, stage, it)
-                save_prompt(str(generated_prompts_path), prompt, it, stage)
-                
-                decoding_agent.feedback(feedback.dev_score, feedback.dev_feedback, it)  # Use dev set score as feedback
-                # Record Previous best
-                previous_best_path = os.path.join(ROOT_DIR, "data", problems_dir_name, "outputs", timestamp, f"iter_{it}", "previous_best", "previous_best.json")
-                previous_best_prompt, previous_best_score, previous_best_feedback, previous_best_iter = decoding_agent.get_previous_best()
-                record_previous_best_solution(previous_best_path, previous_best_prompt, previous_best_score, previous_best_feedback, previous_best_iter)
-                # Get the final solution
-                # print('right before calline finalize()')
-                if it % rounds == 0: # about to switch over to the next stage
-                    best_prompt_so_far = decoding_agent.finalize()
-                    prev_decoder_prompt = best_prompt_so_far
-
-            except Exception as e:
-                print(f"Error in iteration {it} for stage {stage}: {e}")
-                continue  # Skip to the next round
-        if (evolving_encoding or evolving_decoding) and it % rounds == 0: # maybe start at iterations = 1 ? and put this at the bottom of the loop
-            evolving_encoding = not evolving_encoding
-            evolving_decoding = not evolving_decoding
-
-    # Finalize:
-    if (evolving_encoding or evolving_decoding) and iterations > 1:
-        print('finalize section:')
-        print('encoding:')
-        prompt = encoding_agent.finalize()
-        save_prompt(str(generated_prompts_path), prompt, iterations + 1, 'encoder')
-        feedback = evaluator.evaluate(prompt, prev_decoder_prompt, 'encoder', timestamp, iterations + 1, client)
-        avg_metrics = feedback.avg_metrics
-        save_metrics(avg_metrics, metrics_path, timestamp, 'encoder', iterations + 1)
-        # print(feedback.test_feedback)  # Test set score < this is maybe where i can get the metrics: [TO DO]!
-
-        print('decoding:')
-        prompt = decoding_agent.finalize()
-        save_prompt(str(generated_prompts_path), prompt, iterations + 2, 'decoder')
-        feedback = evaluator.evaluate(prompt, prev_encoder_prompt, 'decoder', timestamp, iterations + 2, client)
-        avg_metrics = feedback.avg_metrics
-        save_metrics(avg_metrics, metrics_path, timestamp, 'decoder', iterations + 2)
 
     ######################## Store pseudocode in a pandas dataframe: ################################
     problems_dir = f"{ROOT_DIR}/data/{problems_dir_name}"
@@ -515,16 +440,9 @@ def main(cfg):
         # Encoding:
         if evolving_classifier and False:
             stage = 'classifier'
-            try: # may hit an LLM rate limite
-                # reevo = ga(cfg, ROOT_DIR, stage, round, timestamp, client) # maybe i should have different clients for generating and for reflecting
-                # best_prompt_overall, best_prompt_path_overall = reevo.evolve()
-                # run_results(best_prompt_overall, best_prompt_path_overall, stage, problems_dir_name, timestamp, round)
-                
-                # UNCOMMENT:
-                # prompt = classifier_agent.step_direct_answer()
+            try:
                 prompt = classifier_agent.step()
 
-                # prompt = file_to_string(f"{ROOT_DIR}/prompts/greedy_refine/trivial_classifier.txt")
                 
                 if prompt is None:  # agent decides to terminate
                     # print('prompt is none')
