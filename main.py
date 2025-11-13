@@ -139,12 +139,6 @@ def main(cfg):
     # print(f"Directory '{generated_prompts_path}' created successfully")
     # print('prompt path: ', str(generated_prompts_path))
 
-    # client = OpenAI(
-    #     # api_key=os.environ.get("OPENAI_API_KEY"),  # This is the default and can be omitted
-    #     api_key = os.getenv('OPENAI_API_KEY'),
-    # )
-   
-
     encoding_agent = ga(
         client=client,
         src_dir=ROOT_DIR,
@@ -228,114 +222,6 @@ def main(cfg):
     new_filename = f'LeetCodeDataset-v0.3.0-hard-test.jsonl'
     # copy_difficulty_problems(os.path.join(problems_dir, problems_filename), os.path.join(problems_dir, new_filename), difficulty_map, limit)
 
-    store_pseudocode = False
-    if store_pseudocode:
-        print('in store pseudocode')
-        stage = 'encoder'
-        # timestamp = '2025-06-16_14-15-27'
-        first_timestamp = '' # <- passing rate + natural language + conciseness
-        # first_timestamp = '2025-09-18_21-00-18' # <- passing rate + natural language
-        # first_timestamp = '2025-09-18_04-55-13'
-        # first_timestamp = '2025-09-18_21-00-18'
-        # first_timestamp = '2025-09-24_15-05-02'
-        # first_timestamp = '2025-09-25_22-10-58'
-        first_timestamp = '2025-09-29_10-32-52'
-        first_dir_name = 'human_eval'
-        # first_timestamp = '2025-09-26_19-55-20'
-        # first_dir_name = 'leet_code'
-        first_pipeline_json_path_name = f"{ROOT_DIR}/data/{first_dir_name}/metrics/{first_timestamp}_metrics.json"
-        # second_timestamp =  '2025-09-18_21-00-18' # <- just readability: avg_word_length - avg_words_per_line
-        # second_timestamp =  '2025-09-19_11-38-47'
-        # second_timestamp =  '2025-09-20_00-16-56'
-        # second_timestamp =  '2025-09-24_18-22-37'
-        # second_timestamp =  '2025-09-24_23-50-30'
-        # second_timestamp =  '2025-09-20_19-13-22'
-        second_timestamp =  '2025-09-29_04-57-21'
-        second_dir_name = 'cosmetic_pseudocodes'
-        # second_dir_name = 'leet_code'
-        second_pipeline_json_path_name = f"{ROOT_DIR}/data/{second_dir_name}/metrics/{second_timestamp}_metrics.json"
-        # problems_dir_file_name = "HumanEval.jsonl"
-        # problems_filename = f'LeetCodeDataset-v0.3.0tiny-train.jsonl'
-        # problems_filename = f'LeetCodeDataset-v0.3.0-hard-train.jsonl'
-        # problems_dir = f"{ROOT_DIR}/data/{first_dir_name}"
-        # first_problems_filename = f'LeetCodeDataset-v0.3.0-hard-test.jsonl'
-        first_problems_filename = f'HumanEval-test.jsonl'
-        first_dir = f"{ROOT_DIR}/data/{first_dir_name}"
-        second_dir = f"{ROOT_DIR}/data/{second_dir_name}"
-        # second_problems_filename = f"positive_labels_{first_timestamp}.jsonl"
-        second_problems_filename = f"pseudocode_labels_{first_timestamp}.jsonl"
-        # second_problems_filename = f'LeetCodeDataset-v0.3.0-hard-train.jsonl'
-        # positive_labels_path_name = os.path.join(ROOT_DIR, "outputs", "pseudocodes", f"positive_labels_{timestamp}")
-        # GET POSITIVE EXAMPLES:
-        # first_timestamp = '2025-09-18_21-00-18'
-        # first_timestamp = '2025-09-24_15-05-02'
-        
-        # new_file_name = os.path.join(ROOT_DIR, "data", "cosmetic_pseudocodes", f"positive_labels_{first_timestamp}.jsonl")
-        # positive_examples = get_positive_labels(first_pipeline_json_path_name, first_dir, first_problems_filename, new_file_name, first_timestamp)
-        # positive_examples = get_positive_labels(first_pipeline_json_path_name, problems_dir, problems_filename, first_timestamp, iterations)
-
-        # GET PSEUDOCODES FROM THE AUTOENCODER PIPELINE
-        # first_timestamp = '2025-09-25_22-10-58'
-        # first_timestamp = '2025-09-24_15-05-02'
-        first_timestamp = '2025-09-29_10-32-52'
-        first_timestamp = '2025-09-26_19-55-20'
-        new_file_name = os.path.join(ROOT_DIR, "data", "cosmetic_pseudocodes", f"pseudocode_labels_{first_timestamp}.jsonl")
-        # pseudocode_examples = get_pseudocode_labels(first_pipeline_json_path_name, first_dir, first_problems_filename, new_file_name, first_timestamp)
-        
-        # GET PSEUDOCODE DATASET FOR THE CLASSIFIER:
-        limit = 150
-        # problem_results, dev_set_results = get_pseudocode_dataset(first_pipeline_json_path_name, second_pipeline_json_path_name, first_dir, second_dir, first_problems_filename, second_problems_filename, first_timestamp, second_timestamp, iterations, limit)
-
-        # GET PSEUDOCODE TEST DATASET FOR THE CLASSIFIER
-        # first_timestamp = '2025-09-25_22-10-58'
-        first_timestamp = '2025-09-24_15-05-02'
-        # first_timestamp = '2025-09-29_10-32-52'
-        first_dir_name = 'cosmetic_pseudocodes'
-        first_dir = f"{ROOT_DIR}/data/{first_dir_name}"
-        # second_timestamp = '2025-09-26_02-36-01'
-        # second_timestamp = '2025-09-29_10-50-33'
-        second_timestamp = '2025-09-29_13-46-17'
-        second_pipeline_json_path_name = f"{ROOT_DIR}/data/{first_dir_name}/metrics/{second_timestamp}_metrics.json"
-        first_problems_filename = os.path.join(ROOT_DIR, "data", "cosmetic_pseudocodes", f"pseudocode_labels_{first_timestamp}.jsonl")
-        limit = 150
-        problem_results = get_pseudocode_dataset_test(second_pipeline_json_path_name, first_dir, first_problems_filename, second_timestamp, limit)
-        version = 2
-        # test_set_filename = os.path.join(ROOT_DIR, "data", "classifier_pseudocodes", f"LeetCode-pseudo-v0.{version}.0-test.jsonl" )
-        test_set_filename = os.path.join(ROOT_DIR, "data", "classifier_pseudocodes", f"HumanEval-pseudo-v0.{version}.0-train.jsonl" )
-        write_dataset_to_file(problem_results, test_set_filename)
-        # print('problem_results: ')
-        # print(problem_results)
-        # print('dev_set_results:')
-        # print(dev_set_results)
-        # true_positive_examples, true_negative_examples, near_miss_examples, near_pass_examples = results
-        version = 1
-        # train_set_filename = os.path.join(ROOT_DIR, "data", "classifier_pseudocodes", f"HumanEval-pseudo-v0.{version}.0-train.jsonl" )
-        # dev_set_filename = os.path.join(ROOT_DIR, "data", "classifier_pseudocodes", f"HumanEval-pseudo-v0.{version}.0-dev.jsonl")
-        # write_dataset_to_file(problem_results, train_set_filename)
-        # write_dataset_to_file(dev_set_results, dev_set_filename)
-        # write_dataset_to_file(positive_examples, positive_examples_file_name)
-        # [TO DO]: add near-misses, and near-passes as something i get from the pseudocode dataset
-        # For train:
-        previous_timestamp = '2025-09-18_04-55-13'
-        final_iter = 34
-        decoder_prompt = file_to_string(f"{ROOT_DIR}/outputs/prompts/{previous_timestamp}/prompt_iter_{final_iter}_decoder.txt")
-        version = 2
-        file_name = os.path.join(ROOT_DIR, "data", "classifier_pseudocodes", f"LeetCode-pseudo-v0.{version}.0-dev.jsonl")
-        # file_name = os.path.join(ROOT_DIR, "data", "classifier_pseudocodes", f"LeetCode-pseudo-v0.{version}.0-train.jsonl" )
-        version = 3
-        new_file_name = os.path.join(ROOT_DIR, "data", "classifier_pseudocodes", f"LeetCode-pseudo-v0.{version}.0-dev.jsonl")
-        # new_file_name = os.path.join(ROOT_DIR, "data", "classifier_pseudocodes", f"LeetCode-pseudo-v0.{version}.0-train.jsonl" )
-        # write_error_strings_to_file(file_name, new_file_name, decoder_prompt, client)
-        # split = "test"
-        # problems_filename = f'HumanEval-{split}.jsonl'
-        # file_name = os.path.join(ROOT_DIR, "data", "human_eval", problems_filename)
-        # reformat_human_eval_file(file_name)
-        # previous_best_timestamp = '2025-09-25_15-00-26'
-        # current_iter = 16
-        # previous_best_file_path = os.path.join(ROOT_DIR, "data", "classifier_pseudocodes", "outputs", previous_best_timestamp, f"iter_{current_iter}", "previous_best", "previous_best.json")
-        # print_feedback_from_file(previous_best_file_path)
-
-
     ######################## Create cosmetic changes for the positive labels: ################################
 
     if load_previous and evolving_cosmetic:
@@ -354,6 +240,8 @@ def main(cfg):
     )
 
     if cfg.evolving_cosmetic:
+        get_cosmetic_dataset(cfg)
+
         cosmetic = Cosmetic(
             client=client, 
             src_dir=ROOT_DIR, 
@@ -369,6 +257,9 @@ def main(cfg):
 
         cosmetic.run()
     ######################## Run the classifier: ####################################################
+
+    if cfg.evolving_classifier:
+        get_classifier_dataset(cfg, limit=150)
     generated_prompts_path = Path(f"{ROOT_DIR}/outputs/prompts/{timestamp}")
     generated_prompts_path.mkdir(parents=True, exist_ok=True)
 
