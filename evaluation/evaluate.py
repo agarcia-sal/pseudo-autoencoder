@@ -1,4 +1,4 @@
-from evaluation.utils import FileLock, ParallelRun, design_optimal, eval_all, filter_dev, filter_test, normalize_metrics, average_metrics, check_if_no_metrics, get_problem_passing_rates, get_problem_readability_scores, record_problem_scores
+from evaluation.utils import FileLock, ParallelRun, design_optimal, eval_all, filter_dev, filter_test, normalize_metrics, average_metrics, check_if_no_metrics, get_problem_passing_rates, get_problem_readability_scores, record_problem_scores, evaluate_classifier_prompt, evaluate_classifier_prompt_test
 import os
 import random
 # import asyncio
@@ -161,8 +161,6 @@ class Evaluator:
     
     def get_feedback_classifier(self, mislabeled_positives, mislabeled_cosmetic, mislabeled_negatives, mislabeled_near_misses, true_negative_errors, near_miss_errors, final_score, metrics):
     # def get_feedback_classifier(self, mislabeled_problems, true_negative_errors, near_miss_errors, final_score, metrics):
-        metrics = check_if_no_metrics(metrics)
-        avg_metrics = average_metrics(metrics) # averaged across all problems
         
         positives = mislabeled_positives[:self.classifier_count]
         cosmetic = mislabeled_cosmetic[:self.classifier_count]
@@ -212,13 +210,13 @@ class Evaluator:
             feedback += "The following are pseudocodes that are reproducible but were labeled as not:\n"
             for entry in positives:
                 feedback += entry["pseudocode"]+"\n"
-        if cosmetic:
-            feedback += "\nThe following are modified pseudocodes of other reproducible versions of pseudocode that are reproducible but were labeled as not:\n"
-            for entry in cosmetic:
-                # feedback += "original version of the pseudocode for this problem that is reproducible:\n" 
-                # feedback += entry["true_positive"] + "\n"
-                # feedback += "modified version of the pseudocode for this problem that is also reproducible:\n"
-                feedback += entry["pseudocode"]+"\n"
+        # if cosmetic:
+        #     feedback += "\nThe following are modified pseudocodes of other reproducible versions of pseudocode that are reproducible but were labeled as not:\n"
+        #     for entry in cosmetic:
+        #         # feedback += "original version of the pseudocode for this problem that is reproducible:\n" 
+        #         # feedback += entry["true_positive"] + "\n"
+        #         # feedback += "modified version of the pseudocode for this problem that is also reproducible:\n"
+        #         feedback += entry["pseudocode"]+"\n"
         if negatives:
             feedback += "\nThe following are pseudocodes that are not reproducible but were labeled as reproducible:\n"
             for entry in negatives:
@@ -253,56 +251,55 @@ class Evaluator:
         # Average metrics
         
         # print('after average metrics')
-        avg_metrics['final_score'] = final_score
-        avg_metrics['avg_score'] = avg_metrics['accuracy_score']
+        
 
         # problem_accuracy_scores = get_problem_readability_scores(metrics, "accuracy_score")
         # print('after getting problem accuracy scores')
         # avg_metrics = record_problem_scores(problem_accuracy_scores, avg_metrics, "accuracy_score") # add the problem passing rates to the metrics
 
         # print('rigth before returning from getting feedback')
-        return Feedback( # [TO DO]: change this back to the above Feedback
-            score=final_score,
-            dev_score=final_score,
-            test_score=final_score,
-            feedback=feedback,
-            dev_feedback=feedback,
-            test_feedback=feedback,
-            results={}, 
-            avg_metrics=avg_metrics,
-        )
+        return feedback
 
-    def evaluate_classifier(self, prompt, decoder_prompt, stage, timestamp, it, client):
-        runtime = ParallelRun(evaluate_instance)
-        with FileLock():
-            results, metrics, original_pseudocodes, pseudocodes, errors = runtime(
-                self.data.problem_cases, self.data.dataset_name, self.data.problems_file_name, prompt, decoder_prompt,
-                self.data.config_path, self.data.src_dir, stage, timestamp, it, client,
-                timeout=self.timeout, instance_workers=self.instance_workers, case_workers=self.case_workers)
+    # def evaluate_classifier(self, prompt, decoder_prompt, stage, timestamp, it, client):
+    def evaluate_classifier(self, prompt, client, pseudocode_path, split='train'):
+        # runtime = ParallelRun(evaluate_instance)
+        # with FileLock():
+        #     results, metrics, original_pseudocodes, pseudocodes, errors = runtime(
+        #         self.data.problem_cases, self.data.dataset_name, self.data.problems_file_name, prompt, decoder_prompt,
+        #         self.data.config_path, self.data.src_dir, stage, timestamp, it, client,
+        #         timeout=self.timeout, instance_workers=self.instance_workers, case_workers=self.case_workers)
 
+        # [TO DO]: set up self.data.train_set_filename
+        problems_file_name = ''
+        if split == 'train':
+            problems_file_name = self.data.train_set_filename
+        elif split == 'dev':
+            problems_file_name = self.data.dev_set_filename
+        elif split == 'test':
+            problems_file_name = self.data.test_set_filename
 
-        # print('results in evaluate_cosmetic:')
-        # print(results)
-        problem_passing_rates = get_problem_passing_rates(results)
-        passing_rate = eval_all(results, self.data.problem_cases)
+        if split == 'train' or split 'dev':
+            results = evaluate_classifier_prompt(problems_file_name, prompt, client)
+            mislabeled_positives, mislabeled_cosmetic, mislabeled_negatives, mislabeled_near_misses, labeled_correctly, true_negative_errors, near_miss_errors, final_score, metrics = results
+            mislabeled = mislabeled_positives + mislabeled_cosmetic + mislabeled_negatives + mislabeled_near_misses
+        elif split == 'test':
+            results = evaluate_classifier_prompt_test(test_set_filename, prompt, client)
+            mislabeled_positives, mislabeled_negatives, labeled_correctly, avg_metrics = results
+            mislabeled = mislabeled_positives + mislabeled_negatives
+        
+        write_classifier_pseudocodes_to_file(labeled_correctly, os.path.join(pseudocode_path, "pass"))x
+        write_classifier_pseudocodes_to_file(mislabeled, os.path.join(pseudocode_path, "fail"))
+
+        feedback = self.get_feedback_classifier(mislabeled_positives, mislabeled_cosmetic, mislabeled_negatives, mislabeled_near_misses, true_negative_errors, near_miss_errors, final_score, metrics) 
+        
+        # problem_passing_rates = get_problem_passing_rates(results)
+        # passing_rate = eval_all(results, self.data.problem_cases)
 
         metrics = check_if_no_metrics(metrics)
-        # it's just the bleu score so no need to normalize
         avg_metrics = average_metrics(metrics) # averaged across all problems
 
-        final_score = passing_rate - avg_metrics['bleu_score'] 
-
-        avg_metrics['passing_rate'] = passing_rate
-        avg_metrics['avg_score'] = final_score
-
-        problem_bleu_scores = get_problem_readability_scores(metrics, "bleu_score")
-        avg_metrics = record_problem_scores(problem_passing_rates, avg_metrics, "passing_rate") # add the problem passing rates to the metrics
-        avg_metrics = record_problem_scores(problem_bleu_scores, avg_metrics, "bleu_score") # add the problem avg word length to the metrics
-        # avg_metrics = record_problem_scores(problem_conciseness_scores, avg_metrics, "avg_words_per_line") # add the problem avg word length to the metrics
-        
-        # feedback = self.get_feedback(results, dev_score)
-        # print('right begore calling get_feedback')
-        feedback = self.get_feedback(results, final_score, stage, pseudocodes, original_pseudocodes, errors)
+        avg_metrics['final_score'] = final_score
+        avg_metrics['avg_score'] = avg_metrics['accuracy_score']
 
         return Feedback( # [TO DO]: change this back to the above Feedback
             score=final_score,
