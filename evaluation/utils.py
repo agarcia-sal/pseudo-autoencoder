@@ -1528,38 +1528,6 @@ def calculate_reward_pseudocode(pseudocode):
     
     return final_reward
 
-def get_avg_test_case_length(problems_file_name):
-    num_problems = 0
-    num_total_test_cases = 0
-    for problem in read_jsonl(problems_file_name):
-        num_problems += 1
-        input_output = problem["input_output"]
-        num_test_cases = len(input_output)
-        num_total_test_cases += num_test_cases
-    return num_total_test_cases / num_problems if num_problems > 0 else 0
-        # completion = problem["completion"]
-
-def get_num_difficulty(problems_file_name, difficulty, start, end):
-    num_problems = 0
-    num_difficulty_problems = 0
-    for problem in read_jsonl(problems_file_name):
-        num_problems += 1
-        problem_difficulty = problem["meta"]["difficulty"]
-        if problem_difficulty == difficulty and num_problems >= start and num_problems < end :
-            num_difficulty_problems +=1
-    return num_difficulty_problems
-
-def copy_difficulty_problems(problems_file_name, new_file_name, difficulty_map, limit):
-    num_problems_map = {difficulty: 0 for difficulty in difficulty_map}
-    result = []
-    for problem in read_jsonl(problems_file_name):
-        problem_difficulty = problem["meta"]["difficulty"]
-        for difficulty in difficulty_map:
-            if problem_difficulty == difficulty and num_problems_map[difficulty] < difficulty_map[difficulty] :
-                num_problems_map[difficulty] += 1
-                result.append(problem)
-    write_jsonl(new_file_name, result)
-
 def get_dataset_for_cosmetic_test(metrics_json_path_name, problems_dir, problems_filename, new_file_name, timestamp):
     '''
     Gets the pseudocodes from the given timestamp along with their scores for the test split of the autoencoder. 
@@ -2866,32 +2834,6 @@ def evaluate_classifier_prompt_v2(positive_examples, negative_examples, prompt, 
 
     return score / len(train_pseudocodes_dataset) if train_pseudocodes_dataset else 0
 
-def save_classifier_score(score, metrics_path, timestamp, stage, iteration, round, rounds):
-    metrics_file_path = f'{metrics_path}/{timestamp}_{stage}_metrics.json' # [TO DO]: create time stamp directory, refactor calculate_metrics i think to only do encoding or decoding metrics
-    # metrics_file_path = f'{metrics_path}/{timestamp}_encoder_metrics.json'
-    # Load existing data (if any)
-    if os.path.exists(metrics_file_path):
-        with open(metrics_file_path, "r") as f:
-            results = json.load(f)
-    else:
-        results = []
-
-    # new_result = {key: value for key, value in avg_metrics.items()}
-    new_result = {}
-    new_result['iteration-rounds'] = (iteration * (rounds + 1)) + round
-    new_result['iter'] = iteration
-    new_result['round'] = round
-    new_result['score'] = score
-
-    # if round == rounds: ## means one iterations # [TO DO]: add a new condition here
-
-        # Append new result
-    results.append(new_result)
-
-    # Save updated results
-    with open(metrics_file_path, "w") as f:
-        json.dump(results, f, indent=2)  # `indent` for readability
-
 def write_error_strings_to_file(file_name, new_file_name, decoder_prompt, client):
     true_positives = []
     true_negatives = []
@@ -2971,24 +2913,6 @@ def write_error_strings_to_file(file_name, new_file_name, decoder_prompt, client
         results.append(problem)
 
     write_jsonl(new_file_name, results)
-
-def reformat_human_eval_file(file_name):
-    results = []
-    for problem in read_jsonl(file_name):
-        task_id = problem["task_id"]
-        task_id = task_id.replace("/", "-")
-        problem["task_id"] = task_id
-        results.append(problem)
-
-    write_jsonl(file_name, results)
-
-def print_feedback_from_file(file_name_json):
-    if os.path.exists(file_name_json):
-        with open(file_name_json, "r") as f:
-            results = json.load(f)
-
-    print('feedback:')
-    print(results['feedback'])
 
 def write_classifier_pseudocodes_to_file(labeled_pseudocode, pseudocode_path):
     positives = []
@@ -3196,4 +3120,3 @@ def get_intersection_of_pseudocodes(dir_path_name, timestamp, first_iter, second
     
 
 
- 

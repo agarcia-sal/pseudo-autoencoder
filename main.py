@@ -10,8 +10,8 @@ import numpy as np
 import cProfile
 import pstats
 import traceback
-from utils.utils import init_client, file_to_string, setup_dataset, minify_code
-from evaluation.utils import save_metrics, save_prompt, get_pseudocode_dataset, evaluate_classifier_prompt, save_classifier_score, record_previous_best_solution, get_avg_test_case_length, get_num_difficulty, copy_difficulty_problems, get_cosmetic_dataset, get_classifier_dataset, write_dataset_to_file, write_error_strings_to_file, reformat_human_eval_file, print_feedback_from_file, evaluate_classifier_prompt_test, write_classifier_pseudocodes_to_file, organize_pseudocode, get_intersection_of_pseudocodes
+from utils.utils import init_client, file_to_string, setup_dataset, preprocess_data
+from evaluation.utils import get_pseudocode_dataset, evaluate_classifier_prompt, get_cosmetic_dataset, get_classifier_dataset, write_dataset_to_file, write_error_strings_to_file, evaluate_classifier_prompt_test
 # from agents import GreedyRefine
 from evaluation import Evaluator, get_data
 from openai import OpenAI
@@ -57,41 +57,26 @@ def main(cfg):
 
     client = init_client(cfg)
 
-    print('client: ', client)
-
     if cfg.algorithm == "reevo":
         from reevo import ReEvo as ga
     elif cfg.algorithm == "greedy":
         from agents.greedy_refine import GreedyRefine as ga
     elif cfg.algorithm == "direct_answer":
         from agents.direct_answer import DirectAnswer as ga
-#         agent = GreedyRefine(
-#         timeout=10,
-#         model='openai/o3-mini', # We use LiteLLM to call API
-# )
     else:
         raise NotImplementedError
+
+    # uncomment below when first setting up
+    # preprocess_data(ROOT_DIR) 
     
     # Main algorithm
     data = get_data(cfg, src_dir=os.path.join(ROOT_DIR, "data"))
 
     timestamp = hydra.core.hydra_config.HydraConfig.get().run.dir.split("/")[-1] # this should syncronize with hydra's timestamp
 
-    evolving_encoding = False # depends on whether we are continuing in the encoding or decoding
-    evolving_decoding = False # This should start off as False always
-    evolving_cosmetic = False
-    evolving_classifier = False
-
-    # if (evolving_encoding or evolving_decoding or evolving_cosmetic or evolving_classifier) and not load_previous: 
-    #     setup_dataset(timestamp, f"{ROOT_DIR}/data/{problems_dir_name}", iterations + 2) # plus 2 because of the final encoder and decoder verification at the end
-    setup_dataset(timestamp, f"{ROOT_DIR}/data/{cfg.pipeline}/{cfg.dataset}", iterations + 3) # plus 2 because of the final encoder and decoder verification at the end with train, val, and test splits
-
-    generated_prompts_path = Path(f"{ROOT_DIR}/outputs/prompts/{timestamp}") # [TO DO]: decide if i still need this
-    generated_prompts_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
-    metrics_path = f"{ROOT_DIR}/data/{problems_dir_name}/metrics"
-
-
-
+    if (cfg.evolving_encoding or cfg.evolving_decoding or cfg.evolving_cosmetic or cfg.evolving_classifier) and not cfg.load_previous: 
+        setup_dataset(timestamp, os.path.join(ROOT_DIR, "data", cfg.pipeline, cfg.dataset), cfg.num_iterations + 3) # plus 2 because of the final encoder and decoder verification at the end with train, val, and test splits
+   
     encoding_agent = ga(
         client=client,
         src_dir=ROOT_DIR,
@@ -106,10 +91,6 @@ def main(cfg):
         model='gpt-4.1-mini', # We use LiteLLM to call API; was previously 'openai/o3-mini'; im assuming to fit in with LiteLLM api
         stage='decoder'
     )
-
-    prev_decoder_prompt = file_to_string(f"{ROOT_DIR}/prompts/common/trivial_decoder_prompt.txt")
-    prev_encoder_prompt = file_to_string(f"{ROOT_DIR}/prompts/common/trivial_encoder_prompt.txt")
-
 
     evaluator = Evaluator(data, timeout=5) # [TO DO]: change timeout
 
@@ -129,29 +110,7 @@ def main(cfg):
     autoencoder.run()
     autoencoder.finalize()
 
-
-    ######################## Store pseudocode in a pandas dataframe: ################################
-    problems_dir = f"{ROOT_DIR}/data/{problems_dir_name}"
-    # avg_test_case_num = get_avg_test_case_length(os.path.join(problems_dir, problems_filename))
-    # print("avg num of test cases: ", avg_test_case_num)
-    start = 1
-    end = 3000
-    difficulty = "Hard"
-    # for v0.3.0 in first 800, there is 165 Hard, 444 Medium, and 190 Easy
-    # in next 800, 801 through 1600, there is 177 Hard, 416 Medium, and 208 Easy
-    # ok in total there are ony 532 Hard...
-    # for v0.3.0 test, there are 108 Hard and 188 Medium. ok let's try to do a 50/50 split
-    # new_filename = f'LeetCodeDataset-v0.3.0-hard-train.jsonl'
-    # num_difficulty_problems = get_num_difficulty(os.path.join(problems_dir, new_filename), difficulty, start, end)
-    # print(f"number of problems with difficulty {difficulty} is: ", num_difficulty_problems)
-    # Get hard pseudocodes
-    difficulty_map = {"Hard": 100, "Medium": 100}
-    limit = 200
-    problems_filename = f'LeetCodeDataset-v0.3.0-test.jsonl'
-    new_filename = f'LeetCodeDataset-v0.3.0-hard-test.jsonl'
-    # copy_difficulty_problems(os.path.join(problems_dir, problems_filename), os.path.join(problems_dir, new_filename), difficulty_map, limit)
-
-    ######################## Create cosmetic changes for the positive labels: ################################
+    ######################## Run the cosmetic pipeline ################################
 
     evaluator_cosmetic = Evaluator(data, timeout=5) 
 

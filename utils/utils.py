@@ -7,6 +7,8 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from pathlib import Path
 
+from evaluation.eval_dataset.data import read_jsonl, write_jsonl
+
 
 load_dotenv()
 
@@ -201,6 +203,11 @@ def setup_dataset(timestamp, problems_dir, iterations): # [TO DO]: this needs to
         errors_path = iter_path / "errors"
         prompts_path = iter_path / "prompts"
 
+        success_path = pseudocodes_path / "pass"
+        failure_path = pseudocodes_path / "fail"
+        # near_miss_path = pseudocodes_path / "near_miss"
+        # cosmetic_path = pseudocodes_path / "cosmetic"
+
         previous_best_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
         # print(f"Directory '{stdouts_path}' created successfully")
         pseudocodes_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
@@ -215,6 +222,9 @@ def setup_dataset(timestamp, problems_dir, iterations): # [TO DO]: this needs to
         # print(f"Directory '{errors_path}' created successfully")
         prompts_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
         # print(f"Directory '{prompts_path}' created successfully")
+        success_path.mkdir(parents=True, exist_ok=True)
+        failure_path.mkdir(parents=True, exist_ok=True)
+        # near_miss_path.mkdir(parents=True, exist_ok=True)
             
             ##### Make timestamps:
             # pseudocodes_timestamp = pseudocodes_path / timestamp
@@ -235,15 +245,82 @@ def setup_dataset(timestamp, problems_dir, iterations): # [TO DO]: this needs to
     overall_metrics_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
     print(f"Directory '{overall_metrics_path}' created successfully")
 
-def minify_code(problems_dir):
-    base_directory = Path(problems_dir)
 
-    for problem in base_directory.iterdir():
-        if problem.is_dir() and problem.name != 'metrics':
-            code_path = problem / "llm_scripting" / "starter_code.py"
-            minified_code_path = problem / "llm_scripting" / "minified_code.py"
-            starter_code = file_to_string(str(code_path))
-            minified_code = minify(starter_code, rename_locals=True, remove_annotations=True, remove_literal_statements=True)
-            with open(str(minified_code_path), 'w') as file:
-                file.write(minified_code)
+def get_avg_test_case_length(problems_file_name):
+    num_problems = 0
+    num_total_test_cases = 0
+    for problem in read_jsonl(problems_file_name):
+        num_problems += 1
+        input_output = problem["input_output"]
+        num_test_cases = len(input_output)
+        num_total_test_cases += num_test_cases
+    return num_total_test_cases / num_problems if num_problems > 0 else 0
+        # completion = problem["completion"]
+
+def get_num_difficulty(problems_file_name, difficulty, start, end):
+    num_problems = 0
+    num_difficulty_problems = 0
+    for problem in read_jsonl(problems_file_name):
+        num_problems += 1
+        problem_difficulty = problem["meta"]["difficulty"]
+        if problem_difficulty == difficulty and num_problems >= start and num_problems < end :
+            num_difficulty_problems +=1
+    return num_difficulty_problems
+
+def copy_difficulty_problems(problems_file_name, new_file_name, difficulty_map, limit):
+    num_problems_map = {difficulty: 0 for difficulty in difficulty_map}
+    result = []
+    for problem in read_jsonl(problems_file_name):
+        problem_difficulty = problem["meta"]["difficulty"]
+        for difficulty in difficulty_map:
+            if problem_difficulty == difficulty and num_problems_map[difficulty] < difficulty_map[difficulty] :
+                num_problems_map[difficulty] += 1
+                result.append(problem)
+    write_jsonl(new_file_name, result)
+
+def reformat_human_eval_file(file_name):
+    results = []
+    for problem in read_jsonl(file_name):
+        task_id = problem["task_id"]
+        task_id = task_id.replace("/", "-")
+        problem["task_id"] = task_id
+        results.append(problem)
+
+    write_jsonl(file_name, results)
+
+def print_feedback_from_file(file_name_json):
+    if os.path.exists(file_name_json):
+        with open(file_name_json, "r") as f:
+            results = json.load(f)
+
+    print('feedback:')
+    print(results['feedback'])
+
+def pre_process_data(ROOT_DIR):
+    '''
+    This function will perform the following operations:
+    1. Take LeetCodeDataset-v0.3.0 and return only 50% medium difficulty and 50% hard difficulty as a new dataset called
+    LeetCodeDataset-v0.3.5 for both the train and test split
+    2. Reformat HumanEval file so that task ids contain '-' instead of '/'
+    '''
+    # LeetCode reformatting
+    problems_dir = os.path.join(ROOT_DIR, "data", "autoencoder", "leet_code")
+    size_limits = [800, 200]
+    splits = ['train', 'test']
+
+    for limit, split in zip(size_limits, splits):
+        difficulty_map = {"Hard": limit / 2, "Medium": limit /2 }
+        problems_file_name = os.path.join(problems_dir, f'LeetCodeDataset-v0.3.0-{split}.jsonl')
+        new_file_name = os.path.join(problems_dir, f'LeetCodeDataset-v0.3.5-{split}.jsonl')
+        if os.path.exists(problems_file_name):
+            copy_difficulty_problems(problems_file_name, new_file_name, difficulty_map, limit)
+
+    # HumanEval reformatting to replace task ids '/' with '-'
+    problems_dir = os.path.join(ROOT_DIR, "data", "autoencoder", "human_eval")
+    for split in splits:
+        problems_file_name = f'HumanEval-{split}.jsonl'
+        file_name = os.path.join(problems_dir, problems_file_name)
+        reformat_human_eval_file(file_name)
+
+
 
