@@ -73,48 +73,8 @@ def main(cfg):
         raise NotImplementedError
     
     # Main algorithm
-    # problems_dir_name = 'human_eval'
-    problems_dir_name = 'leet_code'
-    # problems_dir_name = 'cosmetic_pseudocodes'
-    # problems_dir_name = 'classifier_pseudocodes'
-    if problems_dir_name == 'leet_code':
-        # version = 'v0.1.0'
-        version = 'v0.3.0-hard'
-        # version = 'v3rd100'
-        # version = 'v0.3.0tiny'
-        split = 'train'
-        # problems_filename = f'LeetCodeDataset-v0.3.0-hard-train.jsonl'
-        problems_filename = f'LeetCodeDataset-{version}-{split}.jsonl'
-        data = get_data(problems_dir_name, problems_filename, src_dir=f'{ROOT_DIR}/data')
-    elif problems_dir_name == "cosmetic_pseudocodes":
-        # previous_timestamp = '2025-09-18_21-00-18'
-        # previous_timestamp = '2025-09-18_04-55-13'
-        # previous_timestamp = '2025-09-24_15-05-02'
-        # previous_timestamp = '2025-09-25_22-10-58'
-        previous_timestamp = '2025-09-26_19-55-20'
-        # problems_filename = f"positive_labels_{previous_timestamp}.jsonl"
-        problems_filename = f"pseudocode_labels_{previous_timestamp}.jsonl"
-        data = get_data(problems_dir_name, problems_filename, src_dir=f'{ROOT_DIR}/data')
-    elif problems_dir_name == "classifier_pseudocodes":
-        version = 1
-        # problems_filename = f"LeetCode-pseudo-v0.{version}.0-train.jsonl"
-        problems_filename = f"HumanEval-pseudo-v0.{version}.0-train.jsonl"
-        # train_set_filename = os.path.join(ROOT_DIR, "data", "classifier_pseudocodes", f"LeetCode-pseudo-v0.{version}.0-train.jsonl" )
-        # dev_set_filename = os.path.join(ROOT_DIR, "data", "classifier_pseudocodes", f"LeetCode-pseudo-v0.{version}.0-dev.jsonl")
-        data = get_data(problems_dir_name, problems_filename, src_dir=f'{ROOT_DIR}/data')
-    else:
-        split = "test"
-        problems_filename = f'HumanEval-{split}.jsonl'
-        data = get_data(problems_dir_name, problems_filename, src_dir=f'{ROOT_DIR}/data')
+    data = get_data(cfg, src_dir=os.path.join(ROOT_DIR, "data"))
 
-
-    starting_iteration = cfg.starting_iteration
-    iterations = cgf.num_iterations
-    rounds = cfg.rounds
-
-    # starting_iteration = 1
-    # iterations = 32
-    # rounds = 2
     timestamp = hydra.core.hydra_config.HydraConfig.get().run.dir.split("/")[-1] # this should syncronize with hydra's timestamp
     
 
