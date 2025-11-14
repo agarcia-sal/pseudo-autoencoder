@@ -76,12 +76,7 @@ def main(cfg):
     data = get_data(cfg, src_dir=os.path.join(ROOT_DIR, "data"))
 
     timestamp = hydra.core.hydra_config.HydraConfig.get().run.dir.split("/")[-1] # this should syncronize with hydra's timestamp
-    
 
-    load_previous = False
-    if load_previous:
-        timestamp = '2025-09-13_12-15-28'
-    
     evolving_encoding = False # depends on whether we are continuing in the encoding or decoding
     evolving_decoding = False # This should start off as False always
     evolving_cosmetic = False
@@ -96,9 +91,6 @@ def main(cfg):
     metrics_path = f"{ROOT_DIR}/data/{problems_dir_name}/metrics"
 
 
-        # previous_best_path = os.path.join(ROOT_DIR, "data", problems_dir_name, "outputs", timestamp, f"iter_{iteration}", "previous_best", previous_best.json)
-    # print(f"Directory '{generated_prompts_path}' created successfully")
-    # print('prompt path: ', str(generated_prompts_path))
 
     encoding_agent = ga(
         client=client,
@@ -118,30 +110,6 @@ def main(cfg):
     prev_decoder_prompt = file_to_string(f"{ROOT_DIR}/prompts/common/trivial_decoder_prompt.txt")
     prev_encoder_prompt = file_to_string(f"{ROOT_DIR}/prompts/common/trivial_encoder_prompt.txt")
 
-    if load_previous and (evolving_encoding or evolving_decoding):
-        # if starting_iteration % 8 <= 4: # encoding stage
-        #     encoding_previous_best_path = os.path.join(ROOT_DIR, "data", problems_dir_name, "outputs", timestamp, f"iter_{starting_iteration - 1}", "previous_best", "previous_best.json")
-        # else:
-        prev_encoder_iter = 9 # [TO DO]: CHANGE
-        encoding_previous_best_path = os.path.join(ROOT_DIR, "data", problems_dir_name, "outputs", timestamp, f"iter_{prev_encoder_iter}", "previous_best", "previous_best.json")
-        encoding_agent.load_previous(encoding_previous_best_path) # [TO DO]: write load_previous() function
-        # prev_decoder_iter = 0
-        # prev_decoder_filename = os.path.join(ROOT_DIR, "data", problems_dir_name, "outputs", timestamp, f"iter_{prev_decoder_iter}", "prompts", "decoder_stage_decoding_prompt.txt")
-        # prev_decoder_prompt = file_to_string(prev_decoder_filename)
-        if starting_iteration >= (rounds + 2):
-            # if starting_iteration % 8 > 4:
-            prev_decoder_iter = 8 # [TO DO]: CHANGE
-            decoding_previous_best_path = os.path.join(ROOT_DIR, "data", problems_dir_name, "outputs", timestamp, f"iter_{prev_decoder_iter}", "previous_best", "previous_best.json")
-            decoding_agent.load_previous(decoding_previous_best_path)
-            prev_encoder_prompt = encoding_agent.finalize()
-            # prev_encoder_iter = 0
-            # prev_encoder_filename = os.path.join(ROOT_DIR, "data", problems_dir_name, "outputs", timestamp, f"iter_{prev_encoder_iter}", "prompts", "encoder_stage_encoding_prompt.txt")
-            # prev_encoder_prompt = file_to_string(prev_encoder_filename)
-        if starting_iteration >= (2*rounds + 1): # After at least one round of decoding 
-            prev_decoder_prompt = decoding_agent.finalize()
-        
-    if load_previous and evolving_cosmetic:
-        prev_cosmetic_iter = 0 
 
     evaluator = Evaluator(data, timeout=5) # [TO DO]: change timeout
 
@@ -185,11 +153,6 @@ def main(cfg):
 
     ######################## Create cosmetic changes for the positive labels: ################################
 
-    if load_previous and evolving_cosmetic:
-        prev_iter = 0
-        cosmetic_previous_best_path = os.path.join(ROOT_DIR, "data", problems_dir_name, "outputs", timestamp, f"iter_{prev_iter}", "previous_best", "previous_best.json")
-        cosmetic_agent.load_previous(cosmetic_previous_best_path)
-
     evaluator_cosmetic = Evaluator(data, timeout=5) 
 
     cosmetic_agent = ga(
@@ -218,14 +181,6 @@ def main(cfg):
 
         cosmetic.run()
     ######################## Run the classifier: ####################################################
-
-    version = 1
-    problems_filename = f"HumanEval-pseudo-v0.{version}.0-train.jsonl"
-    # train_set_filename = os.path.join(ROOT_DIR, "data", "classifier_pseudocodes", f"LeetCode-pseudo-v0.{version}.0-train.jsonl" )
-    # dev_set_filename = os.path.join(ROOT_DIR, "data", "classifier_pseudocodes", f"LeetCode-pseudo-v0.{version}.0-dev.jsonl")
-    train_set_filename = os.path.join(ROOT_DIR, "data", "classifier_pseudocodes", f"HumanEval-pseudo-v0.{version}.0-train.jsonl" )
-    dev_set_filename = os.path.join(ROOT_DIR, "data", "classifier_pseudocodes", f"HumanEval-pseudo-v0.{version}.0-dev.jsonl")
-    classifier_dataset_name = os.path.join(ROOT_DIR, "data", "classifier_pseudocodes")
     
     classifier_agent = ga(
         client=client,
@@ -254,6 +209,7 @@ def main(cfg):
         classifier.run()
         classifier.finalize()
 
+    #######################################################
     # Plot:
     # Load results
     # problems_dir_path = Path(f"{ROOT_DIR}/data/{problems_dir_name}")

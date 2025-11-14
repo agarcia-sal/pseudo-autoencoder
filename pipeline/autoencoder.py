@@ -49,6 +49,13 @@ class AutoEncoder(BasePipeline):
         
         self.evolving_encoding = self.cfg.evolving_encoding # set to True if i want to run setup_pipeline
         self.evolving_decoding = self.cfg.evolving_decoding
+
+        if self.cfg.load_previous:
+            self.load_previous_state()
+
+    def load_previous_state(self):
+        previous_best_path = os.path.join(self.src_dir, "data", self.pipeline_name, self.cfg.dataset, "outputs", self.cfg.load_previous_timestamp, f"iter_{self.cfg.previous_last_iter}", "previous_best", "previous_best.json")
+        # [TO DO]: finish implementing
         
 
     def run(self):

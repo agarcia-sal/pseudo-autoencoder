@@ -50,7 +50,12 @@ class Cosmetic(BasePipeline):
         else:
             self.decoder_prompt = file_to_string(os.path.join(self.src_dir, "prompts", "common", "trivial_decoder_prompt.txt"))
 
-        
+        if self.cfg.load_previous:
+            self.load_previous_state()
+
+    def load_previous_state(self):
+        previous_best_path = os.path.join(self.src_dir, "data", self.pipeline_name, self.cfg.dataset, "outputs", self.cfg.load_previous_timestamp, f"iter_{self.cfg.previous_last_iter}", "previous_best", "previous_best.json")
+        self.agent.load_previous(previous_best_path)
 
     def run(self):
         for it in range(self.cfg.starting_iteration, self.cfg.num_iterations + 1):
