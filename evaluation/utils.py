@@ -1660,7 +1660,7 @@ def get_cosmetic_dataset(cfg):
     elif cfg.dataset == 'human_eval':
         autoencoder_problems_filename = f'HumanEval-{cfg.split}.jsonl'
     
-    new_file_name = os.path.join(ROOT_DIR, "data", "cosmetic", cfg.dataset, f"AutoEncoderPseudocodes_{cfg.cosmetic_version}-{cfg.split}.jsonl")
+    new_file_name = os.path.join(ROOT_DIR, "data", "cosmetic", cfg.dataset, f"AutoEncoderLabels_{cfg.autoencoder_timestamp}-{cfg.split}.jsonl")
     
     if cfg.split == 'train':
         positive_examples = get_dataset_for_cosmetic_train(autoencoder_metrics_file, autoencoder_dir, autoencoder_problems_filename, new_file_name, cfg.autoencoder_timestamp)
@@ -1692,7 +1692,7 @@ def get_classifier_dataset(cfg, limit=150):
     autoencoder_dir = f"{ROOT_DIR}/data/autoencoder/{cfg.dataset}"
     
     cosmetic_dir = f"{ROOT_DIR}/data/cosmetic/{cfg.dataset}"
-    cosmetic_problems_filename = f"AutoEncoderPseudocodes_{cfg.autoencoder_timestamp}.jsonl"
+    cosmetic_problems_filename = f"AutoEncoderLabels_{cfg.autoencoder_timestamp}.jsonl"
 
     #########################
     if cfg.split == 'train':

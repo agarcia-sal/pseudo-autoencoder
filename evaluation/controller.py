@@ -120,7 +120,7 @@ def get_data(cfg, src_dir='data', version = 'v0.1.0', split='train'):
             problems_filename = f'HumanEval-{cfg.split}.jsonl'
 
     elif cfg.pipeline == "cosmetic":
-        problems_filename = f"AutoencoderLabels_{cfg.autoencoder_timestamp}-{cfg.split}.jsonl"
+        problems_filename = f"AutoEncoderLabels_{cfg.autoencoder_timestamp}-{cfg.split}.jsonl"
 
     elif cfg.pipeline == "classifier":
         version = 3

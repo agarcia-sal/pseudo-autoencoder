@@ -3,6 +3,7 @@ import re
 import os
 import inspect
 import hydra
+import matplotlib.pyplot as plt
 from openai import OpenAI
 from dotenv import load_dotenv
 from pathlib import Path
@@ -296,7 +297,7 @@ def print_feedback_from_file(file_name_json):
     print('feedback:')
     print(results['feedback'])
 
-def pre_process_data(ROOT_DIR):
+def preprocess_data(ROOT_DIR):
     '''
     This function will perform the following operations:
     1. Take LeetCodeDataset-v0.3.0 and return only 50% medium difficulty and 50% hard difficulty as a new dataset called
@@ -321,6 +322,66 @@ def pre_process_data(ROOT_DIR):
         problems_file_name = f'HumanEval-{split}.jsonl'
         file_name = os.path.join(problems_dir, problems_file_name)
         reformat_human_eval_file(file_name)
+
+def plot_pipeline(cfg, ROOT_DIR, timestamp, pipeline):
+        problems_dir_name = 'leet_code'
+        # [TO DO]: figure out what to do about the timestamps for autoencoder and classifier cause they might be the same
+        # ^ can't be the same because then the data class doesn't work
+        problem_metrics_file = os.path.join(ROOT_DIR, "data", pipeline, cfg.dataset, "metrics", f"{timestamp}_metrics.json")
+        problem_metrics_file = f"{ROOT_DIR}/data/{problems_dir_name}/metrics/{timestamp}_metrics.json"
+        with open(problem_metrics_file, "r") as f:
+            data = json.load(f)
+        df_pipeline = pd.DataFrame(data)
+
+        label = ''
+        metrics = []
+        if cfg.dataset == 'leet_code':
+            label = "LeetCode"
+        elif cfg.dataset == 'human_eval':
+            label = "HumanEval"
+
+        agent = ''
+        if cfg.algorithm == 'greedy':
+            agent = 'GreedyRefinenment'
+        elif cfg.algorithm == 'direct_answer':
+            agent = 'DirectAnswer'
+
+        table_values = {}
+        if pipeline == 'autoencoder': # [TO DO]: change readability metric
+            metrics = ['avg_score', 'avg_passing_rate', 'avg_syllables_per_word']
+            last_row = df_pipeline.iloc[-1]
+            table_values = {metric: last_row[metric] for metric in metrics}
+
+        elif pipeline == 'classifier':
+            metrics = ['classifier_score_train', 'classifier_score_val', 'classifier_score_test']
+            for idx in range(-3, -1):
+                row = df_pipeline.iloc[idx]
+                metric = metrics[idx]
+                table_values[metric] = row["avg_score"]
+
+        fig, ax = plt.subplots(figsize=(12, 4))
+        ax.axis('tight')
+        ax.axis('off')
+
+        table_data = []
+        for metric in metrics:
+            table_data.append([metric, f"{table_values[metric]:.3f}"])
+
+        table = ax.table(cellText=table_data,
+                        colLabels=['Metric', f'{label}'],
+                        cellLoc='center',
+                        loc='center',
+                        colColours=['#f0f0f0', '#d0e5ff'])
+
+        table.auto_set_font_size(False)
+        table.set_fontsize(10)
+        table.scale(1, 1.5)
+
+        plt.title(f'Metric Values for {label} Dataset with {agent} Agent', fontsize=14)
+        plt.savefig(os.path.join(ROOT_DIR, "outputs", "figures", f"{pipeline}_{timestamp}.png"), bbox_inches='tight', dpi=300)
+    
+
+    
 
 
 

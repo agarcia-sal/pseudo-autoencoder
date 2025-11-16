@@ -133,7 +133,7 @@ def main(cfg):
             evaluator=evaluator_cosmetic,
             timestamp=timestamp,
             final_iter=34,
-            previous_timestamp='2025-09-18_21-00-18',
+            previous_timestamp=cfg.autoencoder_timestamp,
             timeout=5, 
             model='gpt-4.1-mini',         
         )
@@ -160,13 +160,20 @@ def main(cfg):
             evaluator=evaluator_classifier,
             timestamp=timestamp,
             final_iter=34,
-            previous_timestamp='2025-09-18_21-00-18',
+            previous_timestamp=cfg.autoencoder_timestamp,
             timeout=5, 
             model='gpt-4.1-mini',         
         )
 
         classifier.run()
         classifier.finalize()
+
+    if plotting_pipeline:
+        autoencoder_timestamp = ''
+        classifier_timestamp = ''
+        plot_pipeline(cfg, ROOT_DIR, autoencoder_timestamp, "autoencoder")
+        plot_pipeline(cfg, ROOT_DIR, classifier_timestamp, "classifier")
+        plt.show()
 
     #######################################################
     # Plot:
@@ -323,26 +330,28 @@ def main(cfg):
     plt.show()
 
     # Additional visualization: Side-by-side metrics table
-    # fig, ax = plt.subplots(figsize=(12, 4))
-    # ax.axis('tight')
-    # ax.axis('off')
+    fig, ax = plt.subplots(figsize=(12, 4))
+    ax.axis('tight')
+    ax.axis('off')
 
-    # table_data = []
-    # for metric in metrics:
-    #     table_data.append([metric, f"{leetcode_data[metric]:.3f}", f"{humaneval_data[metric]:.3f}"])
+    table_data = []
+    for metric in metrics:
+        table_data.append([metric, f"{leetcode_data[metric]:.3f}", f"{humaneval_data[metric]:.3f}"])
 
-    # table = ax.table(cellText=table_data,
-    #                 colLabels=['Metric', 'LeetCode', 'HumanEval'],
-    #                 cellLoc='center',
-    #                 loc='center',
-    #                 colColours=['#f0f0f0', '#d0e5ff', '#ffe5cc'])
+    table = ax.table(cellText=table_data,
+                    colLabels=['Metric', 'LeetCode', 'HumanEval'],
+                    cellLoc='center',
+                    loc='center',
+                    colColours=['#f0f0f0', '#d0e5ff', '#ffe5cc'])
 
-    # table.auto_set_font_size(False)
-    # table.set_fontsize(10)
-    # table.scale(1, 1.5)
+    table.auto_set_font_size(False)
+    table.set_fontsize(10)
+    table.scale(1, 1.5)
 
-    # plt.title('Metric Values Comparison', fontsize=14)
-    # plt.show()
+    plt.title('Metric Values Comparison', fontsize=14)
+    plt.show()
+
+    ######## BELOW is other stuff I tried but the main stuff is above: ###############
 
     # filtered_df_2 = df_enc_2[df_enc_2['stage'] == 'encoder']
     # max_index = filtered_df_2['avg_score'].idxmax()
