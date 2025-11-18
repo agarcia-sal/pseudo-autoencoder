@@ -3,11 +3,27 @@
 **Data:** [LeetCodeDataset](https://github.com/newfacade/LeetCodeDataset) and [HumanEval](https://github.com/openai/human-eval)
 
 # Download Data
-Download the raw data from [HumanEval](https://github.com/openai/human-eval) to the local directory `data/human_eval` and LeetCodeDataset-v0.3.0-train.jsonl and LeetCodeDataset-v0.3.0-test.jsonl from [LeetCodeDataset](https://github.com/newfacade/LeetCodeDataset) to the local directory `data/leet_code`
+Download the raw data from [HumanEval](https://github.com/openai/human-eval) to the local directory `data/autoencoder/human_eval` and LeetCodeDataset-v0.3.0-train.jsonl and LeetCodeDataset-v0.3.0-test.jsonl from [LeetCodeDataset](https://github.com/newfacade/LeetCodeDataset) to the local directory `data/autoencoder/leet_code`
+
+# Set Up Environment - Usage
+
+- Set your OpenAI API key as an environment variable:
+    ```bash
+    OPENAI_API_KEY="<Your API key>" # see more options in ./cfg/llm_client
+    ```
+
+When first running the code, uncomment the line below in the main function:
+```python
+# uncomment below when first setting up
+# preprocess_data(ROOT_DIR) 
+```
+The `preprocess_data` function will do reformat the HumanEval dataset as well as create a new version of the LeetCodeDataset-v0.3.0 that will be which will be a 50% split of medium difficulty and 50% split of hard difficulty instead of a mix of 'easy', 'medium', and 'hard'. The new version of the dataset will be called LeetCodeDataset-v0.3.5-train.jsonl and LeetCodeDataset-v0.3.5-test.jsonl
 
 # Agent Implementations
 
 Agents are implemented in the `agents` module. Currently supported agents include: `GreedyRefine`, `DirectAnswer`
+
+in the cfg/config.yaml file, set `algorithm` to `greedy` or `direct_answer`, depending on which one you're using.
 
 Each agent implements the following functions:
 - `step()`: Returns the next candidate prompt for evaluation.
@@ -16,335 +32,215 @@ Each agent implements the following functions:
 - `get_previous_best()`: Returns previous best Solution so far to store at each iteration of a pipeline
 - `load_previous()`: If a pipeline stops running prematurely, will return previous best solution up to that point so that the pipeline can continue running
 
+To run the classifier, we need to create the pseudocode dataset. The following is the process:
+    ok wait so what's the process? i have to run the cosmetic pipeline for the training and test versions right? ok so what
+    are the steps:
+    1. run autoencoder on the training set to generate the pseudocodes with their labels
+        - each run will have its own timestamp
+        - in config.yaml file, set the following variables:
+        - dataset: leet_code # options: human_eval, leet_code
+        - autoencoder_version: v0.3.0 # for leet_code dataset, specify which version you are using. default is v0.3.0
+        - split: train # options: train or test
+        - the end result is a folder named by the timestamp with all the pseudocodes and codes generated per iteration
+    2. call get_cosmetic_dataset() to get AutoEncoderLabels_timestamp-train.jsonl
+    3. run autoencoder on the testing set to generate the pseudocodes with their labels
+    4. call get_cosmetic_dataset() to get AutoEncoderLabels_timestamp-test.jsonl
+    5. run cosmetic pipeline on AutoEncoderLabels_timestamp-train.jsonl
+    6. call get_classifier_dataset() passing with autoencoder and cosmetic timestamps set in cfg to create {dataset}Pseudocodes-v0.{version}.0-train.jsonl
+    7. run cosmetic pipeline on AutoEncoderLabels_timestamp-test.jsonl
+    8. call get_classifier_dataset() passing with autoencoder and cosmetic timestamps set in cfg to create {dataset}Pseudocodes-v0.{version}.0-test.jsonl
+    9. run classifier pipeline
+
 # Pipeline selection
 
 There are 3 pipelines available to run: Autoencoder, Cosmetic, and Classifier
 
-Set the `evolving_encoding`, `evolving_decoding`, `evolving_cosmetic`, `evolving_classifier` flag to True depending on which pipeline you want to run. For the autoencoder pipeline, set the `evolving_encoding` flag to True and `evolving_decoding` flag to False to start off with. The flags will toggle as the autoencoder switches between these two stages.
+In the cfg/config.yaml file Set the `evolving_encoder`, `evolving_decoder`, `evolving_cosmetic`, `evolving_classifier` flag to True depending on which pipeline you want to run. For the autoencoder pipeline, set the `evolving_encoder` flag to True and `evolving_decoder` flag to False to start off with. The flags will toggle as the autoencoder switches between these two stages.
 
-Depending on which pipeline you are running, set the correct `problems_dir_name` under which you will be operating. For the autoencoder, choose either `problems_dir_name = leet_code` or `problems_dir_name = human_eval`
+Also in the cfg/config.yaml file, set `pipeline` to either `autoencoder`, `cosmetic`, `classifier` and specify which dataset you are using by setting `dataset` to either `human_eval` or `leet_code`. Set `num_iterations` to however many iterations you want to run. Default is 32. Set `rounds`, which is the number of iterations run before switching from encoder to decoder and vice versa. Default is 2.
 
-Set the number of iterations you want to run. Default is 32
-Set number of rounds, which is the number of iterations run before switching from encoder to decoder and vice versa. Default is 2
+# Workflow
+
+The autoencoder pipeline can be run separately but to run the cosmetic pipeline, first run the autoencoder pipeline. To run the classifier pipeline, run the autoencoder pipeline and then the cosmetic pipeline. Each run of each pipeline will have a timestamp associated with it. The entire workflow with all the pipelines is as follows: 
+1. Run the autoencoder on the training set to generate the pseudocodes with their labels
+    - the end result is a folder named by the timestamp with all the pseudocodes and codes generated per iteration
+2. Run the autoencoder on the testing set to generate the pseudocodes with their labels
+3. Call get_cosmetic_dataset() to get AutoEncoderLabels_{cosmetic_version}-train.jsonl, which is generated from the pseudocodes generated by the autoencoder 
+4. Call get_cosmetic_dataset() to get AutoEncoderLabels_{cosmetic_version}-test.jsonl
+5. Run the cosmetic pipeline on AutoEncoderLabels_{cosmetic_version}-train.jsonl
+6. Run the cosmetic pipeline on AutoEncoderLabels_{cosmetic_version}-test.jsonl
+7. Call get_classifier_dataset() with the autoencoder and cosmetic timestamps set in cfg to create HumanEvalPseudocodes-{classifier_version}-train.jsonl or LeetCodePseudocodes-{classifier_version}-train.jsonl
+8. Call get_classifier_dataset() with the autoencoder and cosmetic timestamps set in cfg to create HumanEvalPseudocodes-{classifier_version}-test.jsonl or LeetCodePseudocodes-{classifier_version}-test.jsonl
+9. Run the classifier pipeline
 
 # Results
 
-Passing rates and readability metrics for each iteration will be displayed in a metrics.json file under `data/problems_dir_name/metrics/timestamp_metrics.json` for the timestamp for that run.
+Passing rates and readability metrics for each iteration will be displayed in a metrics.json file under `data/pipeline/dataset/metrics/timestamp_metrics.json` for the timestamp for that run.
 
 # Autoencoder Pipeline
-Below is code to run the autoencoder with *Greedy Refinement* agent for LeetCode dataset for 32 iterations.
+
+In the cfg/config.yaml file, set the following values:
+- `split` to either `train` or `test`
+- `autoencoder_version` to whichever version of the LeetCodeDataset is being used, if `leet_code` is the chosen dataset. Default is `v0.3.5` which is the more difficult version of `v0.3.0`
+
+Below is code to run the autoencoder with *Greedy Refinement* agent for LeetCode dataset for 32 iterations. If running *Direct Answer* then pass in the timestamp for the decoder prompt generated by the autoencoder pipeline that should be used.
 ```python
-from agents import GreedyRefine, DirectAnswer, FunSearch, AIDE, ChainOfExperts, ReEvo, BestOfN
+from agents import GreedyRefine, DirectAnswer
 from evaluation import Evaluator, get_data
 
 # Set greedy_refine in the cfg file
 if cfg.algorithm == "greedy":
     from agents.greedy_refine import GreedyRefine as ga
 
-# Select directory name, version, and split
-if problems_dir_name == 'leet_code':
-    version = 'v0.3.0'
-    split = 'train'
-    problems_filename = f'LeetCodeDataset-{version}-{split}.jsonl'
-    data = get_data(problems_dir_name, problems_filename, src_dir=f'{ROOT_DIR}/data')
+timestamp = hydra.core.hydra_config.HydraConfig.get().run.dir.split("/")[-1] # this should syncronize with hydra's timestamp
 
-starting_iteration = 1
-iterations = 32
-rounds = 2
-timestamp = hydra.core.hydra_config.HydraConfig.get().run.dir.split("/")[-1]
+if (cfg.evolving_encoder or cfg.evolving_decoder or cfg.evolving_cosmetic or cfg.evolving_classifier) and not cfg.load_previous: 
+    setup_dataset(timestamp, os.path.join(ROOT_DIR, "data", cfg.pipeline, cfg.dataset), cfg.num_iterations + 3) # plus 2 because of the final encoder and decoder verification at the end with train, val, and test splits
 
-# Set up dataset:
-if (evolving_encoding or evolving_decoding or evolving_cosmetic or evolving_classifier) and not load_previous: 
-        setup_dataset(timestamp, f"{ROOT_DIR}/data/{problems_dir_name}", iterations + 3) 
 
-# Define agents
-encoding_agent = ga(
-    client=client,
-    src_dir=ROOT_DIR,
-    timeout=5,
-    model='gpt-4.1-mini', # We use LiteLLM to call API; was previously 'openai/o3-mini'; im assuming to fit in with LiteLLM api
-    stage='encoder'
-)
+if cfg.evolving_encoder or cfg.evolving_decoder:
+    encoding_agent = ga(
+        client=client,
+        src_dir=ROOT_DIR,
+        timeout=5,
+        model='gpt-4.1-mini', # We use LiteLLM to call API; was previously 'openai/o3-mini'; im assuming to fit in with LiteLLM api
+        stage='encoder'
+    )
+    decoding_agent = ga(
+        client=client,
+        src_dir=ROOT_DIR,
+        timeout=5,
+        model='gpt-4.1-mini', # We use LiteLLM to call API; was previously 'openai/o3-mini'; im assuming to fit in with LiteLLM api
+        stage='decoder'
+    )
 
-decoding_agent = ga(
-    client=client,
-    src_dir=ROOT_DIR,
-    timeout=5,
-    model='gpt-4.1-mini', # We use LiteLLM to call API; was previously 'openai/o3-mini'; im assuming to fit in with LiteLLM api
-    stage='decoder'
-)
+    data = get_data(cfg, src_dir=os.path.join(ROOT_DIR, "data", cfg.pipeline))
 
-# Set trivial decoder prompt for encoder to start off with:
-prev_decoder_prompt = file_to_string(f"{ROOT_DIR}/prompts/common/trivial_decoder_prompt.txt")
+    evaluator = Evaluator(data, timeout=5) # [TO DO]: change timeout
 
-# Load evaluator
-evaluator = Evaluator(data, timeout=10)
+    autoencoder = AutoEncoder(
+        client=client, 
+        src_dir=ROOT_DIR, 
+        cfg=cfg,
+        encoding_agent=encoding_agent, 
+        decoding_agent=decoding_agent, 
+        evaluator=evaluator,
+        timeout=5, 
+        model='gpt-4.1-mini', 
+        stage='encoder', 
+        timestamp=timestamp
+    )
 
-# Run for 32 iterations:
-for it in range(starting_iteration, iterations + 1):
-    # Encoding:
-    if evolving_encoding:
-        stage = 'encoder'
-        try: 
-            prompt = encoding_agent.step()
-        
-            if prompt is None:  
-                break
-            feedback = evaluator.evaluate(prompt, prev_decoder_prompt, stage, timestamp, it, client)  # Run evaluation
-            avg_metrics = feedback.avg_metrics
-
-            # Save metrics to file for each iteration
-            save_metrics(avg_metrics, metrics_path, timestamp, stage, it)
-
-            # Save prompt to file for each iteration
-            save_prompt(str(generated_prompts_path), prompt, it, stage)
-            
-            # UNCOMMENT BELOW:
-            encoding_agent.feedback(feedback.dev_score, feedback.dev_feedback, it)  # Use dev set score as feedback
-
-            # Record previous best prompt
-            previous_best_path = os.path.join(ROOT_DIR, "data", problems_dir_name, "outputs", timestamp, f"iter_{it}", "previous_best", "previous_best.json")
-            previous_best_prompt, previous_best_score, previous_best_feedback, previous_best_iter = encoding_agent.get_previous_best()
-            record_previous_best_solution(previous_best_path, previous_best_prompt, previous_best_score, previous_best_feedback, previous_best_iter)
-            
-            # Get the final best solution before switching over to decoder
-            if it % rounds == 0: 
-                best_prompt_so_far = encoding_agent.finalize()
-                prev_encoder_prompt = best_prompt_so_far
-
-        except Exception as e:
-            print(f"Error in iteration {it} for stage {stage}: {e}")
-            traceback.print_exc()
-            continue  # Skip to the next round
-    if evolving_decoding:
-        stage = 'decoder'
-        try:
-            prompt = decoding_agent.step()
-            if prompt is None:  
-                break
-            feedback = evaluator.evaluate(prompt, prev_encoder_prompt, stage, timestamp, it, client)  # Run evaluation
-            avg_metrics = feedback.avg_metrics
-
-            # Save metrics to file for each iteration
-            save_metrics(avg_metrics, metrics_path, timestamp, stage, it)
-
-            # Save prompt to file for each iteration
-            save_prompt(str(generated_prompts_path), prompt, it, stage)
-            
-            decoding_agent.feedback(feedback.dev_score, feedback.dev_feedback, it) 
-
-            # Record previous best prompt
-            previous_best_path = os.path.join(ROOT_DIR, "data", problems_dir_name, "outputs", timestamp, f"iter_{it}", "previous_best", "previous_best.json")
-            previous_best_prompt, previous_best_score, previous_best_feedback, previous_best_iter = decoding_agent.get_previous_best()
-            record_previous_best_solution(previous_best_path, previous_best_prompt, previous_best_score, previous_best_feedback, previous_best_iter)
-
-            # Get the final best solution before switching over to encoder
-            if it % rounds == 0: 
-                best_prompt_so_far = decoding_agent.finalize()
-                prev_decoder_prompt = best_prompt_so_far
-
-        except Exception as e:
-            print(f"Error in iteration {it} for stage {stage}: {e}")
-            continue  # Skip to the next round
-    # Switch to next stage
-    if (evolving_encoding or evolving_decoding) and it % rounds == 0: 
-        evolving_encoding = not evolving_encoding
-        evolving_decoding = not evolving_decoding
-
-# Finalize: Run encoder and decoder again on their best prompts
-if (evolving_encoding or evolving_decoding) and iterations > 1:
-
-    prompt = encoding_agent.finalize()
-    save_prompt(str(generated_prompts_path), prompt, iterations + 1, 'encoder')
-    feedback = evaluator.evaluate(prompt, prev_decoder_prompt, 'encoder', timestamp, iterations + 1, client)
-    avg_metrics = feedback.avg_metrics
-    save_metrics(avg_metrics, metrics_path, timestamp, 'encoder', iterations + 1)
-
-    prompt = decoding_agent.finalize()
-    save_prompt(str(generated_prompts_path), prompt, iterations + 2, 'decoder')
-    feedback = evaluator.evaluate(prompt, prev_encoder_prompt, 'decoder', timestamp, iterations + 2, client)
-    avg_metrics = feedback.avg_metrics
-    save_metrics(avg_metrics, metrics_path, timestamp, 'decoder', iterations + 2)
+    autoencoder.run()
+    autoencoder.finalize()
 ```
 
 
 # Cosmetic Changes Pipeline
+First, call `get_cosmetic_dataset()` to get the AutoEncoderLabels-{cfg.cosmetic_version}-{cfg.split}.jsonl that the cosmetic pipeline will use to run.
+
+In the cfg/config.yaml file, set the following values:
+- `cosmetic_version` to whichever version of the AutoEncoderLabels dataset the cosmetic pipeline will use. Should generally increment by 1 e.g `v0.1.0` to `v0.2.0`
+- `split` to either `train` or `test` depending on which split the autoencoder used.
+- `autoencoder_timestamp` to the timestamp of the autoencoder run that the cosmetic pipeline is building off of
+
 Below is code to run the cosmetic changes pipeline with *Greedy Refinement* agent for LeetCode dataset for 32 iterations.
 
-First, we need to get either the positive_labels jsonl file by calling `get_positive_labels(metrics_file, autoencoder_directory_name, jsonl_filename, new_file_name, autoencoder_timestamp)` or the pseucodoe_labels jsonl file by calling `get_pseudocode_labels(metrics_file, first_dir, autoencoder_directory_name, new_file_name, autoencoder_timestamp)`
-
 ```python
+from agents import GreedyRefine, DirectAnswer
+from evaluation import Evaluator, get_data
+
 # Set greedy_refine in the cfg file
 if cfg.algorithm == "greedy":
     from agents.greedy_refine import GreedyRefine as ga
 
-# Select directory name, previous_timestamp, and either a positive_labels or pseudocode_labels jsonl file
-if problems_dir_name = 'cosmetic_pseudocodes:
-    previous_timestamp = '2025-09-26_19-55-20'
-    # problems_filename = f"positive_labels_{previous_timestamp}.jsonl"
-    problems_filename = f"pseudocode_labels_{previous_timestamp}.jsonl"
-    data = get_data(problems_dir_name, problems_filename, src_dir=f'{ROOT_DIR}/data')
+timestamp = hydra.core.hydra_config.HydraConfig.get().run.dir.split("/")[-1] # this should syncronize with hydra's timestamp
 
-starting_iteration = 1
-cosmetic_iterations = 32
-timestamp = hydra.core.hydra_config.HydraConfig.get().run.dir.split("/")[-1]
+if (cfg.evolving_encoder or cfg.evolving_decoder or cfg.evolving_cosmetic or cfg.evolving_classifier) and not cfg.load_previous: 
+    setup_dataset(timestamp, os.path.join(ROOT_DIR, "data", cfg.pipeline, cfg.dataset), cfg.num_iterations + 3) # plus 2 because of the final encoder and decoder verification at the end with train, val, and test splits
 
-# Set up dataset:
-if (evolving_encoding or evolving_decoding or evolving_cosmetic or evolving_classifier) and not load_previous: 
-        setup_dataset(timestamp, f"{ROOT_DIR}/data/{problems_dir_name}", iterations + 3) 
+if cfg.evolving_cosmetic:
+    cosmetic_agent = ga(
+        client=client,
+        src_dir=ROOT_DIR,
+        timeout=5,
+        model='gpt-4.1-mini', # We use LiteLLM to call API; was previously 'openai/o3-mini'; im assuming to fit in with LiteLLM api
+        stage='cosmetic'
+    )
 
-# Define agents
-cosmetic_agent = ga(
-    client=client,
-    src_dir=ROOT_DIR,
-    timeout=5,
-    model='gpt-4.1-mini', # We use LiteLLM to call API; was previously 'openai/o3-mini'; im assuming to fit in with LiteLLM api
-    stage='cosmetic'
-)
+    get_cosmetic_dataset(cfg)
+    data = get_data(cfg, src_dir=os.path.join(ROOT_DIR, "data", cfg.pipeline))
+    evaluator_cosmetic = Evaluator(data, timeout=5) 
 
-# Load Evaluator
-evaluator = Evaluator(data, timeout=5)
+    cosmetic = Cosmetic(
+        client=client, 
+        src_dir=ROOT_DIR, 
+        cfg=cfg,
+        agent=cosmetic_agent, 
+        evaluator=evaluator_cosmetic,
+        timestamp=timestamp,
+        final_iter=34,
+        previous_timestamp=cfg.autoencoder_timestamp,
+        timeout=5, 
+        model='gpt-4.1-mini',         
+    )
 
-# Set final_iter, previous_timestamp to load in best decoder prompt from the autoencoder pipeline
-final_iter = 34
-previous_timestamp = '2025-09-18_21-00-18'
-decoder_prompt = file_to_string(f"{ROOT_DIR}/prompts/greedy_refine/trivial_decoder_prompt.txt")
-
-# Run for 32 iterations:
-for it in range(1, cosmetic_iterations+1):
-    if evolving_cosmetic:
-        stage = 'cosmetic'
-        try: 
-            prompt = cosmetic_agent.step()
-           
-            if prompt is None:  
-                break
-
-            feedback = evaluator_cosmetic.evaluate_cosmetic(prompt, decoder_prompt, stage, timestamp, it, client)
-            avg_metrics = feedback.avg_metrics
-
-            # Save metrics to file for each iteration
-            save_metrics(avg_metrics, metrics_path, timestamp, stage, it)
-
-            # Save prompt to file for each iteration
-            save_prompt(str(generated_prompts_path), prompt, it, stage)
-            
-            cosmetic_agent.feedback(feedback.dev_score, feedback.dev_feedback, it)  
-
-            # Record previous best prompt:
-            previous_best_path = os.path.join(ROOT_DIR, "data", problems_dir_name, "outputs", timestamp, f"iter_{it}", "previous_best", "previous_best.json")
-            previous_best_prompt, previous_best_score, previous_best_feedback, previous_best_iter = cosmetic_agent.get_previous_best()
-            record_previous_best_solution(previous_best_path, previous_best_prompt, previous_best_score, previous_best_feedback, previous_best_iter)
-
-            
-        except Exception as e:
-            print(f"Error in iteration {it} for stage {stage}: {e}")
-            continue
+    cosmetic.run()
 ```
 
 # Classifier Pipeline
+In the cfg/config.yaml file, set the following values:
+- `classifier_version` to whichever version of the HumanEvalPseudocodes or LeetCodePseudocodes dataset the classifier pipeline will use. Should generally increment by 1 e.g `v0.1.0` to `v0.2.0`
+- `split` to `train`
+- `autoencoder_timestamp_train` to the timestamp of the autoencoder run for the train split that `get_classifier_dataset()` will use to create the classifier dataset
+- `cosmetic_timestamp_train` to the timestamp of the cosmetic run for the train split that `get_classifier_dataset()` will use to create the classifier dataset
+- `autoencoder_timestamp_test` to the timestamp of the autoencoder run for the test split that `get_classifier_dataset()` will use to create the classifier dataset
+- `cosmetic_timestamp_test` to the timestamp of the cosmetic run for the test split that `get_classifier_dataset()` will use to create the classifier dataset
+
+Then, call `get_classifier_dataset(split='train')` to get the Pseudocodes-{cfg.classifier_version}-train.jsonl that the classifier pipeline will use to run. Call `get_classifier_dataset(split='test')` to get the Pseudocodes-{cfg.classifier_version}-test.jsonl that the classifier pipeline will use to score final results.
+
 Below is code to run the classifier pipeline with *Greedy Refinement* agent for LeetCode dataset for 32 iterations.
 
 ```python
+from agents import GreedyRefine, DirectAnswer
+from evaluation import Evaluator, get_data
+
 # Set greedy_refine in the cfg file
 if cfg.algorithm == "greedy":
     from agents.greedy_refine import GreedyRefine as ga
 
-# Select directory name, version, and split
-if problems_dir_name = 'classifier_pseudocodes':
-    version = 3
-    train_set_filename = os.path.join(ROOT_DIR, "data", "classifier_pseudocodes", f"HumanEval-pseudo-v0.{version}.0-train.jsonl" )
-    dev_set_filename = os.path.join(ROOT_DIR, "data", "classifier_pseudocodes", f"HumanEval-pseudo-v0.{version}.0-dev.jsonl")
-    classifier_dataset_name = os.path.join(ROOT_DIR, "data", "classifier_pseudocodes")
+timestamp = hydra.core.hydra_config.HydraConfig.get().run.dir.split("/")[-1] # this should syncronize with hydra's timestamp
 
-starting_iteration = 1
-classifier_iterations = 32 = 32# [TO DO]: CO-Bench paper uses 64
-timestamp = hydra.core.hydra_config.HydraConfig.get().run.dir.split("/")[-1]
+if (cfg.evolving_encoder or cfg.evolving_decoder or cfg.evolving_cosmetic or cfg.evolving_classifier) and not cfg.load_previous: 
+    setup_dataset(timestamp, os.path.join(ROOT_DIR, "data", cfg.pipeline, cfg.dataset), cfg.num_iterations + 3) # plus 2 because of the final encoder and decoder verification at the end with train, val, and test splits
 
-# Set up dataset:
-if (evolving_encoding or evolving_decoding or evolving_cosmetic or evolving_classifier) and not load_previous: 
-        setup_dataset(timestamp, f"{ROOT_DIR}/data/{problems_dir_name}", iterations + 2) 
+if cfg.evolving_classifier:
+    classifier_agent = ga(
+        client=client,
+        src_dir=ROOT_DIR,
+        timeout=5,
+        model='gpt-4.1-mini', # We use LiteLLM to call API; was previously 'openai/o3-mini'; im assuming to fit in with LiteLLM ap
+    )
 
-# Define agent
-classifier_agent = ga(
-    client=client,
-    src_dir=ROOT_DIR,
-    timeout=5,
-    model='gpt-4.1-mini', # We use LiteLLM to call API; was previously 'openai/o3-mini'; im assuming to fit in with LiteLLM api
-    stage='classifier'
-)
+    get_classifier_dataset(cfg, split='train', limit=150)
+    get_classifier_dataset(cfg, split='test', limit=150)
+    data = get_data(cfg, src_dir=os.path.join(ROOT_DIR, "data", cfg.pipeline))
+    evaluator_classifier = Evaluator(data, timeout=5) 
 
-# Set final_iter, previous_timestamp to load in best decoder prompt from the autoencoder pipeline
-final_iter = 34
-previous_timestamp = '2025-09-18_21-00-18'
-decoder_prompt = file_to_string(f"{ROOT_DIR}/prompts/greedy_refine/trivial_decoder_prompt.txt")
+    classifier = Classifier(
+        client=client, 
+        src_dir=ROOT_DIR, 
+        cfg=cfg,
+        agent=classifier_agent, 
+        evaluator=evaluator_classifier,
+        timestamp=timestamp,
+        final_iter=34,
+        previous_timestamp=cfg.autoencoder_timestamp,
+        timeout=5, 
+        model='gpt-4.1-mini',         
+    )
 
-# Run for 32 iterations
-for it in range(1, classifier_iterations + 1):
-    if evolving_classifier:
-        stage = 'classifier'
-        try: 
-            prompt = classifier_agent.step()
-            
-            if prompt is None: 
-                break
-            save_prompt(str(generated_prompts_path), prompt, it, stage)
-            
-            mislabeled_positives, mislabeled_cosmetic, mislabeled_negatives, mislabeled_near_misses, true_negative_errors, near_miss_errors, final_score, metrics = evaluate_classifier_prompt(train_set_filename, prompt, client)
-            
-            feedback = evaluator_classifier.get_feedback_classifier(mislabeled_positives, mislabeled_cosmetic, mislabeled_negatives, mislabeled_near_misses, true_negative_errors, near_miss_errors, final_score, metrics)   
-            score = feedback.dev_score
-        
-            classifier_agent.feedback(feedback.dev_score, feedback.dev_feedback, it)  
-
-            avg_metrics = feedback.avg_metrics
-            save_metrics(avg_metrics, metrics_path, timestamp, stage, it)
-
-            # Record previous best prompt:
-            previous_best_path = os.path.join(ROOT_DIR, "data", problems_dir_name, "outputs", timestamp, f"iter_{it}", "previous_best", "previous_best.json")
-            previous_best_prompt, previous_best_score, previous_best_feedback, previous_best_iter = classifier_agent.get_previous_best()
-            record_previous_best_solution(previous_best_path, previous_best_prompt, previous_best_score, previous_best_feedback, previous_best_iter)
-
-        except Exception as e:
-            print(f"Error in iteration {it} for stage {stage}: {e}")
-            continue  
-
-if evolving_classifier:
-        # test final classifier prompt with dev_set and test_set
-        # UNCOMMENT PROMPT BELOW:
-        prompt = classifier_agent.finalize()
-
-        generated_prompts_path = Path(f"{ROOT_DIR}/outputs/prompts/{timestamp}")
-        generated_prompts_path.mkdir(parents=True, exist_ok=True)
-        save_prompt(str(generated_prompts_path), prompt, classifier_iterations+1, 'classifier')
-        save_prompt(str(generated_prompts_path), prompt, classifier_iterations+2, 'classifier')
-        # train score:
-        mislabeled_positives, mislabeled_cosmetic, mislabeled_negatives, mislabeled_near_misses, labeled_correctly, true_negative_errors, near_miss_errors, final_score, metrics = evaluate_classifier_prompt(train_set_filename, prompt, client)
-        feedback = evaluator_classifier.get_feedback_classifier(mislabeled_positives, mislabeled_cosmetic, mislabeled_negatives, mislabeled_near_misses, true_negative_errors, near_miss_errors, final_score, metrics)  # Run evaluation
-        avg_metrics = feedback.avg_metrics
-        save_metrics(avg_metrics, metrics_path, timestamp, "classifier", classifier_iterations+1)
-        pseudocode_path = os.path.join(classifier_dataset_name, "outputs", timestamp, f"iter_{classifier_iterations+1}", "pseudocodes")
-        write_classifier_pseudocodes_to_file(labeled_correctly, os.path.join(pseudocode_path, "pass"))
-        mislabeled = mislabeled_positives + mislabeled_cosmetic + mislabeled_negatives + mislabeled_near_misses
-        write_classifier_pseudocodes_to_file(mislabeled, os.path.join(pseudocode_path, "fail"))
-        # val score:
-        dev_set_filename = os.path.join(ROOT_DIR, "data", "classifier_pseudocodes", f"LeetCode-pseudo-v0.{version}.0-dev.jsonl" )
-        mislabeled_positives, mislabeled_cosmetic, mislabeled_negatives, mislabeled_near_misses, labeled_correctly, true_negative_errors, near_miss_errors, final_score, metrics = evaluate_classifier_prompt(dev_set_filename, prompt, client)
-        dev_feedback = evaluator_classifier.get_feedback_classifier(mislabeled_positives, mislabeled_cosmetic, mislabeled_negatives, mislabeled_near_misses, true_negative_errors, near_miss_errors, final_score, metrics)  
-        avg_metrics = dev_feedback.avg_metrics
-        save_metrics(avg_metrics, metrics_path, timestamp, "classifier", classifier_iterations+2)
-
-        pseudocode_path = os.path.join(classifier_dataset_name, "outputs", timestamp, f"iter_{classifier_iterations+2}", "pseudocodes")
-        write_classifier_pseudocodes_to_file(labeled_correctly, os.path.join(pseudocode_path, "pass"))
-        mislabeled = mislabeled_positives + mislabeled_cosmetic + mislabeled_negatives + mislabeled_near_misses
-        write_classifier_pseudocodes_to_file(mislabeled, os.path.join(pseudocode_path, "fail"))
-        # test score:
-        mislabeled_positives, mislabeled_negatives, labeled_correctly, avg_metrics = evaluate_classifier_prompt_test(test_set_filename, prompt, client)
-        save_metrics(avg_metrics, metrics_path, timestamp, "classifier", classifier_iterations+3)
-        pseudocode_path = os.path.join(classifier_dataset_name, "outputs", timestamp, f"iter_{classifier_iterations+3}", "pseudocodes")
-        write_classifier_pseudocodes_to_file(labeled_correctly, os.path.join(pseudocode_path, "pass"))
-        mislabeled = mislabeled_positives + mislabeled_negatives
-        write_classifier_pseudocodes_to_file(mislabeled, os.path.join(pseudocode_path, "fail"))
-
+    classifier.run()
+    classifier.finalize()
 ```
 
