@@ -50,8 +50,6 @@ Also in the cfg/config.yaml file, set `pipeline` to either `autoencoder`, `cosme
 
 Further, in the cfg/config.yaml file, set `autoencoder_version`, `cosmetic_version`, `classifier_version`. The `autoencoder_version` is the version of the LeetCodeDataset that will be used to start off with. The dataset that the cosmetic pipeline will use will be created throughout the workflow and the version name corresponds to the value set for `cosmetic_version`. The dataset that the classifier pipeline will use will also be created throughout the worfklow and the version name corresponds to the value set for `classifier_version`.
 
-Further, 
-
 # Workflow for sequential run of the 3 pipelines
 To run the entire workflow at once, set the following values in the config.yaml file:
 - `dataset`: `leet_code` or `human_eval`
