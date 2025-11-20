@@ -10,7 +10,7 @@ import numpy as np
 import cProfile
 import pstats
 import traceback
-from utils.utils import init_client, file_to_string, set_up_dataset, preprocess_data, plot_pipeline
+from utils.utils import init_client, file_to_string, set_up_dataset, preprocess_data, plot_pipeline, set_up_dataset, set_up_codebase
 from evaluation.utils import evaluate_classifier_prompt, get_cosmetic_dataset, get_classifier_dataset, write_dataset_to_file, write_error_strings_to_file, evaluate_classifier_prompt_test
 # from agents import GreedyRefine
 from evaluation import Evaluator, get_data
@@ -67,8 +67,9 @@ def main(cfg):
     else:
         raise NotImplementedError
 
-    # uncomment below when first setting up
+    # Uncomment below when first setting up
     # preprocess_data(ROOT_DIR) 
+    # set_up_codebase(ROOT_DIR)
     
     # Main algorithm
 

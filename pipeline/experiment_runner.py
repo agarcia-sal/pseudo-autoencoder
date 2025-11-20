@@ -1,6 +1,6 @@
 import os
 import shutil
-from utils.utils import empty_folder, delete_file, set_up_dataset, set_up_codebase
+from utils.utils import empty_folder, delete_file, set_up_dataset
 from evaluation.utils import get_cosmetic_dataset, get_classifier_dataset
 from evaluation import Evaluator, get_data
 
@@ -21,10 +21,6 @@ class ExperimentRunner:
         #     rounds=config.rounds,
         #     initial_stage=EvolutionStage.ENCODING
         # )
-        self._set_up_experiment()
-
-    def _set_up_experiment(self):
-        set_up_codebase(self.src_dir)
 
     def _set_up_pipeline(self):
         outputs_folder = os.path.join(self.src_dir, "data", self.pipeline, self.cfg.dataset, "outputs", "train")
