@@ -5,19 +5,27 @@
 # Download Data
 Download the raw data from [HumanEval](https://github.com/openai/human-eval) to the local directory `data/autoencoder/human_eval` and LeetCodeDataset-v0.3.0-train.jsonl and LeetCodeDataset-v0.3.0-test.jsonl from [LeetCodeDataset](https://github.com/newfacade/LeetCodeDataset) to the local directory `data/autoencoder/leet_code`
 
-# Set Up Environment - Usage
+# Usage
 
-- Set your OpenAI API key as an environment variable:
-    ```bash
-    OPENAI_API_KEY="<Your API key>" # see more options in ./cfg/llm_client
-    ```
+Set your OpenAI API key as an environment variable:
+```bash
+OPENAI_API_KEY="<Your API key>" # see more options in ./cfg/llm_client
+```
+
+Create a new conda environment with the pseudo_env.yml file:
+```bash
+conda env create -f pseudo_env.yml
+```
 
 When first running the code, uncomment the line below in the main function:
 ```python
 # uncomment below when first setting up
+# set_up_codebase(ROOT_DIR)
 # preprocess_data(ROOT_DIR) 
 ```
-The `preprocess_data` function will do reformat the HumanEval dataset as well as create a new version of the LeetCodeDataset-v0.3.0 that will be which will be a 50% split of medium difficulty and 50% split of hard difficulty instead of a mix of 'easy', 'medium', and 'hard'. The new version of the dataset will be called LeetCodeDataset-v0.3.5-train.jsonl and LeetCodeDataset-v0.3.5-test.jsonl
+The `set_up_codebase` function will set up necessary folder structure.
+
+Meanwhile, the `preprocess_data` function will do reformat the HumanEval dataset as well as create a new, shorter version of the LeetCodeDataset-v0.3.0 that will be which will be a 50% split of medium difficulty and 50% split of hard difficulty instead of a mix of 'easy', 'medium', and 'hard'. The new version of the dataset will be called LeetCodeDataset-v0.3.5-train.jsonl and LeetCodeDataset-v0.3.5-test.jsonl
 
 # Agent Implementations
 
@@ -32,46 +40,68 @@ Each agent implements the following functions:
 - `get_previous_best()`: Returns previous best Solution so far to store at each iteration of a pipeline
 - `load_previous()`: If a pipeline stops running prematurely, will return previous best solution up to that point so that the pipeline can continue running
 
-To run the classifier, we need to create the pseudocode dataset. The following is the process:
-    ok wait so what's the process? i have to run the cosmetic pipeline for the training and test versions right? ok so what
-    are the steps:
-    1. run autoencoder on the training set to generate the pseudocodes with their labels
-        - each run will have its own timestamp
-        - in config.yaml file, set the following variables:
-        - dataset: leet_code # options: human_eval, leet_code
-        - autoencoder_version: v0.3.0 # for leet_code dataset, specify which version you are using. default is v0.3.0
-        - split: train # options: train or test
-        - the end result is a folder named by the timestamp with all the pseudocodes and codes generated per iteration
-    2. call get_cosmetic_dataset() to get AutoEncoderLabels_timestamp-train.jsonl
-    3. run autoencoder on the testing set to generate the pseudocodes with their labels
-    4. call get_cosmetic_dataset() to get AutoEncoderLabels_timestamp-test.jsonl
-    5. run cosmetic pipeline on AutoEncoderLabels_timestamp-train.jsonl
-    6. call get_classifier_dataset() passing with autoencoder and cosmetic timestamps set in cfg to create {dataset}Pseudocodes-v0.{version}.0-train.jsonl
-    7. run cosmetic pipeline on AutoEncoderLabels_timestamp-test.jsonl
-    8. call get_classifier_dataset() passing with autoencoder and cosmetic timestamps set in cfg to create {dataset}Pseudocodes-v0.{version}.0-test.jsonl
-    9. run classifier pipeline
-
 # Pipeline selection
 
-There are 3 pipelines available to run: Autoencoder, Cosmetic, and Classifier
+There are 3 pipelines available to run: Autoencoder, Cosmetic, and Classifier. They can be run separately by loading in the timestamps of the previous pipeline or they can be run all at once. To run them individually:
 
 In the cfg/config.yaml file Set the `evolving_encoder`, `evolving_decoder`, `evolving_cosmetic`, `evolving_classifier` flag to True depending on which pipeline you want to run. For the autoencoder pipeline, set the `evolving_encoder` flag to True and `evolving_decoder` flag to False to start off with. The flags will toggle as the autoencoder switches between these two stages.
 
 Also in the cfg/config.yaml file, set `pipeline` to either `autoencoder`, `cosmetic`, `classifier` and specify which dataset you are using by setting `dataset` to either `human_eval` or `leet_code`. Set `num_iterations` to however many iterations you want to run. Default is 32. Set `rounds`, which is the number of iterations run before switching from encoder to decoder and vice versa. Default is 2.
 
-# Workflow
+Further, in the cfg/config.yaml file, set `autoencoder_version`, `cosmetic_version`, `classifier_version`. The `autoencoder_version` is the version of the LeetCodeDataset that will be used to start off with. The dataset that the cosmetic pipeline will use will be created throughout the workflow and the version name corresponds to the value set for `cosmetic_version`. The dataset that the classifier pipeline will use will also be created throughout the worfklow and the version name corresponds to the value set for `classifier_version`.
 
-The autoencoder pipeline can be run separately but to run the cosmetic pipeline, first run the autoencoder pipeline. To run the classifier pipeline, run the autoencoder pipeline and then the cosmetic pipeline. Each run of each pipeline will have a timestamp associated with it. The entire workflow with all the pipelines is as follows: 
-1. Run the autoencoder on the training set to generate the pseudocodes with their labels
-    - the end result is a folder named by the timestamp with all the pseudocodes and codes generated per iteration
-2. Run the autoencoder on the testing set to generate the pseudocodes with their labels
-3. Call get_cosmetic_dataset() to get AutoEncoderLabels_{cosmetic_version}-train.jsonl, which is generated from the pseudocodes generated by the autoencoder 
-4. Call get_cosmetic_dataset() to get AutoEncoderLabels_{cosmetic_version}-test.jsonl
-5. Run the cosmetic pipeline on AutoEncoderLabels_{cosmetic_version}-train.jsonl
-6. Run the cosmetic pipeline on AutoEncoderLabels_{cosmetic_version}-test.jsonl
-7. Call get_classifier_dataset() with the autoencoder and cosmetic timestamps set in cfg to create HumanEvalPseudocodes-{classifier_version}-train.jsonl or LeetCodePseudocodes-{classifier_version}-train.jsonl
-8. Call get_classifier_dataset() with the autoencoder and cosmetic timestamps set in cfg to create HumanEvalPseudocodes-{classifier_version}-test.jsonl or LeetCodePseudocodes-{classifier_version}-test.jsonl
-9. Run the classifier pipeline
+Further, 
+
+# Workflow for sequential run of the 3 pipelines
+To run the entire workflow at once, set the following values in the config.yaml file:
+- `dataset`: `leet_code` or `human_eval`
+- `use_timestamp`: `False` # if running pipelines individually, set to True
+- `num_iterations`: the number of iterations for a pipeline. Default is 32
+- `rounds`: 2 
+- `evolving_encoder`: True
+- `autoencoder_version`: the version of the LeetCodeDataset being used. Default is v0.3.5 which is the harder version of v0.3.0
+- `cosmetic_version`: v0.1.0 # update this as more datasets for the cosmetic pipeline are created
+- `classifier_version`: v0.1.0
+- `readability_metric`: `avg_syllables_per_word` or `avg_word_length`. Default is `avg_syllables_per_word`    
+- `near_miss_threshold`: 0.8
+
+Below is the code to run the entire worfklow at once:
+
+```python
+from agents import GreedyRefine, DirectAnswer
+from pipeline.experiment_runner import ExperimentRunner
+
+# Set greedy_refine in the cfg file
+client = init_client(cfg)
+
+if cfg.algorithm == "reevo":
+    from reevo import ReEvo as ga
+elif cfg.algorithm == "greedy":
+    from agents.greedy_refine import GreedyRefine as ga
+elif cfg.algorithm == "direct_answer":
+    from agents.direct_answer import DirectAnswer as ga
+else:
+    raise NotImplementedError
+
+# Uncomment below when first setting up
+# preprocess_data(ROOT_DIR) 
+# set_up_codebase(ROOT_DIR)
+
+# Main algorithm
+
+timestamp = hydra.core.hydra_config.HydraConfig.get().run.dir.split("/")[-1] # this should syncronize with hydra's timestamp
+
+# Run all 3 pipelines one after the other
+experiment_runner = ExperimentRunner(
+    client=client, 
+    src_dir=ROOT_DIR, 
+    cfg=cfg,
+    timestamp=timestamp,
+    ga=ga,
+)
+
+experiment_runner.run_main_evolution()
+```
 
 # Results
 
@@ -81,7 +111,8 @@ Passing rates and readability metrics for each iteration will be displayed in a 
 
 In the cfg/config.yaml file, set the following values:
 - `split` to either `train` or `test`
-- `autoencoder_version` to whichever version of the LeetCodeDataset is being used, if `leet_code` is the chosen dataset. Default is `v0.3.5` which is the more difficult version of `v0.3.0`
+- `autoencoder_version` to whichever version of the LeetCodeDataset is being used, if `leet_code` is the chosen dataset. Default is `v0.3.5` which is the shorter, more difficult version of `v0.3.0`
+- `readability_metric` to either `avg_syllables_per_word` or `avg_word_length`. Default is `avg_syllables_per_word`
 
 Below is code to run the autoencoder with *Greedy Refinement* agent for LeetCode dataset for 32 iterations. If running *Direct Answer* then pass in the timestamp for the decoder prompt generated by the autoencoder pipeline that should be used.
 ```python
@@ -142,7 +173,9 @@ First, call `get_cosmetic_dataset()` to get the AutoEncoderLabels-{cfg.cosmetic_
 In the cfg/config.yaml file, set the following values:
 - `cosmetic_version` to whichever version of the AutoEncoderLabels dataset the cosmetic pipeline will use. Should generally increment by 1 e.g `v0.1.0` to `v0.2.0`
 - `split` to either `train` or `test` depending on which split the autoencoder used.
-- `autoencoder_timestamp` to the timestamp of the autoencoder run that the cosmetic pipeline is building off of
+- `autoencoder_timestamp_train` or `autoencoder_timestamp_test` to the timestamp of the autoencoder run that the cosmetic pipeline is building off of for either the train or test split
+- `previous_timestamp_cosmetic` to the timestamp of the autoencoder run from which to load in the decoder prompt from
+- `prev_iter_cosmetic` to the iteration of the autoencoder from which to load in the decoder prompt fromn 
 
 Below is code to run the cosmetic changes pipeline with *Greedy Refinement* agent for LeetCode dataset for 32 iterations.
 
@@ -179,8 +212,6 @@ if cfg.evolving_cosmetic:
         agent=cosmetic_agent, 
         evaluator=evaluator_cosmetic,
         timestamp=timestamp,
-        final_iter=34,
-        previous_timestamp=cfg.autoencoder_timestamp,
         timeout=5, 
         model='gpt-4.1-mini',         
     )
@@ -196,6 +227,8 @@ In the cfg/config.yaml file, set the following values:
 - `cosmetic_timestamp_train` to the timestamp of the cosmetic run for the train split that `get_classifier_dataset()` will use to create the classifier dataset
 - `autoencoder_timestamp_test` to the timestamp of the autoencoder run for the test split that `get_classifier_dataset()` will use to create the classifier dataset
 - `cosmetic_timestamp_test` to the timestamp of the cosmetic run for the test split that `get_classifier_dataset()` will use to create the classifier dataset
+- `previous_timestamp_classifier` to the timestamp of the autoencoder from which to load in the decoder prompt from
+- `prev_iter_classifier` to the iteration of the autoencoder from which to load in the decoder prompt from
 
 Then, call `get_classifier_dataset(split='train')` to get the Pseudocodes-{cfg.classifier_version}-train.jsonl that the classifier pipeline will use to run. Call `get_classifier_dataset(split='test')` to get the Pseudocodes-{cfg.classifier_version}-test.jsonl that the classifier pipeline will use to score final results.
 
@@ -219,7 +252,8 @@ if cfg.evolving_classifier:
         client=client,
         src_dir=ROOT_DIR,
         timeout=5,
-        model='gpt-4.1-mini', # We use LiteLLM to call API; was previously 'openai/o3-mini'; im assuming to fit in with LiteLLM ap
+        model='gpt-4.1-mini',
+        stage='classifier',
     )
 
     get_classifier_dataset(cfg, split='train', limit=150)
@@ -234,8 +268,6 @@ if cfg.evolving_classifier:
         agent=classifier_agent, 
         evaluator=evaluator_classifier,
         timestamp=timestamp,
-        final_iter=34,
-        previous_timestamp=cfg.autoencoder_timestamp,
         timeout=5, 
         model='gpt-4.1-mini',         
     )
