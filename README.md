@@ -105,6 +105,19 @@ experiment_runner.run_main_evolution()
 
 Passing rates and readability metrics for each iteration will be displayed in a metrics.json file under `data/pipeline/dataset/metrics/timestamp_metrics.json` for the timestamp for that run.
 
+To plot pipelines after individual runs, set the values for the timestamps of those runs:
+```python
+if cfg.plotting_pipeline:
+    autoencoder_timestamp = '2025-11-18_14-39-59'
+    classifier_timestamp = '2025-11-18_19-27-00'
+    if not cfg.use_timestamp:
+        autoencoder_timestamp = timestamp
+        classifier_timestamp = timestamp
+    plot_pipeline(cfg, ROOT_DIR, autoencoder_timestamp, "autoencoder")
+    plot_pipeline(cfg, ROOT_DIR, classifier_timestamp, "classifier")
+    plt.show()
+```
+
 # Autoencoder Pipeline
 
 In the cfg/config.yaml file, set the following values:
