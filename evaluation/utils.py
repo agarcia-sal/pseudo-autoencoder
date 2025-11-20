@@ -482,7 +482,7 @@ class ParallelRun:
         print('metrics in process_all_problems(): ', metrics)
         return results, metrics
 
-    def gen_multi_chat_encodings_cosmetic(self, dataset_name, problems_file_path, encoding_prompt, stage, timestamp, it, client):
+    def gen_multi_chat_encodings_cosmetic(self, dataset_name, problems_file_path, encoding_prompt, stage, timestamp, split, it, client):
         message_list = []
 
         #[TO DO]: I think actually problem_file_path_list should be the path to the json file. cause i don't think it makes
@@ -491,7 +491,12 @@ class ParallelRun:
         # jsonl_files = [file for file in os.listdir(dataset_name) if file.endswith('.jsonl')]
         # filename = os.path.join(dataset_name, jsonl_files[0])
         original_pseudocodes = []
+
         encoding_prompt_file_path = os.path.join(dataset_name, "outputs", timestamp, f"iter_{it}", "prompts", f"{stage}_stage_encoding_prompt.txt")
+        with open(encoding_prompt_file_path, 'w') as file: 
+            file.write(encoding_prompt)
+
+        encoding_prompt_file_path = os.path.join(dataset_name, "outputs", split, f"iter_{it}", "prompts", f"{stage}_stage_encoding_prompt.txt")
         with open(encoding_prompt_file_path, 'w') as file: 
             file.write(encoding_prompt)
 
@@ -547,7 +552,7 @@ class ParallelRun:
     
         return pseudocode_encoding_list, problem_metrics
     
-    def gen_multi_chat_encodings(self, dataset_name, problems_file_path, encoding_prompt, stage, timestamp, it, client):
+    def gen_multi_chat_encodings(self, dataset_name, problems_file_path, encoding_prompt, stage, timestamp, split, it, client):
         message_list = []
 
         #[TO DO]: I think actually problem_file_path_list should be the path to the json file. cause i don't think it makes
@@ -555,9 +560,12 @@ class ParallelRun:
         task_ids = []
         # jsonl_files = [file for file in os.listdir(dataset_name) if file.endswith('.jsonl')]
         # filename = os.path.join(dataset_name, jsonl_files[0])
-        encoding_prompt_file_path = os.path.join(dataset_name, "outputs", timestamp, f"iter_{it}", "prompts", f"{stage}_stage_encoding_prompt.txt")
-        with open(encoding_prompt_file_path, 'w') as file: 
-            file.write(encoding_prompt)
+
+        # encoding_prompt_file_path = os.path.join(dataset_name, "outputs", timestamp, f"iter_{it}", "prompts", f"{stage}_stage_encoding_prompt.txt")
+        # with open(encoding_prompt_file_path, 'w') as file: 
+        #     file.write(encoding_prompt)
+
+        
 
         with open(problems_file_path, 'r', encoding='utf-8') as f:
             for line in f:
@@ -568,7 +576,7 @@ class ParallelRun:
                     # starter_code = json_obj.get("meta").get("lang_code")
                 else:
                     # print("'response' in gen_multi_chat_encodingindgs")
-                    if 'v0.3.0' in problems_file_path:
+                    if 'v0.3' in problems_file_path:
                         original_code = json_obj.get("prompt") + json_obj.get("response")
                         # description = json_obj.get("meta").get("question_title")
                         # starter_code = json_obj.get("meta").get("lang_code")
@@ -616,13 +624,14 @@ class ParallelRun:
             problem_metrics[task_id] = metrics
             new_task_id = task_id.replace("/", "-")
             # pseudocode_file_path = os.path.join(problem_file_path, "outputs", timestamp, f"iter_{it}", "pseudocodes", f"pseudocode_{stage}.txt")
-            pseudocode_file_path = os.path.join(dataset_name, "outputs", timestamp, f"iter_{it}", "pseudocodes", f"{new_task_id}_pseudocode_{stage}.txt")
-            with open(pseudocode_file_path, 'w') as file:
-                file.write(pseudocode)
+            
+            # pseudocode_file_path = os.path.join(dataset_name, "outputs", timestamp, f"iter_{it}", "pseudocodes", f"{new_task_id}_pseudocode_{stage}.txt")
+            # with open(pseudocode_file_path, 'w') as file:
+            #     file.write(pseudocode)
     
         return pseudocode_encoding_list, problem_metrics
     
-    def gen_multi_chat_decodings(self, dataset_name, problem_cases, decoding_prompt, pseudocode_encoding_list, stage, timestamp, it, client):
+    def gen_multi_chat_decodings(self, dataset_name, problem_cases, decoding_prompt, pseudocode_encoding_list, stage, timestamp, split, it, client):
         message_list = []
         for pseudocode in pseudocode_encoding_list:
             message=[
@@ -634,14 +643,17 @@ class ParallelRun:
             message_list.append(message)
 
         code_decodings = client.multi_chat_completion(message_list)
-        # code_decodings = client.multi_chat_completion_batch(message_list)
-        # code_decodings = await self.batch_multi_chat_completion_async(client, message_list)
+       
         # print('code decodings:', code_decodings)
         # print('length of code_decodings: ', len(code_decodings))
         # print('length of pseudocode encodings: ', len(pseudocode_encoding_list))
-        decoding_prompt_file_path = os.path.join(dataset_name, "outputs", timestamp, f"iter_{it}", "prompts", f"{stage}_stage_decoding_prompt.txt")
-        with open(decoding_prompt_file_path, 'w') as file:
-            file.write(decoding_prompt)
+        # decoding_prompt_file_path = os.path.join(dataset_name, "outputs", timestamp, f"iter_{it}", "prompts", f"{stage}_stage_decoding_prompt.txt")
+        # with open(decoding_prompt_file_path, 'w') as file:
+        #     file.write(decoding_prompt)
+
+        # decoding_prompt_file_path = os.path.join(dataset_name, "outputs", split, f"iter_{it}", "prompts", f"{stage}_stage_decoding_prompt.txt")
+        # with open(decoding_prompt_file_path, 'w') as file:
+        #     file.write(decoding_prompt)
 
         # Write codes to file:
         code_file_path_list = []
@@ -662,9 +674,11 @@ class ParallelRun:
 
             new_task_id = problem.replace("/", "-")
             # code_file_path = os.path.join(problem_file_path, "outputs", timestamp, f"iter_{it}", "decoded_codes", f"generated_code_{stage}.py")
-            code_file_path = os.path.join(dataset_name, "outputs", timestamp, f"iter_{it}", "decoded_codes", f"{new_task_id}_decoded_code_{stage}.py")
-            with open(code_file_path, 'w') as file:
-                file.write(code)
+            
+            # code_file_path = os.path.join(dataset_name, "outputs", timestamp, f"iter_{it}", "decoded_codes", f"{new_task_id}_decoded_code_{stage}.py")
+            # with open(code_file_path, 'w') as file:
+            #     file.write(code)
+
             # code_file_path_list.append(code_file_path)
             task_pseudocodes_codes[problem] = {"pseudocode": pseudocode, "decoded_code": code}
 
@@ -767,7 +781,7 @@ class ParallelRun:
         # results = evaluate_functional_correctness(sample_file, problem_file, k)
         # print(results)
     
-    def process_all_problems(self, problem_cases, dataset_name, problems_file_name, prompt, prev_stage_prompt, config_path, src_dir, stage, timestamp, it, client,
+    def process_all_problems(self, problem_cases, dataset_name, problems_file_name, prompt, prev_stage_prompt, config_path, src_dir, stage, timestamp, split, it, client, near_miss_threshold,
                           timeout=60, instance_workers=4, case_workers=4):
         
         problem_file_path_list = [os.path.join(src_dir, dataset_name, problem) for problem in problem_cases]
@@ -807,12 +821,12 @@ class ParallelRun:
         # print('problem_cases in process_all_problems: ', problem_cases)
         print('right before calling gen_multi_chat_encodings: ')
         if stage == 'cosmetic':
-            pseudocode_encoding_list, problem_metrics = self.gen_multi_chat_encodings_cosmetic(dataset_name, problems_file, encoding_prompt, stage, timestamp, it, client)
+            pseudocode_encoding_list, problem_metrics = self.gen_multi_chat_encodings_cosmetic(dataset_name, problems_file, encoding_prompt, stage, timestamp, split, it, client)
         else:
-            pseudocode_encoding_list, problem_metrics = self.gen_multi_chat_encodings(dataset_name, problems_file, encoding_prompt, stage, timestamp, it, client)
+            pseudocode_encoding_list, problem_metrics = self.gen_multi_chat_encodings(dataset_name, problems_file, encoding_prompt, stage, timestamp, split, it, client)
         print('after calling gen_multi_chat_encodings')
         # code_decoding_list, code_file_path_list = self.gen_multi_chat_decodings(dataset_name, problem_cases, decoding_prompt, pseudocode_encoding_list, stage, timestamp, it, client)
-        code_decoding_list, task_pseudocodes_codes = self.gen_multi_chat_decodings(dataset_name, problem_cases, decoding_prompt, pseudocode_encoding_list, stage, timestamp, it, client)
+        code_decoding_list, task_pseudocodes_codes = self.gen_multi_chat_decodings(dataset_name, problem_cases, decoding_prompt, pseudocode_encoding_list, stage, timestamp, split, it, client)
         print('after calling gen_multi_chat_decodings')
         # print('code_decoding_list:')
         # for code_dec in code_decoding_list:
@@ -852,10 +866,20 @@ class ParallelRun:
         #     metrics[problem_case] = problem_metrics
         #     pbar.update(1)
         # pbar.close()
-        error_file_path = os.path.join(dataset_name, "outputs", timestamp, f"iter_{it}", "errors")
         num_errors = 2
         results, errors = evaluate_functional_correctness(dataset_name, problems_file, task_pseudocodes_codes)
-        write_errors_to_file(error_file_path, errors, num_errors)
+
+        # [TO DO]: add near-miss threshold to cfg file and pass it in
+        outputs_file_path = os.path.join(dataset_name, "outputs", timestamp, f"iter_{it}")
+        write_outputs_to_file(outputs_file_path, encoding_prompt, decoding_prompt, task_pseudocodes_codes, results, errors, num_errors, stage, near_miss_threshold)
+        
+        outputs_file_path = os.path.join(dataset_name, "outputs", split, f"iter_{it}")
+        write_outputs_to_file(outputs_file_path, encoding_prompt, decoding_prompt, task_pseudocodes_codes, results, errors, num_errors, stage, near_miss_threshold)
+        
+        # write_errors_to_file(error_file_path, errors, num_errors)
+        # error_file_path = os.path.join(dataset_name, "outputs", split, f"iter_{it}", "errors")
+        # write_errors_to_file(error_file_path, errors, num_errors)
+        
         # print('results from evaluate_functional_correctness:')
         # print(results)
         if stage == 'cosmetic':
@@ -910,10 +934,10 @@ class ParallelRun:
         pbar.close()
         return results, metrics
 
-    def __call__(self, problem_cases, dataset_name, problems_file_name, prompt, prev_stage_prompt, config_path, src_dir, stage, timestamp, it, client, 
+    def __call__(self, problem_cases, dataset_name, problems_file_name, prompt, prev_stage_prompt, config_path, src_dir, stage, timestamp, split, it, client, near_miss_threshold,
                           timeout=60, instance_workers=4, case_workers=4):
         # return self.process_all_problems(problem_cases, dataset_name, load_data, solve_source, prev_stage_prompt, client, config_path, src_dir, stage)
-        return self.process_all_problems(problem_cases, dataset_name, problems_file_name, prompt, prev_stage_prompt, config_path, src_dir, stage, timestamp, it, client,
+        return self.process_all_problems(problem_cases, dataset_name, problems_file_name, prompt, prev_stage_prompt, config_path, src_dir, stage, timestamp, split, it, client, near_miss_threshold,
                             timeout, case_workers, instance_workers)
 
 
@@ -1008,7 +1032,7 @@ def get_original_codes_jsonl(dataset_name, problems_file):
             code = problem["canonical_solution"]
         else:
             print("response in get_original_codes_jsonl")
-            if "v0.3.0" in problems_file:
+            if "v0.3" in problems_file:
                 code = problem["response"]
             else:
                 code = extract_code_blocks(problem["response"])[0]
@@ -1441,30 +1465,36 @@ def average_metrics(normalized_metrics):
 
     return averaged_metrics_dict
 
-def save_metrics(avg_metrics, metrics_path, timestamp, stage, iteration):
-    metrics_file_path = f'{metrics_path}/{timestamp}_metrics.json' # [TO DO]: create time stamp directory, refactor calculate_metrics i think to only do encoding or decoding metrics
+def save_metrics(avg_metrics, metrics_path, timestamp, stage, iteration, split):
+    # metrics_file_path = f'{metrics_path}/{timestamp}_metrics.json' # [TO DO]: create time stamp directory, refactor calculate_metrics i think to only do encoding or decoding metrics
     # metrics_file_path = f'{metrics_path}/{timestamp}_encoder_metrics.json'
     # Load existing data (if any)
-    if os.path.exists(metrics_file_path):
-        with open(metrics_file_path, "r") as f:
-            results = json.load(f)
-    else:
-        results = []
+    timestamp_file_path = f'{metrics_path}/{timestamp}_metrics.json'
+    general_file_path = f'{metrics_path}/{split}_metrics.json'
 
-    new_result = {key: value for key, value in avg_metrics.items()}
-    # new_result['iteration-rounds'] = (iteration * (rounds + 1)) + round
-    new_result['iter'] = iteration
-    # new_result['round'] = round
-    new_result['stage'] = stage
+    metric_file_paths = [timestamp_file_path, general_file_path]
 
-    # if round == rounds: ## means one iterations # [TO DO]: add a new condition here
+    for file_path in metric_file_paths:
+        if os.path.exists(file_path):
+            with open(file_path, "r") as f:
+                results = json.load(f)
+        else:
+            results = []
 
-        # Append new result
-    results.append(new_result)
+        new_result = {key: value for key, value in avg_metrics.items()}
+        # new_result['iteration-rounds'] = (iteration * (rounds + 1)) + round
+        new_result['iter'] = iteration
+        # new_result['round'] = round
+        new_result['stage'] = stage
 
-    # Save updated results
-    with open(metrics_file_path, "w") as f:
-        json.dump(results, f, indent=2)  # `indent` for readability
+        # if round == rounds: ## means one iterations # [TO DO]: add a new condition here
+
+            # Append new result
+        results.append(new_result)
+
+        # Save updated results
+        with open(file_path, "w") as f:
+            json.dump(results, f, indent=2)  # `indent` for readability
 
 def check_if_no_metrics(metrics):
     metric_keys = ["line_count", "keyword_count", "comment_count", "avg_variable_name_length", "word_count", "avg_word_length", "avg_score"]
@@ -1528,13 +1558,13 @@ def calculate_reward_pseudocode(pseudocode):
     
     return final_reward
 
-def get_dataset_for_cosmetic_test(metrics_json_path_name, problems_dir, problems_filename, new_file_name, timestamp):
+def get_dataset_for_cosmetic_test(metrics_json_path_name, problems_dir, problems_file_name, new_file_name, timestamp, use_timestamp, near_miss_threshold):
     '''
     Gets the pseudocodes from the given timestamp along with their scores for the test split of the autoencoder. 
     Only takes the last iteration and gets both positive and negative examples because we want to get both more 
     positive and negative examples through the cosmetic pipeline. 
     '''
-    problems_file_name = os.path.join(problems_dir,problems_filename)
+    problems_file_name = os.path.join(problems_dir, problems_file_name)
     problems = list_jsonl_task_ids(problems_file_name)
     num_problems = len(problems)
 
@@ -1568,14 +1598,31 @@ def get_dataset_for_cosmetic_test(metrics_json_path_name, problems_dir, problems
             #     original_code = problem["prompt"] + problem["canonical_solution"]
 
             score = entry[f"{task_id}_passing_rate"]
-
             iteration = entry["iter"]
             stage = entry["stage"]
-            pseudocode_path_name = os.path.join(problems_dir, "outputs", timestamp, f"iter_{iteration}", "pseudocodes", f"{task_id}_pseudocode_{stage}.txt")
+
+            # [TO DO]: pass in near_miss_threshold
+            if score == 1.0:
+                score_folder = 'positives'
+            elif score >= near_miss_threshold:
+                score_folder = 'near_misses'
+            else:
+                score_folder = 'negatives'
+
+
+            if use_timestamp:
+                pseudocode_path_name = os.path.join(problems_dir, "outputs", timestamp, f"iter_{iteration}", "pseudocodes", score_folder, f"{task_id}_pseudocode_{stage}.txt")
+            else:
+                pseudocode_path_name = os.path.join(problems_dir, "outputs", "test", f"iter_{iteration}", "pseudocodes", score_folder, f"{task_id}_pseudocode_{stage}.txt")
+
             with open(pseudocode_path_name, 'r') as file:
                 pseudocode = file.read()
 
-            error_file_path = os.path.join(problems_dir, "outputs", timestamp, f"iter_{iteration}", "errors", f"{task_id}_errors.txt")
+            if use_timestamp:
+                error_file_path = os.path.join(problems_dir, "outputs", timestamp, f"iter_{iteration}", "errors", score_folder, f"{task_id}_errors.txt")
+            else:
+                error_file_path = os.path.join(problems_dir, "outputs", "test", f"iter_{iteration}", "errors", score_folder, f"{task_id}_errors.txt")
+
             if os.path.isfile(error_file_path):
                 with open(error_file_path, 'r') as file:
                     error = file.read()
@@ -1592,11 +1639,12 @@ def get_dataset_for_cosmetic_test(metrics_json_path_name, problems_dir, problems
     # print(pseudocode_examples)
     write_jsonl(new_file_name, pseudocode_examples)
     
-def get_dataset_for_cosmetic_train(metrics_json_path_name, problems_dir, problems_filename, new_file_name, timestamp):
+def get_dataset_for_cosmetic_train(metrics_json_path_name, problems_dir, problems_filename, new_file_name, timestamp, use_timestamp):
     '''
     Gets the pseudocodes from the given timestamp along with their scores for the train split of the autoencoder. 
     Only takes positive examples to get more cosmetic changes through the cosmetic pipeline. 
     '''
+
     problems_file_name = os.path.join(problems_dir,problems_filename)
     problems = list_jsonl_task_ids(problems_file_name)
     num_problems = len(problems)
@@ -1607,6 +1655,7 @@ def get_dataset_for_cosmetic_train(metrics_json_path_name, problems_dir, problem
 
     with open(metrics_json_path_name, 'r') as file:
         pipeline_data = json.load(file)
+
 
     for i in range(len(pipeline_data)-1, -1, -1): # how to iterate? i suppose starting from the back to get the best ones? with the most iterations?
         entry = pipeline_data[i]
@@ -1632,7 +1681,11 @@ def get_dataset_for_cosmetic_train(metrics_json_path_name, problems_dir, problem
             if entry[f"{task_id}_passing_rate"] == 1.0 and task_id not in true_positive_problems: # per set I only want one problem
                 iteration = entry["iter"]
                 stage = entry["stage"]
-                pseudocode_path_name = os.path.join(problems_dir, "outputs", timestamp, f"iter_{iteration}", "pseudocodes", f"{task_id}_pseudocode_{stage}.txt")
+                if use_timestamp:
+                    pseudocode_path_name = os.path.join(problems_dir, "outputs", timestamp, f"iter_{iteration}", "pseudocodes", "positives", f"{task_id}_pseudocode_{stage}.txt")
+                else:
+                    pseudocode_path_name = os.path.join(problems_dir, "outputs", "train", f"iter_{iteration}", "pseudocodes", "positives", f"{task_id}_pseudocode_{stage}.txt")
+
             # pseudocode_path_name = os.path.join(problems_dir, problem, "outputs", "pseudocodes", timestamp, f"iter_{iter}_pseudocode_{stage}.txt")
 
                 with open(pseudocode_path_name, 'r') as file:
@@ -1650,24 +1703,32 @@ def get_dataset_for_cosmetic_train(metrics_json_path_name, problems_dir, problem
 
     return true_positive_examples
 
-def get_cosmetic_dataset(cfg):
+def get_cosmetic_dataset(cfg, ROOT_DIR, split='train'):
     # GET PSEUDOCODES FROM THE AUTOENCODER PIPELINE FOR TRAIN OR TEST SPLIT
     # autoencoder_timestamp = '2025-09-18_21-00-18'
-    autoencoder_metrics_file = os.path.join(ROOT_DIR, "data", "autoencoder", cfg.dataset, "metrics", f"{cfg.autoencoder_timestamp}_metrics.json")
-    autoencoder_dir = f"{ROOT_DIR}/data/autoencoder/{cfg.dataset}"
+    
+    autoencoder_dir = os.path.join(ROOT_DIR, "data", "autoencoder", cfg.dataset)
     if cfg.dataset == 'leet_code':
-        autoencoder_problems_filename = f'LeetCodeDataset-{cfg.autoencoder_version}-{cfg.split}.jsonl'
+        autoencoder_problems_filename = f'LeetCodeDataset-{cfg.autoencoder_version}-{split}.jsonl'
     elif cfg.dataset == 'human_eval':
-        autoencoder_problems_filename = f'HumanEval-{cfg.split}.jsonl'
+        autoencoder_problems_filename = f'HumanEval-{split}.jsonl'
     
-    new_file_name = os.path.join(ROOT_DIR, "data", "cosmetic", cfg.dataset, f"AutoEncoderLabels_{cfg.autoencoder_timestamp}-{cfg.split}.jsonl")
+    new_file_name = os.path.join(ROOT_DIR, "data", "cosmetic", cfg.dataset, f"AutoEncoderLabels-{cfg.cosmetic_version}-{split}.jsonl")
     
-    if cfg.split == 'train':
-        positive_examples = get_dataset_for_cosmetic_train(autoencoder_metrics_file, autoencoder_dir, autoencoder_problems_filename, new_file_name, cfg.autoencoder_timestamp)
-    elif cfg.split == 'test':
-        pseudocode_examples = get_dataset_for_cosmetic_test(autoencoder_metrics_file, autoencoder_dir, autoencoder_problems_filename, new_file_name, cfg.autoencoder_timestamp)
+    if split == 'train':
+        if cfg.use_timestamp:
+            autoencoder_metrics_file = os.path.join(ROOT_DIR, "data", "autoencoder", cfg.dataset, "metrics", f"{cfg.autoencoder_timestamp_train}_metrics.json")
+        else:
+            autoencoder_metrics_file = os.path.join(ROOT_DIR, "data", "autoencoder", cfg.dataset, "metrics", f"train_metrics.json")
+        positive_examples = get_dataset_for_cosmetic_train(autoencoder_metrics_file, autoencoder_dir, autoencoder_problems_filename, new_file_name, cfg.autoencoder_timestamp_train, cfg.use_timestamp)
+    elif split == 'test':
+        if cfg.use_timestamp:
+            autoencoder_metrics_file = os.path.join(ROOT_DIR, "data", "autoencoder", cfg.dataset, "metrics", f"{cfg.autoencoder_timestamp_test}_metrics.json")
+        else:
+            autoencoder_metrics_file = os.path.join(ROOT_DIR, "data", "autoencoder", cfg.dataset, "metrics", f"test_metrics.json")
+        pseudocode_examples = get_dataset_for_cosmetic_test(autoencoder_metrics_file, autoencoder_dir, autoencoder_problems_filename, new_file_name, cfg.autoencoder_timestamp_test, cfg.use_timestamp, cfg.near_miss_threshold)
 
-def get_classifier_dataset(cfg, limit=150):
+def get_classifier_dataset(cfg, ROOT_DIR, split='train', limit=150):
     '''
     Combines the pseudocodes from the autoencoder pipeline and the cosmetic pipeline to create a final dataset of pseudocodes
     for the classifier.
@@ -1676,40 +1737,50 @@ def get_classifier_dataset(cfg, limit=150):
     '''
     # autoencoder_timestamp = '2025-09-18_21-00-18' # leet_code
     # autoencoder_timestamp = '2025-09-24_15-05-02' #human_eval
-    autoencoder_metrics_file = os.path.join(ROOT_DIR, "data", "autoencoder", cfg.dataset, "metrics", f"{cfg.autoencoder_timestamp}_metrics.json")
-
     # cosmetic_timestamp = '2025-09-29_13-46-17'
-    cosmetic_metrics_file = os.path.join(ROOT_DIR, "data", "cosmetic", cfg.dataset, "metrics", f"{cfg.cosmetic_timestamp}_metrics.json")
-    
+ 
     dataset_file_name = ''
     if cfg.dataset == 'leet_code':
-        autoencoder_problems_filename = f'LeetCodeDataset-{cfg.autoencoder_version}-{cfg.split}.jsonl'
+        autoencoder_problems_filename = f'LeetCodeDataset-{cfg.autoencoder_version}-{split}.jsonl'
         dataset_file_name = 'LeetCode'
     elif cfg.dataset == 'human_eval':
-        autoencoder_problems_filename = f'HumanEval-{cfg.split}.jsonl'
+        autoencoder_problems_filename = f'HumanEval-{split}.jsonl'
         dataset_file_name = 'HumanEval'
 
-    autoencoder_dir = f"{ROOT_DIR}/data/autoencoder/{cfg.dataset}"
+    autoencoder_dir = os.path.join(ROOT_DIR, "data", "autoencoder", cfg.dataset)
     
-    cosmetic_dir = f"{ROOT_DIR}/data/cosmetic/{cfg.dataset}"
-    cosmetic_problems_filename = f"AutoEncoderLabels_{cfg.autoencoder_timestamp}.jsonl"
+    cosmetic_dir = os.path.join(ROOT_DIR, "data", "cosmetic", cfg.dataset)
+    cosmetic_problems_filename = f"AutoEncoderLabels-{cfg.cosmetic_version}-{split}.jsonl"
 
     #########################
-    if cfg.split == 'train':
-        problem_results, dev_set_results = get_dataset_for_classifier_train(autoencoder_metrics_file, cosmetic_metrics_file, autoencoder_dir, cosmetic_dir, autoencoder_problems_filename, cosmetic_problems_filename, cfg.autoencoder_timestamp, cfg.cosmetic_timestamp, iterations, limit)
+    if split == 'train':
+        if cfg.use_timestamp:
+            autoencoder_metrics_file = os.path.join(ROOT_DIR, "data", "autoencoder", cfg.dataset, "metrics", f"{cfg.autoencoder_timestamp_train}_metrics.json")
+            cosmetic_metrics_file = os.path.join(ROOT_DIR, "data", "cosmetic", cfg.dataset, "metrics", f"{cfg.cosmetic_timestamp_train}_metrics.json")
+        else:
+            autoencoder_metrics_file = os.path.join(ROOT_DIR, "data", "autoencoder", cfg.dataset, "metrics", "train_metrics.json")
+            cosmetic_metrics_file = os.path.join(ROOT_DIR, "data", "cosmetic", cfg.dataset, "metrics", "train_metrics.json")
+
+        problem_results, dev_set_results = get_dataset_for_classifier_train(autoencoder_metrics_file, cosmetic_metrics_file, autoencoder_dir, cosmetic_dir, autoencoder_problems_filename, cosmetic_problems_filename, cfg.autoencoder_timestamp_train, cfg.cosmetic_timestamp_train, cfg.use_timestamp, cfg.near_miss_threshold, limit)
         
-        train_set_filename = os.path.join(ROOT_DIR, "data", "classifier", cfg.dataset, f"{dataset_file_name}Pseudocodes-v0.{cfg.classifier_version}.0-train.jsonl" )
-        dev_set_filename = os.path.join(ROOT_DIR, "data", "classifier", cfg.dataset, f"{dataset_file_name}Pseudocodes-v0.{cfg.classifier_version}.0-dev.jsonl")
+        train_set_filename = os.path.join(ROOT_DIR, "data", "classifier", cfg.dataset, f"{dataset_file_name}Pseudocodes-{cfg.classifier_version}-train.jsonl" )
+        dev_set_filename = os.path.join(ROOT_DIR, "data", "classifier", cfg.dataset, f"{dataset_file_name}Pseudocodes-{cfg.classifier_version}-dev.jsonl")
         
         write_dataset_to_file(problem_results, train_set_filename)
         write_dataset_to_file(dev_set_results, dev_set_filename)
 
-    elif cfg.split == 'test':    
-        problem_results = get_dataset_for_classifier_test(cosmetic_metrics_file, cosmetic_dir, cosmetic_problems_filename, cfg.cosmetic_timestamp, limit)
-        test_set_filename = os.path.join(ROOT_DIR, "data", "classifier", cfg.dataset, f"{dataset_file_name}Pseudocodes-v0.{cfg.classifier_version}.0-test.jsonl" )
+    elif split == 'test':    
+        if cfg.use_timestamp:
+            autoencoder_metrics_file = os.path.join(ROOT_DIR, "data", "autoencoder", cfg.dataset, "metrics", f"{cfg.autoencoder_timestamp_test}_metrics.json")
+            cosmetic_metrics_file = os.path.join(ROOT_DIR, "data", "cosmetic", cfg.dataset, "metrics", f"{cfg.cosmetic_timestamp_test}_metrics.json")
+        else:
+            autoencoder_metrics_file = os.path.join(ROOT_DIR, "data", "autoencoder", cfg.dataset, "metrics", "test_metrics.json")
+            cosmetic_metrics_file = os.path.join(ROOT_DIR, "data", "cosmetic", cfg.dataset, "metrics", "test_metrics.json")
+        
+        problem_results = get_dataset_for_classifier_test(cosmetic_metrics_file, cosmetic_dir, cosmetic_problems_filename, cfg.cosmetic_timestamp_test, cfg.use_timestamp, limit)
+        test_set_filename = os.path.join(ROOT_DIR, "data", "classifier", cfg.dataset, f"{dataset_file_name}Pseudocodes-{cfg.classifier_version}-test.jsonl" )
+        
         write_dataset_to_file(problem_results, test_set_filename)
-
-    
 
 def write_dataset_to_file(true_positive_examples, positive_examples_file_name):
     write_jsonl(positive_examples_file_name, true_positive_examples)
@@ -1728,8 +1799,49 @@ def write_errors_to_file(error_file_path, errors, num_errors):
     #     if error_list:
     #         with open(problem_error_file_path, 'w') as file:
     #             file.write(str(error_list[:num_errors]))
-def get_dataset_for_classifier_test(cosmetic_metrics_file, cosmetic_dir, cosmetic_problems_filename, cosmetic_timestamp, limit):
-    problems = list_jsonl_task_ids(os.path.join(cosmetic_dir, cosmetic_problems_filename)) 
+
+
+
+def write_outputs_to_file(file_path, encoding_prompt, decoding_prompt, task_pseudocodes_codes, results, errors, num_errors, stage, near_miss_threshold):
+    problem_passing_rates = get_problem_passing_rates(results)
+
+    for task_id in results:
+        code = task_pseudocodes_codes[task_id]["decoded_code"]
+        pseudocode = task_pseudocodes_codes[task_id]["pseudocode"]
+        passing_rate = problem_passing_rates[task_id]
+        error_list = errors.get(task_id, None)
+        
+        if passing_rate == 1.0:
+            score_folder = "positives"
+        elif passing_rate >= near_miss_threshold:
+            score_folder = "near_misses"
+        else:
+            score_folder = "negatives"
+            
+        code_file_path = os.path.join(file_path, "decoded_codes", score_folder, f"{task_id}_decoded_code_{stage}.py")
+        with open(code_file_path, 'w') as file:
+            file.write(code)
+
+        pseudocode_file_path = os.path.join(file_path, "pseudocodes", score_folder, f"{task_id}_pseudocode_{stage}.txt")
+        with open(pseudocode_file_path, 'w') as file:
+            file.write(pseudocode)
+
+        error_file_path = os.path.join(file_path, "errors", score_folder, f"{task_id}_errors.txt")
+        if error_list:
+            with open(error_file_path, 'w') as file:
+                file.write(str(error_list[:num_errors]))
+
+        encoding_prompt_file_path = os.path.join(file_path, "prompts", f"{stage}_stage_encoding_prompt.txt")
+        with open(encoding_prompt_file_path, 'w') as file: 
+            file.write(encoding_prompt)
+
+        decoding_prompt_file_path = os.path.join(file_path, "prompts", f"{stage}_stage_decoding_prompt.txt")
+        with open(decoding_prompt_file_path, 'w') as file:
+            file.write(decoding_prompt)
+
+
+def get_dataset_for_classifier_test(cosmetic_metrics_file, cosmetic_problems_dir, cosmetic_problems_filename, cosmetic_timestamp, use_timestamp, limit):
+    problems = list_jsonl_task_ids(os.path.join(cosmetic_problems_dir, cosmetic_problems_filename)) 
     
     true_positive_problems = set()
     true_negative_problems = set()
@@ -1744,8 +1856,7 @@ def get_dataset_for_classifier_test(cosmetic_metrics_file, cosmetic_dir, cosmeti
     with open(cosmetic_metrics_file, 'r') as file:
         cosmetic_pipeline_data = json.load(file)
 
-    # for i in range(len(first_pipeline_data)-1, -1, -1): # how to iterate? i suppose starting from the back to get the best ones? with the most iterations?
-    for i in range(0, 6, 1):    
+    for i in range(len(cosmetic_pipeline_data)-1, -1, -1): # how to iterate? i suppose starting from the back to get the best ones? with the most iterations?
         entry = cosmetic_pipeline_data[i]
         current_iter = entry["iter"]
         print('current iter:')
@@ -1767,7 +1878,7 @@ def get_dataset_for_classifier_test(cosmetic_metrics_file, cosmetic_dir, cosmeti
     limited_problems = random.sample(sorted(problems_overlap), min(len(problems_overlap), limit))
     print('size of overlap: ', len(limited_problems))
 
-    problems_json_file = os.path.join(cosmetic_dir,cosmetic_problems_filename)
+    problems_json_file = os.path.join(cosmetic_problems_dir, cosmetic_problems_filename)
 
     problem_results = []
 
@@ -1775,19 +1886,21 @@ def get_dataset_for_classifier_test(cosmetic_metrics_file, cosmetic_dir, cosmeti
         problem = entry["task_id"]
         
         if problem in limited_problems:
-            if "leet_code" in cosmetic_dir:
-                original_code = entry["prompt"] + entry["response"]
-            elif "human_eval" in cosmetic_dir:
-                original_code = entry["prompt"] + entry["canonical_solution"]
+            if "leet_code" in cosmetic_problems_dir:
+                # original_code = entry["prompt"] + entry["response"]
+                original_code = entry['original_code']
+            elif "human_eval" in cosmetic_problems_dir:
+                # original_code = entry["prompt"] + entry["canonical_solution"]
+                original_code = entry['original_code']
             elif 'pseudocode_labels' in cosmetic_problems_filename:
                 original_code = entry["original_code"]
 
             prompt = entry["prompt"]
             entry_point = entry["entry_point"]
-            if "leet_code" in cosmetic_dir:
+            if "leet_code" in cosmetic_problems_dir:
                 test_cases = entry["input_output"]
                 test_cases_key = 'input_output'
-            elif "human_eval" in cosmetic_dir:
+            elif "human_eval" in cosmetic_problems_dir:
                 test_cases = entry["test"]
                 test_cases_key = 'test'
             else:
@@ -1797,36 +1910,24 @@ def get_dataset_for_classifier_test(cosmetic_metrics_file, cosmetic_dir, cosmeti
             true_positive_entries = true_positive_examples[problem]
             true_negative_entries = true_negative_examples[problem]
 
+            near_miss_threshold = 0.8 # [TO DO]: fix
+            autoencoder_problems_dir = ''
+            autoencoder_timestamp = ''
+
             # get true positive example
-            iteration = true_positive_entries[0]["iter"]
-            score = true_positive_entries[0]["score"]
-            stage = true_positive_entries[0]["stage"]
-            pseudocode_path_name = os.path.join(cosmetic_dir, "outputs", cosmetic_timestamp, f"iter_{iteration}", "pseudocodes", f"{problem}_pseudocode_{stage}.txt")
-            with open(pseudocode_path_name, 'r') as file:
-                pseudocode = file.read()
-            true_positive_pseudocode = pseudocode
-            train_set.append({"label": "true_positive","pseudocode": pseudocode,  "score": score})
+            true_positive_entry = get_labeled_pseudocode_for_classifier("true_positive", true_positive_entries[0], near_miss_threshold, autoencoder_problems_dir, cosmetic_problems_dir, autoencoder_timestamp, cosmetic_timestamp, use_timestamp, problem, 'test')
+            true_positive_pseudocode = true_positive_entry["pseudocode"]
+            train_set.append(true_positive_entry)
 
             # get true negative example
-            iteration = true_negative_entries[0]["iter"]
-            score = true_negative_entries[0]["score"]
-            stage = true_negative_entries[0]["stage"]
-            pseudocode_path_name = os.path.join(cosmetic_dir, "outputs", cosmetic_timestamp, f"iter_{iteration}", "pseudocodes", f"{problem}_pseudocode_{stage}.txt")
-            with open(pseudocode_path_name, 'r') as file:
-                pseudocode = file.read()
-            error_file_path = os.path.join(cosmetic_dir, "outputs", first_timestamp, f"iter_{iteration}", "errors", f"{problem}_errors.txt")
-            if os.path.isfile(error_file_path):
-                with open(error_file_path, 'r') as file:
-                    error = file.read()
-            else:
-                error = ''
-            train_set.append({"label": "true_negative","pseudocode": pseudocode,  "score": score, "error": error, "true_positive": true_positive_pseudocode})
+            true_negative_entry = get_labeled_pseudocode_for_classifier("true_negative", true_negative_entries[0], near_miss_threshold, autoencoder_problems_dir, cosmetic_problems_dir, autoencoder_timestamp, cosmetic_timestamp, use_timestamp, problem, 'test', true_positive_pseudocode)
+            train_set.append(true_negative_entry)
 
             problem_results.append({"task_id": problem, "pseudocode_dataset": train_set, "original_code": original_code, "prompt": prompt, "entry_point": entry_point, f"{test_cases_key}": test_cases})
     return problem_results
             
 
-def get_dataset_for_classifier_train(autoencoder_metrics_file, cosmetic_metrics_file, first_problems_dir, second_problems_dir, first_problems_filename, second_problems_filename, first_timestamp, second_timestamp, num_iterations, limit):
+def get_dataset_for_classifier_train(autoencoder_metrics_file, cosmetic_metrics_file, autoencoder_problems_dir, cosmetic_problems_dir, autoencoder_problems_filename, cosmetic_problems_filename, autoencoder_timestamp, cosmetic_timestamp, use_timestamp, near_miss_threshold, limit):
     # First step: go into the metrics json file and see which iters have a score of 1.0 and which don't.
     # so in the pandas dataframe we have the following columns: problem, pseudocode, score
     # i guess that begs the other question of how many examples to have per problem? i guess just one for now.
@@ -1836,7 +1937,7 @@ def get_dataset_for_classifier_train(autoencoder_metrics_file, cosmetic_metrics_
     # problems = list_jsonl_task_ids(os.path.join(first_problems_dir,first_problems_filename))
 
     # Use the second problems_file_name because the second filters from problems from the first:
-    problems = list_jsonl_task_ids(os.path.join(second_problems_dir,second_problems_filename))
+    problems = list_jsonl_task_ids(os.path.join(cosmetic_problems_dir, cosmetic_problems_filename))
     num_problems = len(problems)
     
     true_positive_problems = set()
@@ -1856,9 +1957,6 @@ def get_dataset_for_classifier_train(autoencoder_metrics_file, cosmetic_metrics_
         cosmetic_pipeline_data = json.load(file)
 
 
-    # Now 'data' is a Python list containing your dictionary
-    # print(data)
-
     dataset_list = []
 
     # Second step: get the iters and rounds of the pseudocodes, now we gotta go find the pseudocodes
@@ -1871,22 +1969,6 @@ def get_dataset_for_classifier_train(autoencoder_metrics_file, cosmetic_metrics_
     problem_near_miss_count_dict = {problem: 0 for problem in problems}
     problem_near_pass_count_dict = {problem: 0 for problem in problems}
 
-    near_miss_threshold = 0.8
-
-    # for i in range(len(first_pipeline_data)-1, -1, -1): # how to iterate? i suppose starting from the back to get the best ones? with the most iterations?
-    #     entry = first_pipeline_data[i]
-    #     for problem in problems:
-    #         if entry[f"{problem}_passing_rate"] == 1.0 and problem not in true_positive_problems: # per set I only want one problem
-    #             true_positive_examples.append({"problem":problem, "score": 1.0, "iter": entry["iter"], "stage": entry["stage"]})
-    #             true_positive_problems.add(problem)
-    #         elif entry[f"{problem}_passing_rate"] < near_miss_threshold and problem not in true_negative_problems:
-    #             true_negative_examples.append({"problem":problem, "score": 0, "iter": entry["iter"], "stage": entry["stage"]})
-    #             true_negative_problems.add(problem)
-    #         elif entry[f"{problem}_passing_rate"] >= near_miss_threshold and entry[f"{problem}_passing_rate"] < 1.0 and problem not in true_negative_problems:
-    #             near_miss_examples.append({"problem":problem, "score": 0, "iter": entry["iter"], "stage": entry["stage"]})
-    #             near_miss_problems.add(problem)
-    #     if len(true_positive_problems) == num_problems and len(true_negative_problems) == num_problems and len(near_pass_problems) == num_problems: # sets are maxed out
-    #         break
     for i in range(len(autoencoder_pipeline_data)-1, -1, -1): # how to iterate? i suppose starting from the back to get the best ones? with the most iterations?
         entry = autoencoder_pipeline_data[i]
         for problem in problems:
@@ -1899,7 +1981,7 @@ def get_dataset_for_classifier_train(autoencoder_metrics_file, cosmetic_metrics_
                 true_negative_problems.add(problem)
                 problem_negatives_count_dict[problem] += 1
             elif entry[f"{problem}_passing_rate"] >= near_miss_threshold and entry[f"{problem}_passing_rate"] < 1.0:
-                near_miss_examples[problem].append({"score": entry[f"{problem}_passing_rate"], "iter": entry["iter"], "stage": entry["stage"], "pipeline": "first"})
+                near_miss_examples[problem].append({"score": entry[f"{problem}_passing_rate"], "iter": entry["iter"], "stage": entry["stage"], "pipeline": "autoencoder"})
                 near_miss_problems.add(problem)
                 problem_near_miss_count_dict[problem] += 1
 
@@ -1907,12 +1989,12 @@ def get_dataset_for_classifier_train(autoencoder_metrics_file, cosmetic_metrics_
     for i in range(len(cosmetic_pipeline_data)-1, -1, -1): # how to iterate? i suppose starting from the back to get the best ones? with the most iterations?
         entry = cosmetic_pipeline_data[i]
         for problem in problems:
-            if entry[f"{problem}_passing_rate"] == 1.0 and (autoencoder_pipeline_json_path_name != cosmetic_pipeline_metrics_path) and entry[f"{problem}_bleu_score"] < bleu_score_threshold :
+            if entry[f"{problem}_passing_rate"] == 1.0 and (autoencoder_metrics_file != cosmetic_metrics_file) and entry[f"{problem}_bleu_score"] < bleu_score_threshold :
                 cosmetic_examples[problem].append({"score": 1.0, "iter": entry["iter"], "stage": entry["stage"]})
                 cosmetic_problems.add(problem)
                 problem_near_pass_count_dict[problem] += 1
             elif entry[f"{problem}_passing_rate"] >= near_miss_threshold and entry[f"{problem}_passing_rate"] < 1.0 and (autoencoder_metrics_file != cosmetic_metrics_file):
-                near_miss_examples[problem].append({"score": entry[f"{problem}_passing_rate"], "iter": entry["iter"], "stage": entry["stage"], "pipeline": "second"})
+                near_miss_examples[problem].append({"score": entry[f"{problem}_passing_rate"], "iter": entry["iter"], "stage": entry["stage"], "pipeline": "cosmetic"})
                 near_miss_problems.add(problem)
                 problem_near_miss_count_dict[problem] += 1
 
@@ -1927,19 +2009,6 @@ def get_dataset_for_classifier_train(autoencoder_metrics_file, cosmetic_metrics_
     near_miss_iter_count_problems = set()
     cosmetic_iter_count_problems = set()
 
-    # for problem in problems:
-    #     if problem_positive_count_dict[problem] >= minimum_problem_iter_count:
-    #         num_positives_count += 1
-    #         positive_iter_count_problems.add(problem)
-    #     if problem_negatives_count_dict[problem] >= minimum_problem_iter_count:
-    #         num_negatives_count += 1
-    #         negative_iter_count_problems.add(problem)
-    #     if problem_near_miss_count_dict[problem] >= minimum_problem_iter_count:
-    #         num_near_miss_count += 1
-    #         near_miss_iter_count_problems.add(problem)
-    #     if problem_near_pass_count_dict[problem] >= minimum_problem_iter_count:
-    #         num_near_pass_count += 1
-    #         cosmetic_iter_count_problems.add(problem)
     for problem in problems:
         if len(true_positive_examples[problem]) >= minimum_problem_iter_count:
             positive_iter_count_problems.add(problem)
@@ -2015,9 +2084,9 @@ def get_dataset_for_classifier_train(autoencoder_metrics_file, cosmetic_metrics_
     dev_set_results = []
     # for problem in intersection_one_version:
     # Use the second problems_file_name because the second filters from problems from the first:
-    problems_json_file = os.path.join(second_problems_dir,second_problems_filename)
+    problems_json_file = os.path.join(cosmetic_problems_dir,cosmetic_problems_filename)
     
-    # for problem in final_set_problems:
+    # for problem in final_set_problems, get the pseudocodes:
     for entry in read_jsonl(problems_json_file):
         problem = entry["task_id"]
         
@@ -2025,10 +2094,10 @@ def get_dataset_for_classifier_train(autoencoder_metrics_file, cosmetic_metrics_
             original_code = entry["original_code"]
             prompt = entry["prompt"]
             entry_point = entry["entry_point"]
-            if "leet_code" in first_problems_dir:
+            if "leet_code" in autoencoder_problems_dir:
                 test_cases = entry["input_output"]
                 test_cases_key = 'input_output'
-            elif "human_eval" in first_problems_dir:
+            elif "human_eval" in cosmetic_problems_dir:
                 test_cases = entry["test"]
                 test_cases_key = 'test'
             buckets_4_train = []
@@ -2038,220 +2107,102 @@ def get_dataset_for_classifier_train(autoencoder_metrics_file, cosmetic_metrics_
             near_miss_entries = near_miss_examples[problem]
             cosmetic_entries = cosmetic_examples[problem]
 
-            # get true positive example
-            iteration = true_positive_entries[0]["iter"]
-            score = true_positive_entries[0]["score"]
-            stage = true_positive_entries[0]["stage"]
-            pseudocode_path_name = os.path.join(first_problems_dir, "outputs", first_timestamp, f"iter_{iteration}", "pseudocodes", f"{problem}_pseudocode_{stage}.txt")
-            with open(pseudocode_path_name, 'r') as file:
-                pseudocode = file.read()
-            true_positive_pseudocode = pseudocode
-            buckets_4_train.append({"label": "true_positive","pseudocode": pseudocode,  "score": score})
+            # get true positive example   
+            true_positive_entry = get_labeled_pseudocode_for_classifier("true_positive", true_positive_entries[0], near_miss_threshold, autoencoder_problems_dir, cosmetic_problems_dir, autoencoder_timestamp, cosmetic_timestamp, use_timestamp, problem, 'train')
+            true_positive_pseudocode = true_positive_entry["pseudocode"]
+            buckets_4_train.append(true_positive_entry)
 
             # get true negative example
-            iteration = true_negative_entries[0]["iter"]
-            score = true_negative_entries[0]["score"]
-            stage = true_negative_entries[0]["stage"]
-            pseudocode_path_name = os.path.join(first_problems_dir, "outputs", first_timestamp, f"iter_{iteration}", "pseudocodes", f"{problem}_pseudocode_{stage}.txt")
-            with open(pseudocode_path_name, 'r') as file:
-                pseudocode = file.read()
-            error_file_path = os.path.join(first_problems_dir, "outputs", first_timestamp, f"iter_{iteration}", "errors", f"{problem}_errors.txt")
-            if os.path.isfile(error_file_path):
-                with open(error_file_path, 'r') as file:
-                    error = file.read()
-            else:
-                error = ''
-            buckets_4_train.append({"label": "true_negative","pseudocode": pseudocode,  "score": score, "error": error, "true_positive":true_positive_pseudocode})
+            true_negative_entry = get_labeled_pseudocode_for_classifier("true_negative", true_negative_entries[0], near_miss_threshold, autoencoder_problems_dir, cosmetic_problems_dir, autoencoder_timestamp, cosmetic_timestamp, use_timestamp, problem, 'train', true_positive_pseudocode)
+            buckets_4_train.append(true_negative_entry)
 
             # get near_miss example
-            iteration = near_miss_entries[0]["iter"]
-            score = near_miss_entries[0]["score"]
-            stage = near_miss_entries[0]["stage"]
-            pipeline = near_miss_entries[0]["pipeline"]
-            # This is because near_miss comes from both the first and second pipelines
-            if pipeline == "first":
-                problems_dir_name = first_problems_dir
-                problem_timestamp = first_timestamp
-            else:
-                problems_dir_name = second_problems_dir
-                problem_timestamp = second_timestamp
-            pseudocode_path_name = os.path.join(problems_dir_name, "outputs", problem_timestamp, f"iter_{iteration}", "pseudocodes", f"{problem}_pseudocode_{stage}.txt")
-            with open(pseudocode_path_name, 'r') as file:
-                pseudocode = file.read()
-            error_file_path = os.path.join(problems_dir_name, "outputs", first_timestamp, f"iter_{iteration}", "errors", f"{problem}_errors.txt")
-            if os.path.isfile(error_file_path):
-                with open(error_file_path, 'r') as file:
-                    error = file.read()
-            else:
-                error = ''
-            buckets_4_train.append({"label": "near_miss","pseudocode": pseudocode,  "score": score, "error": error, "true_positive":true_positive_pseudocode})
+            near_miss_entry = get_labeled_pseudocode_for_classifier("near_miss", near_miss_entries[0], near_miss_threshold, autoencoder_problems_dir, cosmetic_problems_dir, autoencoder_timestamp, cosmetic_timestamp, use_timestamp, problem, 'train', true_positive_pseudocode)
+            buckets_4_train.append(near_miss_entry)
 
             # get cosmetic example
-            iteration = cosmetic_entries[0]["iter"]
-            score = cosmetic_entries[0]["score"]
-            stage = cosmetic_entries[0]["stage"]
-            pseudocode_path_name = os.path.join(second_problems_dir, "outputs", second_timestamp, f"iter_{iteration}", "pseudocodes", f"{problem}_pseudocode_{stage}.txt")
-            with open(pseudocode_path_name, 'r') as file:
-                pseudocode = file.read()
-            buckets_4_train.append({"label": "cosmetic","pseudocode": pseudocode,  "score": score, "true_positive": true_positive_pseudocode})
+            cosmetic_entry = get_labeled_pseudocode_for_classifier("cosmetic", cosmetic_entries[0], near_miss_threshold, autoencoder_problems_dir, cosmetic_problems_dir, autoencoder_timestamp, cosmetic_timestamp, use_timestamp, problem, 'train', true_positive_pseudocode)
+            buckets_4_train.append(cosmetic_entry)
 
             problem_results.append({"task_id":problem, "pseudocode_dataset": buckets_4_train, "original_code": original_code, "prompt": prompt, "entry_point": entry_point, f"{test_cases_key}": test_cases})
 
-            # Get dev set:
+            # Get dev set, use index 1 in the entries:
             if problem in intersection_two_versions:
                 if len(true_positive_entries) > 1:
-                    iteration = true_positive_entries[1]["iter"]
-                    score = true_positive_entries[1]["score"]
-                    stage = true_positive_entries[1]["stage"]
-                    pseudocode_path_name = os.path.join(first_problems_dir, "outputs", first_timestamp, f"iter_{iteration}", "pseudocodes", f"{problem}_pseudocode_{stage}.txt")
-                    with open(pseudocode_path_name, 'r') as file:
-                        pseudocode = file.read()
-                    true_positive_pseudocode = pseudocode
-                    buckets_4_dev.append({"label": "true_positive","pseudocode": pseudocode,  "score": score})
+                    true_positive_entry = get_labeled_pseudocode_for_classifier("true_positive", true_positive_entries[1], near_miss_threshold, autoencoder_problems_dir, cosmetic_problems_dir, autoencoder_timestamp, cosmetic_timestamp, use_timestamp, problem)
+                    true_positive_pseudocode = true_positive_entry["pseudocode"]
+                    buckets_4_dev.append(true_positive_entry)
 
                 if len(true_negative_entries) > 1:
-                    iteration = true_negative_entries[1]["iter"]
-                    score = true_negative_entries[1]["score"]
-                    stage = true_negative_entries[1]["stage"]
-                    pseudocode_path_name = os.path.join(first_problems_dir, "outputs", first_timestamp, f"iter_{iteration}", "pseudocodes", f"{problem}_pseudocode_{stage}.txt")
-                    with open(pseudocode_path_name, 'r') as file:
-                        pseudocode = file.read()
-                    error_file_path = os.path.join(first_problems_dir, "outputs", first_timestamp, f"iter_{iteration}", "errors", f"{problem}_errors.txt")
-                    if os.path.isfile(error_file_path):
-                        with open(error_file_path, 'r') as file:
-                            error = file.read()
-                    else:
-                        error = ''
-                    buckets_4_dev.append({"label": "true_negative","pseudocode": pseudocode,  "score": score, "error": error, "true_positive":true_positive_pseudocode})
+                    true_negative_entry = get_labeled_pseudocode_for_classifier("true_negative", true_negative_entries[1], near_miss_threshold, autoencoder_problems_dir, cosmetic_problems_dir, autoencoder_timestamp, cosmetic_timestamp, use_timestamp, problem, true_positive_pseudocode)
+                    buckets_4_dev.append(true_negative_entry)
 
                 if len(near_miss_entries) > 1:
-                    iteration = near_miss_entries[1]["iter"]
-                    score = near_miss_entries[1]["score"]
-                    stage = near_miss_entries[1]["stage"]
-                    pipeline = near_miss_entries[1]["pipeline"]
-                    # This is because near_miss comes from both the first and second pipelines
-                    if pipeline == "first":
-                        problems_dir_name = first_problems_dir
-                        problem_timestamp = first_timestamp
-                    else:
-                        problems_dir_name = second_problems_dir
-                        problem_timestamp = second_timestamp
-                    pseudocode_path_name = os.path.join(problems_dir_name, "outputs", problem_timestamp, f"iter_{iteration}", "pseudocodes", f"{problem}_pseudocode_{stage}.txt")
-                    with open(pseudocode_path_name, 'r') as file:
-                        pseudocode = file.read()
-                    error_file_path = os.path.join(problems_dir_name, "outputs", first_timestamp, f"iter_{iteration}", "errors", f"{problem}_errors.txt")
-                    if os.path.isfile(error_file_path):
-                        with open(error_file_path, 'r') as file:
-                            error = file.read()
-                    else:
-                        error = ''
-                    buckets_4_dev.append({"label": "near_miss","pseudocode": pseudocode,  "score": score, "error": error, "true_positive":true_positive_pseudocode})
+                    near_miss_entry = get_labeled_pseudocode_for_classifier("near_miss", near_miss_entries[1], near_miss_threshold, autoencoder_problems_dir, cosmetic_problems_dir, autoencoder_timestamp, cosmetic_timestamp, problem, use_timestamp, true_positive_pseudocode)
+                    buckets_4_dev.append(near_miss_entry)
 
                 if len(cosmetic_entries) > 1:
-                    iteration = cosmetic_entries[1]["iter"]
-                    score = cosmetic_entries[1]["score"]
-                    stage = cosmetic_entries[1]["stage"]
-                    pseudocode_path_name = os.path.join(second_problems_dir, "outputs", second_timestamp, f"iter_{iteration}", "pseudocodes", f"{problem}_pseudocode_{stage}.txt")
-                    with open(pseudocode_path_name, 'r') as file:
-                        pseudocode = file.read()
-                    buckets_4_dev.append({"label": "cosmetic","pseudocode": pseudocode,  "score": score, "true_positive": true_positive_pseudocode})
+                    cosmetic_entry = get_labeled_pseudocode_for_classifier("cosmetic", cosmetic_entries[1], near_miss_threshold, autoencoder_problems_dir, cosmetic_problems_dir, autoencoder_timestamp, cosmetic_timestamp, problem, use_timestamp, true_positive_pseudocode)
+                    buckets_4_dev.append(cosmetic_entry)
 
                 dev_set_results.append({"task_id":problem, "pseudocode_dataset": buckets_4_dev, "original_code": original_code, "prompt": prompt, "entry_point": entry_point, f"{test_cases_key}": test_cases})
 
     return problem_results, dev_set_results
 
-    # Step 4: find the pseudocodes
-    # [TO DO]: hmmm this is maybe better done with a jsonl format
-    final_true_positive_examples = []
-    final_true_negative_examples = []
-    final_near_miss_examples = []
-    final_near_pass_examples = []
-    for entry in true_positive_examples:
-        problem = entry["problem"]
-        iter = entry["iter"]
-        score = entry["score"]
-        stage = entry["stage"]
+def get_labeled_pseudocode_for_classifier(label, entry, near_miss_threshold, autoencoder_problems_dir, cosmetic_problems_dir, autoencoder_timestamp, cosmetic_timestamp, use_timestamp, problem, split, true_positive_pseudocode=None):
+    iteration = entry["iter"]
+    score = entry["score"]
+    stage = entry["stage"]
 
-        if problem in intersection_result:
-            pseudocode_path_name = os.path.join(first_problems_dir, "outputs", first_timestamp, f"iter_{iter}", "pseudocodes", f"{problem}_pseudocode_{stage}.txt")
-            # pseudocode_path_name = os.path.join(problems_dir, problem, "outputs", "pseudocodes", timestamp, f"iter_{iter}_pseudocode_{stage}.txt")
+    if score == 1.0:
+        score_folder = "positives"
+    elif score >= near_miss_threshold:
+        score_folder = "near_misses"
+    else:
+        score_folder = "negatives"
 
-            with open(pseudocode_path_name, 'r') as file:
-                pseudocode = file.read()
-            
-            final_true_positive_examples.append({"problem":problem, "score": score, "pseudocode": pseudocode})
+    if label == 'near_miss': # This is because near_miss comes from both the autoencoder and cosmetic pipelines
+        pipeline = entry["pipeline"]
+    else:
+        pipeline = ''
 
-    for entry in true_negative_examples:
-        # print('entry:')
-        # print(entry)
-        problem = entry["problem"]
-        iter = entry["iter"]
-        score = entry["score"]
-        stage = entry["stage"]
-
-        # [TO DO]: change pseudocode_path_name
-        # if problem in final_true_negative_problems:
-        if problem in intersection_result:
-            pseudocode_path_name = os.path.join(first_problems_dir, "outputs", first_timestamp, f"iter_{iter}", "pseudocodes", f"{problem}_pseudocode_{stage}.txt")
-            # pseudocode_path_name = os.path.join(problems_dir, problem, "outputs", "pseudocodes", timestamp, f"iter_{iter}_pseudocode_{stage}.txt")
-
-            with open(pseudocode_path_name, 'r') as file:
-                pseudocode = file.read()
-            
-            final_true_negative_examples.append({"problem":problem, "score": score, "pseudocode": pseudocode})
-
-    for entry in near_miss_examples:
-        # print('entry:')
-        # print(entry)
-        problem = entry["problem"]
-        iter = entry["iter"]
-        score = entry["score"]
-        stage = entry["stage"]
-
-        # [TO DO]: change pseudocode_path_name
-        # if problem in final_near_miss_problems:
-        if problem in intersection_result:
-            pseudocode_path_name = os.path.join(first_problems_dir, "outputs", first_timestamp, f"iter_{iter}", "pseudocodes", f"{problem}_pseudocode_{stage}.txt")
-            # pseudocode_path_name = os.path.join(problems_dir, problem, "outputs", "pseudocodes", timestamp, f"iter_{iter}_pseudocode_{stage}.txt")
-
-            with open(pseudocode_path_name, 'r') as file:
-                pseudocode = file.read()
-            
-            final_near_miss_examples.append({"problem":problem, "score": score, "pseudocode": pseudocode})
-
-    # for entry in near_miss_examples:
-    for entry in cosmetic_examples:
-        # print('entry:')
-        # print(entry)
-        problem = entry["problem"]
-        iter = entry["iter"]
-        score = entry["score"]
-        stage = entry["stage"]
-
-        # [TO DO]: change pseudocode_path_name
-        # if problem in final_near_pass_problems:
-        if problem in intersection_result:
-            pseudocode_path_name = os.path.join(second_problems_dir, "outputs", second_timestamp, f"iter_{iter}", "pseudocodes", f"{problem}_pseudocode_{stage}.txt")
-            # pseudocode_path_name = os.path.join(problems_dir, problem, "outputs", "pseudocodes", timestamp, f"iter_{iter}_pseudocode_{stage}.txt")
-
-            with open(pseudocode_path_name, 'r') as file:
-                pseudocode = file.read()
-            
-            final_near_pass_examples.append({"problem":problem, "score": score, "pseudocode": pseudocode})
-
-    # what do i want the final jsonl file to look like:
-    # {"problem":problem, "pseudocode_dataset": [{"label": "true_positive","pseudocode": pseudocode,  "score":}, {"label": "true_negative","pseudocode": pseudocode,  "score":}]}
-    # this is what the input_output list looks like 
-    # "input_output": [{"input": "s = \"abcabcbb\"", "output": "3"}, {"input": "s = \"bbbbb\"", "output": "1"}, {"input": "s = \"pwwkew\"", "output": "3"}, {"input": "s = \"abcdabcabcabcd\"", "output": "4"}, {"input": "s = \"abcdefgabcdefgabcdefgabcdefg\"", "output": "7"}, {"input": "s = \"aabbccddeeff\"", "output": "2"}, {"input": "s = \"sldfjldskfjdslkfjsdkljflkjsdfljfsdlkflskdjflsdjflskdjflsdkjflsdfjlsd\"", "output": "6"}, {"input": "s = \"racecar\"", "output": "4"}, {"input": "s = \"abcdefghijklmnopqrstuvwxyz\"", "output": "26"}, {"input": "s = \"aabacbebebe\"", "output": "4"}, {"input": "s = \"ekdvdfis\"", "output": "5"}, {"input": "s = \"aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz1234567890abcdefghijklmnopqrstuvwxyz\"", "output": "36"}, {"input": "s = \"abbaabbaabba\"", "output": "2"}, {"input": "s = \"aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz\"", "output": "2"}, {"input": "s = \"abcdefghihgfedcba\"", "output": "9"}, {"input": "s = \"abcdeffedcba\"", "output": "6"}, {"input": "s = \"aaaaaaaabbbbbbbccccccdddddeeeeeeffffffffggggggg\"", "output": "2"}, {"input": "s = \"tmmzuxt\"", "output": "5"}, {"input": "s = \"nfpdmpi\"", "output": "5"}, {"input": "s = \"anviaj\"", "output": "5"}, {"input": "s = \"abcdeabcde\"", "output": "5"}, {"input": "s = \"abcdabcabcd\"", "output": "4"}, {"input": "s = \"dvdf\"", "output": "3"}, {"input": "s = \"zyxwvutsrqponmlkjihgfedcba\"", "output": "26"}, {"input": "s = \"abcdabcdeabcdabcdeabcd\"", "output": "5"}, {"input": "s = \"rjqzupkoz\"", "output": "8"}, {"input": "s = \"ababababababababab\"", "output": "2"}, {"input": "s = \"!@#$%^&*()_+!@#$%^&*()_+\"", "output": "12"}, {"input": "s = \"cdddddddddddddd\"", "output": "2"}, {"input": "s = \"wobgrovw\"", "output": "6"}, {"input": "s = \"abba\"", "output": "2"}, {"input": "s = \"abcbacabc\"", "output": "3"}, {"input": "s = \"ohvhjdml\"", "output": "6"}, {"input": "s = \"123456789012345678901234567890\"", "output": "10"}, {"input": "s = \"aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz1234567890!@#$%^&*()_+\"", "output": "23"}, {"input": "s = \"12345678901234567890\"", "output": "10"}]
-
-
-    # print('length of positive examples: ', len(final_true_positive_examples))
-    # print('length of negative examples: ', len(final_true_negative_examples))
-    # print('length of negative examples: ', len(final_near_miss_examples))
-    # print('length of negative examples: ', len(final_near_pass_examples))
+    if pipeline == 'cosmetic' or label == 'cosmetic' or split == 'test':
+        problems_dir_name = cosmetic_problems_dir
+        problem_timestamp = cosmetic_timestamp
+    elif pipeline == "autoencoder" or label == 'true_positive' or label == 'true_negative':
+        problems_dir_name = autoencoder_problems_dir
+        problem_timestamp = autoencoder_timestamp
     
-    # return final_true_positive_examples, final_true_negative_examples, final_near_miss_examples, final_near_pass_examples
 
+    if use_timestamp:
+        pseudocode_path_name = os.path.join(problems_dir_name, "outputs", problem_timestamp, f"iter_{iteration}", "pseudocodes", score_folder, f"{problem}_pseudocode_{stage}.txt")
+    else:
+        pseudocode_path_name = os.path.join(problems_dir_name, "outputs", split, f"iter_{iteration}", "pseudocodes", score_folder, f"{problem}_pseudocode_{stage}.txt")
+
+    with open(pseudocode_path_name, 'r') as file:
+        pseudocode = file.read()
+
+    error = ''
+    if label == 'true_negative' or label == 'near_miss':
+        if use_timestamp:
+            error_file_path = os.path.join(problems_dir_name, "outputs", problem_timestamp, f"iter_{iteration}", "errors", score_folder, f"{problem}_errors.txt")
+        else:
+            error_file_path = os.path.join(problems_dir_name, "outputs", split, f"iter_{iteration}", "errors", score_folder, f"{problem}_errors.txt")
+
+        if os.path.isfile(error_file_path):
+            with open(error_file_path, 'r') as file:
+                error = file.read()
+        else:
+            error = ''
+
+    if true_positive_pseudocode:
+        new_entry = {"label": label, "pseudocode": pseudocode,  "score": score, "error": error, "true_positive": true_positive_pseudocode}
+    else:
+        new_entry = {"label": label, "pseudocode": pseudocode,  "score": score, "error": error}
+
+    return new_entry
+
+    
 def create_disjoint_sets_4(set_a, set_b, set_c, set_d):
     """
     Attempts to create four disjoint sets of equal size from the input sets.
@@ -2364,6 +2315,9 @@ def gen_classifier_outputs(pseudocode_encoding_list, classifier_prompt, client):
             message_list.append(message)
         output_responses = client.multi_chat_completion(message_list)
 
+        print('output_responses:')
+        print(output_responses)
+
         # print('output_responses: ', output_responses)
 
         # Write codes to file:
@@ -2428,7 +2382,7 @@ def gen_multi_chat_decodings(dataset_name, problem_cases, decoding_prompt, pseud
 
     return code_decodings_list, task_pseudocodes_codes
 
-def evaluate_classifier_prompt_test(test_set_filename, prompt, client):
+def evaluate_classifier_prompt_test(src_dir, dataset_name, test_set_filename, prompt, client):
     true_positives = []
     true_negatives = []
     num_problems = 0
@@ -2438,7 +2392,9 @@ def evaluate_classifier_prompt_test(test_set_filename, prompt, client):
 
     task_ids = set()
 
-    for problem in read_jsonl(test_set_filename):
+    test_file_path_name = os.path.join(src_dir, dataset_name, test_set_filename)
+
+    for problem in read_jsonl(test_file_path_name):
         num_problems += 1
         task_id = problem["task_id"]
         task_ids.add(task_id)
@@ -2549,20 +2505,15 @@ def evaluate_classifier_prompt_test(test_set_filename, prompt, client):
     # print(final_metrics)
     # return mislabeled_problems, true_negative_errors, near_miss_errors, final_score, metrics
 
-    metrics = check_if_no_metrics(metrics)
-    avg_metrics = average_metrics(metrics)
+    # return mislabeled_positives, mislabeled_negatives, labeled_correctly, avg_metrics
 
-    avg_metrics['final_score'] = final_score
-    avg_metrics['avg_score'] = avg_metrics['accuracy_score']
+    # return avg_metrics
 
-    return mislabeled_positives, mislabeled_negatives, labeled_correctly, avg_metrics
-
-    return avg_metrics
-
-    return mislabeled_positives, mislabeled_negatives, true_negative_errors, final_score, metrics
+    # return mislabeled_positives, mislabeled_negatives, true_negative_errors, final_score, metrics
+    return mislabeled_positives, mislabeled_negatives, labeled_correctly, final_score, metrics
 
 
-def evaluate_classifier_prompt(train_set_filename, prompt, client):
+def evaluate_classifier_prompt(src_dir, dataset_name, train_set_filename, prompt, client):
     # Decide whcih problems to feed to the prompt, first half of the positive examples and first half of the negative examples
     # train_pseudocodes_dataset = positive_examples[:len(positive_examples)//2] + negative_examples[:len(negative_examples)//2]
     true_positives = []
@@ -2577,7 +2528,9 @@ def evaluate_classifier_prompt(train_set_filename, prompt, client):
 
     task_ids = set()
 
-    for problem in read_jsonl(train_set_filename):
+    train_file_path_name = os.path.join(src_dir, dataset_name, train_set_filename)
+
+    for problem in read_jsonl(train_file_path_name):
         num_problems += 1
         task_id = problem["task_id"]
         task_ids.add(task_id)

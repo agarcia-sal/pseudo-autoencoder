@@ -1,9 +1,12 @@
 import logging
 import re
 import os
+import shutil
 import inspect
 import hydra
+import json
 import matplotlib.pyplot as plt
+import pandas as pd
 from openai import OpenAI
 from dotenv import load_dotenv
 from pathlib import Path
@@ -160,7 +163,7 @@ def run_prompt_pseudocode_to_code(prompt):
 #     return prompt.format(
 #         pseudocode=get_pseudocode()
 #     )
-def setup_dataset(timestamp, problems_dir, iterations): # [TO DO]: this needs to be edited!!! for sure. actually i don't need this... 
+def set_up_dataset(timestamp, problems_dir, iterations): # [TO DO]: this needs to be edited!!! for sure. actually i don't need this... 
     base_directory = Path(problems_dir)
     # runs_path = base_directory / "runs"
     # runs_path.mkdir(parents=True, exist_ok=True) 
@@ -170,10 +173,17 @@ def setup_dataset(timestamp, problems_dir, iterations): # [TO DO]: this needs to
     outputs_path = base_directory / "outputs"
     timestamp_path = outputs_path / timestamp
 
+    train_path = outputs_path / "train"
+    test_path = outputs_path / "test"
+
     outputs_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
     print(f"Directory '{outputs_path}' created successfully")
     timestamp_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
     print(f"Directory '{timestamp_path}' created successfully")
+    train_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
+    print(f"Directory '{train_path}' created successfully")
+    test_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
+    print(f"Directory '{test_path}' created successfully")
 
     # for problem in base_directory.iterdir():
     #     if problem.is_dir() and problem.name != 'metrics':
@@ -191,41 +201,57 @@ def setup_dataset(timestamp, problems_dir, iterations): # [TO DO]: this needs to
             # timestamp_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
             # print(f"Directory '{timestamp_path}' created successfully")
 
+    archive_paths = [train_path, test_path, timestamp_path]
+
     for it in range(iterations):
-        iter_path = timestamp_path / f"iter_{it+1}"
-        iter_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
-        # print(f"Directory '{iter_path}' created successfully")
+        for arch_path in archive_paths:
+            iter_path = arch_path / f"iter_{it+1}"
+            iter_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
+            # print(f"Directory '{iter_path}' created successfully")
 
-        previous_best_path = iter_path / "previous_best"
-        pseudocodes_path = iter_path / "pseudocodes"
-        results_path = iter_path / "results"
-        codes_path = iter_path / "decoded_codes"
-        # metrics_path = iter_path / "metrics"
-        errors_path = iter_path / "errors"
-        prompts_path = iter_path / "prompts"
+            previous_best_path = iter_path / "previous_best"
+            pseudocodes_path = iter_path / "pseudocodes"
+            # results_path = iter_path / "results"
+            codes_path = iter_path / "decoded_codes"
+            # metrics_path = iter_path / "metrics"
+            errors_path = iter_path / "errors"
+            prompts_path = iter_path / "prompts"
+            
 
-        success_path = pseudocodes_path / "pass"
-        failure_path = pseudocodes_path / "fail"
-        # near_miss_path = pseudocodes_path / "near_miss"
-        # cosmetic_path = pseudocodes_path / "cosmetic"
+            previous_best_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
+            # print(f"Directory '{stdouts_path}' created successfully")
+            pseudocodes_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
+            # print(f"Directory '{pseudocodes_path}' created successfully")
+            # results_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
+            # print(f"Directory '{results_path}' created successfully")
+            codes_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
+            # print(f"Directory '{codes_path}' created successfully")
+            errors_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
+            # print(f"Directory '{errors_path}' created successfully")
+            prompts_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
+            # print(f"Directory '{prompts_path}' created successfully")
 
-        previous_best_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
-        # print(f"Directory '{stdouts_path}' created successfully")
-        pseudocodes_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
-        # print(f"Directory '{pseudocodes_path}' created successfully")
-        results_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
-        # print(f"Directory '{results_path}' created successfully")
-        codes_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
-        # print(f"Directory '{codes_path}' created successfully")
-        # metrics_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
-        # print(f"Directory '{metrics_path}' created successfully")
-        errors_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
-        # print(f"Directory '{errors_path}' created successfully")
-        prompts_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
-        # print(f"Directory '{prompts_path}' created successfully")
-        success_path.mkdir(parents=True, exist_ok=True)
-        failure_path.mkdir(parents=True, exist_ok=True)
-        # near_miss_path.mkdir(parents=True, exist_ok=True)
+            output_paths = [pseudocodes_path, codes_path, errors_path]
+
+            for path in output_paths:
+
+
+                if 'classifier' in problems_dir:
+                    success_path = path / "pass"
+                    failure_path = path / "fail"
+
+                    success_path.mkdir(parents=True, exist_ok=True)
+                    failure_path.mkdir(parents=True, exist_ok=True)
+                elif 'autoencoder' in problems_dir:
+                    positives_path = path / "positives"
+                    near_misses_path = path / "near_misses"
+                    negatives_path = path / "negatives"
+
+                    positives_path.mkdir(parents=True, exist_ok=True)
+                    near_misses_path.mkdir(parents=True, exist_ok=True)
+                    negatives_path.mkdir(parents=True, exist_ok=True)
+                
+            # near_miss_path.mkdir(parents=True, exist_ok=True)
             
             ##### Make timestamps:
             # pseudocodes_timestamp = pseudocodes_path / timestamp
@@ -245,6 +271,37 @@ def setup_dataset(timestamp, problems_dir, iterations): # [TO DO]: this needs to
     overall_metrics_path = base_directory / "metrics"
     overall_metrics_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
     print(f"Directory '{overall_metrics_path}' created successfully")
+
+def set_up_codebase(ROOT_DIR):
+    base_directory = Path(ROOT_DIR)
+    data_path = base_directory / "data"
+
+    outputs_path = base_directory / "outputs"
+    figures_path = outputs_path / "figures"
+    prompts_path = outputs_path / "prompts"
+
+    data_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
+    print(f"Directory '{data_path}' created successfully")
+    outputs_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
+    print(f"Directory '{outputs_path}' created successfully")
+    figures_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
+    print(f"Directory '{figures_path}' created successfully")
+    prompts_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
+    print(f"Directory '{prompts_path}' created successfully")
+
+    pipeline_list = ['autoencoder', 'cosmetic', 'classifier']
+
+    for pipeline in pipeline_list:
+        pipeline_path = data_path / pipeline
+        leet_code_path = pipeline_path / "leet_code"
+        human_eval_path = pipeline_path / "human_eval"
+
+        pipeline_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
+        print(f"Directory '{pipeline_path}' created successfully")
+        leet_code_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
+        print(f"Directory '{leet_code_path}' created successfully")
+        human_eval_path.mkdir(parents=True, exist_ok=True)  # 'parents=True' creates any necessary parent directories
+        print(f"Directory '{human_eval_path}' created successfully")
 
 
 def get_avg_test_case_length(problems_file_name):
@@ -324,62 +381,89 @@ def preprocess_data(ROOT_DIR):
         reformat_human_eval_file(file_name)
 
 def plot_pipeline(cfg, ROOT_DIR, timestamp, pipeline):
-        problems_dir_name = 'leet_code'
-        # [TO DO]: figure out what to do about the timestamps for autoencoder and classifier cause they might be the same
-        # ^ can't be the same because then the data class doesn't work
-        problem_metrics_file = os.path.join(ROOT_DIR, "data", pipeline, cfg.dataset, "metrics", f"{timestamp}_metrics.json")
-        problem_metrics_file = f"{ROOT_DIR}/data/{problems_dir_name}/metrics/{timestamp}_metrics.json"
-        with open(problem_metrics_file, "r") as f:
-            data = json.load(f)
-        df_pipeline = pd.DataFrame(data)
+    problems_dir_name = 'leet_code'
+    # [TO DO]: figure out what to do about the timestamps for autoencoder and classifier cause they might be the same
+    # ^ can't be the same because then the data class doesn't work
+    problem_metrics_file = os.path.join(ROOT_DIR, "data", pipeline, cfg.dataset, "metrics", f"{timestamp}_metrics.json")
+    with open(problem_metrics_file, "r") as f:
+        data = json.load(f)
+    df_pipeline = pd.DataFrame(data)
 
-        label = ''
-        metrics = []
-        if cfg.dataset == 'leet_code':
-            label = "LeetCode"
-        elif cfg.dataset == 'human_eval':
-            label = "HumanEval"
+    label = ''
+    metrics = []
+    if cfg.dataset == 'leet_code':
+        label = "LeetCode"
+    elif cfg.dataset == 'human_eval':
+        label = "HumanEval"
 
-        agent = ''
-        if cfg.algorithm == 'greedy':
-            agent = 'GreedyRefinenment'
-        elif cfg.algorithm == 'direct_answer':
-            agent = 'DirectAnswer'
+    agent = ''
+    if cfg.algorithm == 'greedy':
+        agent = 'GreedyRefinenment'
+    elif cfg.algorithm == 'direct_answer':
+        agent = 'DirectAnswer'
 
-        table_values = {}
-        if pipeline == 'autoencoder': # [TO DO]: change readability metric
-            metrics = ['avg_score', 'avg_passing_rate', 'avg_syllables_per_word']
-            last_row = df_pipeline.iloc[-1]
-            table_values = {metric: last_row[metric] for metric in metrics}
+    table_values = {}
+    if pipeline == 'autoencoder': # [TO DO]: change readability metric
+        metrics = ['avg_score', 'passing_rate', cfg.readability_metric]
+        last_row = df_pipeline.iloc[-1]
+        table_values = {metric: last_row[metric] for metric in metrics}
 
-        elif pipeline == 'classifier':
-            metrics = ['classifier_score_train', 'classifier_score_val', 'classifier_score_test']
-            for idx in range(-3, -1):
-                row = df_pipeline.iloc[idx]
-                metric = metrics[idx]
-                table_values[metric] = row["avg_score"]
+    elif pipeline == 'classifier':
+        metrics = ['classifier_score_train', 'classifier_score_val', 'classifier_score_test']
+        for idx in range(-3, 0):
+            row = df_pipeline.iloc[idx]
+            metric = metrics[idx]
+            table_values[metric] = row["avg_score"]
 
-        fig, ax = plt.subplots(figsize=(12, 4))
-        ax.axis('tight')
-        ax.axis('off')
+    # print('table_values:')
+    # print(table_values)
 
-        table_data = []
-        for metric in metrics:
-            table_data.append([metric, f"{table_values[metric]:.3f}"])
+    fig, ax = plt.subplots(figsize=(12, 4))
+    ax.axis('tight')
+    ax.axis('off')
 
-        table = ax.table(cellText=table_data,
-                        colLabels=['Metric', f'{label}'],
-                        cellLoc='center',
-                        loc='center',
-                        colColours=['#f0f0f0', '#d0e5ff'])
+    table_data = []
+    for metric in metrics:
+        table_data.append([metric, f"{table_values[metric]:.3f}"])
 
-        table.auto_set_font_size(False)
-        table.set_fontsize(10)
-        table.scale(1, 1.5)
+    table = ax.table(cellText=table_data,
+                    colLabels=['Metric', f'{label}'],
+                    cellLoc='center',
+                    loc='center',
+                    colColours=['#f0f0f0', '#d0e5ff'])
 
-        plt.title(f'Metric Values for {label} Dataset with {agent} Agent', fontsize=14)
-        plt.savefig(os.path.join(ROOT_DIR, "outputs", "figures", f"{pipeline}_{timestamp}.png"), bbox_inches='tight', dpi=300)
+    table.auto_set_font_size(False)
+    table.set_fontsize(10)
+    table.scale(1, 1.5)
+
+    plt.title(f'Metric Values for {label} Dataset with {agent} Agent', fontsize=14)
+    plt.savefig(os.path.join(ROOT_DIR, "outputs", "figures", f"{pipeline}_{timestamp}.png"), bbox_inches='tight', dpi=300)
     
+def empty_folder(folder_path):
+    """
+    Empties the contents of a specified folder.
+    Deletes all files and subdirectories within the folder.
+    """
+    if not os.path.exists(folder_path):
+        print(f"Folder '{folder_path}' does not exist.")
+        return
+
+    for item in os.listdir(folder_path):
+        item_path = os.path.join(folder_path, item)
+        try:
+            if os.path.isfile(item_path) or os.path.islink(item_path):
+                os.unlink(item_path)  # Remove file or symbolic link
+                print(f"Removed file: {item_path}")
+            elif os.path.isdir(item_path):
+                shutil.rmtree(item_path)  # Remove subdirectory and its contents
+                print(f"Removed directory: {item_path}")
+        except OSError as e:
+            print(f"Error deleting {item_path}: {e}")
+
+def delete_file(file_path):
+    if os.path.isfile(file_path) or os.path.islink(file_path):
+        os.unlink(file_path)  # Remove file or symbolic link
+        print(f"Removed file: {file_path}")
 
     
 

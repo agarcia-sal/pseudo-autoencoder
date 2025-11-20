@@ -19,7 +19,9 @@ class Data:
     load_data: callable
     src_dir: str
     ## started adding here:
-    previous_timestamp: str
+    train_set_file_name: str
+    dev_set_file_name: str
+    test_set_file_name: str
 
 
 
@@ -71,7 +73,7 @@ PIPELINE_LIST = ['Autoencoder',
 #         norm_score=norm_score,
 #         get_dev=get_dev,
 #     )
-def get_data(cfg, src_dir='data', version = 'v0.1.0', split='train'):
+def get_data(cfg, src_dir='data', pipeline='autoencoder', split='train'):
     # load_data, _, problem = import_func(f"{src_dir}/{dataset_name}/config.py", 'load_data', 'eval_func', 'DESCRIPTION')
     load_data = lambda x : x
     norm_score = lambda x : x
@@ -84,7 +86,6 @@ def get_data(cfg, src_dir='data', version = 'v0.1.0', split='train'):
     # if split != '':
     #     file_path += f"-{split}"
     # file_path += '.jsonl'
-    problem_cases = list_jsonl_task_ids(file_path)
     # try:
     #     norm_score, = import_func(f"{src_dir}/{dataset_name}/config.py", 'norm_score')
     # except AttributeError:
@@ -98,47 +99,41 @@ def get_data(cfg, src_dir='data', version = 'v0.1.0', split='train'):
     problems_file_name = ''
     train_set_file_name = ''
     dev_set_file_name = ''
-    test_set_fil_name = ''
+    test_set_file_name = ''
 
-    dataset_filename = ''
+    dataset_file_name = ''
     if cfg.dataset == 'leet_code':
-        dataset_filename = 'LeetCode'
+        dataset_file_name = 'LeetCode'
     elif cfg.dataset == 'human_eval':
-        dataset_filename = 'HumanEval'
+        dataset_file_name = 'HumanEval'
 
-    if cfg.pipeline == 'autoencoder':
-        # version = 'v0.1.0'
-        # version = 'v0.3.0-hard' will be v0.3.5 will be 0.3.0 but hard
-        # version = 'v3rd100'
-        version = 'v0.3.0tiny'
-        split = 'train'
-        # problems_filename = f'LeetCodeDataset-v0.3.0-hard-train.jsonl'
-        problems_filename = ''
+    if pipeline == 'autoencoder':
+        problems_file_name = ''
         if cfg.dataset == 'leet_code':
-            problems_filename = f'LeetCodeDataset-{cfg.autoencoder_version}-{cfg.split}.jsonl'
+            problems_file_name = f'LeetCodeDataset-{cfg.autoencoder_version}-{split}.jsonl'
         elif cfg.dataset == 'human_eval':
-            problems_filename = f'HumanEval-{cfg.split}.jsonl'
+            problems_file_name = f'HumanEval-{split}.jsonl'
 
-    elif cfg.pipeline == "cosmetic":
-        problems_filename = f"AutoEncoderLabels_{cfg.autoencoder_timestamp}-{cfg.split}.jsonl"
+    elif pipeline == "cosmetic":
+        problems_file_name = f"AutoEncoderLabels-{cfg.cosmetic_version}-{split}.jsonl"
 
-    elif cfg.pipeline == "classifier":
+    elif pipeline == "classifier":
         version = 3
-        train_set_file_name = f"{dataset_filename}Pseudocodes-v0.{cfg.classifier_version}.0-train.jsonl" # made a change here
-        dev_set_file_name = f"{dataset_filename}Pseudocodes-v0.{cfg.classifier_version}.0-dev.jsonl" # made a change here
-        test_set_file_name = f"{dataset_filename}Pseudocodes-v0.{cfg.classifier_version}.0-test.jsonl" # made a change here
-        problems_filename = train_set_file_name
+        train_set_file_name = f"{dataset_file_name}Pseudocodes-{cfg.classifier_version}-train.jsonl" # made a change here
+        dev_set_file_name = f"{dataset_file_name}Pseudocodes-{cfg.classifier_version}-dev.jsonl" # made a change here
+        test_set_file_name = f"{dataset_file_name}Pseudocodes-{cfg.classifier_version}-test.jsonl" # made a change here
+        problems_file_name = train_set_file_name
     else:
-        problems_filename = f'HumanEval-test.jsonl'
+        problems_file_name = f'HumanEval-test.jsonl'
 
-    file_path = os.path.join(src_dir, cfg.pipeline, cfg.dataset, problems_file_name)
+    file_path = os.path.join(src_dir, pipeline, cfg.dataset, problems_file_name)
     problem_cases = list_jsonl_task_ids(file_path)
 
     return Data(
         config_path='',
-        dataset_name=dataset_name,
+        dataset_name=cfg.dataset,
         problems_file_name=problems_file_name,
-        src_dir=src_dir,
+        src_dir=os.path.join(src_dir, pipeline),
         load_data=load_data,
         problem='',
         solve_template='',
@@ -148,5 +143,5 @@ def get_data(cfg, src_dir='data', version = 'v0.1.0', split='train'):
         get_dev='',
         train_set_file_name=train_set_file_name,
         dev_set_file_name=dev_set_file_name,
-        test_set_fil_name=test_set_file_name,
+        test_set_file_name=test_set_file_name,
     )

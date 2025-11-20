@@ -17,15 +17,14 @@ class Classifier(BasePipeline):
     def __str__(self):
         return f"BasePipeline"
 
-    def __init__(self, client, src_dir, cfg, agent, evaluator, timestamp, final_iter=None, previous_timestamp=None, timeout=10, model='openai/o3-mini', max_iter=64, reasoning_effort='medium'):
+    def __init__(self, client, src_dir, cfg, agent, evaluator, timestamp, split, timeout=10, model='openai/o3-mini', max_iter=64, reasoning_effort='medium'):
         self.client=client
         self.src_dir=src_dir
         self.cfg=cfg
         self.agent=agent
         self.evaluator=evaluator
         self.timestamp=timestamp
-        self.final_iter=final_iter
-        self.previous_timestamp=previous_timestamp
+        self.split=split
         self.timeout = timeout
         self.model = model
         self.stage = 'classifier'
@@ -44,12 +43,6 @@ class Classifier(BasePipeline):
         # [TO DO]: modify the data folder to have human_eval and leet_code folders for the classifier folder
         metrics_path = os.path.join(self.src_dir, "data", self.pipeline_name, self.cfg.dataset, "metrics") # TO DO: fill in the variable names
         self.metrics_path = metrics_path
-        
-        if self.final_iter is not None and self.previous_timestamp is not None:
-            self.decoder_prompt = file_to_string(os.path.join(self.src_dir, "outputs", "prompts", self.previous_timestamp, f"prompt_iter_{self.final_iter}_decoder.txt"))
-        else:
-            self.decoder_prompt = file_to_string(os.path.join(self.src_dir, "prompts", "common", "trivial_decoder_prompt.txt"))
-
         
 
     def run(self):
@@ -72,6 +65,7 @@ class Classifier(BasePipeline):
                               
             except Exception as e:
                 print(f"Error in iteration {it} for stage {self.stage}: {e}")
+                traceback.print_exc()
                 continue 
 
     def finalize(self):
@@ -90,7 +84,7 @@ class Classifier(BasePipeline):
         # test score:
         # [TO DO]: figure out how to include test_file_name in data object
         version = 3
-        test_set_filename = os.path.join(ROOT_DIR, "data", "classifier_pseudocodes", f"LeetCode-pseudo-v0.{version}.0-test.jsonl" )
+        # test_set_filename = os.path.join(ROOT_DIR, "data", "classifier_pseudocodes", f"LeetCodePseudocodes-{version}-test.jsonl" )
         pseudocode_path = os.path.join(self.src_dir, "data", self.pipeline_name, self.cfg.dataset, "outputs", self.timestamp, f"iter_{self.cfg.num_iterations + 3}", "pseudocodes")
         feedback = self.evaluator.evaluate_classifier(prompt, self.client, pseudocode_path, split='test')
         self._save_iteration_results(feedback.avg_metrics, prompt, self.cfg.num_iterations + 3)
@@ -98,7 +92,7 @@ class Classifier(BasePipeline):
                
 
     def _save_iteration_results(self, avg_metrics, prompt, it):
-        save_metrics(avg_metrics, self.metrics_path, self.timestamp, self.stage, it)
+        save_metrics(avg_metrics, self.metrics_path, self.timestamp, self.stage, it, self.split)
         save_prompt(self.generated_prompts_path, prompt, it, self.stage)
 
     def _record_previous_best(self, agent, it):

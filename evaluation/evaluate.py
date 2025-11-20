@@ -1,4 +1,4 @@
-from evaluation.utils import FileLock, ParallelRun, design_optimal, eval_all, filter_dev, filter_test, normalize_metrics, average_metrics, check_if_no_metrics, get_problem_passing_rates, get_problem_readability_scores, record_problem_scores, evaluate_classifier_prompt, evaluate_classifier_prompt_test
+from evaluation.utils import FileLock, ParallelRun, design_optimal, eval_all, filter_dev, filter_test, normalize_metrics, average_metrics, check_if_no_metrics, get_problem_passing_rates, get_problem_readability_scores, record_problem_scores, evaluate_classifier_prompt, evaluate_classifier_prompt_test, write_classifier_pseudocodes_to_file
 import os
 import random
 # import asyncio
@@ -271,26 +271,31 @@ class Evaluator:
 
         # [TO DO]: set up self.data.train_set_filename
         problems_file_name = ''
+        metrics = {}
         if split == 'train':
-            problems_file_name = self.data.train_set_filename
+            problems_file_name = self.data.train_set_file_name
         elif split == 'dev':
-            problems_file_name = self.data.dev_set_filename
+            problems_file_name = self.data.dev_set_file_name
         elif split == 'test':
-            problems_file_name = self.data.test_set_filename
+            problems_file_name = self.data.test_set_file_name
 
-        if split == 'train' or split 'dev':
-            results = evaluate_classifier_prompt(problems_file_name, prompt, client)
+        if split == 'train' or split == 'dev':
+            results = evaluate_classifier_prompt(self.data.src_dir, self.data.dataset_name, problems_file_name, prompt, client)
             mislabeled_positives, mislabeled_cosmetic, mislabeled_negatives, mislabeled_near_misses, labeled_correctly, true_negative_errors, near_miss_errors, final_score, metrics = results
             mislabeled = mislabeled_positives + mislabeled_cosmetic + mislabeled_negatives + mislabeled_near_misses
+
+            feedback = self.get_feedback_classifier(mislabeled_positives, mislabeled_cosmetic, mislabeled_negatives, mislabeled_near_misses, true_negative_errors, near_miss_errors, final_score, metrics) 
+
         elif split == 'test':
-            results = evaluate_classifier_prompt_test(test_set_filename, prompt, client)
-            mislabeled_positives, mislabeled_negatives, labeled_correctly, avg_metrics = results
+            results = evaluate_classifier_prompt_test(self.data.src_dir, self.data.dataset_name, problems_file_name, prompt, client)
+            mislabeled_positives, mislabeled_negatives, labeled_correctly, final_score, metrics = results
             mislabeled = mislabeled_positives + mislabeled_negatives
+
+            feedback = ''
         
-        write_classifier_pseudocodes_to_file(labeled_correctly, os.path.join(pseudocode_path, "pass"))x
+        write_classifier_pseudocodes_to_file(labeled_correctly, os.path.join(pseudocode_path, "pass"))
         write_classifier_pseudocodes_to_file(mislabeled, os.path.join(pseudocode_path, "fail"))
 
-        feedback = self.get_feedback_classifier(mislabeled_positives, mislabeled_cosmetic, mislabeled_negatives, mislabeled_near_misses, true_negative_errors, near_miss_errors, final_score, metrics) 
         
         # problem_passing_rates = get_problem_passing_rates(results)
         # passing_rate = eval_all(results, self.data.problem_cases)
@@ -312,12 +317,12 @@ class Evaluator:
             avg_metrics=avg_metrics,
         )
 
-    def evaluate_cosmetic(self, prompt, prev_stage_prompt, stage, timestamp, it, client):
+    def evaluate_cosmetic(self, prompt, prev_stage_prompt, stage, timestamp, it, client, split, near_miss_threshold):
         runtime = ParallelRun(evaluate_instance)
         with FileLock():
             results, metrics, original_pseudocodes, pseudocodes, errors = runtime(
                 self.data.problem_cases, self.data.dataset_name, self.data.problems_file_name, prompt, prev_stage_prompt,
-                self.data.config_path, self.data.src_dir, stage, timestamp, it, client,
+                self.data.config_path, self.data.src_dir, stage, timestamp, split, it, client, near_miss_threshold,
                 timeout=self.timeout, instance_workers=self.instance_workers, case_workers=self.case_workers)
 
 
@@ -330,8 +335,10 @@ class Evaluator:
         # it's just the bleu score so no need to normalize
         avg_metrics = average_metrics(metrics) # averaged across all problems
 
-        # final_score = passing_rate - avg_metrics['bleu_score'] 
-        final_score = -1*avg_metrics['bleu_score']
+        if split == 'train':
+            final_score = passing_rate - avg_metrics['bleu_score'] # to create more cosmetic changes
+        elif split == 'test':
+            final_score = -1*avg_metrics['bleu_score'] # to create as different pseudocode as possible
 
         avg_metrics['passing_rate'] = passing_rate
         avg_metrics['avg_score'] = final_score
@@ -357,18 +364,22 @@ class Evaluator:
         )
         
 
-    def evaluate(self, prompt, prev_stage_prompt, stage, timestamp, it, client):
+    def evaluate(self, cfg, prompt, prev_stage_prompt, stage, timestamp, split, it, client, near_miss_threshold):
         runtime = ParallelRun(evaluate_instance)
         with FileLock():
             results, metrics, pseudocodes, codes, errors = runtime(
                 self.data.problem_cases, self.data.dataset_name, self.data.problems_file_name, prompt, prev_stage_prompt,
-                self.data.config_path, self.data.src_dir, stage, timestamp, it, client,
+                self.data.config_path, self.data.src_dir, stage, timestamp, split, it, client, near_miss_threshold,
                 timeout=self.timeout, instance_workers=self.instance_workers, case_workers=self.case_workers)
         # print('results in evaluate(): ', results)
         # print('metrics in evaluate(): ', metrics)
         # results = self.data.norm_score(results) # [TO DO]: change this -> apply it to the metrics
         problem_passing_rates = get_problem_passing_rates(results)
         passing_rate = eval_all(results, self.data.problem_cases)
+
+        # [TO DO]: write pseudocodes and codes to file into either the 'pass' or 'fail' folderd
+        # write_pseudocodes_to_file(pseudocode_file_path, problem_passing_rates)
+        # write_codes_to_file(code_file_path, problem_passing_rates)
         # print('passing_rate in evaluate(): ', passing_rate)
         # dev_score = eval_all(filter_dev(results, self.data.get_dev()), self.data.problem_cases) # [TO DO]: uncomment and pass in a get_dev()
         # test_score = eval_all(filter_test(results, self.data.get_dev()), self.data.problem_cases) 
@@ -377,7 +388,7 @@ class Evaluator:
         # print('normalized_metrics in evaluate():', normalize_metrics)
         # problem_readability_scores = get_problem_readability_scores(metrics, "avg_word_length")
         # problem_readability_scores = get_problem_readability_scores(metrics, "readability")
-        problem_readability_scores = get_problem_readability_scores(metrics, "avg_syllables_per_word")
+        problem_readability_scores = get_problem_readability_scores(metrics, cfg.readability_metric)
         # problem_conciseness_scores = get_problem_readability_scores(metrics, "avg_words_per_line")
         avg_metrics = average_metrics(normalized_metrics)
         # avg_metrics = average_metrics(metrics)
@@ -389,7 +400,7 @@ class Evaluator:
             # final_score = 0.5*passing_rate + 4*avg_metrics['avg_word_length'] - avg_metrics['avg_words_per_line']
             # final_score = avg_metrics['avg_word_length'] - avg_metrics['avg_words_per_line']
             # final_score = passing_rate + 4*avg_metrics['avg_word_length'] 
-            final_score = passing_rate + 4*avg_metrics['avg_syllables_per_word'] 
+            final_score = passing_rate + 4*avg_metrics[cfg.readability_metric] 
             # final_score = avg_metrics['avg_word_length'] 
         else:
             final_score = passing_rate
@@ -398,7 +409,7 @@ class Evaluator:
         avg_metrics['passing_rate'] = passing_rate
         avg_metrics['avg_score'] = final_score
         avg_metrics = record_problem_scores(problem_passing_rates, avg_metrics, "passing_rate") # add the problem passing rates to the metrics
-        avg_metrics = record_problem_scores(problem_readability_scores, avg_metrics, "avg_syllables_per_word") # add the problem avg word length to the metrics
+        avg_metrics = record_problem_scores(problem_readability_scores, avg_metrics, cfg.readability_metric) # add the problem avg word length to the metrics
         # avg_metrics = record_problem_scores(problem_conciseness_scores, avg_metrics, "avg_words_per_line") # add the problem avg word length to the metrics
 
         # feedback = self.get_feedback(results, dev_score)

@@ -10,8 +10,8 @@ import numpy as np
 import cProfile
 import pstats
 import traceback
-from utils.utils import init_client, file_to_string, setup_dataset, preprocess_data
-from evaluation.utils import get_pseudocode_dataset, evaluate_classifier_prompt, get_cosmetic_dataset, get_classifier_dataset, write_dataset_to_file, write_error_strings_to_file, evaluate_classifier_prompt_test
+from utils.utils import init_client, file_to_string, set_up_dataset, preprocess_data, plot_pipeline
+from evaluation.utils import evaluate_classifier_prompt, get_cosmetic_dataset, get_classifier_dataset, write_dataset_to_file, write_error_strings_to_file, evaluate_classifier_prompt_test
 # from agents import GreedyRefine
 from evaluation import Evaluator, get_data
 from openai import OpenAI
@@ -19,6 +19,7 @@ from openai import OpenAI
 from pipeline.autoencoder import AutoEncoder
 from pipeline.cosmetic import Cosmetic
 from pipeline.classifier import Classifier
+from pipeline.experiment_runner import ExperimentRunner
 
 
 ROOT_DIR = os.getcwd()
@@ -70,60 +71,102 @@ def main(cfg):
     # preprocess_data(ROOT_DIR) 
     
     # Main algorithm
-    data = get_data(cfg, src_dir=os.path.join(ROOT_DIR, "data"))
 
     timestamp = hydra.core.hydra_config.HydraConfig.get().run.dir.split("/")[-1] # this should syncronize with hydra's timestamp
 
-    if (cfg.evolving_encoding or cfg.evolving_decoding or cfg.evolving_cosmetic or cfg.evolving_classifier) and not cfg.load_previous: 
-        setup_dataset(timestamp, os.path.join(ROOT_DIR, "data", cfg.pipeline, cfg.dataset), cfg.num_iterations + 3) # plus 2 because of the final encoder and decoder verification at the end with train, val, and test splits
-   
-    encoding_agent = ga(
-        client=client,
-        src_dir=ROOT_DIR,
-        timeout=5,
-        model='gpt-4.1-mini', # We use LiteLLM to call API; was previously 'openai/o3-mini'; im assuming to fit in with LiteLLM api
-        stage='encoder'
-    )
-    decoding_agent = ga(
-        client=client,
-        src_dir=ROOT_DIR,
-        timeout=5,
-        model='gpt-4.1-mini', # We use LiteLLM to call API; was previously 'openai/o3-mini'; im assuming to fit in with LiteLLM api
-        stage='decoder'
-    )
-
-    evaluator = Evaluator(data, timeout=5) # [TO DO]: change timeout
-
-    autoencoder = AutoEncoder(
+    # Run all 3 pipelines one after the other
+    experiment_runner = ExperimentRunner(
         client=client, 
         src_dir=ROOT_DIR, 
         cfg=cfg,
-        encoding_agent=encoding_agent, 
-        decoding_agent=decoding_agent, 
-        evaluator=evaluator,
-        timeout=5, 
-        model='gpt-4.1-mini', 
-        stage='encoder', 
-        timestamp=timestamp
+        timestamp=timestamp,
+        ga=ga,
     )
 
-    autoencoder.run()
-    autoencoder.finalize()
+    experiment_runner.run_main_evolution()
+
+    if (cfg.evolving_encoder or cfg.evolving_decoder or cfg.evolving_cosmetic or cfg.evolving_classifier) and not cfg.load_previous and cfg.use_timestamp: 
+        set_up_dataset(timestamp, os.path.join(ROOT_DIR, "data", cfg.pipeline, cfg.dataset), cfg.num_iterations + 3) # plus 2 because of the final encoder and decoder verification at the end with train, val, and test splits
+
+
+    if (cfg.evolving_encoder or cfg.evolving_decoder) and cfg.use_timestamp:
+        encoding_agent = ga(
+            client=client,
+            src_dir=ROOT_DIR,
+            timeout=5,
+            model='gpt-4.1-mini', # We use LiteLLM to call API; was previously 'openai/o3-mini'; im assuming to fit in with LiteLLM api
+            stage='encoder',
+            previous_timestamp = '2025-09-18_21-00-18',
+            prev_iter = 33
+        )
+        decoding_agent = ga(
+            client=client,
+            src_dir=ROOT_DIR,
+            timeout=5,
+            model='gpt-4.1-mini', # We use LiteLLM to call API; was previously 'openai/o3-mini'; im assuming to fit in with LiteLLM api
+            stage='decoder',
+            previous_timestamp = '2025-09-18_21-00-18',
+            prev_iter = 34
+        )
+
+        data = get_data(cfg, os.path.join(ROOT_DIR, "data"), cfg.pipeline, cfg.split)
+
+        evaluator = Evaluator(data, timeout=5) # [TO DO]: change timeout
+
+        autoencoder = AutoEncoder(
+            client=client, 
+            src_dir=ROOT_DIR, 
+            cfg=cfg,
+            encoding_agent=encoding_agent, 
+            decoding_agent=decoding_agent, 
+            evaluator=evaluator,
+            timestamp=timestamp,
+            split=cfg.split,
+            timeout=5, 
+            model='gpt-4.1-mini', 
+            stage='encoder', 
+            
+        )
+        autoencoder.run()
+        autoencoder.finalize()
 
     ######################## Run the cosmetic pipeline ################################
 
-    evaluator_cosmetic = Evaluator(data, timeout=5) 
+    '''
+    To run the classifier, we need to create the pseudocode dataset. The following is the process:
+    ok wait so what's the process? i have to run the cosmetic pipeline for the training and test versions right? ok so what
+    are the steps:
+    1. run autoencoder on the training set to generate the pseudocodes with their labels
+        - each run will have its own timestamp
+        - in config.yaml file, set the following variables:
+        - dataset: leet_code # options: human_eval, leet_code
+        - autoencoder_version: v0.3.0 # for leet_code dataset, specify which version you are using. default is v0.3.0
+        - split: train # options: train or test
+        - the end result is a folder named by the timestamp with all the pseudocodes and codes generated per iteration
+    2. call get_cosmetic_dataset() to get AutoEncoderLabels_timestamp-train.jsonl
+    3. run autoencoder on the testing set to generate the pseudocodes with their labels
+    4. call get_cosmetic_dataset() to get AutoEncoderLabels_timestamp-test.jsonl
+    5. run cosmetic pipeline on AutoEncoderLabels_timestamp-train.jsonl
+    6. call get_classifier_dataset() passing with autoencoder and cosmetic timestamps set in cfg to create {dataset}Pseudocodes-v0.{version}.0-train.jsonl
+    7. run cosmetic pipeline on AutoEncoderLabels_timestamp-test.jsonl
+    8. call get_classifier_dataset() passing with autoencoder and cosmetic timestamps set in cfg to create {dataset}Pseudocodes-v0.{version}.0-test.jsonl
+    9. run classifier pipeline
 
-    cosmetic_agent = ga(
-        client=client,
-        src_dir=ROOT_DIR,
-        timeout=5,
-        model='gpt-4.1-mini', # We use LiteLLM to call API; was previously 'openai/o3-mini'; im assuming to fit in with LiteLLM api
-        stage='cosmetic'
-    )
+
+    '''
 
     if cfg.evolving_cosmetic:
-        get_cosmetic_dataset(cfg)
+        cosmetic_agent = ga(
+            client=client,
+            src_dir=ROOT_DIR,
+            timeout=5,
+            model='gpt-4.1-mini', # We use LiteLLM to call API; was previously 'openai/o3-mini'; im assuming to fit in with LiteLLM api
+            stage='cosmetic'
+        )
+
+        get_cosmetic_dataset(cfg, ROOT_DIR)
+        data = get_data(cfg, os.path.join(ROOT_DIR, "data"), cfg.pipeline, cfg.split)
+        evaluator_cosmetic = Evaluator(data, timeout=5) 
 
         cosmetic = Cosmetic(
             client=client, 
@@ -132,25 +175,27 @@ def main(cfg):
             agent=cosmetic_agent, 
             evaluator=evaluator_cosmetic,
             timestamp=timestamp,
-            final_iter=34,
-            previous_timestamp=cfg.autoencoder_timestamp,
+            split=cfg.split,
             timeout=5, 
             model='gpt-4.1-mini',         
         )
 
         cosmetic.run()
     ######################## Run the classifier: ####################################################
-    
-    classifier_agent = ga(
-        client=client,
-        src_dir=ROOT_DIR,
-        timeout=5,
-        model='gpt-4.1-mini', # We use LiteLLM to call API; was previously 'openai/o3-mini'; im assuming to fit in with LiteLLM api
-        stage='classifier'
-    )
-    
+
     if cfg.evolving_classifier:
-        get_classifier_dataset(cfg, limit=150)
+        classifier_agent = ga(
+            client=client,
+            src_dir=ROOT_DIR,
+            timeout=5,
+            model='gpt-4.1-mini', # We use LiteLLM to call API; was previously 'openai/o3-mini'; im assuming to fit in with LiteLLM ap
+            stage='classifier',
+        )
+
+        get_classifier_dataset(cfg, ROOT_DIR, split='train', limit=150)
+        get_classifier_dataset(cfg, ROOT_DIR, split='test', limit=150)
+        data = get_data(cfg, os.path.join(ROOT_DIR, "data"), cfg.pipeline, cfg.split)
+        evaluator_classifier = Evaluator(data, timeout=5) 
 
         classifier = Classifier(
             client=client, 
@@ -159,8 +204,7 @@ def main(cfg):
             agent=classifier_agent, 
             evaluator=evaluator_classifier,
             timestamp=timestamp,
-            final_iter=34,
-            previous_timestamp=cfg.autoencoder_timestamp,
+            split=cfg.split,
             timeout=5, 
             model='gpt-4.1-mini',         
         )
@@ -168,9 +212,14 @@ def main(cfg):
         classifier.run()
         classifier.finalize()
 
-    if plotting_pipeline:
-        autoencoder_timestamp = ''
-        classifier_timestamp = ''
+    ################################### Plotting: ##########################################################
+
+    if cfg.plotting_pipeline:
+        autoencoder_timestamp = '2025-11-18_14-39-59'
+        classifier_timestamp = '2025-11-18_19-27-00'
+        if not cfg.use_timestamp:
+            autoencoder_timestamp = timestamp
+            classifier_timestamp = timestamp
         plot_pipeline(cfg, ROOT_DIR, autoencoder_timestamp, "autoencoder")
         plot_pipeline(cfg, ROOT_DIR, classifier_timestamp, "classifier")
         plt.show()

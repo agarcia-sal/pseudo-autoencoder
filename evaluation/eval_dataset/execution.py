@@ -403,8 +403,8 @@ def safe_execute(problem: Dict, completion: str, timeout: float):
                 # print('error:', result.stderr)
 
                 if result.stderr:
-                    print('error:')
-                    print(result.stderr)
+                    # print('error:')
+                    # print(result.stderr)
                     test_results.append({"test_case_id": idx, "test_case": test_case, "passed": False, "error": result.stderr})
                     all_passed = False
                 else:
@@ -420,12 +420,12 @@ def safe_execute(problem: Dict, completion: str, timeout: float):
                 test_results.append({"test_case_id": idx, "test_case": test_case, "passed": False, "error": str(e)})
                 all_passed = False
                 
-            if all_passed:
-                # result_list.append({"status": "passed", "num_test_cases": num_test_cases, "num_correct": num_correct, "test_results": test_results})
-                result = [{"status": "passed", "num_test_cases": num_test_cases, "num_correct": num_correct, "test_results": test_results}]
-            else:
-                # result_list.append({"status": "failed", "num_test_cases": num_test_cases, "num_correct": num_correct, "test_results": test_results})
-                result = [{"status": "failed", "num_test_cases": num_test_cases, "num_correct": num_correct, "test_results": test_results}]
+        if all_passed:
+            # result_list.append({"status": "passed", "num_test_cases": num_test_cases, "num_correct": num_correct, "test_results": test_results})
+            result = [{"status": "passed", "num_test_cases": num_test_cases, "num_correct": num_correct, "test_results": test_results}]
+        else:
+            # result_list.append({"status": "failed", "num_test_cases": num_test_cases, "num_correct": num_correct, "test_results": test_results})
+            result = [{"status": "failed", "num_test_cases": num_test_cases, "num_correct": num_correct, "test_results": test_results}]
 
         return result
 
