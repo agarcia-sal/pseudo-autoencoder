@@ -47,16 +47,6 @@ Each agent implements the following functions:
 - `get_previous_best()`: Returns previous best Solution so far to store at each iteration of a pipeline
 - `load_previous()`: If a pipeline stops running prematurely, will return previous best solution up to that point so that the pipeline can continue running
 
-# Pipeline selection
-
-There are 3 pipelines available to run: Autoencoder, Cosmetic, and Classifier. They can be run separately by loading in the timestamps of the previous pipeline or they can be run all at once. To run them individually:
-
-In the cfg/config.yaml file Set the `evolving_encoder`, `evolving_decoder`, `evolving_cosmetic`, `evolving_classifier` flag to True depending on which pipeline you want to run. For the autoencoder pipeline, set the `evolving_encoder` flag to True and `evolving_decoder` flag to False to start off with. The flags will toggle as the autoencoder switches between these two stages.
-
-Also in the cfg/config.yaml file, set `pipeline` to either `autoencoder`, `cosmetic`, `classifier` and specify which dataset you are using by setting `dataset` to either `human_eval` or `leet_code`. Set `num_iterations` to however many iterations you want to run. Default is 32. Set `rounds`, which is the number of iterations run before switching from encoder to decoder and vice versa. Default is 2.
-
-Further, in the cfg/config.yaml file, set `autoencoder_version`, `cosmetic_version`, `classifier_version`. The `autoencoder_version` is the version of the LeetCodeDataset that will be used to start off with. The dataset that the cosmetic pipeline will use will be created throughout the workflow and the version name corresponds to the value set for `cosmetic_version`. The dataset that the classifier pipeline will use will also be created throughout the worfklow and the version name corresponds to the value set for `classifier_version`.
-
 # Workflow for sequential run of the 3 pipelines
 To run the entire workflow at once, set the following values in the config.yaml file:
 - `dataset`: `leet_code` or `human_eval`
@@ -124,6 +114,16 @@ if cfg.plotting_pipeline:
     plot_pipeline(cfg, ROOT_DIR, classifier_timestamp, "classifier")
     plt.show()
 ```
+
+# Pipeline selection
+
+There are 3 pipelines available to run: Autoencoder, Cosmetic, and Classifier. They can be run separately by loading in the timestamps of the previous pipeline or they can be run all at once. To run them individually:
+
+In the cfg/config.yaml file set the `evolving_encoder`, `evolving_decoder`, `evolving_cosmetic`, `evolving_classifier` flag to True depending on which pipeline you want to run. For the autoencoder pipeline, set the `evolving_encoder` flag to True and `evolving_decoder` flag to False to start off with. The flags will toggle as the autoencoder switches between these two stages.
+
+Also in the cfg/config.yaml file, set `pipeline` to either `autoencoder`, `cosmetic`, `classifier` and specify which dataset you are using by setting `dataset` to either `human_eval` or `leet_code`. Set `num_iterations` to however many iterations you want to run. Default is 32. Set `rounds`, which is the number of iterations run before switching from encoder to decoder and vice versa. Default is 2.
+
+Further, in the cfg/config.yaml file, set `autoencoder_version`, `cosmetic_version`, `classifier_version`. The `autoencoder_version` is the version of the LeetCodeDataset that will be used to start off with. The dataset that the cosmetic pipeline will use will be created throughout the workflow and the version name corresponds to the value set for `cosmetic_version`. The dataset that the classifier pipeline will use will also be created throughout the worfklow and the version name corresponds to the value set for `classifier_version`.
 
 # Autoencoder Pipeline
 
