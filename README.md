@@ -16,9 +16,9 @@ Download the raw data from [HumanEval](https://github.com/openai/human-eval) to 
 
 # Usage
 
-Set your OpenAI API key as an environment variable:
+Set your OpenAI API key as an environment variable in an .env file:
 ```bash
-OPENAI_API_KEY="<Your API key>" # see more options in ./cfg/llm_client
+OPENAI_API_KEY="<Your API key>" 
 ```
 
 Create a new conda environment with the pseudo_env.yml file:
@@ -33,6 +33,18 @@ When first running the code, uncomment the line below in the main function:
 ```
 
 The `preprocess_data` function will reformat the HumanEval dataset as well as create a new, shorter version of the LeetCodeDataset-v0.3.0 that will will be a 50% split of medium difficulty and 50% split of hard difficulty instead of a mix of 'easy', 'medium', and 'hard'. The new version of the dataset will be called LeetCodeDataset-v0.3.5-train.jsonl and LeetCodeDataset-v0.3.5-test.jsonl
+
+To run, set values in cfg/config.yaml file or:
+
+```bash
+# e.g., for tsp_aco
+python main.py \
+    algorithm=greedy \ # other options are "direct_answer"
+    dataset=leet_code \ # options: human_eval, leet_code
+    use_timestamp=False \ # for individual run of pipeline, set to True
+    readability_metric=avg_syllables_per_word \ # options are: avg_syllables_per_word and avg_word_length
+    near_miss_threshold=0.8
+```
 
 # Agent Implementations
 
