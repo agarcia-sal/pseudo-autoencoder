@@ -37,7 +37,6 @@ The `preprocess_data` function will reformat the HumanEval dataset as well as cr
 To run, set values in cfg/config.yaml file or:
 
 ```bash
-# e.g., for tsp_aco
 python main.py \
     algorithm=greedy \ # other options are "direct_answer"
     dataset=leet_code \ # options: human_eval, leet_code
