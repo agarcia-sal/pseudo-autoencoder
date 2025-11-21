@@ -32,7 +32,7 @@ When first running the code, uncomment the line below in the main function:
 # preprocess_data(ROOT_DIR) 
 ```
 
-The `preprocess_data` function will reformat the HumanEval dataset as well as create a new, shorter version of the LeetCodeDataset-v0.3.0 that will will be a 50% split of medium difficulty and 50% split of hard difficulty instead of a mix of 'easy', 'medium', and 'hard'. The new version of the dataset will be called LeetCodeDataset-v0.3.5-train.jsonl and LeetCodeDataset-v0.3.5-test.jsonl
+The `preprocess_data` function will create train and test splits for the HumanEval dataset along with some reformatting as well as create a new, shorter version of the LeetCodeDataset-v0.3.0 that will will be a 50% split of medium difficulty and 50% split of hard difficulty instead of a mix of 'easy', 'medium', and 'hard'. The new version of the dataset will be called LeetCodeDataset-v0.3.5-train.jsonl and LeetCodeDataset-v0.3.5-test.jsonl
 
 To run, set values in cfg/config.yaml file or:
 

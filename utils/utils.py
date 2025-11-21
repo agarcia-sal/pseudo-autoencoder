@@ -340,8 +340,8 @@ def reformat_human_eval_file(file_name):
     results = []
     for problem in read_jsonl(file_name):
         task_id = problem["task_id"]
-        task_id = task_id.replace("/", "-")
-        problem["task_id"] = task_id
+        new_task_id = task_id.replace("/", "-")
+        problem["task_id"] = new_task_id
         results.append(problem)
 
     write_jsonl(file_name, results)
@@ -367,18 +367,37 @@ def preprocess_data(ROOT_DIR):
     splits = ['train', 'test']
 
     for limit, split in zip(size_limits, splits):
-        difficulty_map = {"Hard": limit / 2, "Medium": limit /2 }
+        difficulty_map = {"Hard": limit / 2, "Medium": limit / 2 }
         problems_file_name = os.path.join(problems_dir, f'LeetCodeDataset-v0.3.0-{split}.jsonl')
         new_file_name = os.path.join(problems_dir, f'LeetCodeDataset-v0.3.5-{split}.jsonl')
         if os.path.exists(problems_file_name):
             copy_difficulty_problems(problems_file_name, new_file_name, difficulty_map, limit)
+
+    # Create HumanEval train and test splits
+    idx = 1
+    result_train = []
+    result_test = []
+    problems_file_name = os.path.join(ROOT_DIR, "data", "autoencoder", "human_eval", 'HumanEval.jsonl')
+    new_file_name_train = os.path.join(ROOT_DIR, "data", "autoencoder", "human_eval", 'HumanEval-train.jsonl')
+    new_file_name_test = os.path.join(ROOT_DIR, "data", "autoencoder", "human_eval", 'HumanEval-test.jsonl')
+
+    if os.path.exists(problems_file_name):
+        for problem in read_jsonl(problems_file_name):
+            if idx < 135:
+                result_train.append(problem)
+            else:
+                result_test.append(problem)
+            idx += 1
+        write_jsonl(new_file_name_train, result_train)
+        write_jsonl(new_file_name_test, result_test)
 
     # HumanEval reformatting to replace task ids '/' with '-'
     problems_dir = os.path.join(ROOT_DIR, "data", "autoencoder", "human_eval")
     for split in splits:
         problems_file_name = f'HumanEval-{split}.jsonl'
         file_name = os.path.join(problems_dir, problems_file_name)
-        reformat_human_eval_file(file_name)
+        if os.path.exists(file_name):
+            reformat_human_eval_file(file_name)
 
 def plot_pipeline(cfg, ROOT_DIR, timestamp, pipeline):
     problems_dir_name = 'leet_code'
