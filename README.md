@@ -32,7 +32,7 @@ When first running the code, uncomment the line below in the main function:
 # preprocess_data(ROOT_DIR) 
 ```
 
-The `preprocess_data` function will do reformat the HumanEval dataset as well as create a new, shorter version of the LeetCodeDataset-v0.3.0 that will be which will be a 50% split of medium difficulty and 50% split of hard difficulty instead of a mix of 'easy', 'medium', and 'hard'. The new version of the dataset will be called LeetCodeDataset-v0.3.5-train.jsonl and LeetCodeDataset-v0.3.5-test.jsonl
+The `preprocess_data` function will reformat the HumanEval dataset as well as create a new, shorter version of the LeetCodeDataset-v0.3.0 that will will be a 50% split of medium difficulty and 50% split of hard difficulty instead of a mix of 'easy', 'medium', and 'hard'. The new version of the dataset will be called LeetCodeDataset-v0.3.5-train.jsonl and LeetCodeDataset-v0.3.5-test.jsonl
 
 # Agent Implementations
 
@@ -47,18 +47,18 @@ Each agent implements the following functions:
 - `get_previous_best()`: Returns previous best Solution so far to store at each iteration of a pipeline
 - `load_previous()`: If a pipeline stops running prematurely, will return previous best solution up to that point so that the pipeline can continue running
 
-# Workflow for sequential run of the 3 pipelines
+# Workflow for Sequential Run of the 3 Pipelines
 To run the entire workflow at once, set the following values in the config.yaml file:
-- `dataset`: `leet_code` or `human_eval`
-- `use_timestamp`: `False` # if running pipelines individually, set to True
-- `num_iterations`: the number of iterations for a pipeline. Default is 32
-- `rounds`: 2 
-- `evolving_encoder`: True
-- `autoencoder_version`: the version of the LeetCodeDataset being used. Default is v0.3.5 which is the harder version of v0.3.0
-- `cosmetic_version`: v0.1.0 # update this as more datasets for the cosmetic pipeline are created
-- `classifier_version`: v0.1.0
-- `readability_metric`: `avg_syllables_per_word` or `avg_word_length`. Default is `avg_syllables_per_word`    
-- `near_miss_threshold`: 0.8
+- `dataset` to `leet_code` or `human_eval`
+- `use_timestamp` to `False`. If running pipelines individually, set to True
+- `num_iterations`to the number of iterations for a pipeline. Default is 32
+- `rounds` the number of iterations before switching from encoder to decoder and vice versa. Default is 2.
+- `evolving_encoder` to True
+- `autoencoder_version` to the version of the LeetCodeDataset being used. Default is v0.3.5 which is the harder version of v0.3.0
+- `cosmetic_version` to v0.1.0 to start off. Uppdate this as more datasets for the cosmetic pipeline are created for each run
+- `classifier_version`: v0.1.0 to start off. Uppdate this as more datasets for the cosmetic pipeline are created for each run
+- `readability_metric` to `avg_syllables_per_word` or `avg_word_length`. Default is `avg_syllables_per_word`    
+- `near_miss_threshold` to passing rate threshold for a near miss. Default is 0.8
 
 Below is the code to run the entire worfklow at once:
 
