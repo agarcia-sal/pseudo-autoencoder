@@ -3,6 +3,15 @@
 **Data:** [LeetCodeDataset](https://github.com/newfacade/LeetCodeDataset) and [HumanEval](https://github.com/openai/human-eval)
 
 # Download Data
+
+When first running the code, uncomment the line below in the main function:
+
+```python
+# uncomment below when first setting up
+# set_up_codebase(ROOT_DIR)
+```
+The `set_up_codebase` function will set up necessary folder structure.
+
 Download the raw data from [HumanEval](https://github.com/openai/human-eval) to the local directory `data/autoencoder/human_eval` and LeetCodeDataset-v0.3.0-train.jsonl and LeetCodeDataset-v0.3.0-test.jsonl from [LeetCodeDataset](https://github.com/newfacade/LeetCodeDataset) to the local directory `data/autoencoder/leet_code`
 
 # Usage
@@ -20,12 +29,10 @@ conda env create -f pseudo_env.yml
 When first running the code, uncomment the line below in the main function:
 ```python
 # uncomment below when first setting up
-# set_up_codebase(ROOT_DIR)
 # preprocess_data(ROOT_DIR) 
 ```
-The `set_up_codebase` function will set up necessary folder structure.
 
-Meanwhile, the `preprocess_data` function will do reformat the HumanEval dataset as well as create a new, shorter version of the LeetCodeDataset-v0.3.0 that will be which will be a 50% split of medium difficulty and 50% split of hard difficulty instead of a mix of 'easy', 'medium', and 'hard'. The new version of the dataset will be called LeetCodeDataset-v0.3.5-train.jsonl and LeetCodeDataset-v0.3.5-test.jsonl
+The `preprocess_data` function will do reformat the HumanEval dataset as well as create a new, shorter version of the LeetCodeDataset-v0.3.0 that will be which will be a 50% split of medium difficulty and 50% split of hard difficulty instead of a mix of 'easy', 'medium', and 'hard'. The new version of the dataset will be called LeetCodeDataset-v0.3.5-train.jsonl and LeetCodeDataset-v0.3.5-test.jsonl
 
 # Agent Implementations
 
