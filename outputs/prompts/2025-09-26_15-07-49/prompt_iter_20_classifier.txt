@@ -1,0 +1,79 @@
+Given the provided analysis and examples, key failure modes appear to be:
+
+- Missing or mismatched top-level class/method names or signatures expected by the test harness  
+- Incomplete, ambiguous, or underspecified logic, control flow, or data handling  
+- Use of ambiguous or non-standard pseudocode notation, making direct translation to working code impossible  
+- Implicit assumptions about inputs or internal state not explicitly handled or declared  
+- Missing scoping, unreferenced variables, or incomplete helper function definitions  
+
+The prior prompt is very thorough but somewhat verbose and rigid in form, which risks misjudging slight phrasing variations or practical ambiguities. Meanwhile, failures relate heavily to interface mismatch and unclear structural completeness. A more effective prompt should:
+
+- Emphasize **exact interface compliance, including class name and method signatures, exactly matching those expected by tests**  
+- Validate **use of standard, unambiguous pseudocode constructs, explicitly prohibiting implicit or informal descriptions**  
+- Explicitly require **complete declarations: all used variables, functions, classes, and data structures must be clearly declared and scoped**  
+- Demand **deterministic, exhaustive logic covering all input scenarios**, no gaps, no incomplete or missing branches  
+- Require **pseudocode runnable as-is in a standard programming environment after straightforward translation**  
+- Detect **typos or naming/signature inconsistencies that preclude test harness discovery and invocation**  
+- Disallow ambiguous indexing, uses of globals without declaration, or hidden side effects  
+- Make perfectly clear the output is exactly one character, either 1 or 0, nothing else  
+- Include instructions to carefully cross-check every detail involving interfaces, data, and control flow  
+- Provide a minimal but rigorous checklist mental model to the LLM  
+
+---
+
+**Enhanced prompt (single, concise block):**
+
+```
+You will be given a pseudocode snippet representing a purportedly complete solution implementing a specified interface expected by unit tests.  
+Your task is to determine with absolute certainty whether this pseudocode is fully reproducible, meaning it can be directly translated into working code that will pass **all** associated unit tests without failure.
+
+Apply a rigorous, detailed validation per these critical criteria:
+
+1. **Exact Interface and Naming Compliance:**  
+ - The top-level class and its method(s) match the expected names and parameter lists **exactly**.  
+ - All functions, helpers, and classes invoked or referenced within are fully defined, properly scoped, and accessible.  
+ - No naming mismatches or signature discrepancies exist that would prevent test harness recognition or invocation.  
+
+2. **Complete, Unambiguous Logic:**  
+ - Every computational step, initialization, conditional branch, loop, recursion, and return is fully and precisely specified without assumptions or omissions.  
+ - Control flow covers all inputs including normal, edge, and exceptional cases explicitly or documents their handling unambiguously.  
+ - There are no unreachable, contradictory, or missing code paths.  
+ - The pseudocode guarantees termination (no infinite loops or recursion without base cases).  
+
+3. **Explicit Data Structures and Variable Declarations:**  
+ - All variables, data structures, and constants are clearly declared with their types, sizes, and indexing conventions stated or unambiguously inferable without guesswork.  
+ - No use of undeclared variables, hidden globals, or implicit state.  
+ - Indexing and element access explicitly respect bounds and conform to standard indexing semantics.  
+
+4. **Standardized and Translatable Notation:**  
+ - The pseudocode uses clear, conventional programming constructs and operators readily mappable to executable code without inventions, ambiguous shorthand, or inconsistent notation.  
+ - All expressions, operations, and statements have a well-defined, unambiguous meaning.  
+
+Only if **all** of these criteria are met perfectly and without ambiguity, output:
+
+`1`
+
+Otherwise, if **any** defect, ambiguity, mismatch, omission, or implementation obstacle exists, output:
+
+`0`
+
+Produce exactly one character, either `1` or `0`, with no additional text, explanation, or whitespace before or after.
+
+```
+<PSEUDOCODE HERE>
+```
+```
+
+---
+
+This formulation improves upon the prior one by:
+
+- Making explicit the **exact interface matching** demands that frequently slipped (class/method names, args)  
+- Explicitly forbidding hidden state or implicit variables, preventing “NameError”-style failures  
+- Ensuring **logic covers all input cases and is fully spelled out** rather than loosely described  
+- Emphasizing **standard, translatable pseudocode**, preventing ambiguous shorthand pitfalls  
+- Being crisp and unambiguous on output formatting and behavior  
+- Giving a checklist-like structure easy for a model to operationalize  
+- Avoiding verbosity that dilutes critical focus areas, giving a sharper decision boundary that matches the errors seen  
+
+This prompt should improve classification reliability and better align output with true test reproducibility.
