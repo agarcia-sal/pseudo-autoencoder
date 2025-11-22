@@ -424,12 +424,12 @@ def plot_pipeline(cfg, ROOT_DIR, timestamp, pipeline):
     table_values = {}
     if pipeline == 'autoencoder': # [TO DO]: change readability metric
         metrics = ['avg_score', 'passing_rate', cfg.readability_metric]
-        last_row = df_pipeline.iloc[-1]
+        last_row = df_pipeline.iloc[-2] # to get the encoder stage instead of the decoder stage
         table_values = {metric: last_row[metric] for metric in metrics}
 
     elif pipeline == 'classifier':
-        if cfg.dataset == 'human_eval:
-            metrics = ['classifier_score_train', 'classifier_score_val', 'classifier_score_test']
+        if cfg.dataset == 'human_eval':
+            metrics = ['classifier_score_train', 'classifier_score_test']
             starting_idx = -2
         else:
             metrics = ['classifier_score_train', 'classifier_score_val', 'classifier_score_test']

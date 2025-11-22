@@ -16,36 +16,34 @@ class DirectAnswer:
     def __str__(self):
         return f"Directly Answer"
 
-    def __init__(self, client, src_dir, timeout=10, model='openai/o3-mini', stage='encoder', previous_timestamp=None, prev_iter=None, reasoning_effort='medium', **kwargs):
+    def __init__(self, client, src_dir, timeout=10, model='openai/o3-mini', stage='encoder', reasoning_effort='medium', **kwargs):
         self.client=client
         self.src_dir=src_dir
         self.timeout = timeout
         self.model = model
         self.stage = stage
-        self.previous_timestamp = previous_timestamp
-        self.prev_iter = prev_iter
         self.reasoning_effort = reasoning_effort
         self.solution = []
         self.iteration = 0
 
-    def set_prompt(self):
+    def set_prompt(self, cfg):
         
         if self.stage == 'encoder':
-            self.prev_iter = self.cfg.prev_iter_encoder
-            self.previous_timestamp = cfg.previous_timestamp_autoencoder
+            self.prev_iter = cfg.prev_iter_encoder
+            self.previous_timestamp = cfg.previous_autoencoder_label
         elif self.stage == 'decoder':
-            self.prev_iter = self.cfg.prev_iter_decoder
-            self.previous_timestamp = cfg.previous_timestamp_autoencoder
+            self.prev_iter = cfg.prev_iter_decoder
+            self.previous_timestamp = cfg.previous_autoencoder_label
         elif self.stage == 'cosmetic':
-            self.prev_iter = self.cfg.prev_iter_cosmetic
-            self.previous_timestamp = cfg.previous_timestamp_cosmetic
+            self.prev_iter = cfg.prev_iter_cosmetic
+            self.previous_timestamp = cfg.previous_cosmetic_label
         elif self.stage == 'classifier':
-            self.prev_iter = self.cfg.prev_iter_classifier
-            self.previous_timestamp = cfg.previous_timestamp_classifier
+            self.previous_timestamp = cfg.previous_classifier_label
+            self.prev_iter = cfg.prev_iter_classifier
         
 
     def step(self):
-        if self.previous_timestamp is not None and self.final_iter is not None:
+        if self.previous_timestamp is not None and self.prev_iter is not None:
             prompt = file_to_string(os.path.join(self.src_dir, "outputs", "prompts", self.previous_timestamp, f'prompt_iter_{self.prev_iter}_{self.stage}.txt' ))
         else:
             prompt = file_to_string(os.path.join(self.src_dir, "prompts", "common", f"trivial_{self.stage}_prompt.txt"))

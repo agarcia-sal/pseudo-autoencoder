@@ -81,7 +81,7 @@ def main(cfg):
         )
 
         if cfg.algorithm == 'direct_answer':
-            encoding_agent.set_prompt()
+            encoding_agent.set_prompt(cfg)
 
         decoding_agent = ga(
             client=client,
@@ -92,7 +92,7 @@ def main(cfg):
         )
 
         if cfg.algorithm == 'direct_answer':
-            decoding_agent.set_prompt()
+            decoding_agent.set_prompt(cfg)
 
         data = get_data(cfg, os.path.join(ROOT_DIR, "data"), cfg.pipeline, cfg.split)
         evaluator = Evaluator(data, timeout=5) # [TO DO]: change timeout
@@ -109,7 +109,6 @@ def main(cfg):
             timeout=5, 
             model='gpt-4.1-mini', 
             stage='encoder', 
-            
         )
         autoencoder.run()
         autoencoder.finalize()
@@ -131,7 +130,7 @@ def main(cfg):
         )
 
         if cfg.algorithm == 'direct_answer':
-            cosmetic_agent.set_prompt()
+            cosmetic_agent.set_prompt(cfg)
 
         get_cosmetic_dataset(cfg, ROOT_DIR)
         data = get_data(cfg, os.path.join(ROOT_DIR, "data"), cfg.pipeline, cfg.split)
@@ -162,9 +161,9 @@ def main(cfg):
         )
 
         if cfg.algorithm == 'direct_answer':
-            classifier_agent.set_prompt()
+            classifier_agent.set_prompt(cfg)
 
-        if not cfg.load_previous_cosmetic_dataset:
+        if not cfg.load_previous_classifier_dataset:
             get_classifier_dataset(cfg, ROOT_DIR, split='train', limit=150)
             get_classifier_dataset(cfg, ROOT_DIR, split='test', limit=150)
 

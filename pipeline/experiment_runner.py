@@ -66,7 +66,7 @@ class ExperimentRunner:
         )
 
         if self.cfg.algorithm == 'direct_answer':
-            encoding_agent.set_prompt()
+            encoding_agent.set_prompt(self.cfg)
 
         decoding_agent = self.ga(
             client=self.client,
@@ -77,7 +77,7 @@ class ExperimentRunner:
         )
 
         if self.cfg.algorithm == 'direct_answer':
-            decoding_agent.set_prompt()
+            decoding_agent.set_prompt(self.cfg)
 
         data = get_data(self.cfg, os.path.join(self.src_dir, "data"), self.pipeline, split)
 
@@ -111,7 +111,7 @@ class ExperimentRunner:
         )
 
         if self.cfg.algorithm == 'direct_answer':
-            cosmetic_agent.set_prompt()
+            cosmetic_agent.set_prompt(self.cfg)
 
         get_cosmetic_dataset(self.cfg, self.src_dir, split)
         data = get_data(self.cfg, os.path.join(self.src_dir, "data"), self.pipeline, split)
@@ -141,7 +141,7 @@ class ExperimentRunner:
         )
 
         if self.cfg.algorithm == 'direct_answer':
-            classifier_agent.set_prompt()
+            classifier_agent.set_prompt(self.cfg)
 
         get_classifier_dataset(self.cfg, self.src_dir, split='train', limit=150)
         get_classifier_dataset(self.cfg, self.src_dir, split='test', limit=150)
