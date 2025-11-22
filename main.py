@@ -78,21 +78,23 @@ def main(cfg):
             timeout=5,
             model='gpt-4.1-mini', # We use LiteLLM to call API; was previously 'openai/o3-mini'; im assuming to fit in with LiteLLM api
             stage='encoder',
-            previous_timestamp = '2025-09-18_21-00-18',
-            prev_iter = 33
         )
+
+        if cfg.algorithm == 'direct_answer':
+            encoding_agent.set_prompt()
+
         decoding_agent = ga(
             client=client,
             src_dir=ROOT_DIR,
             timeout=5,
             model='gpt-4.1-mini', # We use LiteLLM to call API; was previously 'openai/o3-mini'; im assuming to fit in with LiteLLM api
             stage='decoder',
-            previous_timestamp = '2025-09-18_21-00-18',
-            prev_iter = 34
         )
 
-        data = get_data(cfg, os.path.join(ROOT_DIR, "data"), cfg.pipeline, cfg.split)
+        if cfg.algorithm == 'direct_answer':
+            decoding_agent.set_prompt()
 
+        data = get_data(cfg, os.path.join(ROOT_DIR, "data"), cfg.pipeline, cfg.split)
         evaluator = Evaluator(data, timeout=5) # [TO DO]: change timeout
 
         autoencoder = AutoEncoder(
@@ -112,6 +114,11 @@ def main(cfg):
         autoencoder.run()
         autoencoder.finalize()
 
+        if cfg.plotting_pipeline:
+            autoencoder_timestamp = timestamp
+            plot_pipeline(cfg, ROOT_DIR, autoencoder_timestamp, "autoencoder")
+            plt.show()
+
     ######################## Run the cosmetic pipeline ################################
 
     if cfg.evolving_cosmetic and cfg.use_timestamp:
@@ -122,6 +129,9 @@ def main(cfg):
             model='gpt-4.1-mini', # We use LiteLLM to call API; was previously 'openai/o3-mini'; im assuming to fit in with LiteLLM api
             stage='cosmetic'
         )
+
+        if cfg.algorithm == 'direct_answer':
+            cosmetic_agent.set_prompt()
 
         get_cosmetic_dataset(cfg, ROOT_DIR)
         data = get_data(cfg, os.path.join(ROOT_DIR, "data"), cfg.pipeline, cfg.split)
@@ -151,8 +161,13 @@ def main(cfg):
             stage='classifier',
         )
 
-        get_classifier_dataset(cfg, ROOT_DIR, split='train', limit=150)
-        get_classifier_dataset(cfg, ROOT_DIR, split='test', limit=150)
+        if cfg.algorithm == 'direct_answer':
+            classifier_agent.set_prompt()
+
+        if not cfg.load_previous_cosmetic_dataset:
+            get_classifier_dataset(cfg, ROOT_DIR, split='train', limit=150)
+            get_classifier_dataset(cfg, ROOT_DIR, split='test', limit=150)
+
         data = get_data(cfg, os.path.join(ROOT_DIR, "data"), cfg.pipeline, cfg.split)
         evaluator_classifier = Evaluator(data, timeout=5) 
 
@@ -171,14 +186,16 @@ def main(cfg):
         classifier.run()
         classifier.finalize()
 
+        if cfg.plotting_pipeline:
+            classifier_timestamp = timestamp
+            plot_pipeline(cfg, ROOT_DIR, classifier_timestamp, "classifier")
+            plt.show()
+
     ################################### Plotting: ##########################################################
 
-    if cfg.plotting_pipeline:
-        autoencoder_timestamp = '2025-11-18_14-39-59'
-        classifier_timestamp = '2025-11-18_19-27-00'
-        if not cfg.use_timestamp:
-            autoencoder_timestamp = timestamp
-            classifier_timestamp = timestamp
+    if cfg.plotting_pipeline and not cfg.use_timestamp:
+        autoencoder_timestamp = timestamp
+        classifier_timestamp = timestamp
         plot_pipeline(cfg, ROOT_DIR, autoencoder_timestamp, "autoencoder")
         plot_pipeline(cfg, ROOT_DIR, classifier_timestamp, "classifier")
         plt.show()

@@ -77,17 +77,20 @@ class Classifier(BasePipeline):
         self._save_iteration_results(feedback.avg_metrics, prompt, self.cfg.num_iterations + 1)
 
         # dev score:
-        pseudocode_path = os.path.join(self.src_dir, "data", self.pipeline_name, self.cfg.dataset, "outputs", self.timestamp, f"iter_{self.cfg.num_iterations + 2}", "pseudocodes")
-        feedback = self.evaluator.evaluate_classifier(prompt, self.client, pseudocode_path, split='dev')
-        self._save_iteration_results(feedback.avg_metrics, prompt, self.cfg.num_iterations + 2)
-
+        if self.cfg.dataset != 'human_eval':
+            num_test_iterations = self.cfg.num_iterations + 3
+            pseudocode_path = os.path.join(self.src_dir, "data", self.pipeline_name, self.cfg.dataset, "outputs", self.timestamp, f"iter_{self.cfg.num_iterations + 2}", "pseudocodes")
+            feedback = self.evaluator.evaluate_classifier(prompt, self.client, pseudocode_path, split='dev')
+            self._save_iteration_results(feedback.avg_metrics, prompt, self.cfg.num_iterations + 2)
+        else:
+            num_test_iterations = self.cfg.num_iterations + 2
         # test score:
         # [TO DO]: figure out how to include test_file_name in data object
         version = 3
         # test_set_filename = os.path.join(ROOT_DIR, "data", "classifier_pseudocodes", f"LeetCodePseudocodes-{version}-test.jsonl" )
         pseudocode_path = os.path.join(self.src_dir, "data", self.pipeline_name, self.cfg.dataset, "outputs", self.timestamp, f"iter_{self.cfg.num_iterations + 3}", "pseudocodes")
         feedback = self.evaluator.evaluate_classifier(prompt, self.client, pseudocode_path, split='test')
-        self._save_iteration_results(feedback.avg_metrics, prompt, self.cfg.num_iterations + 3)
+        self._save_iteration_results(feedback.avg_metrics, prompt, num_test_iterations)
 
                
 

@@ -341,7 +341,7 @@ def reformat_human_eval_file(file_name):
     for problem in read_jsonl(file_name):
         task_id = problem["task_id"]
         new_task_id = task_id.replace("/", "-")
-        problem["task_id"] = new_task_id
+        problem["task_id"] = new_task_idf
         results.append(problem)
 
     write_jsonl(file_name, results)
@@ -428,8 +428,13 @@ def plot_pipeline(cfg, ROOT_DIR, timestamp, pipeline):
         table_values = {metric: last_row[metric] for metric in metrics}
 
     elif pipeline == 'classifier':
-        metrics = ['classifier_score_train', 'classifier_score_val', 'classifier_score_test']
-        for idx in range(-3, 0):
+        if cfg.dataset == 'human_eval:
+            metrics = ['classifier_score_train', 'classifier_score_val', 'classifier_score_test']
+            starting_idx = -2
+        else:
+            metrics = ['classifier_score_train', 'classifier_score_val', 'classifier_score_test']
+            starting_idx = -3
+        for idx in range(starting_idx, 0):
             row = df_pipeline.iloc[idx]
             metric = metrics[idx]
             table_values[metric] = row["avg_score"]
