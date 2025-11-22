@@ -1,0 +1,38 @@
+CLASS Solution  
+    FUNCTION getProbability(balls)  
+        FUNCTION dfs(ind, leftCount, delta)  
+            IF NOT (ind < k) THEN  
+                IF (leftCount = 0) AND (delta = 0) THEN  
+                    OUTPUT 1  
+                ELSE  
+                    OUTPUT 0  
+                END IF  
+            ELSE IF leftCount < 0 THEN  
+                OUTPUT 0  
+            END IF  
+
+            SET accumulator AS 0  
+            SET upper_bound TO balls[ind]  
+            SET indexVar TO 0  
+            WHILE indexVar <= upper_bound DO  
+                IF indexVar = upper_bound THEN  
+                    SET offset TO 1  
+                ELSE  
+                    IF indexVar = 0 THEN  
+                        SET offset TO -1  
+                    ELSE  
+                        SET offset TO 0  
+                    END IF  
+                END IF  
+                SET partialResult TO dfs(ind + 1, leftCount - indexVar, delta + offset)  
+                SET accumulator TO accumulator + (partialResult * combination(balls[ind], indexVar))  
+                SET indexVar TO indexVar + 1  
+            END WHILE  
+            OUTPUT accumulator  
+        END FUNCTION  
+
+        SET halfSum AS (sum over val IN balls: val) / 2  
+        SET k AS LENGTH OF balls  
+        OUTPUT dfs(0, halfSum, 0) / combination(halfSum + halfSum, halfSum)  
+    END FUNCTION  
+END CLASS

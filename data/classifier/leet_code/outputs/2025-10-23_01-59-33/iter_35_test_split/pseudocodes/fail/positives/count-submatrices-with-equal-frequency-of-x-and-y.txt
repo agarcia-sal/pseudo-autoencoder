@@ -1,0 +1,57 @@
+```pseudocode
+CLASS Solution
+    FUNCTION numberOfSubmatrices(grid)
+        SET result RETURN_VALUE TO 0
+        IF NOT (grid != EMPTY AND grid[0] != EMPTY)
+            RETURN 0
+        END IF
+
+        SET total_rows R TO LENGTH(grid)
+        SET total_cols S TO LENGTH(grid[0])
+        INITIALIZE prefix_accumulator P TO ARRAY OF SIZE (R + 1) WITH EACH ELEMENT BEING ARRAY OF SIZE (S + 1) FILLED WITH [0,0]
+
+        FUNCTION compute_prefix(m, n)
+            IF m > R THEN RETURN
+            IF n > S THEN CALL compute_prefix(m + 1, 1); RETURN
+            LET top_left = P[m - 1][n][0]
+            LET left_top = P[m][n - 1][0]
+            LET diagonal = P[m - 1][n - 1][0]
+
+            LET top_left_y = P[m - 1][n][1]
+            LET left_top_y = P[m][n - 1][1]
+            LET diagonal_y = P[m - 1][n - 1][1]
+
+            SET P[m][n][0] TO (top_left + left_top - diagonal)
+            SET P[m][n][1] TO (top_left_y + left_top_y - diagonal_y)
+
+            LET current_char = grid[m - 1][n - 1]
+            IF current_char == 'X'
+                SET P[m][n][0] TO (P[m][n][0] + 1)
+            ELSE IF current_char == 'Y'
+                SET P[m][n][1] TO (P[m][n][1] + 1)
+            END IF
+
+            CALL compute_prefix(m, n + 1)
+        END FUNCTION
+
+        CALL compute_prefix(1, 1)
+
+        FUNCTION count_valid(m, n)
+            IF m > R THEN RETURN
+            IF n > S THEN CALL count_valid(m + 1, 1); RETURN
+
+            LET x_c = P[m][n][0]
+            LET y_c = P[m][n][1]
+
+            IF x_c > 0 AND (x_c == y_c)
+                SET result TO (result + 1)
+            END IF
+
+            CALL count_valid(m, n + 1)
+        END FUNCTION
+
+        CALL count_valid(1, 1)
+        RETURN result
+    END FUNCTION
+END CLASS
+```

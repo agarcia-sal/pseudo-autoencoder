@@ -1,0 +1,72 @@
+CLASS Solution  
+    FUNCTION secondMinimum(n  
+                            edges  
+                            time  
+                            change)  
+        SET web TO empty dictionary  
+        SET index TO 1  
+        WHILE index LESS THAN OR EQUAL TO n  
+            SET web[index] TO empty list  
+            INCREMENT index BY 1  
+        END WHILE  
+        
+        SET pairIndex TO 0  
+        WHILE pairIndex LESS THAN LENGTH(edges)  
+            SET x TO edges[pairIndex][0]  
+            SET y TO edges[pairIndex][1]  
+            APPEND y TO web[x]  
+            APPEND x TO web[y]  
+            INCREMENT pairIndex BY 1  
+        END WHILE  
+        
+        SET deq TO a list containing one tuple: (1, 0, 0)  
+        SET minimalTimes TO a dictionary  
+        SET keyIndex TO 1  
+        WHILE keyIndex LESS THAN OR EQUAL TO n  
+            SET minimalTimes[keyIndex] TO [∞, ∞]  
+            INCREMENT keyIndex BY 1  
+        END WHILE  
+        SET minimalTimes[1][0] TO 0  
+        
+        WHILE LENGTH(deq) GREATER THAN 0  
+            REMOVE first element FROM deq AND ASSIGN TO node, elapsed, cnt  
+            
+            IF node EQUALS n THEN  
+                IF cnt EQUALS 1 THEN  
+                    RETURN elapsed  
+                ELSE  
+                    CONTINUE  
+                END IF  
+            END IF  
+            
+            SET period TO elapsed DIV change  
+            IF (period MOD 2) EQUALS 0 THEN  
+                SET nxtElapsed TO elapsed PLUS time  
+            ELSE  
+                SET nxtElapsed TO ((period PLUS 1) MULTIPLIED BY change) PLUS time  
+            END IF  
+            
+            SET nbIndex TO 0  
+            SET neighborsList TO web[node]  
+            WHILE nbIndex LESS THAN LENGTH(neighborsList)  
+                SET neighbor TO neighborsList[nbIndex]  
+                
+                SET firstMin TO minimalTimes[neighbor][0]  
+                SET secondMin TO minimalTimes[neighbor][1]  
+                
+                IF firstMin GREATER THAN nxtElapsed THEN  
+                    SET minimalTimes[neighbor][1] TO firstMin  
+                    SET minimalTimes[neighbor][0] TO nxtElapsed  
+                    APPEND (neighbor, nxtElapsed, 0) TO deq  
+                ELSE IF firstMin LESS THAN nxtElapsed AND nxtElapsed LESS THAN secondMin THEN  
+                    SET minimalTimes[neighbor][1] TO nxtElapsed  
+                    APPEND (neighbor, nxtElapsed, 1) TO deq  
+                END IF  
+                
+                INCREMENT nbIndex BY 1  
+            END WHILE  
+        END WHILE  
+        
+        RETURN -1  
+    END FUNCTION  
+END CLASS

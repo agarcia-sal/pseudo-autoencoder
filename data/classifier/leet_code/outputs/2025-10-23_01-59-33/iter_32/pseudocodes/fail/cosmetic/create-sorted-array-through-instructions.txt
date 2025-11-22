@@ -1,0 +1,42 @@
+CLASS Solution  
+    FUNCTION createSortedArray(instructions)  
+        ASSIGN MOD ← 1 + (10 ^ 9)  
+        ASSIGN MAX ← 1 + MAX_VALUE(instructions)  
+        ASSIGN bit ← LIST_OF_ZEROS_WITH_LENGTH(MAX)  
+
+        FUNCTION update(idx val)  
+            LOOP  
+                IF NOT (idx < MAX) THEN BREAK  
+                bit[idx] ← bit[idx] + val  
+                idx ← idx + (idx AND (-idx))  
+            END LOOP  
+        END FUNCTION  
+
+        FUNCTION query(idx)  
+            ASSIGN acc ← 0  
+            REPEAT WHILE idx > 0  
+                acc ← acc + bit[idx]  
+                idx ← idx - (idx AND (-idx))  
+            END REPEAT  
+            RETURN acc  
+        END FUNCTION  
+
+        ASSIGN total_cost ← 0  
+        SET enumerator ← ENUMERATE(instructions)  
+        FOR EACH i_num IN enumerator  
+            LET i ← i_num[0]  
+            LET num ← i_num[1]  
+            ASSIGN less_than ← query(num - 1)  
+            ASSIGN greater_than ← i - query(num)  
+            IF less_than <= greater_than THEN  
+                ASSIGN cost ← less_than  
+            ELSE  
+                ASSIGN cost ← greater_than  
+            END IF  
+            total_cost ← (total_cost + cost) MOD MOD  
+            CALL update(num, 1)  
+        END FOR  
+
+        RETURN total_cost  
+    END FUNCTION  
+END CLASS

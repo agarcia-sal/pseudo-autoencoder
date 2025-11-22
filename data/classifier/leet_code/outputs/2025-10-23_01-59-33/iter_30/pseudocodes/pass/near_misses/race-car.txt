@@ -1,0 +1,48 @@
+CLASS Solution
+    FUNCTION racecar(target)
+        DECLARE queue AS new empty list
+        DECLARE seen AS new empty dictionary
+        INSERT [0, 1, 0] AT END OF queue
+        MARK key (0, 1) AS true IN seen
+
+        DEFINE FUNCTION explore()
+            IF LENGTH OF queue IS ZERO
+                RETURN
+            END IF
+
+            REMOVE first_element FROM queue
+            ASSIGN current_position TO first_element[0]
+            ASSIGN current_speed TO first_element[1]
+            ASSIGN current_steps TO first_element[2]
+
+            IF current_position = target THEN
+                RETURN current_steps
+            END IF
+
+            DECLARE position_candidate = current_position + current_speed
+            DECLARE speed_candidate = current_speed * 2
+            DECLARE key1 = (position_candidate, speed_candidate)
+
+            IF NOT seen CONTAINS key1 AND position_candidate >= 0 AND position_candidate < 2 * target THEN
+                MARK key1 AS true IN seen
+                APPEND [position_candidate, speed_candidate, current_steps + 1] TO queue
+            END IF
+
+            IF current_speed > 0 THEN
+                ASSIGN speed_candidate TO -1
+            ELSE
+                ASSIGN speed_candidate TO 1
+            END IF
+            DECLARE key2 = (current_position, speed_candidate)
+
+            IF NOT seen CONTAINS key2 AND current_position >= 0 AND current_position < 2 * target THEN
+                MARK key2 AS true IN seen
+                APPEND [current_position, speed_candidate, current_steps + 1] TO queue
+            END IF
+
+            RETURN explore()
+        END FUNCTION
+
+        RETURN explore()
+    END FUNCTION
+END CLASS

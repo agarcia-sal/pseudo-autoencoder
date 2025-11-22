@@ -1,0 +1,103 @@
+CLASS Solution
+    FUNCTION sortItems(n, m, group, beforeItems)
+        SET next_group_id TO m
+        SET idx TO 0
+        WHILE idx LESS THAN n
+            IF group[idx] EQUALS -1
+                ASSIGN next_group_id TO group[idx]
+                INCREMENT next_group_id
+            END IF
+            INCREMENT idx
+        END WHILE
+
+        ASSIGN group_contents TO empty dictionary mapping keys to empty lists
+        ASSIGN adjacency_per_group TO empty dictionary mapping keys to empty lists
+        ASSIGN adjacency_per_item TO empty dictionary mapping keys to empty lists
+        ASSIGN in_degree_per_item TO list of zeros repeated n times
+        ASSIGN in_degree_per_group TO list of zeros repeated next_group_id times
+
+        ASSIGN index_var TO 0
+        WHILE index_var LESS THAN n
+            APPEND index_var TO group_contents[group[index_var]]
+            INCREMENT index_var
+        END WHILE
+
+        SET outer_index TO 0
+        WHILE outer_index LESS THAN n
+            SET inner_index TO 0
+            SET current_dependencies TO beforeItems[outer_index]
+            WHILE inner_index LESS THAN LENGTH OF current_dependencies
+                SET dependency TO current_dependencies[inner_index]
+                IF NOT (group[dependency] DIFFERENT FROM group[outer_index])
+                    APPEND outer_index TO adjacency_per_item[dependency]
+                    in_degree_per_item[outer_index] = in_degree_per_item[outer_index] + 1
+                ELSE
+                    APPEND group[outer_index] TO adjacency_per_group[group[dependency]]
+                    in_degree_per_group[group[outer_index]] = in_degree_per_group[group[outer_index]] + 1
+                END IF
+                INCREMENT inner_index
+            END WHILE
+            INCREMENT outer_index
+        END WHILE
+
+        FUNCTION topological_sort(graph, in_degree, items)
+            ASSIGN processing_queue TO empty double-ended queue
+            ASSIGN collected_result TO empty list
+
+            FOR each element IN items
+                IF in_degree[element] EQUALS 0
+                    APPEND element TO processing_queue
+                END IF
+            END FOR
+
+            WHILE LENGTH OF processing_queue GREATER THAN 0
+                REMOVE front OF processing_queue AND STORE IN current_node
+                APPEND current_node TO collected_result
+                ASSIGN neighbors TO graph[current_node]
+                ASSIGN neighbor_counter TO 0
+                WHILE neighbor_counter LESS THAN LENGTH OF neighbors
+                    SET neighbor TO neighbors[neighbor_counter]
+                    DECREMENT in_degree[neighbor] BY 1
+                    IF in_degree[neighbor] EQUALS 0
+                        APPEND neighbor TO processing_queue
+                    END IF
+                    INCREMENT neighbor_counter
+                END WHILE
+            END WHILE
+
+            IF LENGTH OF collected_result EQUALS LENGTH OF items
+                RETURN collected_result
+            ELSE
+                RETURN empty list
+            END IF
+        END FUNCTION
+
+        ASSIGN global_sorted_items TO empty list
+        FOR EACH group_key IN group_contents KEYS
+            ASSIGN sorted_sequence TO topological_sort(adjacency_per_item, in_degree_per_item, group_contents[group_key])
+            IF LENGTH OF sorted_sequence EQUALS 0
+                RETURN empty list
+            END IF
+            FOR each element IN sorted_sequence
+                APPEND element TO global_sorted_items
+            END FOR
+        END FOR
+
+        ASSIGN sorted_group_order TO topological_sort(adjacency_per_group, in_degree_per_group, LIST OF INTEGERS FROM 0 TO next_group_id MINUS 1)
+        IF LENGTH OF sorted_group_order EQUALS 0
+            RETURN empty list
+        END IF
+
+        ASSIGN ordered_items_per_group TO empty dictionary mapping keys to empty lists
+        FOR EACH sorted_item IN global_sorted_items
+            APPEND sorted_item TO ordered_items_per_group[group[sorted_item]]
+        END FOR
+
+        ASSIGN final_sorted_list TO empty list
+        FOR EACH group_in_order IN sorted_group_order
+            CONCATENATE ordered_items_per_group[group_in_order] TO final_sorted_list
+        END FOR
+
+        RETURN final_sorted_list
+    END FUNCTION
+END CLASS

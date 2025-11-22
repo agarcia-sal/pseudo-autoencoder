@@ -1,0 +1,145 @@
+```  
+CLASS UnionFind  
+    FUNCTION __init__(self, n)  
+        PROCEDURE buildList(x, y, z, acc)  
+            IF y GREATER THAN z THEN  
+                RETURN acc  
+            ELSE  
+                RETURN buildList(x, y + 1, z, acc + [y])  
+            END IF  
+        END PROCEDURE  
+  
+        SET tempA TO buildList(0, 0, n - 1, [])  
+        SET tempB TO []  
+        PROCEDURE fillOnes(count, arr)  
+            IF count EQUALS 0 THEN  
+                RETURN arr  
+            ELSE  
+                RETURN fillOnes(count - 1, arr + [1])  
+            END IF  
+        END PROCEDURE  
+  
+        SET tempB TO fillOnes(n, [])  
+        SET self.parent TO tempA  
+        SET self.rank TO tempB  
+    END FUNCTION  
+  
+    FUNCTION find(self, u)  
+        FUNCTION internalFind(x)  
+            IF self.parent[x] EQUALS x THEN  
+                RETURN x  
+            ELSE  
+                SET r TO internalFind(self.parent[x])  
+                SET self.parent[x] TO r  
+                RETURN r  
+            END IF  
+        END FUNCTION  
+  
+        RETURN internalFind(u)  
+    END FUNCTION  
+  
+    FUNCTION union(self, u, v)  
+        SET aVal TO self.find(u)  
+        SET bVal TO self.find(v)  
+        IF (aVal NOT EQUALS bVal) THEN  
+            IF (self.rank[aVal] GREATER THAN self.rank[bVal]) THEN  
+                SET self.parent[bVal] TO aVal  
+            ELSE   
+                IF (self.rank[aVal] LESS THAN self.rank[bVal]) THEN  
+                    SET self.parent[aVal] TO bVal  
+                ELSE  
+                    SET self.parent[bVal] TO aVal  
+                    SET tempC TO self.rank[aVal] + (1 * 1)  
+                    SET self.rank[aVal] TO tempC  
+                END IF  
+            END IF  
+        END IF  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION minimumCost(self, n, edges, query)  
+        SET ufVar TO UnionFind(n)  
+  
+        SET maxInt TO (2 SHIFT_LEFT_BY 32) - 1  
+        PROCEDURE initList(size, val, acc)  
+            IF size EQUALS 0 THEN  
+                RETURN acc  
+            ELSE  
+                RETURN initList(size - 1, val, acc + [val])  
+            END IF  
+        END PROCEDURE  
+  
+        SET compAnd TO initList(n, maxInt, [])  
+  
+        PROCEDURE processEdges(idx, arr)  
+            IF idx GREATER_OR_EQUALS LENGTH(arr) THEN  
+                RETURN  
+            ELSE  
+                SET triple TO arr[idx]  
+                SET first TO triple[0]  
+                SET second TO triple[1]  
+                SET weight TO triple[2]  
+  
+                CALL ufVar.union(first, second)  
+  
+                SET rootIdx TO ufVar.find(first)  
+  
+                SET newVal TO compAnd[rootIdx] BITWISE_AND weight  
+  
+                SET compAnd[rootIdx] TO newVal  
+  
+                CALL processEdges(idx + 1, arr)  
+            END IF  
+        END PROCEDURE  
+  
+        CALL processEdges(0, edges)  
+  
+        SET compCost TO {}  
+  
+        PROCEDURE buildCostMap(i)  
+            IF i GREATER_OR_EQUALS n THEN  
+                RETURN  
+            ELSE  
+                SET r TO ufVar.find(i)  
+                IF r NOT_IN compCost THEN  
+                    SET compCost[r] TO compAnd[r]  
+                END IF  
+                CALL buildCostMap(i + 1)  
+            END IF  
+        END PROCEDURE  
+  
+        CALL buildCostMap(0)  
+  
+        SET resList TO []  
+  
+        PROCEDURE processQueries(j)  
+            IF j GREATER_OR_EQUALS LENGTH(query) THEN  
+                RETURN  
+            ELSE  
+                SET qPair TO query[j]  
+                SET leftVal TO qPair[0]  
+                SET rightVal TO qPair[1]  
+  
+                IF leftVal EQUALS rightVal THEN  
+                    SET resList TO resList + [0]  
+                ELSE  
+                    SET rootLeft TO ufVar.find(leftVal)  
+                    SET rootRight TO ufVar.find(rightVal)  
+  
+                    IF rootLeft EQUALS rootRight THEN  
+                        SET resList TO resList + [compCost[rootLeft]]  
+                    ELSE  
+                        SET resList TO resList + [-1]  
+                    END IF  
+                END IF  
+                CALL processQueries(j + 1)  
+            END IF  
+        END PROCEDURE  
+  
+        CALL processQueries(0)  
+  
+        RETURN resList  
+    END FUNCTION  
+END CLASS  
+```

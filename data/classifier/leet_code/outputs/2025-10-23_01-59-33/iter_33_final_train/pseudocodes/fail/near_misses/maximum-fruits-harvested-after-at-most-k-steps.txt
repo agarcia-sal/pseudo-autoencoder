@@ -1,0 +1,42 @@
+CLASS Solution
+    FUNCTION maxTotalFruits(fruits AS list of list of integers, startPos AS integer, k AS integer) RETURNS integer
+        ASSIGN 0 TO peakAmount
+        ASSIGN 0 TO accumulated
+        ASSIGN 0 TO beginIndex
+
+        SET endIndex TO 0
+        WHILE endIndex IS LESS THAN LENGTH(fruits)
+            LET currentPos BE fruits[endIndex][0]
+            LET basketCount BE fruits[endIndex][1]
+            ASSIGN accumulated PLUS basketCount TO accumulated
+
+            LOOP INDEFINITE
+                LET lowPos BE fruits[beginIndex][0]
+                LET rightDistance BE ABS(currentPos - startPos)
+                LET leftDistance BE ABS(lowPos - startPos)
+                LET gap BETWEEN BE currentPos - lowPos
+
+                LET distanceMetric BE MIN(rightDistance, leftDistance) + gap
+                
+                LET inLeftBound BE (startPos - k) <= lowPos AND lowPos <= (startPos + k)
+                LET inRightBound BE (startPos - k) <= currentPos AND currentPos <= (startPos + k)
+                LET condition VALID BE inLeftBound AND inRightBound AND distanceMetric <= k
+
+                IF beginIndex > endIndex OR condition VALID THEN
+                    BREAK OUT OF LOOP
+                END IF
+
+                ASSIGN accumulated - fruits[beginIndex][1] TO accumulated
+                ASSIGN beginIndex + 1 TO beginIndex
+            END LOOP
+
+            IF peakAmount < accumulated THEN
+                ASSIGN accumulated TO peakAmount
+            END IF
+
+            ASSIGN endIndex + 1 TO endIndex
+        END WHILE
+
+        RETURN peakAmount
+    END FUNCTION
+END CLASS

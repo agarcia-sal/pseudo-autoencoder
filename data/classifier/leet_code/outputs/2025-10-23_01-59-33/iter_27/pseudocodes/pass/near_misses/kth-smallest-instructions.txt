@@ -1,0 +1,31 @@
+CLASS Solution
+    FUNCTION kthSmallestPath(destination, k)
+        LET x = destination[0]
+        LET y = destination[1]
+        LET steps = []
+        LET moves = x + y
+
+        FUNCTION countComb(a, b)
+            IF b = 0 OR b = a THEN RETURN 1
+            RETURN countComb(a - 1, b - 1) + countComb(a - 1, b)
+        END FUNCTION
+
+        FUNCTION buildPath(xLeft, yLeft, kValue, acc)
+            IF xLeft = 0 THEN
+                RETURN acc + repeatChar('V', yLeft)
+            END IF
+            IF yLeft = 0 THEN
+                RETURN acc + repeatChar('H', xLeft)
+            END IF
+
+            LET combos = countComb(xLeft + yLeft - 1, xLeft - 1)
+            IF kValue <= combos THEN
+                RETURN buildPath(xLeft - 1, yLeft, kValue, acc + 'H')
+            ELSE
+                RETURN buildPath(xLeft, yLeft - 1, kValue - combos, acc + 'V')
+            END IF
+        END FUNCTION
+
+        RETURN buildPath(y, x, k, "")
+    END FUNCTION
+END CLASS

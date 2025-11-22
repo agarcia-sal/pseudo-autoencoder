@@ -1,0 +1,79 @@
+CLASS Solution
+    FUNCTION maximumTotalDamage(power)
+        DEFINE FUNCTION replicateCountMapping(array)
+            SET auxCount TO empty mapping
+            SET idxA TO 0
+            WHILE idxA LESS THAN LENGTH(array)
+                SET currentVal TO array[idxA]
+                IF currentVal NOT IN auxCount
+                    SET auxCount[currentVal] TO 0
+                END IF
+                SET auxCount[currentVal] TO auxCount[currentVal] + 1
+                SET idxA TO idxA + 1
+            END WHILE
+            RETURN auxCount
+        END FUNCTION
+
+        SET countMap TO replicateCountMapping(power)
+
+        SET uniqueValues TO empty list
+        FOR EACH key IN countMap KEYSET
+            APPEND key TO uniqueValues
+        END FOR
+        SET swapped TO TRUE
+        WHILE swapped
+            SET swapped TO FALSE
+            FOR i FROM 0 TO LENGTH(uniqueValues) - 2
+                IF uniqueValues[i] GREATER THAN uniqueValues[i + 1]
+                    SET tempStore TO uniqueValues[i]
+                    SET uniqueValues[i] TO uniqueValues[i + 1]
+                    SET uniqueValues[i + 1] TO tempStore
+                    SET swapped TO TRUE
+                END IF
+            END FOR
+        END WHILE
+
+        SET dpMap TO empty mapping
+        SET pos TO 0
+        WHILE pos LESS THAN LENGTH(uniqueValues)
+            SET powerEntry TO uniqueValues[pos]
+            IF pos GREATER THAN 0
+                IF uniqueValues[pos - 1] IN dpMap
+                    SET exclVal TO dpMap[uniqueValues[pos - 1]]
+                ELSE
+                    SET exclVal TO 0
+                END IF
+            ELSE
+                SET exclVal TO 0
+            END IF
+
+            SET includeVal TO powerEntry * countMap[powerEntry]
+            SET wIdx TO pos - 1
+            WHILE wIdx GREATER THAN OR EQUAL TO 0 AND uniqueValues[wIdx] GREATER THAN OR EQUAL TO (powerEntry - 2)
+                SET wIdx TO wIdx - 1
+            END WHILE
+
+            IF wIdx GREATER THAN OR EQUAL TO 0 AND uniqueValues[wIdx] IN dpMap
+                SET includeVal TO includeVal + dpMap[uniqueValues[wIdx]]
+            END IF
+
+            IF includeVal GREATER THAN exclVal
+                SET dpMap[powerEntry] TO includeVal
+            ELSE
+                SET dpMap[powerEntry] TO exclVal
+            END IF
+            SET pos TO pos + 1
+        END WHILE
+
+        SET firstKey TO NULL
+        SET maxVal TO NULL
+        FOR EACH k IN dpMap KEYSET
+            IF maxVal IS NULL OR dpMap[k] GREATER THAN maxVal
+                SET maxVal TO dpMap[k]
+                SET firstKey TO k
+            END IF
+        END FOR
+
+        RETURN maxVal
+    END FUNCTION
+END CLASS

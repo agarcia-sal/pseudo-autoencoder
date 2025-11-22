@@ -1,0 +1,50 @@
+CLASS Solution
+    FUNCTION minCostToEqualizeArray(nums cost1 cost2)
+      SET MOD TO 1000000007
+      SET sz TO LENGTH OF nums
+      SET low TO nums[0]
+      SET high TO nums[0]
+      SET total TO 0
+
+      SET idx TO 0
+      WHILE idx < sz
+        SET el TO nums[idx]
+        IF el < low THEN
+          SET low TO el
+        END IF
+        IF el > high THEN
+          SET high TO el
+        END IF
+        SET total TO total + el
+        SET idx TO idx + 1
+      END WHILE
+
+      IF cost1 * 2 <= cost2 OR sz < 3 THEN
+          SET diff TO high * sz - total
+          RETURN (cost1 * diff) MOD MOD
+      END IF
+
+      FUNCTION getMinCost(target)
+          SET gapMax TO target - low
+          SET gapTot TO target * sz - total
+          SET pairCnt TO MINIMUM OF (gapTot / 2) AND (gapTot - gapMax)
+          SET value TO (cost1 * gapTot) - (2 * cost1 * pairCnt) + (cost2 * pairCnt)
+          RETURN value
+      END FUNCTION
+
+      SET best TO NULL
+      SET val TO 0
+      SET key TO high
+      SET limit TO 2 * high - 1
+
+      WHILE key <= limit
+          SET val TO getMinCost(key)
+          IF best IS NULL OR val < best THEN
+              SET best TO val
+          END IF
+          SET key TO key + 1
+      END WHILE
+
+      RETURN best MOD MOD
+    END FUNCTION
+END CLASS

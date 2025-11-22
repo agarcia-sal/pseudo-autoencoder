@@ -1,0 +1,96 @@
+CLASS Solution  
+    FUNCTION largestMultipleOfThree(digits)  
+        SET freq_map AS a mapping from digits to their counts in digits  
+        SET summation TO 0  
+        FOR index FROM 0 TO LENGTH OF digits MINUS 1  
+            summation ← summation PLUS digits[index]  
+        END FOR  
+        SET mod_val AS summation MODULO 3  
+        
+        SWITCH mod_val  
+            CASE 1:  
+                DEFINE singles AS [1, 4, 7]  
+                SET changed_flag AS false  
+                SET pointer AS 0  
+                WHILE pointer < LENGTH OF singles AND changed_flag EQUALS false  
+                    IF freq_map CONTAINS singles[pointer] AND freq_map[singles[pointer]] > 0 THEN  
+                        freq_map[singles[pointer]] ← freq_map[singles[pointer]] MINUS 1  
+                        changed_flag ← true  
+                    END IF  
+                    pointer ← pointer PLUS 1  
+                END WHILE  
+                IF changed_flag EQUALS false THEN  
+                    DEFINE doubles AS [2, 5, 8]  
+                    SET idx AS 0  
+                    WHILE idx < LENGTH OF doubles AND changed_flag EQUALS false  
+                        IF freq_map CONTAINS doubles[idx] AND freq_map[doubles[idx]] > 1 THEN  
+                            freq_map[doubles[idx]] ← freq_map[doubles[idx]] MINUS 2  
+                            changed_flag ← true  
+                        END IF  
+                        idx ← idx PLUS 1  
+                    END WHILE  
+                END IF  
+                BREAK  
+            
+            CASE 2:  
+                DEFINE singles_arr AS [2, 5, 8]  
+                SET done AS false  
+                SET position AS 0  
+                WHILE position < LENGTH OF singles_arr AND done EQUALS false  
+                    IF freq_map CONTAINS singles_arr[position] AND freq_map[singles_arr[position]] > 0 THEN  
+                        freq_map[singles_arr[position]] ← freq_map[singles_arr[position]] MINUS 1  
+                        done ← true  
+                    END IF  
+                    position ← position PLUS 1  
+                END WHILE  
+                IF done EQUALS false THEN  
+                    DEFINE doubles_arr AS [1, 4, 7]  
+                    SET pos AS 0  
+                    WHILE pos < LENGTH OF doubles_arr AND done EQUALS false  
+                        IF freq_map CONTAINS doubles_arr[pos] AND freq_map[doubles_arr[pos]] > 1 THEN  
+                            freq_map[doubles_arr[pos]] ← freq_map[doubles_arr[pos]] MINUS 2  
+                            done ← true  
+                        END IF  
+                        pos ← pos PLUS 1  
+                    END WHILE  
+                END IF  
+                BREAK  
+            DEFAULT:  
+                // no action needed  
+                BREAK  
+        END SWITCH  
+        
+        SET output_segments AS an empty list  
+        SET digit_val AS 9  
+        WHILE digit_val >= 0  
+            IF freq_map CONTAINS digit_val THEN  
+                SET count_value AS freq_map[digit_val]  
+                SET part_str AS empty string  
+                SET iter_num AS 0  
+                WHILE iter_num < count_value  
+                    part_str ← part_str CONCATENATED WITH STRING OF digit_val  
+                    iter_num ← iter_num PLUS 1  
+                END WHILE  
+                IF LENGTH OF part_str > 0 THEN  
+                    output_segments APPEND part_str  
+                END IF  
+            END IF  
+            digit_val ← digit_val MINUS 1  
+        END WHILE  
+        
+        SET assembled_str AS empty string  
+        FOR each segment IN output_segments  
+            assembled_str ← assembled_str CONCATENATED WITH segment  
+        END FOR  
+        
+        IF LENGTH OF assembled_str > 0 THEN  
+            IF assembled_str[0] EQUALS "0" THEN  
+                RETURN "0"  
+            END IF  
+        ELSE  
+            RETURN ""  
+        END IF  
+        
+        RETURN assembled_str  
+    END FUNCTION  
+END CLASS

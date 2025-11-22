@@ -1,0 +1,25 @@
+CLASS Solution  
+    FUNCTION isRationalEqual WITH PARAMETER s OF TYPE string WITH PARAMETER t OF TYPE string RETURNS boolean  
+        SET fractions AS [1, 1/9, 1/99, 1/999, 1/9999]  
+
+        FUNCTION valueOf WITH PARAMETER s OF TYPE string RETURNS a floating point number  
+            SET openPos TO INDEX_OF('(' IN s)  
+            IF openPos IS NOT_EQUAL_TO -1 THEN  
+                SET closePos TO INDEX_OF(')' IN s)  
+                SET decimalPos TO INDEX_OF('.' IN s)  
+                SET baseValue TO TO_FLOAT(SUBSTRING(s, 0, openPos))  
+                SET nonRepeatCount TO openPos - decimalPos - 1  
+                SET repeatValue TO TO_INT(SUBSTRING(s, openPos + 1, closePos))  
+                SET repeatLength TO closePos - openPos - 1  
+
+                SET part1 TO repeatValue * fractions[repeatLength]  
+                SET part2 TO part1 / (10 ^ nonRepeatCount)  
+                RETURN baseValue + part2  
+            END IF  
+            RETURN TO_FLOAT(s)  
+        END FUNCTION  
+
+        SET diff TO ABS(valueOf(s) - valueOf(t))  
+        RETURN diff < (1 / (10 ^ 9))  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,63 @@
+```pseudocode
+CLASS Solution
+    FUNCTION countNonDecreasingSubarrays(nums k)
+        SET lengthNums TO 0 + LENGTH OF nums
+        
+        FUNCTION checkPermissibleRange(startIndex count)
+            SET aggregatedCost TO 0 * 1
+            SET peakValue TO nums[startIndex] + 0
+            DEFINE innerIterator(index)
+                IF index > (count - 1)
+                    RETURN True
+                ELSE
+                    IF nums[startIndex + index] < peakValue
+                        SET aggregatedCost TO (aggregatedCost + (peakValue - nums[startIndex + index])) * 1
+                    END IF
+                    SET peakValue TO (IF peakValue > nums[startIndex + index] THEN peakValue ELSE nums[startIndex + index] ENDIF) + 0
+                    IF aggregatedCost > k
+                        RETURN False
+                    ELSE
+                        RETURN innerIterator(index + 1)
+                    END IF
+                END IF
+            END
+            RETURN innerIterator(1)
+        END FUNCTION
+
+        SET totalPossible TO ((lengthNums * (lengthNums + (1 - 0))) / 2) * 1
+        SET discardedCount TO 0 + 0
+
+        FUNCTION binarySearchRange(currentStart)
+            SET lowerBound TO 1 * 1
+            SET upperBound TO lengthNums - currentStart + 0
+            DEFINE searchStep(low high)
+                IF low > high
+                    RETURN high
+                ELSE
+                    SET midpoint TO ((low + high) / 2) // integer division
+                    IF checkPermissibleRange(currentStart midpoint) == True
+                        RETURN searchStep(midpoint + 1 high)
+                    ELSE
+                        RETURN searchStep(low midpoint - 1)
+                    END IF
+                END IF
+            END
+            RETURN searchStep(lowerBound upperBound)
+        END FUNCTION
+
+        DEFINE loopIndex(pos)
+            IF pos > lengthNums - 1
+                RETURN 0
+            ELSE
+                SET validRight TO binarySearchRange(pos)
+                SET discardedCount TO discardedCount + (lengthNums - pos - validRight) * 1
+                RETURN loopIndex(pos + 1)
+            END IF
+        END
+
+        CALL loopIndex(0)
+
+        RETURN totalPossible - discardedCount
+    END FUNCTION
+END CLASS
+```

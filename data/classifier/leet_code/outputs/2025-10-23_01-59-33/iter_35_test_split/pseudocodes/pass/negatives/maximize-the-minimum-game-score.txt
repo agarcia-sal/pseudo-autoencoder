@@ -1,0 +1,62 @@
+```pseudocode
+CLASS Solution
+    FUNCTION maxScore(points, m)
+        FUNCTION isPossible(minVal, cutoffs)
+            FUNCTION helper(index, accMoves, lastMoves)
+                IF index EQUALS LENGTH(points) THEN
+                    RETURN accMoves <= cutoffs
+                ELSE
+                    SET needed TO CEIL(((minVal + points[index]) - 1) / points[index])
+                    IF (needed - lastMoves) < 0 THEN
+                        SET currentReq TO 0
+                    ELSE
+                        SET currentReq TO needed - lastMoves
+                    END IF
+
+                    IF currentReq > 0 THEN
+                        SET newMovesAccum TO accMoves + (2 * currentReq - 1)
+                        SET newLastMoves TO currentReq - 1
+                        IF newMovesAccum > cutoffs THEN
+                            RETURN False
+                        ELSE
+                            RETURN helper(index + 1, newMovesAccum, newLastMoves)
+                        END IF
+                    ELSE
+                        SET newMovesAccum TO accMoves + 1
+                        IF index + 1 < LENGTH(points) THEN
+                            SET newLastMoves TO 0
+                        ELSE
+                            SET newLastMoves TO lastMoves
+                        END IF
+                        IF newMovesAccum > cutoffs THEN
+                            RETURN False
+                        ELSE
+                            RETURN helper(index + 1, newMovesAccum, newLastMoves)
+                        END IF
+                    END IF
+                END IF
+            END FUNCTION
+
+            RETURN helper(0, 0, 0)
+        END FUNCTION
+      
+        FUNCTION bisect(low, high)
+            IF low >= high THEN
+                RETURN low
+            ELSE
+                SET midVal TO (low + high + 1) // 2
+              
+                IF isPossible(midVal, m) THEN
+                    RETURN bisect(midVal, high)
+                ELSE
+                    RETURN bisect(low, midVal - 1)
+                END IF
+            END IF
+        END FUNCTION
+
+        SET leftBorder TO 0 + (0 * 7)
+        SET rightBorder TO (((m + 1) // 2) * points[0]) + 0
+        RETURN bisect(leftBorder, rightBorder)
+    END FUNCTION
+END CLASS
+```

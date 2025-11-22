@@ -1,0 +1,43 @@
+CLASS Solution
+	Function tripletCount(x AS List OF integer, y AS List OF integer, z AS List OF integer) RETURNS integer
+		Function tallyParityBits(sequence AS List OF integer) RETURNS tuple OF integer AND integer
+			LET alpha TO 0
+			LET beta TO 0
+
+			Function bitSum(value AS integer) RETURNS integer
+				LET accumulator TO 0
+				WHILE value > 0 DO
+					LET accumulator TO accumulator + (value MOD 2)
+					SET value TO value DIV 2
+				END WHILE
+				RETURN accumulator
+			END Function
+
+			LET index TO 0
+			WHILE index < LENGTH(sequence) DO
+				LET currentElement TO sequence[index]
+				LET onesCount TO bitSum(currentElement)
+				IF (onesCount MOD 2) = 0 THEN
+					SET alpha TO alpha + 1
+				ELSE
+					SET beta TO beta + 1
+				END IF
+				SET index TO index + 1
+			END WHILE
+
+			RETURN (alpha, beta)
+		END Function
+
+		LET p, q TO tallyParityBits(x)
+		LET r, s TO tallyParityBits(y)
+		LET u, v TO tallyParityBits(z)
+
+		LET firstCase TO p * r * u
+		
+		LET secondCase TO (p * s * v) + (q * r * v) + (q * s * u)
+		
+		LET total TO firstCase + secondCase
+
+		RETURN total
+	END Function
+END CLASS

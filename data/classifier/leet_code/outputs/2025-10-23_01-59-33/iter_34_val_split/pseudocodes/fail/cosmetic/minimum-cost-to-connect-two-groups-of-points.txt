@@ -1,0 +1,41 @@
+CLASS Solution
+    FUNCTION connectTwoGroups(cost)
+        ASSIGN countA ← LENGTH(cost)
+        ASSIGN countB ← LENGTH(cost[0])
+        ASSIGN dpTable ← ARRAY OF size (countA + 1) × (2 ^ countB), ALL SET TO infinity
+        dpTable[0][0] ← 0
+
+        DECLARE outerIndex ← 0
+        WHILE outerIndex ≤ countA - 1 DO
+            DECLARE subsetMask ← 0
+            WHILE subsetMask < (1 << countB) DO
+                DECLARE midIndex ← 0
+                WHILE midIndex ≤ countB - 1 DO
+                    DECLARE newMask ← subsetMask OR (1 << midIndex)
+                    ASSIGN newVal ← dpTable[outerIndex][subsetMask] + cost[outerIndex][midIndex]
+                    IF newVal < dpTable[outerIndex + 1][newMask] THEN
+                        dpTable[outerIndex + 1][newMask] ← newVal
+                    END IF
+                    midIndex ← midIndex + 1
+                END WHILE
+
+                DECLARE innerIndex ← 0
+                WHILE innerIndex ≤ countB - 1 DO
+                    IF (subsetMask AND (1 << innerIndex)) ≠ 0 THEN
+                        DECLARE toggledMask ← subsetMask XOR (1 << innerIndex)
+                        DECLARE candidate ← dpTable[outerIndex + 1][toggledMask] + cost[outerIndex][innerIndex]
+                        IF candidate < dpTable[outerIndex + 1][subsetMask] THEN
+                            dpTable[outerIndex + 1][subsetMask] ← candidate
+                        END IF
+                    END IF
+                    innerIndex ← innerIndex + 1
+                END WHILE
+
+                subsetMask ← subsetMask + 1
+            END WHILE
+            outerIndex ← outerIndex + 1
+        END WHILE
+
+        RETURN dpTable[countA][(1 << countB) - 1]
+    END FUNCTION
+END CLASS

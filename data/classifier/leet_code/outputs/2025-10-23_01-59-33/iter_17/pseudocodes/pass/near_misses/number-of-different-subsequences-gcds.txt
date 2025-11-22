@@ -1,0 +1,46 @@
+CLASS Solution
+    FUNCTION countDifferentSubsequenceGCDs(nums)
+        SET limit TO 0
+        SET index TO 0
+        SET existenceDict TO DICTIONARY
+        WHILE index < LENGTH(nums)
+            IF nums[index] > limit THEN
+                SET limit TO nums[index]
+            END IF
+            SET existenceDict[nums[index]] TO true
+            SET index TO index + 1
+        END WHILE
+
+        SET totalCount TO 0
+        SET currentDivisor TO 1
+
+        FUNCTION innerCheck(divisor)
+            IF divisor > limit THEN
+                RETURN
+            END IF
+            SET accumulatedGCD TO 0
+            SET multipleCounter TO divisor
+            FUNCTION processMultiples(multiplicand)
+                IF multiplicand > limit THEN
+                    IF accumulatedGCD = divisor THEN
+                        totalCount = totalCount + 1
+                    END IF
+                    RETURN
+                END IF
+                IF existenceDict HAS KEY multiplicand THEN
+                    SET accumulatedGCD TO gcd(accumulatedGCD, multiplicand)
+                    IF accumulatedGCD = divisor THEN
+                        totalCount = totalCount + 1
+                        RETURN
+                    END IF
+                END IF
+                processMultiples(multiplicand + divisor)
+            END FUNCTION
+            processMultiples(multipleCounter)
+            innerCheck(divisor + 1)
+        END FUNCTION
+
+        innerCheck(currentDivisor)
+        RETURN totalCount
+    END FUNCTION
+END CLASS

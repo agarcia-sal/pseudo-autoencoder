@@ -1,0 +1,44 @@
+CLASS Solution  
+    FUNCTION minimumDeleteSum(s1, s2)  
+        SET length_s1 AS LENGTH OF s1  
+        SET length_s2 AS LENGTH OF s2  
+        
+        DECLARE dp AS LIST OF LISTS WITH (length_s1 + 1) ROWS AND (length_s2 + 1) COLUMNS FILLED WITH 0  
+        
+        SET idx_col TO 1  
+        WHILE idx_col <= length_s2  
+            LET previous_value BE dp[0][idx_col - 1]  
+            LET ascii_code BE ASCII OF s2[idx_col - 1]  
+            dp[0][idx_col] ← previous_value + ascii_code  
+            idx_col ← idx_col + 1  
+        END WHILE  
+        
+        SET idx_row TO 1  
+        WHILE idx_row <= length_s1  
+            LET previous_value_row BE dp[idx_row - 1][0]  
+            LET ascii_code_row BE ASCII OF s1[idx_row - 1]  
+            dp[idx_row][0] ← previous_value_row + ascii_code_row  
+            idx_row ← idx_row + 1  
+        END WHILE  
+        
+        SET outer_index TO 1  
+        WHILE outer_index <= length_s1  
+            SET inner_index TO 1  
+            WHILE inner_index <= length_s2  
+                LET char_s1 BE s1[outer_index - 1]  
+                LET char_s2 BE s2[inner_index - 1]  
+                IF char_s1 ≠ char_s2 THEN
+                    LET deletion_s1 COST ← dp[outer_index - 1][inner_index] + ASCII OF char_s1  
+                    LET deletion_s2 COST ← dp[outer_index][inner_index - 1] + ASCII OF char_s2  
+                    LET dp[outer_index][inner_index] BE MINIMUM OF deletion_s1 COST AND deletion_s2 COST  
+                ELSE  
+                    LET dp[outer_index][inner_index] BE dp[outer_index - 1][inner_index - 1]  
+                END IF  
+                inner_index ← inner_index + 1  
+            END WHILE  
+            outer_index ← outer_index + 1  
+        END WHILE  
+        
+        RETURN dp[length_s1][length_s2]  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,52 @@
+CLASS Solution  
+    FUNCTION maximumCost(n, highways, k)  
+        INITIALIZE graph AS a dictionary with default value empty list  
+        SET idx TO zero  
+        WHILE idx LESS THAN LENGTH of highways DO  
+            ASSIGN cityA TO highways[idx][0]  
+            ASSIGN cityB TO highways[idx][1]  
+            ASSIGN tollAmt TO highways[idx][2]  
+  
+            APPEND (cityB, tollAmt) TO graph[cityA]  
+            APPEND (cityA, tollAmt) TO graph[cityB]  
+  
+            INCREMENT idx BY one  
+        END WHILE  
+  
+        FUNCTION dfs(city, visited, cost, highways_used)  
+            DECLARE max_cost AS nonlocal  
+  
+            IF highways_used IS k THEN  
+                ASSIGN max_cost TO the maximum between max_cost and cost  
+                RETURN  
+            END IF  
+  
+            INITIALIZE neighbor_idx TO zero  
+            SET neighbor_list TO graph[city]  
+            WHILE neighbor_idx LESS THAN LENGTH of neighbor_list DO  
+                ASSIGN adj_city TO neighbor_list[neighbor_idx][0]  
+                ASSIGN adj_toll TO neighbor_list[neighbor_idx][1]  
+  
+                IF adj_city IN visited THEN  
+                    CONTINUE  
+                END IF  
+  
+                INSERT adj_city INTO visited  
+                CALL dfs(adj_city, visited, cost + adj_toll, highways_used + 1)  
+                DELETE adj_city FROM visited  
+  
+                INCREMENT neighbor_idx BY one  
+            END WHILE  
+        END FUNCTION  
+  
+        ASSIGN max_cost TO -1  
+        SET current_city TO 0  
+        WHILE current_city NOT EQUAL n DO  
+            ASSIGN visited TO a set containing current_city  
+            CALL dfs(current_city, visited, 0, 0)  
+            INCREMENT current_city BY one  
+        END WHILE  
+  
+        GIVE BACK max_cost  
+    END FUNCTION  
+END CLASS

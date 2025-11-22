@@ -1,0 +1,39 @@
+CLASS Solution
+    FUNCTION sumDigitDifferences(nums)
+        FUNCTION digit_difference(numA, numB)
+            SET mismatch_count TO 0
+            SET idx TO 0
+            FUNCTION recurse_chars(cA, cB, pos)
+                IF pos < LENGTH(cA) THEN
+                    SET increment TO 0
+                    IF NOT (cA[pos] == cB[pos]) THEN
+                        SET increment TO 1
+                    END IF
+                    RETURN increment + recurse_chars(cA, cB, pos + 1)
+                ELSE
+                    RETURN 0
+                END IF
+            END FUNCTION
+            SET mismatch_count TO recurse_chars(numA, numB, 0)
+            RETURN mismatch_count
+        END FUNCTION
+
+        SET accumulated_difference TO 0
+        SET total_numbers TO LENGTH(nums)
+        SET outer_index TO 0
+
+        FUNCTION accumulate_pairs(i, j)
+            IF i >= total_numbers - 1 THEN
+                RETURN
+            ELSEIF j >= total_numbers THEN
+                CALL accumulate_pairs(i + 1, i + 2)
+            ELSE
+                SET accumulated_difference TO accumulated_difference + digit_difference(nums[i], nums[j])
+                CALL accumulate_pairs(i, j + 1)
+            END IF
+        END FUNCTION
+
+        CALL accumulate_pairs(0, 1)
+        RETURN accumulated_difference
+    END FUNCTION
+END CLASS

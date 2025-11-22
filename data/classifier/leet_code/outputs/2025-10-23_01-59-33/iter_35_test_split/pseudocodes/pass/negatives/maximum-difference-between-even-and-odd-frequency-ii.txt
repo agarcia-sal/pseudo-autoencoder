@@ -1,0 +1,95 @@
+```pseudocode
+CLASS Solution
+    FUNCTION maxDifference WITH PARAMETERS s k
+        SET resultVar TO - ( 1E100 )
+        SET combos TO ARRAY()
+        SET alphabetStr TO "zeroonetwothreefour"
+        DEFINE buildPairs:
+            FUNCTION (idx1 idx2)
+                IF idx1 >= LENGTH(alphabetStr)
+                    RETURN
+                ENDIF
+                IF idx2 >= LENGTH(alphabetStr)
+                    CALL buildPairs(idx1 + 1, 0)
+                    RETURN
+                ENDIF
+                IF idx1 != idx2
+                    APPEND TO combos (alphabetStr[idx1], alphabetStr[idx2])
+                ENDIF
+                CALL buildPairs(idx1, idx2 + 1)
+            END FUNCTION
+        CALL buildPairs(0,0)
+        DEFINE lenS TO LENGTH(s)
+
+        DEFINE processPair:
+            FUNCTION(pairA pairB)
+                SET mapping TO DICT WITH DEFAULT VALUE (1E100)
+                SET prefixCountA TO [0]
+                SET prefixCountB TO [0]
+                SET boundL TO 0
+
+                DEFINE handlePosition:
+                    FUNCTION(position idx)
+                        SET charC TO s[idx]
+                        IF charC = pairA
+                            SET nextCountA TO prefixCountA[-1] + 1
+                        ELSE
+                            SET nextCountA TO 0
+                        ENDIF
+                        APPEND nextCountA TO prefixCountA
+                        IF charC = pairB
+                            SET nextCountB TO prefixCountB[-1] + 1
+                        ELSE
+                            SET nextCountB TO 0
+                        ENDIF
+                        APPEND nextCountB TO prefixCountB
+
+                        WHILE ( (idx - boundL + 1) >= k ) AND ( prefixCountA[boundL] < prefixCountA[-1] ) AND ( prefixCountB[boundL] < prefixCountB[-1] )
+                            SET keyTuple TO ( prefixCountA[boundL] MOD 2, prefixCountB[boundL] MOD 2 )
+                            SET prevVal TO mapping.GET(keyTuple)
+                            SET candVal TO prefixCountA[boundL] - prefixCountB[boundL]
+                            IF candVal < prevVal THEN
+                                SET mapping[keyTuple] TO candVal
+                            ENDIF
+                            SET boundL TO boundL + 1
+                        ENDWHILE
+
+                        SET lastA TO prefixCountA[-1]
+                        SET lastB TO prefixCountB[-1]
+                        SET parityKey TO ((1 - (lastA MOD 2)), lastB MOD 2)
+                        SET prevAns TO resultVar
+
+                        SET candidate TO lastA - lastB - mapping.GET(parityKey)
+                        IF candidate > prevAns THEN
+                            SET resultVar TO candidate
+                        ENDIF
+                    END FUNCTION
+
+                DEFINE iterateThrough:
+                    FUNCTION(idx iterIdx)
+                        IF iterIdx == lenS
+                            RETURN
+                        ENDIF
+                        CALL handlePosition(iterIdx)
+                        CALL iterateThrough(iterIdx + 1)
+                    END FUNCTION
+
+                CALL iterateThrough(0)
+            END FUNCTION
+
+        DEFINE idxPairs:
+            FUNCTION(i pairIdx)
+                IF pairIdx == LENGTH(combos)
+                    RETURN
+                ENDIF
+                SET currentPair TO combos[pairIdx]
+                CALL processPair(currentPair[0], currentPair[1])
+                CALL idxPairs(i + 1)
+            END FUNCTION
+
+        CALL idxPairs(0)
+
+        RETURN resultVar
+    END FUNCTION
+END CLASS
+```

@@ -1,0 +1,56 @@
+```pseudocode
+CLASS Solution
+    FUNCTION beautifulIndices(s parameter, a parameter, b parameter, k parameter)
+        FUNCTION matchPositions(strParam parameter, pattern parameter) RETURNS list
+            SET accumPositions TO EMPTY LIST
+            SET lenStr TO LENGTH OF strParam
+            SET lenPat TO LENGTH OF pattern
+            FUNCTION iter(pos parameter)
+                IF NOT (pos <= lenStr - lenPat) THEN
+                    RETURN
+                END IF
+                SET currSubstr TO SUBSTRING OF strParam FROM pos TO (pos + lenPat - 1)
+                IF currSubstr == pattern THEN
+                    APPEND pos TO accumPositions
+                END IF
+                CALL iter(pos + 1)
+            END FUNCTION
+            CALL iter(0)
+            RETURN accumPositions
+        END FUNCTION
+
+        SET collectedA TO matchPositions(s, a)
+        SET collectedB TO matchPositions(s, b)
+        SET resultIndices TO EMPTY LIST
+
+        FUNCTION outerLoop(xList parameter, yList parameter, limit parameter)
+            FUNCTION innerLoop(i parameter, j parameter, appended parameter)
+                IF j >= LENGTH OF yList THEN
+                    RETURN
+                END IF
+                IF ABS(i - yList[j]) <= limit THEN
+                    IF NOT appended THEN
+                        APPEND i TO resultIndices
+                        SET appended TO TRUE
+                    END IF
+                    RETURN
+                END IF
+                CALL innerLoop(i, j + 1, appended)
+            END FUNCTION
+
+            FUNCTION recurseIndices(index parameter)
+                IF index >= LENGTH OF xList THEN
+                    RETURN
+                END IF
+                CALL innerLoop(xList[index], 0, FALSE)
+                CALL recurseIndices(index + 1)
+            END FUNCTION
+
+            CALL recurseIndices(0)
+        END FUNCTION
+
+        CALL outerLoop(collectedA, collectedB, k)
+        RETURN resultIndices
+    END FUNCTION
+END CLASS
+```

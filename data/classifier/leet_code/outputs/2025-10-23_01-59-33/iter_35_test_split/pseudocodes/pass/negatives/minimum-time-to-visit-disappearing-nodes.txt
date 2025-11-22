@@ -1,0 +1,72 @@
+CLASS Solution
+    FUNCTION minimumTime(n, edges, disappear)
+      SET alpha TO an empty mapping defaulting to empty list
+      FOR x y z IN edges DO
+        ADD (y, z) TO alpha[x]
+        ADD (x, z) TO alpha[y]
+      END FOR
+
+      SET beta TO a list of size n filled with (1 INFINITY)
+      SET beta[0] TO (0)
+      
+      SET gamma TO [(0, 0)]
+
+      DEFINE FUNCTION pop_minimum(heap)
+        SET a TO heap[0]
+        REPLACE heap[0] WITH heap[-1]
+        REMOVE last element from heap
+        SET idx TO 0
+        WHILE TRUE
+          SET l_child TO 2 * idx + 1
+          SET r_child TO 2 * idx + 2
+          SET smallest TO idx
+          IF l_child < LENGTH(heap) AND heap[l_child][0] < heap[smallest][0] THEN
+            SET smallest TO l_child
+          END IF
+          IF r_child < LENGTH(heap) AND heap[r_child][0] < heap[smallest][0] THEN
+            SET smallest TO r_child
+          END IF
+          IF smallest == idx THEN BREAK END IF
+          SET heap[idx], heap[smallest] TO heap[smallest], heap[idx]
+          SET idx TO smallest
+        END WHILE
+        RETURN a
+      END FUNCTION
+
+      DEFINE FUNCTION insert_heap(heap, elem)
+        ADD elem TO END OF heap
+        SET pos TO LENGTH(heap) - 1
+        WHILE pos > 0
+          SET parent TO (pos - 1) // 2
+          IF heap[parent][0] <= heap[pos][0] THEN BREAK END IF
+          SET heap[parent], heap[pos] TO heap[pos], heap[parent]
+          SET pos TO parent
+        END WHILE
+      END FUNCTION
+
+      WHILE LENGTH(gamma) > 0 DO
+        SET curr_dist, curr_node TO pop_minimum(gamma)
+        IF NOT (curr_dist < disappear[curr_node]) THEN CONTINUE END IF
+        IF NOT (curr_dist < beta[curr_node]) THEN CONTINUE END IF
+
+        FOR neighbor, length IN alpha[curr_node] DO
+          SET new_dist TO curr_dist + length
+          IF new_dist < beta[neighbor] AND new_dist < disappear[neighbor] THEN
+            SET beta[neighbor] TO new_dist
+            CALL insert_heap(gamma, (new_dist, neighbor))
+          END IF
+        END FOR
+      END WHILE
+
+      SET final_results TO a list of size n filled with (-1)
+      SET idx TO 0
+      WHILE idx < n DO
+        IF beta[idx] < disappear[idx] THEN
+          SET final_results[idx] TO beta[idx]
+        END IF
+        SET idx TO idx + 1
+      END WHILE
+
+      RETURN final_results
+    END FUNCTION
+END CLASS

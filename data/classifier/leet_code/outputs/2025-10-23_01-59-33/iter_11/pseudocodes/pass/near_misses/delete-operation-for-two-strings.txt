@@ -1,0 +1,39 @@
+CLASS Solution
+    FUNCTION minDistance(word1, word2)
+        DECLARE a AS INTEGER ← LENGTH(word1)
+        DECLARE b AS INTEGER ← LENGTH(word2)
+        
+        DECLARE matrix AS ARRAY OF ARRAY OF INTEGER ← NEW ARRAY(a + 1)
+        FOR x FROM 0 TO a
+            ASSIGN NEW ARRAY(b + 1) TO matrix[x]
+        END FOR
+        
+        PROCEDURE fillDP(row INTEGER, col INTEGER)
+            IF row > a THEN RETURN
+            END IF
+            IF col > b THEN
+                CALL fillDP(row + 1, 1)
+                RETURN
+            END IF
+            
+            IF word1[row - 1] == word2[col - 1] THEN
+                matrix[row][col] ← matrix[row - 1][col - 1] + 1
+            ELSE
+                DECLARE val1 INTEGER ← matrix[row - 1][col]
+                DECLARE val2 INTEGER ← matrix[row][col - 1]
+                IF val1 > val2 THEN
+                    matrix[row][col] ← val1
+                ELSE
+                    matrix[row][col] ← val2
+                END IF
+            END IF
+            
+            CALL fillDP(row, col + 1)
+        END PROCEDURE
+        
+        CALL fillDP(1, 1)
+        
+        DECLARE longestCommonSubseq INTEGER ← matrix[a][b]
+        RETURN (a - longestCommonSubseq) + (b - longestCommonSubseq)
+    END FUNCTION
+END CLASS

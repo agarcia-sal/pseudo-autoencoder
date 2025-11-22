@@ -1,0 +1,89 @@
+CLASS Solution
+    FUNCTION validTicTacToe(board)
+        SET tallyAlpha TO 0
+        SET lineBuffer TO 0
+
+        WHILE lineBuffer LESS THAN LENGTH(board)
+            SET currentLine TO board[lineBuffer]
+            SET idxChar TO 0
+            WHILE idxChar LESS THAN LENGTH(currentLine)
+                IF currentLine[idxChar] EQUALS 'X'
+                    SET tallyAlpha TO tallyAlpha + 1
+                END IF
+                SET idxChar TO idxChar + 1
+            END WHILE
+            SET lineBuffer TO lineBuffer + 1
+        END WHILE
+
+        SET tallyBeta TO 0
+        SET scanRow TO 0
+
+        WHILE scanRow LESS THAN LENGTH(board)
+            SET currentSequence TO board[scanRow]
+            SET posChar TO 0
+            LOOP
+                IF posChar GREATER THAN OR EQUAL TO LENGTH(currentSequence)
+                    BREAK
+                END IF
+                IF currentSequence[posChar] EQUALS 'O'
+                    SET tallyBeta TO tallyBeta + 1
+                END IF
+                SET posChar TO posChar + 1
+            END LOOP
+            SET scanRow TO scanRow + 1
+        END WHILE
+
+        IF NOT (tallyAlpha GREATER THAN OR EQUAL TO tallyBeta AND tallyAlpha LESS THAN OR EQUAL TO tallyBeta + 1)
+            RETURN False
+        END IF
+
+        FUNCTION check_win(player)
+            SET lineIndex TO 0
+            WHILE lineIndex LESS THAN LENGTH(board)
+                SET candidateRow TO board[lineIndex]
+                IF candidateRow EQUALS player + player + player
+                    RETURN True
+                END IF
+                SET lineIndex TO lineIndex + 1
+            END WHILE
+
+            SET columnIndex TO 0
+            WHILE columnIndex LESS THAN 3
+                IF board[0][columnIndex] EQUALS player
+                   AND board[1][columnIndex] EQUALS player
+                   AND board[2][columnIndex] EQUALS player
+                    RETURN True
+                END IF
+                SET columnIndex TO columnIndex + 1
+            END WHILE
+
+            IF board[0][0] EQUALS player
+               AND board[1][1] EQUALS player
+               AND board[2][2] EQUALS player
+                RETURN True
+            END IF
+
+            IF board[0][2] EQUALS player
+               AND board[1][1] EQUALS player
+               AND board[2][0] EQUALS player
+                RETURN True
+            END IF
+
+            RETURN False
+        END FUNCTION
+
+        SET victoriousX TO check_win('X')
+        SET victoriousO TO check_win('O')
+
+        SELECT
+            CASE victoriousX AND victoriousO
+                RETURN False
+            CASE victoriousX AND (tallyAlpha EQUALS tallyBeta)
+                RETURN False
+            CASE victoriousO AND (tallyAlpha NOT EQUALS tallyBeta)
+                RETURN False
+            DEFAULT
+                RETURN True
+        END SELECT
+    END FUNCTION
+END CLASS

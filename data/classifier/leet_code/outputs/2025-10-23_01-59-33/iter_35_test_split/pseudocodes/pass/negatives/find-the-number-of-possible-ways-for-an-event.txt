@@ -1,0 +1,74 @@
+```pseudocode
+CLASS Solution
+    FUNCTION numberOfWays(n integer parameter, x integer parameter, y integer parameter) RETURNS integer
+        SET MOD_CONST TO (1000000000 + 7)
+        FUNCTION computeProductAndSum(a integer, b integer, c integer, d integer) RETURNS integer
+            RETURN ((a * b) + (c * d)) % MOD_CONST
+        END FUNCTION
+
+        FUNCTION init2DArray(rows integer, cols integer) RETURNS list of list of integer
+            FUNCTION createRow(index integer, acc list of integer) RETURNS list of integer
+                IF index > cols THEN
+                    RETURN acc
+                ELSE
+                    RETURN createRow(index + 1, acc + [0])
+                ENDIF
+            END FUNCTION
+            FUNCTION buildRows(cur integer, acc list of list of integer) RETURNS list of list of integer
+                IF cur > rows THEN
+                    RETURN acc
+                ELSE
+                    RETURN buildRows(cur + 1, acc + [createRow(1, [])])
+                ENDIF
+            END FUNCTION
+            RETURN buildRows(1, [])
+        END FUNCTION
+
+        SET arrayF TO init2DArray(n + 1, x + 1)
+        SET indexA TO 0
+        SET tempList TO arrayF[indexA]
+        SET indexB TO 0
+        SET tempList[indexB] TO 1
+
+        FUNCTION outerLoopI(indexI integer)
+            IF (indexI > n) THEN RETURN ENDIF
+
+            FUNCTION innerLoopJ(indexJ integer)
+                IF (indexJ > x) THEN RETURN ENDIF
+
+                SET val1 TO arrayF[indexI - 1][indexJ]
+                SET val2 TO arrayF[indexI - 1][indexJ - 1]
+                SET mult1 TO val1 * indexJ
+                SET mult2 TO val2 * (x - (indexJ - 1))
+                SET combinedVal TO (mult1 + mult2) % MOD_CONST
+
+                SET arrayF[indexI][indexJ] TO combinedVal
+
+                innerLoopJ(indexJ + 1)
+            END FUNCTION
+
+            innerLoopJ(1)
+            outerLoopI(indexI + 1)
+        END FUNCTION
+
+        outerLoopI(1)
+
+        SET resultAccum TO 0
+        SET powerAcc TO 1
+
+        FUNCTION loopJpower(indexJ integer)
+            IF (indexJ > x) THEN RETURN ENDIF
+
+            SET powerAcc TO (powerAcc * y) % MOD_CONST
+            SET tempVal TO arrayF[n][indexJ] * powerAcc
+            SET resultAccum TO (resultAccum + tempVal) % MOD_CONST
+
+            loopJpower(indexJ + 1)
+        END FUNCTION
+
+        loopJpower(1)
+
+        RETURN resultAccum
+    END FUNCTION
+END CLASS
+```

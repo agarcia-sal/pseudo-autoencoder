@@ -1,0 +1,89 @@
+CLASS Solution
+  FUNCTION minimumArea(matrix)
+    FUNCTION countRows(arr)
+      VARIABLE counter ← 0
+      REPEAT
+        IF counter EQUALS LENGTH(arr)
+          BREAK
+        END IF
+        SET counter TO counter + 1
+      UNTIL FALSE
+      RETURN counter
+    END FUNCTION
+
+    FUNCTION countCols(arr)
+      VARIABLE idx ← 0
+      REPEAT
+        IF idx EQUALS LENGTH(arr)
+          BREAK
+        END IF
+        SET idx TO idx + 1
+      UNTIL FALSE
+      RETURN idx
+    END FUNCTION
+
+    FUNCTION isEmpty(arr)
+      RETURN NOT (arr EQUALS [] OR LENGTH(arr) EQUALS 0)
+    END FUNCTION
+
+    VARIABLE alpha ← matrix
+    IF alpha EQUALS [] OR (alpha[0] EQUALS [])
+      RETURN 0
+    END IF
+
+    VARIABLE total_rows ← countRows(alpha)
+    VARIABLE total_cols ← countCols(alpha[0])
+    VARIABLE upper_bound_row ← total_rows + 1
+    VARIABLE lower_bound_row ← -1
+    VARIABLE upper_bound_col ← total_cols + 1
+    VARIABLE lower_bound_col ← -1
+
+    FUNCTION findBounds(row_index, col_index, min_r, max_r, min_c, max_c)
+      IF alpha[row_index][col_index] EQUALS 1
+        IF min_r GREATER THAN row_index
+          SET min_r TO row_index
+        END IF
+        IF max_r LESS THAN row_index
+          SET max_r TO row_index
+        END IF
+        IF min_c GREATER THAN col_index
+          SET min_c TO col_index
+        END IF
+        IF max_c LESS THAN col_index
+          SET max_c TO col_index
+        END IF
+      END IF
+      RETURN (min_r, max_r, min_c, max_c)
+    END FUNCTION
+
+    FUNCTION iterateCols(row, col_start, col_end, min_r, max_r, min_c, max_c)
+      IF col_start GREATER THAN col_end
+        RETURN (min_r, max_r, min_c, max_c)
+      ELSE
+        (min_r, max_r, min_c, max_c) ← findBounds(row, col_start, min_r, max_r, min_c, max_c)
+        RETURN iterateCols(row, col_start + 1, col_end, min_r, max_r, min_c, max_c)
+      END IF
+    END FUNCTION
+
+    FUNCTION iterateRows(row_start, row_end, min_r, max_r, min_c, max_c)
+      IF row_start GREATER THAN row_end
+        RETURN (min_r, max_r, min_c, max_c)
+      ELSE
+        (min_r, max_r, min_c, max_c) ← iterateCols(row_start, 0, total_cols - 1, min_r, max_r, min_c, max_c)
+        RETURN iterateRows(row_start + 1, row_end, min_r, max_r, min_c, max_c)
+      END IF
+    END FUNCTION
+
+    VARIABLE bound_min_row ← upper_bound_row
+    VARIABLE bound_max_row ← lower_bound_row
+    VARIABLE bound_min_col ← upper_bound_col
+    VARIABLE bound_max_col ← lower_bound_col
+
+    (bound_min_row, bound_max_row, bound_min_col, bound_max_col) ← iterateRows(0, total_rows - 1, bound_min_row, bound_max_row, bound_min_col, bound_max_col)
+
+    VARIABLE calc_height ← bound_max_row - bound_min_row + 1
+    VARIABLE calc_width ← bound_max_col - bound_min_col + 1
+
+    RETURN calc_height * calc_width
+  END FUNCTION
+END CLASS

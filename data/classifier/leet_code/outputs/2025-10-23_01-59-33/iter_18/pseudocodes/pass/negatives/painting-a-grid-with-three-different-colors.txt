@@ -1,0 +1,33 @@
+```
+MOD = 10^9+7
+colors = [1,2,3]
+
+gen_cols(prev_col):
+  res = []
+  backtrack(col=[], r=0):
+    if r==m: res.append(tuple(col)); return
+    for c in colors:
+      if (not col or col[-1]!=c) and (not prev_col or prev_col[r]!=c):
+        col.append(c); backtrack(col, r+1); col.pop()
+  backtrack([],0)
+  return res
+
+all_cols = gen_cols(None)
+N = len(all_cols)
+
+compat = {i:[] for i in range(N)}
+for i in range(N):
+  for j in range(N):
+    if all(all_cols[i][k] != all_cols[j][k] for k in range(m)):
+      compat[i].append(j)
+
+dp = [1]*N
+for _ in range(n-1):
+  ndp = [0]*N
+  for i in range(N):
+    for j in compat[i]:
+      ndp[j] = (ndp[j] + dp[i]) % MOD
+  dp = ndp
+
+return sum(dp) % MOD
+```

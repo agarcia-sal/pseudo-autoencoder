@@ -1,0 +1,60 @@
+CLASS Solution  
+    FUNCTION getSmallestString(s parameter of type string k parameter of type integer) RETURNS string  
+        
+        FUNCTION cyclic_distance(c1 parameter of type character c2 parameter of type character) RETURNS integer  
+            DECLARE diff1 AS integer  
+            DECLARE diff2 AS integer  
+            SET diff1 TO (IF (character code of c1) GREATER THAN (character code of c2) THEN (character code of c1) MINUS (character code of c2) ELSE (character code of c2) MINUS (character code of c1))  
+            SET diff2 TO 26 MINUS diff1  
+            IF diff2 LESS THAN diff1 THEN  
+                RETURN diff2  
+            ELSE  
+                RETURN diff1  
+            END IF  
+        END FUNCTION  
+
+        DECLARE arr AS list of characters  
+        DECLARE idx AS integer  
+        DECLARE length_s AS integer  
+        SET arr TO EMPTY LIST  
+        FOR pos FROM 0 TO (length of s) MINUS 1 DO  
+            APPEND s[pos] TO arr  
+        END FOR  
+        SET idx TO 0  
+        SET length_s TO 0  
+        WHILE TRUE  
+            IF NOT (idx LESS THAN length_s) THEN  
+                SET length_s TO (length of s)  
+                CONTINUE  
+            END IF  
+            IF NOT (k GREATER THAN 0) THEN  
+                BREAK  
+            END IF  
+
+            IF NOT (arr[idx] NOT EQUAL TO 'a') THEN  
+                SET idx TO idx + 1  
+                CONTINUE  
+            END IF  
+
+            DECLARE dist AS integer  
+            SET dist TO cyclic_distance(arr[idx], 'a')  
+            IF dist LESS THAN OR EQUAL TO k THEN  
+                SET arr[idx] TO 'a'  
+                SET k TO k - dist  
+            ELSE  
+                DECLARE code AS integer  
+                SET code TO (character code of arr[idx]) - k  
+                SET arr[idx] TO character with code code  
+                SET k TO 0  
+            END IF  
+            SET idx TO idx + 1  
+        END WHILE  
+
+        DECLARE result AS string  
+        SET result TO EMPTY STRING  
+        FOR element IN arr DO  
+            SET result TO result + element  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+END CLASS

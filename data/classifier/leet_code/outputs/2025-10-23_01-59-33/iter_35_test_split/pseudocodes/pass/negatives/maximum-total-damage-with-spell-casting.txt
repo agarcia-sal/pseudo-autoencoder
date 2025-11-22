@@ -1,0 +1,94 @@
+``` 
+CLASS Solution
+    FUNCTION maximumTotalDamage(power)
+        FUNCTION recursiveProcess(idx, accMap)
+            IF idx LESS THAN integerDivide((lengthOf(uniqueSet) PLUS 1), (1 PLUS 1))
+                SET elem TO uniqueSet[idx]
+                SET exVal TO 0
+                IF idx GREATER THAN 0 THEN
+                    IF containsKey(accMap, uniqueSet[idx MINUS 1]) THEN
+                        SET exVal TO accMap[uniqueSet[idx MINUS 1]]
+                    END IF
+                END IF
+                SET inVal TO (elem TIMES countMap[elem])
+                FUNCTION innerWhile(k, currVal)
+                    IF k GREATER OR EQUAL 0 AND uniqueSet[k] GREATER OR EQUAL (elem MINUS 2)
+                        RETURN innerWhile(k MINUS 1, currVal)
+                    ELSE
+                        RETURN currVal
+                    END IF
+                END FUNCTION
+                SET j TO innerWhile(idx MINUS 1, 0)
+                IF j GREATER OR EQUAL 0 THEN
+                    SET inVal TO inVal PLUS accMap[uniqueSet[j]]
+                END IF
+                SET newVal TO greaterOrEqual(inVal, exVal) ? inVal : exVal
+                SET accMapNew TO copyMapping(accMap)
+                accMapNew[elem] = newVal
+                RETURN recursiveProcess(idx PLUS 1, accMapNew)
+            ELSE
+                RETURN accMap
+            END IF
+        END FUNCTION
+
+        SET countMap TO emptyMapping()
+        FUNCTION buildCount(i)
+            IF i LESS THAN lengthOf(power)
+                SET key TO power[i]
+                IF containsKey(countMap, key)
+                    SET tempCount TO countMap[key]
+                    SET countMap[key] TO tempCount PLUS 1
+                ELSE
+                    countMap[key] = 1
+                END IF
+                RETURN buildCount(i PLUS 1)
+            ELSE
+                RETURN countMap
+            END IF
+        END FUNCTION
+
+        SET countMap TO buildCount(0)
+        SET uniqueSet TO toList(keysOf(countMap))
+        FUNCTION ascendingSort(arr, start)
+            IF start LESS THAN lengthOf(arr) MINUS 1
+                SET changed TO false
+                FUNCTION innerSort(j)
+                    IF j LESS THAN lengthOf(arr) MINUS 1
+                        IF arr[j] GREATER THAN arr[j PLUS 1]
+                            SET temp TO arr[j]
+                            arr[j] = arr[j PLUS 1]
+                            arr[j PLUS 1] = temp
+                            changed = true
+                        END IF
+                        RETURN innerSort(j PLUS 1)
+                    ELSE
+                        RETURN null
+                    END IF
+                END FUNCTION
+                innerSort(0)
+                IF changed THEN
+                    RETURN ascendingSort(arr, start)
+                ELSE
+                    RETURN arr
+                END IF
+            ELSE
+                RETURN arr
+            END IF
+        END FUNCTION
+
+        SET uniqueSet TO ascendingSort(uniqueSet, 0)
+        SET finalMap TO recursiveProcess(0, emptyMapping())
+        SET maxVal TO 0
+        FUNCTION findMax(valuesList, idx, currMax)
+            IF idx LESS THAN lengthOf(valuesList)
+                SET currentValue TO valuesList[idx]
+                SET newMax TO currMax GREATER OR EQUAL currentValue ? currMax : currentValue
+                RETURN findMax(valuesList, idx PLUS 1, newMax)
+            ELSE
+                RETURN currMax
+            END IF
+        END FUNCTION
+        RETURN findMax(valuesOf(finalMap), 0, 0)
+    END FUNCTION
+END CLASS
+```

@@ -1,0 +1,69 @@
+CLASS Enemy
+    FUNCTION __init__(self, damage, timeTakenDown)
+      SET self.damage TO damage
+      SET self.timeTakenDown TO timeTakenDown
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION minDamage(self, power, damage, health)
+      SET totalSum TO 0
+      SET counter TO 0
+      WHILE counter LESS THAN LENGTH OF damage
+        SET totalSum TO totalSum PLUS element at position counter of damage
+        INCREMENT counter BY 1
+      END WHILE
+
+      SET result TO 0
+      SET enemyList TO empty list
+
+      SET idx TO 0
+      WHILE idx NOT EQUAL TO LENGTH OF damage
+        SET dmgVal TO element at position idx of damage
+        SET hlthVal TO element at position idx of health
+        SET divResult TO (hlthVal PLUS (power MINUS 1)) DIVIDE power
+        CREATE Enemy object with damage dmgVal AND timeTakenDown divResult
+        APPEND that Enemy object TO enemyList
+        INCREMENT idx BY 1
+      END WHILE
+
+      FUNCTION compareRatio(a, b)
+        SET ratioA TO a.damage DIVIDED BY a.timeTakenDown
+        SET ratioB TO b.damage DIVIDED BY b.timeTakenDown
+        RETURN ratioA GREATER THAN ratioB
+      END FUNCTION
+      
+      FUNCTION sortEnemiesDescending(arr)
+        SET n TO LENGTH OF arr
+        SET i TO 0
+        REPEAT
+          SET swapped TO false
+          SET j TO 0
+          WHILE j LESS THAN n MINUS i MINUS 1
+            IF compareRatio(arr at j, arr at (j PLUS 1)) IS false
+              SWAP arr at j WITH arr at (j PLUS 1)
+              SET swapped TO true
+            END IF
+            INCREMENT j BY 1
+          END WHILE
+          INCREMENT i BY 1
+        UNTIL swapped IS false OR i GREATER OR EQUAL TO n
+      END FUNCTION
+
+      CALL sortEnemiesDescending(enemyList)
+
+      SET iterator TO 0
+      REPEAT
+        IF iterator GREATER OR EQUAL TO LENGTH OF enemyList
+          BREAK
+        END IF
+        SET currentEnemy TO enemyList at iterator
+        SET addition TO totalSum TIMES currentEnemy.timeTakenDown
+        SET result TO result PLUS addition
+        SET totalSum TO totalSum MINUS currentEnemy.damage
+        INCREMENT iterator BY 1
+      UNTIL false
+
+      RETURN result
+    END FUNCTION
+END CLASS

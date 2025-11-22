@@ -1,0 +1,67 @@
+CLASS Solution  
+    FUNCTION isRectangleCover(rectangles)  
+        LET minX BE positive infinity  
+        LET minY BE positive infinity  
+        LET maxX BE negative infinity  
+        LET maxY BE negative infinity  
+        
+        INITIALIZE corners AS empty set  
+        DEFINE totalArea AS 0  
+        
+        DEFINE idx AS 0  
+        WHILE idx LESS THAN LENGTH OF rectangles DO  
+            LET rect BE rectangles[idx]  
+            LET leftX BE rect[0]  
+            LET bottomY BE rect[1]  
+            LET rightX BE rect[2]  
+            LET topY BE rect[3]  
+            
+            IF NOT (leftX >= minX) THEN  
+                minX ← leftX  
+            END IF  
+            IF NOT (bottomY >= minY) THEN  
+                minY ← bottomY  
+            END IF  
+            IF NOT (rightX <= maxX) THEN  
+                maxX ← rightX  
+            END IF  
+            IF NOT (topY <= maxY) THEN  
+                maxY ← topY  
+            END IF  
+            
+            LET rectArea BE (rightX - leftX)  
+            LET height BE (topY - bottomY)  
+            LET thisArea BE rectArea * height  
+            totalArea ← totalArea + thisArea  
+            
+            LET cornerPoints BE list of pairs: (leftX, bottomY), (leftX, topY), (rightX, bottomY), (rightX, topY)  
+            
+            LET ctr AS 0  
+            WHILE ctr LESS THAN LENGTH OF cornerPoints DO  
+                LET corner BE cornerPoints[ctr]  
+                IF corners CONTAINS corner THEN  
+                    REMOVE corner FROM corners  
+                ELSE  
+                    INSERT corner INTO corners  
+                END IF  
+                ctr ← ctr + 1  
+            END WHILE  
+            idx ← idx + 1  
+        END WHILE  
+        
+        LET fullWidth BE maxX - minX  
+        LET fullHeight BE maxY - minY  
+        LET expectedArea BE fullWidth * fullHeight  
+        
+        IF totalArea IS NOT expectedArea THEN  
+            RETURN False  
+        END IF  
+        
+        LET requiredCorners BE set of pairs: (minX, minY), (minX, maxY), (maxX, minY), (maxX, maxY)  
+        IF corners IS NOT EQUAL TO requiredCorners THEN  
+            RETURN False  
+        END IF  
+        
+        RETURN True  
+    END FUNCTION  
+END CLASS

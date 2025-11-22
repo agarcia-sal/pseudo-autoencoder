@@ -1,0 +1,78 @@
+```pseudocode
+CLASS Solution
+    FUNCTION countPairs(nums)
+        FUNCTION innerSwap(arr, idx1, idx2)
+            SET tmp TO arr[idx1]
+            SET arr[idx1] TO arr[idx2]
+            SET arr[idx2] TO tmp
+        END FUNCTION
+
+        FUNCTION recursiveP(iValue, jValue, mValue, arrValue, visitedSet)
+            IF iValue < jValue THEN
+                innerSwap(arrValue, iValue, jValue)
+                SET joinedString TO ""
+                FOR kValue FROM 0 TO (mValue - 1)
+                    SET joinedString TO joinedString + arrValue[kValue]
+                END FOR
+                SET elementInt TO toInteger(joinedString)
+                visitedSet.ADD(elementInt)
+                
+                FUNCTION nestedLoop(qVal, mLim, pStart, arrInner, visitInner)
+                    IF qVal < mLim THEN
+                        IF pStart < qVal THEN
+                            innerSwap(arrInner, pStart, qVal)
+                            SET builtStr TO ""
+                            FOR idxInside FROM 0 TO (mValue - 1)
+                                SET builtStr TO builtStr + arrInner[idxInside]
+                            END FOR
+                            SET convInt TO toInteger(builtStr)
+                            visitInner.ADD(convInt)
+                            innerSwap(arrInner, pStart, qVal)
+                            CALL nestedLoop(qVal, mLim, pStart + 1, arrInner, visitInner)
+                        ELSE
+                            CALL nestedLoop(qVal + 1, mLim, iValue + 1, arrInner, visitInner)
+                        END IF
+                    END IF
+                END FUNCTION
+
+                CALL nestedLoop(iValue + 1, mValue, iValue + 1, arrValue, visitedSet)
+                innerSwap(arrValue, iValue, jValue)
+                CALL recursiveP(iValue + 1, jValue, mValue, arrValue, visitedSet)
+            ELSE
+                IF jValue < mValue THEN
+                    CALL recursiveP(0, jValue + 1, mValue, arrValue, visitedSet)
+                END IF
+            END IF
+        END FUNCTION
+
+        CALL nums.sort()
+        SET countAccumulator TO 0
+        SET mapCounter TO defaultDictionary(defaultValue=0)
+
+        FUNCTION outerLoop(indexCurrent)
+            IF indexCurrent < length(nums) THEN
+                SET elementCurrent TO nums[indexCurrent]
+                SET visitationSet TO newSetWith(elementCurrent)
+                SET strForm TO toString(elementCurrent)
+                SET charArray TO []
+                FOR idxC FROM 0 TO (length(strForm) - 1)
+                    charArray.APPEND(strForm[idxC])
+                END FOR
+                SET lengthStr TO length(charArray)
+                CALL recursiveP(0, 0, lengthStr, charArray, visitationSet)
+
+                SET sumValue TO 0
+                FOR val FROM visitationSet
+                    SET sumValue TO sumValue + mapCounter[val]
+                END FOR
+                SET countAccumulator TO countAccumulator + sumValue
+                SET mapCounter[elementCurrent] TO mapCounter[elementCurrent] + 1
+                CALL outerLoop(indexCurrent + 1)
+            END IF
+        END FUNCTION
+
+        CALL outerLoop(0)
+        RETURN countAccumulator
+    END FUNCTION
+END CLASS
+```

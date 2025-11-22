@@ -1,0 +1,52 @@
+CLASS Solution  
+    FUNCTION waysToPartition(nums parameter of list of integers k parameter of integer) RETURNS integer  
+        SET sum_total AS 0  
+        SET length_nums AS 0  
+        
+        SET iterator_index AS 0  
+        WHILE iterator_index LESS THAN length of nums  
+            SET sum_total AS sum_total PLUS element at position iterator_index of nums  
+            SET iterator_index AS iterator_index PLUS 1  
+        END WHILE  
+        
+        SET length_nums AS length of nums  
+        
+        CREATE diff_counts_left AS a dictionary defaulting to 0  
+        CREATE diff_counts_right AS a dictionary defaulting to 0  
+        
+        SET prefix_sum AS 0  
+        SET counter AS 0  
+        REPEAT  
+            EXIT WHEN counter GREATER OR EQUAL TO (length_nums MINUS 1)  
+            SET prefix_sum AS prefix_sum PLUS element at position counter of nums  
+            SET difference_val AS sum_total MINUS (2 MULTIPLIED BY prefix_sum)  
+            SET diff_counts_right[difference_val] AS diff_counts_right[difference_val] PLUS 1  
+            SET counter AS counter PLUS 1  
+        END REPEAT  
+        
+        SET maximum_ways AS diff_counts_right[0]  
+        
+        SET prefix_sum AS 0  
+        SET index_iter AS 0  
+        FROM WHILE index_iter LESS THAN length_nums DO  
+            SET prefix_sum AS prefix_sum PLUS element at position index_iter of nums  
+            
+            SET delta_diff AS k MINUS element at position index_iter of nums  
+            
+            SET ways_new AS diff_counts_left[NEGATIVE delta_diff] PLUS diff_counts_right[delta_diff]  
+            
+            IF maximum_ways LESS THAN ways_new THEN  
+                SET maximum_ways AS ways_new  
+            END IF  
+            
+            SET current_diff AS sum_total MINUS (2 MULTIPLIED BY prefix_sum)  
+            
+            SET diff_counts_right[current_diff] AS diff_counts_right[current_diff] MINUS 1  
+            SET diff_counts_left[current_diff] AS diff_counts_left[current_diff] PLUS 1  
+            
+            SET index_iter AS index_iter PLUS 1  
+        END FROM  
+        
+        RETURN maximum_ways  
+    END FUNCTION  
+END CLASS

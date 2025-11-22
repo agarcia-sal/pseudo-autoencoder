@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION findKthSmallest(coins k)  
+        FUNCTION count_smaller_or_equal(x)  
+            SET total TO 0  
+            SET upper_limit TO (2 ^ (LENGTH(coins))) - 1  
+            SET subset_indicator TO 1  
+            WHILE subset_indicator <= upper_limit  
+                SET current_lcm TO 1  
+                SET subset_size TO 0  
+                SET idx TO 0  
+                WHILE idx < LENGTH(coins)  
+                    IF (subset_indicator & (1 << idx)) != 0 THEN  
+                        SET gcd_val TO GCD(current_lcm, coins[idx])  
+                        SET current_lcm TO (current_lcm * coins[idx]) / gcd_val  
+                        SET subset_size TO subset_size + 1  
+                    END IF  
+                    SET idx TO idx + 1  
+                END WHILE  
+                IF (subset_size % 2) == 1 THEN  
+                    SET total TO total + (x \ current_lcm)  
+                ELSE  
+                    SET total TO total - (x \ current_lcm)  
+                END IF  
+                SET subset_indicator TO subset_indicator + 1  
+            END WHILE  
+            RETURN total  
+        END FUNCTION  
+  
+        SET low TO 1  
+        SET high TO k * (coins[0])  
+        REPEAT UNTIL low >= high  
+            SET middle TO (low + high) \ 2  
+            IF count_smaller_or_equal(middle) < k THEN  
+                SET low TO middle + 1  
+            ELSE  
+                SET high TO middle  
+            END IF  
+        END REPEAT  
+        RETURN low  
+    END FUNCTION  
+END CLASS

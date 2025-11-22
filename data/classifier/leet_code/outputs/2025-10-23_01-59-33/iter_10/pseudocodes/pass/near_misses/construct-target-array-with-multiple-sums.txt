@@ -1,0 +1,57 @@
+CLASS Solution
+    FUNCTION isPossible(target)
+        DEFINE FUNCTION reconstruct(heap_map, sum_all)
+            IF heap_map IS EMPTY
+                RETURN True
+            END IF
+
+            SET keys_list TO LIST OF KEYS IN heap_map
+            SET max_key TO keys_list[0]
+            FOR each k IN keys_list
+                IF k > max_key THEN
+                    SET max_key TO k
+                END IF
+            END FOR
+
+            SET total_keys_sum TO 0
+            FOR each v IN heap_map VALUES
+                SET total_keys_sum TO total_keys_sum + v
+            END FOR
+
+            SET sum_rest TO total_keys_sum - heap_map[max_key]
+
+            IF max_key <= sum_rest OR sum_rest == 0
+                RETURN False
+            END IF
+
+            SET updated_val TO max_key MOD sum_rest
+
+            IF updated_val == 0 AND sum_rest != 1
+                RETURN False
+            END IF
+
+            SET new_map TO EMPTY MAP
+            FOR each key IN heap_map KEYS
+                IF key IS max_key THEN
+                    CONTINUE
+                END IF
+                SET new_map[key] TO heap_map[key]
+            END FOR
+
+            SET new_map[updated_val] TO heap_map[max_key]
+
+            RETURN reconstruct(new_map, sum_rest + updated_val)
+        END FUNCTION
+
+        DEFINE heap_map_local AS EMPTY MAP
+        FOR each element IN target
+            IF element IN heap_map_local THEN
+                SET heap_map_local[element] TO heap_map_local[element] + 1
+            ELSE
+                SET heap_map_local[element] TO 1
+            END IF
+        END FOR
+
+        RETURN reconstruct(heap_map_local, SUM OF target)
+    END FUNCTION
+END CLASS

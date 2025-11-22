@@ -1,0 +1,81 @@
+CLASS TrieNode  
+    FUNCTION __init__(self)  
+        ASSIGN a new default dictionary returning TrieNode instances TO self.children  
+        ASSIGN False TO self.deleted  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION deleteDuplicateFolder(self, paths)  
+        ASSIGN an empty list TO ans  
+        ASSIGN a new TrieNode instance TO root  
+        ASSIGN a new default dictionary returning empty lists TO subtreeToNodes  
+
+        SET idx1 TO 0  
+        WHILE idx1 < LENGTH OF paths  
+            ASSIGN root TO node  
+            SET current_path TO paths[idx1]  
+            SET idx2 TO 0  
+            WHILE idx2 < LENGTH OF current_path  
+                ASSIGN node.children[current_path[idx2]] TO node  
+                INCREMENT idx2 BY 1  
+            END WHILE  
+            INCREMENT idx1 BY 1  
+        END WHILE  
+
+        FUNCTION buildSubtreeToRoots(node)  
+            ASSIGN "(" TO subtree  
+            SET keys_list TO LIST OF KEYS IN node.children  
+            SET i TO 0  
+            WHILE i < LENGTH OF keys_list  
+                SET key TO keys_list[i]  
+                ASSIGN key + buildSubtreeToRoots(node.children[key]) TO subtree + subtree  
+                INCREMENT i BY 1  
+            END WHILE  
+            ASSIGN subtree + ")" TO subtree  
+            IF NOT (subtree == "()" )  
+                APPEND node TO subtreeToNodes[subtree]  
+            END IF  
+            RETURN subtree  
+        END FUNCTION  
+
+        CALL buildSubtreeToRoots(root)  
+
+        ASSIGN ALL VALUES OF subtreeToNodes TO nodes_list  
+        SET p TO 0  
+        WHILE p < LENGTH OF nodes_list  
+            ASSIGN nodes_list[p] TO current_nodes  
+            IF LENGTH OF current_nodes > 1  
+                SET q TO 0  
+                WHILE q < LENGTH OF current_nodes  
+                    ASSIGN True TO keep_going  
+                    ASSIGN current_nodes[q] TO current_node  
+                    ASSIGN True TO flag_check  
+                    ASSIGN True TO current_node.deleted  
+                    SET q TO q + 1  
+                END WHILE  
+            END IF  
+            INCREMENT p BY 1  
+        END WHILE  
+
+        FUNCTION constructPath(node, path)  
+            ASSIGN node.children ITEMS TO items_list  
+            SET j TO 0  
+            WHILE j < LENGTH OF items_list  
+                SET pair TO items_list[j]  
+                SET s_key TO pair[0]  
+                SET child_node TO pair[1]  
+                IF NOT child_node.deleted == True  
+                    CALL constructPath(child_node, path + [s_key])  
+                END IF  
+                SET j TO j + 1  
+            END WHILE  
+            IF LENGTH OF path > 0  
+                APPEND path TO ans  
+            END IF  
+        END FUNCTION  
+
+        CALL constructPath(root, [])  
+        RETURN ans  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,81 @@
+CLASS Solution
+    FUNCTION maxMoves(kx, ky, positions)
+        SET directions TO [(2,1),(1,2),(-1,2),(-2,1),(-2,-1),(-1,-2),(1,-2),(2,-1)]
+        SET pawnsSet TO empty set
+        FOR pos IN positions DO
+            ADD tuple(pos) TO pawnsSet
+        END FOR
+        SET totalPawns TO SIZE OF pawnsSet
+
+        FUNCTION dp(kx, ky, mask, isAlice)
+            IF mask == 0 THEN
+                RETURN 0
+            END IF
+
+            IF isAlice THEN
+                SET val TO 0
+            ELSE
+                SET val TO +∞
+            END IF
+
+            SET idx TO 0
+            WHILE idx < totalPawns DO
+                SET bitCheck TO mask & (1 << idx)
+                IF bitCheck != 0 THEN
+                    SET targetX TO positions[idx][0]
+                    SET targetY TO positions[idx][1]
+
+                    SET q TO [(kx, ky, 0)]
+                    SET seen TO empty set
+                    ADD (kx, ky) TO seen
+                    SET foundFlag TO False
+
+                    REPEAT
+                        IF LENGTH(q) == 0 THEN
+                            BREAK
+                        END IF
+                        SET curX, curY, steps TO q[0]
+                        REMOVE q[0]
+
+                        IF curX == targetX AND curY == targetY THEN
+                            SET foundFlag TO True
+                            BREAK
+                        END IF
+
+                        FOR deltaX, deltaY IN directions DO
+                            SET nxtX TO curX + deltaX
+                            SET nxtY TO curY + deltaY
+                            IF nxtX >= 0 AND nxtX < 50 AND nxtY >= 0 AND nxtY < 50 THEN
+                                IF (nxtX, nxtY) NOT IN seen THEN
+                                    ADD (nxtX, nxtY) TO seen
+                                    APPEND (nxtX, nxtY, steps+1) TO q
+                                END IF
+                            END IF
+                        END FOR
+                    UNTIL False
+
+                    IF foundFlag THEN
+                        SET newMask TO mask ^ (1 << idx)
+                        IF isAlice THEN
+                            SET candidate TO steps + dp(targetX, targetY, newMask, NOT isAlice)
+                            IF val < candidate THEN
+                                SET val TO candidate
+                            END IF
+                        ELSE
+                            SET candidate TO steps + dp(targetX, targetY, newMask, NOT isAlice)
+                            IF val > candidate THEN
+                                SET val TO candidate
+                            END IF
+                        END IF
+                    END IF
+                END IF
+                SET idx TO idx + 1
+            END WHILE
+
+            RETURN val
+        END FUNCTION
+
+        SET fullMask TO (1 << totalPawns) - 1
+        RETURN dp(kx, ky, fullMask, True)
+    END FUNCTION
+END CLASS

@@ -1,0 +1,74 @@
+CLASS Solution
+    FUNCTION shortestPathAllKeys(grid_of_strings)
+        SET directions TO list of the following tuples zero one zero negative one one zero negative one zero
+        SET m TO the LENGTH OF grid_of_strings
+        SET n TO the LENGTH OF element at position zero of grid_of_strings
+        SET start TO none
+        SET num_keys TO zero
+
+        FOR i FROM zero TO m MINUS one
+            FOR j FROM zero TO n MINUS one
+                SET cell TO element at position i of grid_of_strings element at position j
+                IF cell EQUALS at symbol
+                    SET start TO tuple of i and j
+                ELSE IF cell IS LOWERCASE LETTER
+                    INCREMENT num_keys BY one
+                END IF
+            END FOR
+        END FOR
+
+        CALL InitializeQueueAndVisited WITH start
+        ASSIGN queue TO result of InitializeQueueAndVisited at position zero
+        ASSIGN visited TO result of InitializeQueueAndVisited at position one
+
+        WHILE queue IS NOT empty
+            CALL PopLeft FROM queue
+            ASSIGN x TO result at position zero
+            ASSIGN y TO result at position one
+            ASSIGN keys TO result at position two
+            ASSIGN steps TO result at position three
+
+            FOR each tuple dx dy IN directions
+                SET nx TO x PLUS dx
+                SET ny TO y PLUS dy
+
+                IF nx IS GREATER THAN OR EQUAL TO zero AND nx IS LESS THAN m AND ny IS GREATER THAN OR EQUAL TO zero AND ny IS LESS THAN n
+                    SET cell TO element at position nx of grid_of_strings element at position ny
+
+                    IF cell EQUALS hash symbol
+                        CONTINUE
+                    END IF
+
+                    IF cell IS UPPERCASE LETTER
+                        SET key_needed TO one SHIFTED LEFT BY (UNSIGNED INTEGER VALUE OF ASCII CODE OF cell LOWERCASE LETTER MINUS UNSIGNED INTEGER VALUE OF ASCII CODE OF lowercase a)
+                        IF keys AND key_needed EQUALS zero
+                            CONTINUE
+                        END IF
+                    END IF
+
+                    IF cell IS LOWERCASE LETTER
+                        SET new_keys TO keys OR one SHIFTED LEFT BY (UNSIGNED INTEGER VALUE OF ASCII CODE OF cell MINUS UNSIGNED INTEGER VALUE OF ASCII CODE OF lowercase a)
+                        IF new_keys EQUALS one SHIFTED LEFT BY num_keys MINUS one
+                            RETURN steps PLUS one
+                        END IF
+                    ELSE
+                        SET new_keys TO keys
+                    END IF
+
+                    IF tuple of nx ny new_keys IS NOT IN visited
+                        ADD tuple of nx ny new_keys TO visited
+                        APPEND tuple of nx ny new_keys steps PLUS one TO queue
+                    END IF
+                END IF
+            END FOR
+        END WHILE
+
+        RETURN negative one
+    END FUNCTION
+
+    FUNCTION InitializeQueueAndVisited(start_position)
+        CREATE queue AS double ended queue WITH tuple of element at position zero of start_position element at position one of start_position zero zero
+        CREATE visited AS set WITH tuple of element at position zero of start_position element at position one of start_position zero
+        RETURN tuple of queue AND visited
+    END FUNCTION
+END CLASS

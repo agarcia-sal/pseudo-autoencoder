@@ -1,0 +1,67 @@
+```  
+CLASS Solution  
+    FUNCTION numberOfSpecialChars(word)  
+        DECLARE resultVar AS INTEGER INITIALIZED TO 0  
+        DECLARE mapOne AS A MAPPING FROM CHAR TO INTEGER INITIALIZED TO an empty mapping  
+        DECLARE mapTwo AS A MAPPING FROM CHAR TO INTEGER INITIALIZED TO an empty mapping  
+        
+        FUNCTION recurseIndices(pos, seq)  
+            IF pos >= LENGTH(seq) THEN  
+                RETURN  
+            ELSE  
+                DECLARE currentChar AS CHAR ASSIGNED TO seq[pos]  
+                DECLARE keyExistsInMapOne AS BOOLEAN ASSIGNED TO FALSE  
+                FOR EACH k IN KEYS(mapOne) DO  
+                    IF k == currentChar THEN  
+                        keyExistsInMapOne = TRUE  
+                    END IF  
+                END FOR  
+                IF NOT keyExistsInMapOne THEN  
+                    mapOne[currentChar] = pos  
+                END IF  
+                mapTwo[currentChar] = pos  
+                recurseIndices(pos + 1, seq)  
+            END IF  
+        END FUNCTION  
+        
+        CALL recurseIndices(0, word)  
+        
+        DECLARE charsetLeft AS SEQUENCE OF CHAR INITIALIZED TO [CHARACTER('a') + i for i = 0 TO 25]  
+        DECLARE charsetRight AS SEQUENCE OF CHAR INITIALIZED TO [CHARACTER('A') + j for j = 0 TO 25]  
+        
+        FUNCTION loopCount(index)  
+            IF index >= LENGTH(charsetLeft) THEN  
+                RETURN  
+            ELSE  
+                DECLARE lowerChar AS CHAR ASSIGNED TO charsetLeft[index]  
+                DECLARE upperChar AS CHAR ASSIGNED TO charsetRight[index]  
+                DECLARE hasLowerInMapTwo AS BOOLEAN ASSIGNED TO FALSE  
+                DECLARE hasUpperInMapOne AS BOOLEAN ASSIGNED TO FALSE  
+                
+                FOR EACH k IN KEYS(mapTwo) DO  
+                    IF k == lowerChar THEN  
+                        hasLowerInMapTwo = TRUE  
+                    END IF  
+                END FOR  
+                FOR EACH k IN KEYS(mapOne) DO  
+                    IF k == upperChar THEN  
+                        hasUpperInMapOne = TRUE  
+                    END IF  
+                END FOR  
+                
+                IF hasLowerInMapTwo AND hasUpperInMapOne THEN  
+                    IF mapTwo[lowerChar] < mapOne[upperChar] THEN  
+                        resultVar = resultVar + 1  
+                    END IF  
+                END IF  
+                
+                loopCount(index + 1)  
+            END IF  
+        END FUNCTION  
+        
+        CALL loopCount(0)  
+        
+        RETURN resultVar  
+    END FUNCTION  
+END CLASS  
+```

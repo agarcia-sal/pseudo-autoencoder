@@ -1,0 +1,73 @@
+CLASS Solution
+	FUNCTION rectangleArea(rectangles)
+		ASSIGN (10 ^ 9) PLUS 1 TO moduloLimit
+
+		DECLARE verticalPositions AS empty associative array
+		LOOP THROUGH rect IN rectangles:
+			verticalPositions[rect[1]] = TRUE
+			verticalPositions[rect[3]] = TRUE
+		END LOOP
+
+		CONVERT verticalPositions KEYS TO ARRAY AS sortedVerticals
+		SORT sortedVerticals BY ASCENDING ORDER
+
+		DECLARE lookupIndices AS empty map
+		SET positionTracker TO 0
+		WHILE positionTracker < LENGTH OF sortedVerticals
+			lookupIndices[sortedVerticals[positionTracker]] = positionTracker
+			SET positionTracker TO positionTracker + 1
+		END WHILE
+
+		DECLARE coverage AS ARRAY OF LENGTH LENGTH OF sortedVerticals FILLED WITH 0
+		DECLARE lineEvents AS empty array
+
+		SET pointer TO 0
+		while pointer < LENGTH OF rectangles:
+			ASSIGN rectangles[pointer][0], rectangles[pointer][1], rectangles[pointer][2], rectangles[pointer][3] TO a, b, c, d
+			APPEND (a, 1, b, d) TO lineEvents
+			APPEND (c, -1, b, d) TO lineEvents
+			SET pointer TO pointer + 1
+		END WHILE
+
+		SORT lineEvents ACCORDING TO EVENT[0] IN ASCENDING ORDER
+
+		SET priorX TO 0
+		ASSIGN 0 TO totalArea
+
+		DECLARE eventCounter TO 0
+		WHILE eventCounter < LENGTH OF lineEvents:
+			ASSIGN lineEvents[eventCounter] TO currX, evtType, ypos1, ypos2
+
+			ASSIGN 0 TO cumLength
+			DECLARE idx TO 1
+			WHILE idx < LENGTH OF coverage
+				IF coverage[idx - 1] > 0 THEN
+					ASSIGN sortedVerticals[idx] - sortedVerticals[idx - 1] TO segmentLength
+					ASSIGN cumLength + segmentLength TO cumLength
+				END IF
+				SET idx TO idx + 1
+			END WHILE
+
+			ASSIGN totalArea + cumLength * (currX - priorX) TO totalArea
+			ASSIGN totalArea MOD moduloLimit TO totalArea
+
+			ASSIGN lookupIndices[ypos1] TO startPos
+			ASSIGN lookupIndices[ypos2] TO endPos
+			ASSIGN startPos TO modifyIdx
+
+			WHILE modifyIdx < endPos
+				IF evtType EQUALS 1 THEN
+					coverage[modifyIdx] = coverage[modifyIdx] + 1
+				ELSE
+					coverage[modifyIdx] = coverage[modifyIdx] - 1
+				END IF
+				SET modifyIdx TO modifyIdx + 1
+			END WHILE
+
+			SET priorX TO currX
+			SET eventCounter TO eventCounter + 1
+		END WHILE
+
+		YIELD totalArea
+	END FUNCTION
+END CLASS

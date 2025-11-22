@@ -1,0 +1,52 @@
+CLASS Solution
+    FUNCTION gridIllumination(n, lamps, queries)
+        DEFINE rows AS dictionary with default 0
+        DEFINE columns AS dictionary with default 0
+        DEFINE diagonals AS dictionary with default 0
+        DEFINE anti_diagonals AS dictionary with default 0
+        DEFINE active_lamps AS empty set
+
+        SET index TO 0
+        WHILE index < LENGTH(lamps)
+            LET x = lamps[index][0]
+            LET y = lamps[index][1]
+            IF NOT (x, y) IN active_lamps THEN
+                INSERT (x, y) INTO active_lamps
+                rows[x] = rows[x] + 1
+                columns[y] = columns[y] + 1
+                diagonals[x - y] = diagonals[x - y] + 1
+                anti_diagonals[x + y] = anti_diagonals[x + y] + 1
+            END IF
+            index = index + 1
+        END WHILE
+
+        SET movement_offsets TO [(-1,0),(-1,1),(0,-1),(0,0),(0,1),(1,-1),(1,0),(1,1)]
+
+        LET output AS empty list
+
+        FOR EACH query_point IN queries DO
+            LET a = query_point[0]
+            LET b = query_point[1]
+
+            IF rows[a] <= 0 AND columns[b] <= 0 AND diagonals[a - b] <= 0 AND anti_diagonals[a + b] <= 0 THEN
+                APPEND 0 TO output
+            ELSE
+                APPEND 1 TO output
+            END IF
+
+            FOR EACH offset IN movement_offsets DO
+                LET new_x = a + offset[0]
+                LET new_y = b + offset[1]
+                IF (new_x, new_y) IN active_lamps THEN
+                    REMOVE (new_x, new_y) FROM active_lamps
+                    rows[new_x] = rows[new_x] - 1
+                    columns[new_y] = columns[new_y] - 1
+                    diagonals[new_x - new_y] = diagonals[new_x - new_y] - 1
+                    anti_diagonals[new_x + new_y] = anti_diagonals[new_x + new_y] - 1
+                END IF
+            END FOR
+        END FOR
+
+        RETURN output
+    END FUNCTION
+END CLASS

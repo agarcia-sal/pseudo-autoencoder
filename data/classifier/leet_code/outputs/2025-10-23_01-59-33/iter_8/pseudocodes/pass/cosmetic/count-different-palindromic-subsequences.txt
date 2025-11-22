@@ -1,0 +1,75 @@
+CLASS Solution  
+    FUNCTION countPalindromicSubsequences WITH PARAMETER s  
+        DECLARE MOD AS 1000000007  
+        DECLARE length_s AS LENGTH OF s  
+        
+        DECLARE next_occurrence AS LIST CONTAINING 4 ELEMENTS EACH INITIALIZED TO LIST OF length_s ELEMENTS SET TO -1  
+        DECLARE prev_occurrence AS LIST CONTAINING 4 ELEMENTS EACH INITIALIZED TO LIST OF length_s ELEMENTS SET TO -1  
+        
+        SET index_c TO 0  
+        WHILE index_c LESS THAN 4 DO  
+            SET current_char TO CHARACTER AT (ASCII('a') + index_c)  
+            SET last_seen TO -1  
+            
+            SET pos_idx TO 0  
+            WHILE pos_idx LESS THAN length_s DO  
+                IF s ELEMENT AT pos_idx EQUALS current_char THEN  
+                    SET last_seen TO pos_idx  
+                END IF  
+                SET prev_occurrence[index_c][pos_idx] TO last_seen  
+                INCREMENT pos_idx BY 1  
+            END WHILE  
+            
+            SET last_seen TO -1  
+            SET pos_idx TO length_s - 1  
+            WHILE pos_idx GREATER OR EQUAL TO 0 DO  
+                IF s ELEMENT AT pos_idx EQUALS current_char THEN  
+                    SET last_seen TO pos_idx  
+                END IF  
+                SET next_occurrence[index_c][pos_idx] TO last_seen  
+                DECREMENT pos_idx BY 1  
+            END WHILE  
+            
+            INCREMENT index_c BY 1  
+        END WHILE  
+        
+        DECLARE dp AS LIST OF length_s ELEMENTS EACH BEING A LIST OF length_s ELEMENTS SET TO 0  
+        
+        SET diag_idx TO 0  
+        WHILE diag_idx LESS THAN length_s DO  
+            SET dp[diag_idx][diag_idx] TO 1  
+            INCREMENT diag_idx BY 1  
+        END WHILE  
+        
+        SET current_len TO 2  
+        WHILE current_len LESS OR EQUAL TO length_s DO  
+            SET start_pos TO 0  
+            WHILE start_pos + current_len - 1 LESS THAN length_s DO  
+                SET end_pos TO start_pos + current_len - 1  
+                SET color_code TO 0  
+                WHILE color_code LESS THAN 4 DO  
+                    SET current_char TO CHARACTER AT (ASCII('a') + color_code)  
+                    SET left_idx TO next_occurrence[color_code][start_pos]  
+                    SET right_idx TO prev_occurrence[color_code][end_pos]  
+                    
+                    IF left_idx GREATER THAN end_pos OR right_idx LESS THAN start_pos THEN  
+                        # skip this iteration  
+                    ELSE  
+                        IF left_idx EQUALS right_idx THEN  
+                            SET dp[start_pos][end_pos] TO (dp[start_pos][end_pos] + 1) MOD MOD  
+                        ELSE  
+                            DECLARE addition AS dp[left_idx + 1][right_idx - 1]  
+                            dp[start_pos][end_pos] ← (dp[start_pos][end_pos] + addition + 2) MOD MOD  
+                        END IF  
+                    END IF  
+                    
+                    INCREMENT color_code BY 1  
+                END WHILE  
+                INCREMENT start_pos BY 1  
+            END WHILE  
+            INCREMENT current_len BY 1  
+        END WHILE  
+        
+        RETURN dp[0][length_s - 1]  
+    END FUNCTION  
+END CLASS

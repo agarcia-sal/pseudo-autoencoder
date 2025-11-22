@@ -1,0 +1,113 @@
+CLASS Solution  
+    FUNCTION canMouseWin(grid mouse_grid catJump cat_jump mouseJump mouse_jump)  
+        SET m TO the LENGTH OF mouse_grid  
+        SET n TO the LENGTH OF the FIRST element OF mouse_grid  
+        SET cat_start TO zero  
+        SET mouse_start TO zero  
+        SET food TO zero  
+        SET dirs TO the sequence of directions negative one zero one zero negative one  
+        SET g_mouse TO a list containing an empty list FOR EACH element FROM zero TO m MULTIPLIED BY n MINUS one  
+        SET g_cat TO a list containing an empty list FOR EACH element FROM zero TO m MULTIPLIED BY n MINUS one  
+
+        FOR each index i AND row IN mouse_grid  
+            FOR each index j AND character c IN row  
+                IF character c EQUALS the hash symbol  
+                    CONTINUE to the next iteration  
+                END IF  
+                SET v TO i MULTIPLIED BY n PLUS j  
+                IF character c EQUALS the character C  
+                    SET cat_start TO v  
+                ELSE IF character c EQUALS the character M  
+                    SET mouse_start TO v  
+                ELSE IF character c EQUALS the character F  
+                    SET food TO v  
+                END IF  
+                FOR each pair a AND b IN consecutive pairs OF dirs  
+                    FOR each k FROM zero TO mouse_jump  
+                        SET x TO i PLUS k MULTIPLIED BY a  
+                        SET y TO j PLUS k MULTIPLIED BY b  
+                        IF NOT (x GREATER THAN OR EQUAL TO zero AND x LESS THAN m AND y GREATER THAN OR EQUAL TO zero AND y LESS THAN n AND the character at position x OF mouse_grid AT position y NOT EQUALS the hash symbol)  
+                            BREAK the inner loop  
+                        END IF  
+                        APPEND x MULTIPLIED BY n PLUS y TO the list at position v OF g_mouse  
+                    END FOR  
+                    FOR each k FROM zero TO cat_jump  
+                        SET x TO i PLUS k MULTIPLIED BY a  
+                        SET y TO j PLUS k MULTIPLIED BY b  
+                        IF NOT (x GREATER THAN OR EQUAL TO zero AND x LESS THAN m AND y GREATER THAN OR EQUAL TO zero AND y LESS THAN n AND the character at position x OF mouse_grid AT position y NOT EQUALS the hash symbol)  
+                            BREAK the inner loop  
+                        END IF  
+                        APPEND x MULTIPLIED BY n PLUS y TO the list at position v OF g_cat  
+                    END FOR  
+                END FOR  
+            END FOR  
+        END FOR  
+        RETURN the RESULT OF the FUNCTION calc WITH PARAMETERS g_mouse g_cat mouse_start cat_start food EQUALS one  
+    END FUNCTION  
+
+    FUNCTION calc(g_mouse g_cat mouse_start cat_start hole)  
+        FUNCTION get_prev_states(state)  
+            SET m TO the FIRST element OF state  
+            SET c TO the SECOND element OF state  
+            SET t TO the THIRD element OF state  
+            SET pt TO the result of t EXCLUSIVE OR one  
+            SET pre TO an empty list  
+            IF pt EQUALS one  
+                FOR each pc IN the list at position c OF g_cat  
+                    IF the value at position m pc one of ans EQUALS zero  
+                        APPEND the tuple consisting of m pc pt TO pre  
+                    END IF  
+                END FOR  
+            ELSE  
+                FOR each pm IN the list at position m OF g_mouse  
+                    IF the value at position pm c zero of ans EQUALS zero  
+                        APPEND the tuple consisting of pm c zero TO pre  
+                    END IF  
+                END FOR  
+            END IF  
+            RETURN pre  
+        END FUNCTION  
+
+        SET n TO the LENGTH OF g_mouse  
+        SET degree TO a three DIMENSIONAL list of zeroes with dimensions n BY n BY two  
+        FOR each i FROM zero TO n MINUS one  
+            FOR each j FROM zero TO n MINUS one  
+                SET the element at i j zero OF degree TO the LENGTH OF the list at position i OF g_mouse  
+                SET the element at i j one OF degree TO the LENGTH OF the list at position j OF g_cat  
+            END FOR  
+        END FOR  
+
+        SET ans TO a three DIMENSIONAL list of zeroes with dimensions n BY n BY two  
+        SET q TO an empty double ended queue  
+        FOR each i FROM zero TO n MINUS one  
+            SET the element at hole i one OF ans TO one  
+            SET the element at i hole zero OF ans TO two  
+            SET the element at i i one OF ans TO two  
+            SET the element at i i zero OF ans TO two  
+            APPEND the tuple consisting of hole i one TO q  
+            APPEND the tuple consisting of i hole zero TO q  
+            APPEND the tuple consisting of i i zero TO q  
+            APPEND the tuple consisting of i i one TO q  
+        END FOR  
+        WHILE the queue q IS NOT empty  
+            SET state TO the element REMOVED FROM the LEFT OF q  
+            SET t TO the value at position the first element of state the second element of state the third element of state OF ans  
+            FOR each prev_state IN the RESULT OF get_prev_states WITH PARAMETER state  
+                SET pm TO the FIRST element OF prev_state  
+                SET pc TO the SECOND element OF prev_state  
+                SET pt TO the THIRD element OF prev_state  
+                IF pt EQUALS t MINUS one  
+                    SET the value at position pm pc pt OF ans TO t  
+                    APPEND prev_state TO q  
+                ELSE  
+                    DECREMENT the value at position pm pc pt OF degree BY one  
+                    IF the value at position pm pc pt OF degree EQUALS zero  
+                        SET the value at position pm pc pt OF ans TO t  
+                        APPEND prev_state TO q  
+                    END IF  
+                END IF  
+            END FOR  
+        END WHILE  
+        RETURN the value at position mouse_start cat_start zero OF ans  
+    END FUNCTION  
+END CLASS

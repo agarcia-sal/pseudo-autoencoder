@@ -1,0 +1,103 @@
+CLASS Solution
+    FUNCTION countPairs(nums)
+        PROCEDURE replicateSort(S)
+            SET indexA TO 0
+            WHILE indexA < LENGTH(S) - 1
+                SET indexB TO indexA + 1
+                WHILE indexB < LENGTH(S)
+                    IF NOT (S[indexA] <= S[indexB])
+                        SET temporary TO S[indexA]
+                        SET S[indexA] TO S[indexB]
+                        SET S[indexB] TO temporary
+                    END IF
+                    SET indexB TO indexB + 1
+                END WHILE
+                SET indexA TO indexA + 1
+            END WHILE
+        END PROCEDURE
+
+        CALL replicateSort(nums)
+
+        SET resultCount TO 0
+
+        DEFINE FUNCTION createDefaultDict()
+            RETURN NEW MAP WITH DEFAULT VALUE 0
+        END FUNCTION
+
+        SET frequencyMap TO createDefaultDict()
+
+        SET indexOuter TO 0
+        WHILE indexOuter < LENGTH(nums)
+            SET elementSet TO NEW SET()
+            SET baseNumber TO nums[indexOuter]
+            CALL elementSet.ADD(baseNumber)
+
+            SET digitList TO EMPTY LIST
+            SET iteratorIndex TO 0
+            WHILE iteratorIndex < LENGTH(STR(baseNumber))
+                CALL digitList.APPEND(STR(baseNumber)[iteratorIndex])
+                SET iteratorIndex TO iteratorIndex + 1
+            END WHILE
+ 
+            SET lenDigits TO LENGTH(digitList)
+
+            SET posJ TO 0
+            WHILE posJ < lenDigits
+                SET posI TO 0
+                WHILE posI < posJ
+                    SET tempChar TO digitList[posI]
+                    SET digitList[posI] TO digitList[posJ]
+                    SET digitList[posJ] TO tempChar
+
+                    SET concatenatedString TO EMPTY STRING
+                    SET concatIndex TO 0
+                    WHILE concatIndex < lenDigits
+                        SET concatenatedString TO concatenatedString + digitList[concatIndex]
+                        SET concatIndex TO concatIndex + 1
+                    END WHILE
+                    CALL elementSet.ADD(INT(concatenatedString))
+
+                    SET qIndex TO posI + 1
+                    WHILE qIndex < lenDigits
+                        SET pIndex TO posI + 1
+                        WHILE pIndex < qIndex
+                            SET tempSwap TO digitList[pIndex]
+                            SET digitList[pIndex] TO digitList[qIndex]
+                            SET digitList[qIndex] TO tempSwap
+
+                            SET concatStrInner TO EMPTY STRING
+                            SET innerIdx TO 0
+                            WHILE innerIdx < lenDigits
+                                SET concatStrInner TO concatStrInner + digitList[innerIdx]
+                                SET innerIdx TO innerIdx + 1
+                            END WHILE
+                            CALL elementSet.ADD(INT(concatStrInner))
+
+                            SET digitList[pIndex] TO digitList[qIndex]
+                            SET digitList[qIndex] TO tempSwap
+                            SET pIndex TO pIndex + 1
+                        END WHILE
+                        SET qIndex TO qIndex + 1
+                    END WHILE
+                    SET digitList[posI] TO digitList[posJ]
+                    SET digitList[posJ] TO tempChar
+                    SET posI TO posI + 1
+                END WHILE
+                SET posJ TO posJ + 1
+            END WHILE
+
+            SET sumIncrement TO 0
+            FOR EACH item IN elementSet
+                SET sumIncrement TO sumIncrement + (frequencyMap[item] IF item IN frequencyMap ELSE 0)
+            END FOR
+
+            SET resultCount TO resultCount + sumIncrement
+
+            SET frequencyMap[baseNumber] TO (frequencyMap[baseNumber] + 1 IF baseNumber IN frequencyMap ELSE 1)
+
+            SET indexOuter TO indexOuter + 1
+        END WHILE
+
+        RETURN resultCount
+    END FUNCTION
+END CLASS

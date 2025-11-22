@@ -1,0 +1,80 @@
+```pseudocode
+CLASS Solution
+    FUNCTION stringIndices(wordsContainer wordsContainer TO LIST OF STRING, wordsQuery wordsQuery TO LIST OF STRING) RETURNS LIST OF INTEGER
+        SET map_suffixes TO dictionary STRING->INTEGER initialized as empty
+
+        FUNCTION process_suffixes_at_index(pos currentPos, str currentStr, idx outerIdx)
+            IF currentPos >= LENGTH(currentStr) THEN
+                RETURN
+            END IF
+            SET curr_sfx TO SUBSTRING(currentStr, currentPos, LENGTH(currentStr) - currentPos)
+            IF NOT (curr_sfx IN map_suffixes) THEN
+                SET map_suffixes[curr_sfx] TO outerIdx
+            ELSE
+                IF LENGTH(currentStr) < LENGTH(wordsContainer[map_suffixes[curr_sfx]]) OR
+                   ( (LENGTH(currentStr) = LENGTH(wordsContainer[map_suffixes[curr_sfx]])) AND (outerIdx < map_suffixes[curr_sfx]) ) THEN
+                    SET map_suffixes[curr_sfx] TO outerIdx
+                END IF
+            END IF
+            CALL process_suffixes_at_index(currentPos + 1, currentStr, outerIdx)
+        END FUNCTION
+
+        FUNCTION iterate_words(ctr idx)
+            IF idx >= LENGTH(wordsContainer) THEN
+                RETURN
+            END IF
+            CALL process_suffixes_at_index(0, wordsContainer[idx], idx)
+            CALL iterate_words(idx + 1)
+        END FUNCTION
+
+        CALL iterate_words(0)
+
+        FUNCTION find_matching_index(query_string QUERY TO STRING) RETURNS INTEGER
+            FUNCTION iterate_query_pos(p INTEGER)
+                IF p >= LENGTH(QUERY) THEN
+                    RETURN -1
+                END IF
+                SET candidate_sfx TO SUBSTRING(QUERY, p, LENGTH(QUERY) - p)
+                IF candidate_sfx IN map_suffixes THEN
+                    RETURN map_suffixes[candidate_sfx]
+                ELSE
+                    RETURN iterate_query_pos(p + 1)
+                END IF
+            END FUNCTION
+
+            SET answer TO iterate_query_pos(0)
+            IF answer <> -1 THEN
+                RETURN answer
+            ELSE
+                SET min_idx TO 0
+                SET min_len TO LENGTH(wordsContainer[0])
+                SET i TO 1
+                WHILE i < LENGTH(wordsContainer)
+                    IF LENGTH(wordsContainer[i]) < min_len OR
+                       (LENGTH(wordsContainer[i]) = min_len AND i < min_idx) THEN
+                        SET min_len TO LENGTH(wordsContainer[i])
+                        SET min_idx TO i
+                    END IF
+                    SET i TO i + 1
+                END WHILE
+                RETURN min_idx
+            END IF
+        END FUNCTION
+
+        SET outputs TO LIST OF INTEGER initialized empty
+
+        FUNCTION process_queries(j INTEGER)
+            IF j >= LENGTH(wordsQuery) THEN
+                RETURN
+            END IF
+            SET idx_match TO find_matching_index(wordsQuery[j])
+            APPEND idx_match TO outputs
+            CALL process_queries(j + 1)
+        END FUNCTION
+
+        CALL process_queries(0)
+
+        RETURN outputs
+    END FUNCTION
+END CLASS
+```

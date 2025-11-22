@@ -1,0 +1,113 @@
+```  
+CLASS Solution  
+    FUNCTION maximumLength(nums PARAMETER, k PARAMETER)  
+        FUNCTION traverseNums(pos PARAMETER, res PARAMETER)  
+            IF (pos + 1) > LENGTH(nums) THEN  
+                RETURN res  
+            ELSE  
+                RETURN traverseNums(pos + 1, res(pos, nums[pos]))  
+            END IF  
+        END FUNCTION  
+  
+        SET lengthNums TO LENGTH(nums)  
+        SET matrixF TO LIST()  
+        SET mapMp TO LIST()  
+        SET arrayG TO LIST()  
+  
+        FOR idxH FROM 0 TO k + 0 DO  
+            APPEND LIST() TO matrixF  
+            APPEND DICTIONARY() TO mapMp  
+            APPEND [0,0,0] TO arrayG  
+        END FOR  
+  
+        FOR idxA FROM 0 TO lengthNums - 1 DO  
+            FOR idxB FROM 0 TO k + 0 DO  
+                APPEND 0 TO matrixF[idxB]  
+            END FOR  
+        END FOR  
+  
+        SET resultAns TO 0  
+  
+        FUNCTION processIndices(i PARAMETER, x PARAMETER)  
+            FUNCTION processH(h PARAMETER, state PARAMETER)  
+                SET valX TO state  
+                SET valF TO 0  
+                IF mapMp[h] CONTAINS KEY x THEN  
+                    SET valF TO mapMp[h][x]  
+                ELSE  
+                    SET valF TO 0  
+                END IF  
+  
+                IF h > 0 THEN  
+                    IF arrayG[h - 1][0] != nums[i] THEN  
+                        IF valF < arrayG[h - 1][1] THEN  
+                            SET valF TO arrayG[h - 1][1]  
+                        END IF  
+                    ELSE  
+                        IF valF < arrayG[h - 1][2] THEN  
+                            SET valF TO arrayG[h - 1][2]  
+                        END IF  
+                    END IF  
+                END IF  
+  
+                SET valF TO valF + 1  
+  
+                matrixF[h][i] = valF  
+  
+                IF mapMp[h] CONTAINS KEY nums[i] THEN  
+                    IF mapMp[h][nums[i]] < matrixF[h][i] THEN  
+                        SET mapMp[h][nums[i]] TO matrixF[h][i]  
+                    END IF  
+                ELSE  
+                    SET mapMp[h][nums[i]] TO matrixF[h][i]  
+                END IF  
+  
+                IF arrayG[h][0] != x THEN  
+                    IF matrixF[h][i] >= arrayG[h][1] THEN  
+                        arrayG[h][2] = arrayG[h][1]  
+                        arrayG[h][1] = matrixF[h][i]  
+                        arrayG[h][0] = x  
+                    ELSE  
+                        IF arrayG[h][2] < matrixF[h][i] THEN  
+                            arrayG[h][2] = matrixF[h][i]  
+                        END IF  
+                    END IF  
+                ELSE  
+                    IF arrayG[h][1] < matrixF[h][i] THEN  
+                        arrayG[h][1] = matrixF[h][i]  
+                    END IF  
+                END IF  
+  
+                IF resultAns < matrixF[h][i] THEN  
+                    SET resultAns TO matrixF[h][i]  
+                END IF  
+  
+                RETURN h + 1  
+            END FUNCTION  
+  
+            FUNCTION loopH(count PARAMETER)  
+                IF count > k THEN  
+                    RETURN 0  
+                ELSE  
+                    RETURN loopH(processH(count, x))  
+                END IF  
+            END FUNCTION  
+  
+            loopH(0)  
+            RETURN i + 1  
+        END FUNCTION  
+  
+        FUNCTION recurseI(idx PARAMETER)  
+            IF idx >= lengthNums THEN  
+                RETURN 0  
+            ELSE  
+                RETURN recurseI(processIndices(idx, nums[idx]))  
+            END IF  
+        END FUNCTION  
+  
+        recurseI(0)  
+  
+        RETURN resultAns  
+    END FUNCTION  
+END CLASS  
+```

@@ -1,0 +1,134 @@
+```pseudocode
+CLASS Solution
+    FUNCTION maxPotholes(road STRING road, INTEGER budget) RETURNS INTEGER
+        FUNCTION splitOnDot(inputStr STRING) RETURNS ARRAY OF STRING
+            FUNCTION recurSplit(str STRING, pos INTEGER, acc ARRAY OF STRING) RETURNS ARRAY OF STRING
+                IF pos GREATER THAN OR EQUAL TO LENGTH str THEN
+                    RETURN acc
+                END IF
+                SET nextIdx TO pos
+                WHILE nextIdx LESS THAN LENGTH str AND CHAR_AT str nextIdx NOT EQUAL TO '.' DO
+                    SET nextIdx TO nextIdx PLUS 1
+                END WHILE
+                SET part TO SUBSTRING str FROM pos TO nextIdx MINUS pos
+                APPEND part TO acc
+                RETURN recurSplit str (nextIdx PLUS 1) acc
+            END FUNCTION
+            RETURN recurSplit inputStr 0 []
+        END FUNCTION
+
+        FUNCTION lengthOfSegment(s STRING) RETURNS INTEGER
+            SET result TO 0
+            FUNCTION countChars(idx INTEGER) RETURNS INTEGER
+                IF idx GREATER THAN OR EQUAL TO LENGTH s THEN
+                    RETURN 0
+                ELSE
+                    RETURN 1 PLUS countChars (idx PLUS 1)
+                END IF
+            END FUNCTION
+            SET result TO countChars 0
+            RETURN result
+        END FUNCTION
+
+        FUNCTION comparatorAscLen(a STRING, b STRING) RETURNS BOOLEAN
+            RETURN lengthOfSegment a LESS THAN lengthOfSegment b
+        END FUNCTION
+
+        FUNCTION sortSegments(arr ARRAY OF STRING) RETURNS ARRAY OF STRING
+            IF LENGTH arr LESS THAN OR EQUAL TO 1 THEN
+                RETURN arr
+            END IF
+            SET pivot TO arr[0]
+            SET less TO []
+            SET greater TO []
+            SET idx TO 1
+
+            FUNCTION partitionLoop()
+                IF idx GREATER THAN OR EQUAL TO LENGTH arr THEN
+                    RETURN
+                END IF
+                IF comparatorAscLen arr[idx] pivot THEN
+                    APPEND arr[idx] TO less
+                ELSE
+                    APPEND arr[idx] TO greater
+                END IF
+                SET idx TO idx PLUS 1
+                partitionLoop()
+            END FUNCTION
+
+            partitionLoop()
+            RETURN concatArrays sortSegments(less) [pivot] concatArrays sortSegments(greater)
+        END FUNCTION
+
+        FUNCTION concatArrays(a ARRAY OF STRING, b ARRAY OF STRING, c ARRAY OF STRING) RETURNS ARRAY OF STRING
+            SET res TO []
+            SET i TO 0
+
+            FUNCTION appendAll(arr ARRAY OF STRING)
+                SET j TO 0
+                FUNCTION appendLoop()
+                    IF j GREATER THAN OR EQUAL TO LENGTH arr THEN RETURN END IF
+                    APPEND arr[j] TO res
+                    SET j TO j PLUS 1
+                    appendLoop()
+                END FUNCTION
+                appendLoop()
+            END FUNCTION
+            appendAll a
+            appendAll b
+            appendAll c
+            RETURN res
+        END FUNCTION
+
+        SET segments TO splitOnDot road
+        SET segments TO sortSegments segments
+
+        SET fixedCount TO 0
+        SET idxSeg TO 0
+        FUNCTION processSegments()
+            IF idxSeg GREATER THAN OR EQUAL TO LENGTH segments THEN
+                RETURN
+            END IF
+            SET currSeg TO segments[idxSeg]
+            SET lenCurr TO lengthOfSegment currSeg
+            SET idxSeg TO idxSeg PLUS 1
+
+            IF lenCurr EQUALS 0 THEN
+                processSegments()
+                RETURN
+            END IF
+
+            SET costVal TO lenCurr PLUS 1
+            IF costVal LESS THAN OR EQUAL TO budget THEN
+                SET fixedCount TO fixedCount PLUS lenCurr
+                SET budget TO budget MINUS costVal
+                processSegments()
+                RETURN
+            ELSE
+                FUNCTION tryReduce(n INTEGER)
+                    IF n LESS THAN OR EQUAL TO 0 OR budget EQUALS 0 THEN RETURN n END IF
+                    SET trialCost TO n PLUS 1
+                    IF budget GREATER THAN OR EQUAL TO trialCost THEN
+                        SET fixedCount TO fixedCount PLUS n
+                        SET budget TO budget MINUS trialCost
+                        RETURN 0
+                    ELSE
+                        RETURN tryReduce (n MINUS 1)
+                    END IF
+                END FUNCTION
+                SET remainder TO tryReduce lenCurr
+                IF remainder NOT EQUAL TO 0 THEN
+                    # no change needed, just proceed
+                    NULL
+                END IF
+                processSegments()
+                RETURN
+            END IF
+        END FUNCTION
+
+        processSegments()
+
+        RETURN fixedCount
+    END FUNCTION
+END CLASS
+```

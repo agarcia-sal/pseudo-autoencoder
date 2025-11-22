@@ -1,0 +1,33 @@
+CLASS Solution  
+    FUNCTION solve(nums list OF integers, queries list OF list OF integers) RETURNS list OF integers  
+        SET MODULO_VALUE AS 10^9 + 7  
+        SET length_nums AS LENGTH OF nums  
+        SET highest_y_value AS MAXIMUM OF (EXTRACT second ELEMENT FROM EACH pair IN queries)  
+        SET prefix_accumulators AS LIST OF (highest_y_value + 1) ITEMS EACH INITIALIZED TO A LIST OF length_nums TIMES 0  
+        
+        SET current_y TO 1  
+        WHILE current_y <= highest_y_value  
+            SET index_i TO length_nums - 1  
+            WHILE index_i >= 0  
+                IF (index_i + current_y) < length_nums THEN  
+                    LET temp_sum BE nums[index_i] + prefix_accumulators[current_y][index_i + current_y]  
+                    SET prefix_accumulators[current_y][index_i] AS temp_sum  
+                ELSE  
+                    SET prefix_accumulators[current_y][index_i] AS nums[index_i]  
+                END IF  
+                SET index_i TO index_i - 1  
+            END WHILE  
+            SET current_y TO current_y + 1  
+        END WHILE  
+        
+        SET results AS EMPTY LIST  
+        FOR EACH query_pair IN queries  
+            LET x_val BE query_pair[0]  
+            LET y_val BE query_pair[1]  
+            LET remainder_value BE prefix_accumulators[y_val][x_val] MODULO MODULO_VALUE  
+            APPEND remainder_value TO results  
+        END FOR  
+        
+        RETURN results  
+    END FUNCTION  
+END CLASS

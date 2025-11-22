@@ -1,0 +1,38 @@
+CLASS Solution  
+    FUNCTION hasValidPath(grid)  
+        SET totalRows AS the LENGTH OF grid  
+        SET totalColumns AS the LENGTH OF element at position zero of grid  
+        
+        IF ( (totalRows PLUS totalColumns MINUS 1) MOD 2 ) IS NOT EQUAL TO 0  
+            RETURN false  
+        END IF  
+        
+        INITIALIZE dp AS a three-dimensional array of size (totalRows PLUS 1) BY (totalColumns PLUS 1) BY (totalRows PLUS totalColumns PLUS 1) FILLED WITH false  
+        
+        dp[1][0][0] ← true  
+        
+        SET rowIndex TO 0  
+        WHILE rowIndex LESS THAN totalRows  
+            SET columnIndex TO 0  
+            WHILE columnIndex LESS THAN totalColumns  
+                SET depthIndex TO 0  
+                WHILE depthIndex LESS THAN OR EQUAL TO totalRows PLUS totalColumns  
+                    IF (dp[rowIndex][columnIndex PLUS 1][depthIndex] OR dp[rowIndex PLUS 1][columnIndex][depthIndex]) IS true THEN  
+                        IF (grid[rowIndex][columnIndex] IS '(' AND depthIndex PLUS 1 LESS THAN totalRows PLUS totalColumns PLUS 1) THEN  
+                            dp[rowIndex PLUS 1][columnIndex PLUS 1][depthIndex PLUS 1] ← true  
+                        ELSE  
+                            IF (grid[rowIndex][columnIndex] IS ')' AND depthIndex MINUS 1 GREATER THAN OR EQUAL TO 0) THEN  
+                                dp[rowIndex PLUS 1][columnIndex PLUS 1][depthIndex MINUS 1] ← true  
+                            END IF  
+                        END IF  
+                    END IF  
+                    SET depthIndex TO depthIndex PLUS 1  
+                END WHILE  
+                SET columnIndex TO columnIndex PLUS 1  
+            END WHILE  
+            SET rowIndex TO rowIndex PLUS 1  
+        END WHILE  
+        
+        RETURN dp[totalRows][totalColumns][0]  
+    END FUNCTION  
+END CLASS

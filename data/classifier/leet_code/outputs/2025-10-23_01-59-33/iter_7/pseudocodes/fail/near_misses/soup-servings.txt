@@ -1,0 +1,74 @@
+CLASS Solution
+    FUNCTION soupServings(n)
+        IF NOT (n GREATER THAN 4800) THEN
+            SET x TO n PLUS 24
+            SET y TO 25
+            SET z TO x DIVIDED BY y
+
+            SET store TO empty dictionary
+
+            FUNCTION dp(m, k)
+                FUNCTION helper(m, k)
+                    IF store CONTAINS key (m, k) THEN
+                        RETURN store VALUE FOR key (m, k)
+                    END IF
+                    IF m GREATER THAN 0 OR k GREATER THAN 0 THEN
+                        IF k GREATER THAN 0 THEN
+                            IF m GREATER THAN 0 THEN
+                                SET res TO 0
+                                SET idx TO 0
+
+                                FUNCTION recurSteps(arr, idx, m, k)
+                                    IF idx EQUALS 4 THEN
+                                        RETURN arr
+                                    END IF
+                                    SET stepM TO m
+                                    SET stepK TO k
+                                    SWITCH idx
+                                        CASE 0:
+                                            SET stepM TO m MINUS 4
+                                            SET stepK TO k
+                                        CASE 1:
+                                            SET stepM TO m MINUS 3
+                                            SET stepK TO k MINUS 1
+                                        CASE 2:
+                                            SET stepM TO m MINUS 2
+                                            SET stepK TO k MINUS 2
+                                        CASE 3:
+                                            SET stepM TO m MINUS 1
+                                            SET stepK TO k MINUS 3
+                                    END SWITCH
+                                    SET arr TO arr PLUS [dp(stepM, stepK)]
+                                    RETURN recurSteps(arr, idx PLUS 1, m, k)
+                                END FUNCTION
+
+                                SET probs TO recurSteps([], idx, m, k)
+
+                                FOR EACH p IN probs
+                                    SET res TO res PLUS p
+                                END FOR
+                                SET result TO 0.25 MULTIPLIED BY res
+                                SET store[(m, k)] TO result
+                                RETURN result
+                            ELSE
+                                SET store[(m, k)] TO 1.0
+                                RETURN 1.0
+                            END IF
+                        ELSE
+                            SET store[(m, k)] TO 0.0
+                            RETURN 0.0
+                        END IF
+                    ELSE
+                        SET store[(m, k)] TO 0.5
+                        RETURN 0.5
+                    END IF
+                END FUNCTION
+                RETURN helper(m, k)
+            END FUNCTION
+
+            RETURN dp(z, z)
+        ELSE
+            RETURN 1.0
+        END IF
+    END FUNCTION
+END CLASS

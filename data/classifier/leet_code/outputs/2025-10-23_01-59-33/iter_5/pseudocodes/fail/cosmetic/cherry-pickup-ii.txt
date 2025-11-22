@@ -1,0 +1,42 @@
+CLASS Solution
+    FUNCTION cherryPickup(grid)
+        SET totalRows AS LENGTH(grid)
+        SET totalCols AS LENGTH(grid[0])
+        
+        FUNCTION dp(r c1 c2)
+            IF (c1 < 0) OR (c1 >= totalCols) OR (c2 < 0) OR (c2 >= totalCols) THEN
+                RETURN 0
+            END IF
+
+            IF c1 = c2 THEN
+                SET gathered AS grid[r][c1]
+            ELSE
+                SET gathered AS grid[r][c1] + grid[r][c2]
+            END IF
+
+            IF r = totalRows - 1 THEN
+                RETURN gathered
+            END IF
+            
+            SET supremeValue TO 0
+            SET deltaIndexOneList TO [-1 0 1]
+            SET deltaIndexTwoList TO [-1 0 1]
+            SET outerCounter TO 0
+            WHILE outerCounter < LENGTH(deltaIndexOneList)
+                SET innerCounter TO 0
+                WHILE innerCounter < LENGTH(deltaIndexTwoList)
+                    SET candidateSum TO dp(r + 1 c1 + deltaIndexOneList[outerCounter] c2 + deltaIndexTwoList[innerCounter])
+                    IF candidateSum > supremeValue THEN
+                        supremeValue ← candidateSum
+                    END IF
+                    innerCounter ← innerCounter + 1
+                END WHILE
+                outerCounter ← outerCounter + 1
+            END WHILE
+
+            RETURN gathered + supremeValue
+        END FUNCTION
+
+        RETURN dp(0 0 totalCols - 1)
+    END FUNCTION
+END CLASS

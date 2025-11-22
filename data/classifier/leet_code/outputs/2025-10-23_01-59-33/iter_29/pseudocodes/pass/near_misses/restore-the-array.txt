@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION numberOfArrays(s PARAMETER string, k PARAMETER integer) RETURNS integer  
+        CONST MODULO = 1000000007  
+        VAR len_s = LENGTH(s)  
+        VAR tally = LIST_INITIALIZE_WITH(len_s + 1, 0)  
+        SET tally[0] = 1  
+
+        FUNCTION recurse(index PARAMETER integer) RETURNS void  
+            IF index >= len_s  
+                RETURN  
+            END IF
+
+            VAR fork = index  
+            WHILE fork < len_s  
+                VAR leading_char = s[fork]  
+                IF leading_char = '0'  
+                    RETURN  
+                END IF  
+
+                VAR extract_sub = SUBSTRING(s, index, fork)  
+                VAR number_extracted = TO_INTEGER(extract_sub)  
+
+                IF number_extracted > k  
+                    RETURN  
+                END IF 
+
+                tally[fork + 1] = (tally[fork + 1] + tally[index]) MODULO MODULO  
+                SET fork = fork + 1  
+            END WHILE
+        END FUNCTION  
+
+        VAR pos = 0  
+        WHILE pos < len_s  
+            CALL recurse(pos)  
+            INCREMENT pos  
+        END WHILE  
+
+        RETURN tally[len_s]  
+    END FUNCTION  
+END CLASS

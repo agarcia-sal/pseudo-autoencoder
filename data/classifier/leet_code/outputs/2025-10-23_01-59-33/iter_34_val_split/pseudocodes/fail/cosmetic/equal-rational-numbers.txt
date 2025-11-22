@@ -1,0 +1,26 @@
+CLASS Solution
+    FUNCTION isRationalEqual WITH PARAMETER s OF TYPE string WITH PARAMETER t OF TYPE string RETURNS boolean
+        ASSIGN [1, 1/9, 1/99, 1/999, 1/9999] TO ratiosList
+
+        FUNCTION valueOf WITH PARAMETER s OF TYPE string RETURNS a floating point number
+            ASSIGN indexOfOpenParen TO index(s, "(")
+            IF NOT (indexOfOpenParen >= 0) THEN
+                RETURN float(s)
+            END IF
+
+            ASSIGN indexOpen TO indexOfOpenParen
+            ASSIGN indexClose TO index(s, ")")
+            ASSIGN decimalDot TO index(s, ".")
+
+            ASSIGN baseNum TO float(substring(s, 0, indexOpen - 1))
+            ASSIGN lengthNonRepeat TO indexOpen - decimalDot - 1
+
+            ASSIGN repeatNum TO int(substring(s, indexOpen + 1, indexClose - 1))
+            ASSIGN lengthRepeat TO indexClose - indexOpen - 1
+            RETURN baseNum + repeatNum * (1 / (10 ^ lengthNonRepeat)) * ratiosList[lengthRepeat]
+        END FUNCTION
+
+        ASSIGN diff TO abs(valueOf(s) - valueOf(t))
+        RETURN diff < (1 / (10 ^ 9))
+    END FUNCTION
+END CLASS

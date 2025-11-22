@@ -1,0 +1,37 @@
+CLASS Solution
+    FUNCTION canCross(stones)
+        IF stones IS EMPTY OR NOT (LENGTH stones >= 2)
+            OUTPUT False
+        END IF
+        LET pebbleBank BE A HASH MAP(initialized empty)
+        LET cache BE A HASH MAP(empty)
+
+        FUNCTION can_jump_to(loc, step)
+            IF loc = stones[LENGTH stones - 1]
+                OUTPUT True
+            END IF
+            IF (loc, step) EXISTS IN cache
+                OUTPUT cache[(loc, step)]
+            END IF
+            LET delta BE -1
+            WHILE delta <= 1
+                LET candidateStep BE step + delta
+                IF candidateStep > 0 AND (loc + candidateStep) IN pebbleBank
+                    IF can_jump_to(loc + candidateStep, candidateStep)
+                        SET cache[(loc, step)] AS True
+                        OUTPUT True
+                    END IF
+                END IF
+                INCREMENT delta BY 1
+            END WHILE
+            SET cache[(loc, step)] AS False
+            OUTPUT False
+        END FUNCTION
+
+        FOR peb IN stones
+            SET pebbleBank[peb] AS True
+        END FOR
+
+        OUTPUT can_jump_to(stones[0], 0)
+    END FUNCTION
+END CLASS

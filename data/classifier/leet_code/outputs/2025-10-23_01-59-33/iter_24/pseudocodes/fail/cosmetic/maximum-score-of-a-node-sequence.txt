@@ -1,0 +1,59 @@
+CLASS Solution  
+    FUNCTION maximumScore(scores, edges)  
+        CREATE neighbors AS empty default mapping where each key maps to an empty list  
+        SET indexA TO 0  
+        WHILE indexA < LENGTH(edges)  
+            LET edgePair BE edges[indexA]  
+            LET firstNode TO edgePair[0]  
+            LET secondNode TO edgePair[1]  
+            LET scoreSecond TO scores[secondNode]  
+            LET scoreFirst TO scores[firstNode]  
+            ADD (scoreSecond, secondNode) TO neighbors[firstNode]  
+            ADD (scoreFirst, firstNode) TO neighbors[secondNode]  
+            INCREMENT indexA BY 1  
+        END WHILE  
+
+        LET nodeIterKeys BE KEYS(neighbors)  
+        LET indexB TO 0  
+        WHILE indexB < LENGTH(nodeIterKeys)  
+            LET currNode TO nodeIterKeys[indexB]  
+            LET currList TO neighbors[currNode]  
+            SORT currList DESCENDING BY first ELEMENT OF PAIRS  
+            SET neighbors[currNode] TO SUBLIST(currList, 0, MIN(3, LENGTH(currList)))  
+            INCREMENT indexB BY 1  
+        END WHILE  
+
+        SET highestScore TO -1  
+        LET idxEdge TO 0  
+        WHILE idxEdge < LENGTH(edges)  
+            LET currentEdge TO edges[idxEdge]  
+            LET nodeU TO currentEdge[0]  
+            LET nodeV TO currentEdge[1]  
+            LET listU TO neighbors[nodeU]  
+            LET listV TO neighbors[nodeV]  
+            LET idxU TO 0  
+            WHILE idxU < LENGTH(listU)  
+                LET pairU TO listU[idxU]  
+                LET scr1 TO pairU[0]  
+                LET xNode TO pairU[1]  
+                LET idxV TO 0  
+                WHILE idxV < LENGTH(listV)  
+                    LET pairV TO listV[idxV]  
+                    LET scr2 TO pairV[0]  
+                    LET yNode TO pairV[1]  
+                    IF (xNode ≠ yNode) AND (xNode ≠ nodeU) AND (xNode ≠ nodeV) AND (yNode ≠ nodeU) AND (yNode ≠ nodeV) AND (nodeU ≠ nodeV) THEN  
+                        LET tempSum TO scr1 + scr2 + scores[nodeU] + scores[nodeV]  
+                        IF tempSum > highestScore THEN  
+                            SET highestScore TO tempSum  
+                        END IF  
+                    END IF  
+                    INCREMENT idxV BY 1  
+                END WHILE  
+                INCREMENT idxU BY 1  
+            END WHILE  
+            INCREMENT idxEdge BY 1  
+        END WHILE  
+
+        RETURN highestScore  
+    END FUNCTION  
+END CLASS

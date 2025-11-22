@@ -1,0 +1,50 @@
+CLASS Solution  
+    FUNCTION findMinDifference(timePoints)  
+        FUNCTION to_minutes(time)  
+            SET components TO EMPTY LIST  
+            SET pos TO 0  
+            WHILE pos LESS THAN length of time  
+                IF time[pos] EQUALS ":"  
+                    EXIT WHILE  
+                ELSE  
+                    ADD time[pos] TO components  
+                    SET pos TO pos + 1  
+                END IF  
+            END WHILE  
+            SET colon_index TO pos  
+            
+            SET hrs_str TO SUBSTRING of time FROM 0 TO colon_index  
+            SET mins_str TO SUBSTRING of time FROM colon_index + 1 TO length of time  
+            
+            SET hrs_num TO INTEGER parsed from hrs_str  
+            SET mins_num TO INTEGER parsed from mins_str  
+            RETURN hrs_num * 60 + mins_num  
+        END FUNCTION  
+        
+        SET minute_values TO EMPTY LIST  
+        SET idx TO 0  
+        WHILE idx LESS THAN length of timePoints  
+            ADD to_minutes(timePoints[idx]) TO minute_values  
+            SET idx TO idx + 1  
+        END WHILE
+        
+        CALL sort ON minute_values IN ASCENDING ORDER  
+        
+        SET shortest_gap TO INFINITY  
+        SET pointer TO 1  
+        WHILE pointer LESS THAN length of minute_values  
+            SET gap TO minute_values[pointer] - minute_values[pointer - 1]  
+            IF gap < shortest_gap THEN  
+                SET shortest_gap TO gap  
+            END IF  
+            SET pointer TO pointer + 1  
+        END WHILE  
+        
+        SET wrap_gap TO 1440 - minute_values[length of minute_values - 1] + minute_values[0]  
+        IF wrap_gap < shortest_gap THEN  
+            SET shortest_gap TO wrap_gap  
+        END IF  
+        
+        RETURN shortest_gap  
+    END FUNCTION  
+END CLASS

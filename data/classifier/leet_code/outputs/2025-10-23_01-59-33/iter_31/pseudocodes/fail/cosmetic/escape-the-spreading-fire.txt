@@ -1,0 +1,83 @@
+CLASS Solution
+    FUNCTION maximumMinutes(grid)
+        SET rowCount AS LENGTH OF grid
+        SET colCount AS LENGTH OF element AT 0 OF grid
+        SET moves AS LIST OF PAIRS: (1, 0), (-1, 0), (0, 1), (0, -1)
+
+        FUNCTION can_escape(wait)
+            SET fireArrival TO a 2D LIST sized rowCount BY colCount FILLED WITH infinity
+            CREATE deque AS empty double-ended queue
+
+            SET iCounter TO 0
+            WHILE iCounter < rowCount
+                SET jCounter TO 0
+                WHILE jCounter < colCount
+                    IF element AT iCounter OF grid = 1 THEN
+                        PUSH (iCounter, jCounter, 0) TO deque
+                        ASSIGN fireArrival[iCounter][jCounter] ← 0
+                    END IF
+                    INCREMENT jCounter BY 1
+                END WHILE
+                INCREMENT iCounter BY 1
+            END WHILE
+
+            WHILE deque IS NOT empty
+                POP_LEFT (currX, currY, currTime) FROM deque
+                FOR EACH (dx, dy) IN moves DO
+                    SET nextX TO currX + dx
+                    SET nextY TO currY + dy
+                    IF (nextX ≥ 0) AND (nextX < rowCount) AND (nextY ≥ 0) AND (nextY < colCount) AND (grid[nextX][nextY] = 0) AND (fireArrival[nextX][nextY] = infinity) THEN
+                        ASSIGN fireArrival[nextX][nextY] ← currTime + 1
+                        PUSH (nextX, nextY, currTime + 1) TO deque
+                    END IF
+                END FOR
+            END WHILE
+
+            SET explorerQueue TO new double-ended queue WITH ELEMENT (0, 0, wait)
+            SET visitedSet TO SET CONTAINING PAIR (0, 0)
+
+            WHILE explorerQueue IS NOT empty
+                POP_LEFT (posX, posY, timePassed) FROM explorerQueue
+                FOR EACH (offsetX, offsetY) IN moves DO
+                    SET candidateX TO posX + offsetX
+                    SET candidateY TO posY + offsetY
+                    IF (candidateX ≥ 0) AND (candidateX < rowCount) AND (candidateY ≥ 0) AND (candidateY < colCount) AND NOT ((candidateX, candidateY) IN visitedSet) AND (grid[candidateX][candidateY] = 0) THEN
+                        IF (candidateX = rowCount - 1) AND (candidateY = colCount - 1) THEN
+                            IF fireArrival[candidateX][candidateY] ≥ timePassed + 1 THEN
+                                RETURN true
+                            ELSE
+                                RETURN false
+                            END IF
+                        END IF
+                        IF fireArrival[candidateX][candidateY] > timePassed + 1 THEN
+                            ADD (candidateX, candidateY) TO visitedSet
+                            PUSH (candidateX, candidateY, timePassed + 1) TO explorerQueue
+                        END IF
+                    END IF
+                END FOR
+            END WHILE
+
+            RETURN false
+        END FUNCTION
+
+        SET startPos TO 0
+        SET endPos TO rowCount * colCount
+        SET answer TO -1
+
+        WHILE startPos ≤ endPos
+            SET middle TO startPos + FLOOR((endPos - startPos) / 2)
+            IF can_escape(middle) THEN
+                ASSIGN answer ← middle
+                ASSIGN startPos ← middle + 1
+            ELSE
+                ASSIGN endPos ← middle - 1
+            END IF
+        END WHILE
+
+        IF answer ≠ rowCount * colCount THEN
+            RETURN answer
+        ELSE
+            RETURN 1000000000
+        END IF
+    END FUNCTION
+END CLASS

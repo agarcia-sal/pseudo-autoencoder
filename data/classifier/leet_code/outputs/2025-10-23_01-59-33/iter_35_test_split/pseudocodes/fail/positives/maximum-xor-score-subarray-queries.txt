@@ -1,0 +1,63 @@
+CLASS Solution
+    FUNCTION maximumSubarrayXor(nums PARAMETER, queries PARAMETER)
+        SET lengthVar TO (LENGTH OF nums)
+        DEFINE helperCreateMatrix(size)
+            SET outerIndex TO 0
+            SET matrix TO empty list
+            WHILE outerIndex LESS THAN size
+                SET innerIndex TO 0
+                SET innerList TO empty list
+                WHILE innerIndex LESS THAN size
+                    APPEND 0 TO innerList
+                    SET innerIndex TO innerIndex PLUS 1
+                END WHILE
+                APPEND innerList TO matrix
+                SET outerIndex TO outerIndex PLUS 1
+            END WHILE
+            RETURN matrix
+        END FUNCTION
+        SET firstMatrix TO helperCreateMatrix(lengthVar)
+        SET secondMatrix TO helperCreateMatrix(lengthVar)
+        SET iVar TO lengthVar MINUS 1
+        WHILE iVar GREATER OR EQUAL TO 0
+            SET firstMatrix[iVar][iVar] TO nums[iVar]
+            SET secondMatrix[iVar][iVar] TO nums[iVar]
+            SET jVar TO iVar PLUS 1
+            REPEAT
+                IF NOT (jVar LESS THAN lengthVar) THEN BREAK
+                SET tempXor1 TO firstMatrix[iVar][jVar MINUS 1]
+                SET tempXor2 TO firstMatrix[iVar PLUS 1][jVar]
+                SET firstMatrix[iVar][jVar] TO (tempXor1 XOR tempXor2)
+                SET val1 TO firstMatrix[iVar][jVar]
+                SET val2 TO secondMatrix[iVar][jVar MINUS 1]
+                SET val3 TO secondMatrix[iVar PLUS 1][jVar]
+                IF val1 GREATER OR EQUAL TO val2 THEN
+                    IF val1 GREATER OR EQUAL TO val3 THEN
+                        SET secondMatrix[iVar][jVar] TO val1
+                    ELSE
+                        SET secondMatrix[iVar][jVar] TO val3
+                    END IF
+                ELSE
+                    IF val2 GREATER OR EQUAL TO val3 THEN
+                        SET secondMatrix[iVar][jVar] TO val2
+                    ELSE
+                        SET secondMatrix[iVar][jVar] TO val3
+                    END IF
+                END IF
+                SET jVar TO jVar PLUS 1
+            UNTIL FALSE
+            SET iVar TO iVar MINUS 1
+        END WHILE
+        DEFINE makeResults(queryList)
+            SET idx1 TO 0
+            SET outputList TO empty list
+            WHILE idx1 LESS THAN (LENGTH OF queryList)
+                SET (startIdx, endIdx) TO queryList[idx1]
+                APPEND secondMatrix[startIdx][endIdx] TO outputList
+                SET idx1 TO idx1 PLUS 1
+            END WHILE
+            RETURN outputList
+        END FUNCTION
+        RETURN makeResults(queries)
+    END FUNCTION
+END CLASS

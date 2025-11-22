@@ -1,0 +1,60 @@
+CLASS Solution  
+    FUNCTION countPalindromicSubsequences(s)  
+        SET MOD TO one billion PLUS seven  
+        SET n TO the LENGTH OF s  
+        
+        CALL initialize_grid WITH four ROWS AND n COLUMNS TO CREATE next_occurrence  
+        CALL initialize_grid WITH four ROWS AND n COLUMNS TO CREATE prev_occurrence  
+        
+        FOR c FROM zero TO three  
+            SET char TO the CHARACTER CORRESPONDING TO the ORDINAL VALUE OF letter a PLUS c  
+            SET last TO minus one  
+            FOR i FROM zero TO n MINUS one  
+                IF the ELEMENT AT position i OF s EQUALS char THEN  
+                    SET last TO i  
+                END IF  
+                SET the ELEMENT AT position i OF row c OF prev_occurrence TO last  
+            END FOR  
+            
+            SET last TO minus one  
+            FOR i FROM n MINUS one DOWN TO zero  
+                IF the ELEMENT AT position i OF s EQUALS char THEN  
+                    SET last TO i  
+                END IF  
+                SET the ELEMENT AT position i OF row c OF next_occurrence TO last  
+            END FOR  
+        END FOR  
+        
+        CALL initialize_grid WITH n ROWS AND n COLUMNS TO CREATE dp  
+        
+        FOR i FROM zero TO n MINUS one  
+            SET the ELEMENT AT position i AND i OF dp TO one  
+        END FOR  
+        
+        FOR length FROM two TO n  
+            FOR i FROM zero TO n MINUS length  
+                SET j TO i PLUS length MINUS one  
+                FOR c FROM zero TO three  
+                    SET char TO the CHARACTER CORRESPONDING TO the ORDINAL VALUE OF letter a PLUS c  
+                    SET left TO the ELEMENT AT position i OF row c OF next_occurrence  
+                    SET right TO the ELEMENT AT position j OF row c OF prev_occurrence  
+                    
+                    IF left IS GREATER THAN j OR right IS LESS THAN i THEN  
+                        CONTINUE TO the NEXT iteration of the innermost FOR loop  
+                    ELSE IF left EQUALS right THEN  
+                        SET the ELEMENT AT position i AND j OF dp TO the REMAINDER OF the SUM OF the ELEMENT AT position i AND j OF dp PLUS one DIVIDED BY MOD  
+                    ELSE  
+                        SET the ELEMENT AT position i AND j OF dp TO the REMAINDER OF the SUM OF the ELEMENT AT position i AND j OF dp PLUS the ELEMENT AT position left PLUS one AND right MINUS one OF dp PLUS two DIVIDED BY MOD  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+        
+        RETURN the ELEMENT AT position zero AND n MINUS one OF dp  
+    END FUNCTION
+
+    FUNCTION initialize_grid(rows, columns)  
+        CREATE a TWO DIMENSIONAL LIST CALLED grid WITH the GIVEN number OF rows AND columns FILLED WITH minus one FOR EACH ELEMENT  
+        RETURN grid  
+    END FUNCTION  
+END CLASS

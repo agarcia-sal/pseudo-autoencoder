@@ -1,0 +1,71 @@
+CLASS Solution
+    FUNCTION maxTotalReward(rewardValues)
+        FUNCTION dfs(y)
+            SET Z TO 0
+            SET W TO 0
+            FUNCTION findPosition(a, b)
+                SET c TO (a + b) / 2
+                IF c * 2 = a + b THEN
+                    IF a >= b THEN RETURN a ELSE RETURN b END IF
+                ELSE
+                    IF a < b THEN RETURN a ELSE RETURN b END IF
+                END IF
+            END FUNCTION
+            FUNCTION bisectStep(lo, hi, target)
+                IF lo >= hi THEN RETURN lo END IF
+                SET mid TO findPosition(lo, hi)
+                IF rewardValues[mid] > target THEN 
+                    RETURN bisectStep(lo, mid, target)
+                ELSE
+                    RETURN bisectStep(mid + 1, hi, target)
+                END IF
+            END FUNCTION
+            SET Z TO bisectStep(0, rewardValues LENGTH, y)
+            FUNCTION loopFrom(pos, currentMax)
+                IF pos >= rewardValues LENGTH THEN RETURN currentMax END IF
+                SET tempSum TO y + rewardValues[pos]
+                SET newMax TO currentMax
+                IF NOT (tempSum <= y) THEN
+                    SET nextVal TO dfs(tempSum)
+                    IF currentMax < rewardValues[pos] + nextVal THEN
+                        SET newMax TO rewardValues[pos] + nextVal
+                    END IF
+                END IF
+                RETURN loopFrom(pos + 1, newMax)
+            END FUNCTION
+            SET W TO loopFrom(Z, 0)
+            RETURN W
+        END FUNCTION
+
+        FUNCTION quickSort(arr, start, end)
+            IF start >= end THEN RETURN END IF
+            SET pivotIndex TO end
+            SET pivotValue TO arr[pivotIndex]
+            SET left TO start
+            SET right TO end - 1
+            WHILE left <= right
+                WHILE left <= right AND arr[left] < pivotValue
+                    SET left TO left + 1
+                END WHILE
+                WHILE left <= right AND arr[right] >= pivotValue
+                    SET right TO right - 1
+                END WHILE
+                IF left < right THEN
+                    SET temp TO arr[left]
+                    SET arr[left] TO arr[right]
+                    SET arr[right] TO temp
+                    SET left TO left + 1
+                    SET right TO right - 1
+                END IF
+            END WHILE
+            SET temp TO arr[left]
+            SET arr[left] TO arr[pivotIndex]
+            SET arr[pivotIndex] TO temp
+            CALL quickSort(arr, start, left - 1)
+            CALL quickSort(arr, left + 1, end)
+        END FUNCTION
+
+        CALL quickSort(rewardValues, 0, rewardValues LENGTH - 1)
+        RETURN dfs(0)
+    END FUNCTION
+END CLASS

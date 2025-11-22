@@ -1,0 +1,47 @@
+CLASS Solution
+    FUNCTION maxScore(grid)
+        FUNCTION backtrack(r, taken, acc)
+            IF NOT (r < LENGTH(grid)) THEN
+                IF max_sum < acc THEN
+                    SET max_sum TO acc
+                END IF
+                RETURN
+            END IF
+
+            SET n TO LENGTH(grid[r])
+            SET i TO 0
+            WHILE i < n DO
+                SET x TO grid[r][i]
+                IF x NOT IN taken THEN
+                    ADD x TO taken
+                    CALL backtrack(r + 1, taken, acc + x)
+                    REMOVE x FROM taken
+                END IF
+                SET i TO i + 1
+            END WHILE
+
+            CALL backtrack(r + 1, taken, acc)
+        END FUNCTION
+
+        FOR idx FROM 0 TO LENGTH(grid) - 1 DO
+            -- descending sort rewritten by insertion of swap passes --
+            SET arr TO grid[idx]
+            SET len_arr TO LENGTH(arr)
+            SET outer TO 1
+            WHILE outer < len_arr DO
+                SET inner TO outer
+                WHILE inner > 0 AND arr[inner] > arr[inner - 1] DO
+                    SET temp TO arr[inner]
+                    SET arr[inner] TO arr[inner - 1]
+                    SET arr[inner - 1] TO temp
+                    SET inner TO inner - 1
+                END WHILE
+                SET outer TO outer + 1
+            END WHILE
+        END FOR
+
+        SET max_sum TO 0
+        CALL backtrack(0, EMPTY_SET, 0)
+        RETURN max_sum
+    END FUNCTION
+END CLASS

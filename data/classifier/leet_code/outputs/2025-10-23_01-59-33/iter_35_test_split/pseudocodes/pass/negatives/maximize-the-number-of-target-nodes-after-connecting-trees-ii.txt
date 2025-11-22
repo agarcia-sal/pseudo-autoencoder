@@ -1,0 +1,133 @@
+```  
+CLASS Solution  
+    FUNCTION maxTargetNodes(edges1, edges2)  
+        SET A0s9x TO a new default dictionary with list as default value  
+        SET Bd3fz TO a new default dictionary with list as default value  
+        
+        FUNCTION RecInsertEdgesLST(LST, INDEX)  
+            IF INDEX GREATER THAN OR EQUAL TO LENGTH OF edges1 THEN  
+                RETURN  
+            END IF  
+            SET iRb2mz TO edges1[INDEX]  
+            SET cQp71 TO iRb2mz[0]  
+            SET dNj90 TO iRb2mz[1]  
+            APPEND dNj90 TO LST[cQp71]  
+            APPEND cQp71 TO LST[dNj90]  
+            CALL RecInsertEdgesLST(LST, INDEX PLUS 1)  
+        END FUNCTION  
+        
+        FUNCTION RecInsertEdgesLST2(LST, IDX)  
+            IF IDX GREATER THAN OR EQUAL TO LENGTH OF edges2 THEN  
+                RETURN  
+            END IF  
+            SET Vbn5t TO edges2[IDX]  
+            SET Hm1vk TO Vbn5t[0]  
+            SET Sw8wo TO Vbn5t[1]  
+            APPEND Sw8wo TO LST[Hm1vk]  
+            APPEND Hm1vk TO LST[Sw8wo]  
+            CALL RecInsertEdgesLST2(LST, IDX PLUS 1)  
+        END FUNCTION  
+        
+        CALL RecInsertEdgesLST(A0s9x, 0)  
+        CALL RecInsertEdgesLST2(Bd3fz, 0)  
+        
+        SET Nklc TO LENGTH OF KEYS IN A0s9x  
+        SET L3waz TO LENGTH OF KEYS IN Bd3fz  
+        
+        FUNCTION bfs(tree, init)  
+            SET Ip1qd TO 0  
+            SET Wj28m TO 0  
+            SET pXbq9 TO a new deque containing (init, 0)  
+            SET yRn43 TO a new set containing init  
+            
+            FUNCTION LoopQueue(Q)  
+                IF LENGTH OF Q EQUALS 0 THEN  
+                    RETURN  
+                END IF  
+                SET P6x2v TO Q[0]  
+                REMOVE FIRST ELEMENT FROM Q  
+                SET xZlou TO P6x2v[0]  
+                SET DWjf4 TO P6x2v[1]  
+                IF (DWjf4 PLUS DWjf4) MOD 2 EQUALS 0 THEN  
+                    SET Ip1qd TO Ip1qd PLUS 1  
+                ELSE  
+                    SET Wj28m TO Wj28m PLUS 1  
+                END IF  
+                FUNCTION LoopNeighbors(neighs, index)  
+                    IF index GREATER THAN OR EQUAL TO LENGTH OF neighs THEN  
+                        RETURN  
+                    END IF  
+                    SET xNezb TO neighs[index]  
+                    IF xNezb NOT IN yRn43 THEN  
+                        ADD xNezb TO yRn43  
+                        APPEND (xNezb, DWjf4 PLUS 1) TO Q  
+                    END IF  
+                    CALL LoopNeighbors(neighs, index PLUS 1)  
+                END FUNCTION  
+                CALL LoopNeighbors(tree[xZlou], 0)  
+                CALL LoopQueue(Q)  
+            END FUNCTION  
+            
+            CALL LoopQueue(pXbq9)  
+            RETURN Ip1qd, Wj28m  
+        END FUNCTION  
+        
+        SET M2dnk TO empty list  
+        FUNCTION ComputeE1(i1)  
+            IF i1 GREATER THAN OR EQUAL TO Nklc THEN  
+                RETURN  
+            END IF  
+            APPEND bfs(A0s9x, i1) TO M2dnk  
+            CALL ComputeE1(i1 PLUS 1)  
+        END FUNCTION  
+        CALL ComputeE1(0)  
+        
+        SET Xtgip TO empty list  
+        FUNCTION ComputeE2(j1)  
+            IF j1 GREATER THAN OR EQUAL TO L3waz THEN  
+                RETURN  
+            END IF  
+            APPEND bfs(Bd3fz, j1) TO Xtgip  
+            CALL ComputeE2(j1 PLUS 1)  
+        END FUNCTION  
+        CALL ComputeE2(0)  
+        
+        SET Gb4pi TO empty list  
+        
+        FUNCTION OuterLoops(Oidx)  
+            IF Oidx GREATER THAN OR EQUAL TO Nklc THEN  
+                RETURN  
+            END IF  
+            SET Osclz TO M2dnk[Oidx]  
+            SET Or99k TO Osclz[0]  
+            SET vJx26 TO Osclz[1]  
+            SET wglxj TO 0  
+            
+            FUNCTION InnerLoop(Iidx)  
+                IF Iidx GREATER THAN OR EQUAL TO L3waz THEN  
+                    RETURN  
+                END IF  
+                SET XDnyr TO Xtgip[Iidx]  
+                SET S7clv TO XDnyr[0]  
+                SET Vfmxu TO XDnyr[1]  
+                IF (Oidx NOT EQUAL TO Iidx) AND (((Oidx MOD 2) NOT EQUAL (Iidx MOD 2))) THEN  
+                    SET CA11n TO Vfmxu  
+                ELSE  
+                    SET CA11n TO S7clv  
+                END IF  
+                IF CA11n GREATER THAN wglxj THEN  
+                    SET wglxj TO CA11n  
+                END IF  
+                CALL InnerLoop(Iidx PLUS 1)  
+            END FUNCTION  
+            
+            CALL InnerLoop(0)  
+            APPEND Or99k PLUS wglxj TO Gb4pi  
+            CALL OuterLoops(Oidx PLUS 1)  
+        END FUNCTION  
+        CALL OuterLoops(0)  
+        
+        RETURN Gb4pi  
+    END FUNCTION  
+END CLASS  
+```

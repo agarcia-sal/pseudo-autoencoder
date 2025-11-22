@@ -1,0 +1,138 @@
+CLASS Solution
+	FUNCTION countGoodIntegers(n integer, k integer) RETURNS integer
+		PROCEDURE computeFactorial(y integer) RETURNS integer
+			IF y LESS THAN OR EQUAL TO 1 THEN
+				RETURN 1
+			ELSE
+				RETURN y MULTIPLIED BY computeFactorial(y MINUS 1)
+			END IF
+		END PROCEDURE
+
+		DECLARATION u []integer
+		SET u TO empty list
+
+		DECLARE p integer
+		SET p TO 0
+		REPEAT
+			IF NOT (p LESS THAN n PLUS 1) THEN BREAK END IF
+			APPEND computeFactorial(p) TO u
+			SET p TO p PLUS 1
+		UNTIL FALSE
+
+		DECLARE z integer
+		SET z TO 0
+
+		DECLARE w set
+		SET w TO empty set
+
+		DECLARE q integer
+		SET q TO 1
+		DECLARE r integer
+		SET r TO n MINUS 1
+		DECLARE o integer
+		SET o TO integer division of r BY 2
+
+		DECLARE v integer
+		SET v TO q
+		REPEAT
+			IF NOT (o GREATER THAN 0) THEN BREAK END IF
+			SET v TO v MULTIPLIED BY 10
+			SET o TO o MINUS 1
+		UNTIL FALSE
+
+		DECLARE m integer
+		SET m TO v
+		WHILE m LESS THAN v MULTIPLIED BY 10 DO
+			LET a string
+			SET a TO string conversion of m
+
+			DECLARE b string
+			LET rev_str string
+			SET rev_str TO empty string
+
+			DECLARE idx integer
+			SET idx TO length of a MINUS 1
+			WHILE idx GREATER THAN OR EQUAL TO 0 DO
+				SET rev_str TO rev_str CONCATENATED WITH character at position idx of a
+				SET idx TO idx MINUS 1
+			END WHILE
+
+			DECLARE cnt_sub integer
+			SET cnt_sub TO n MOD 2
+
+			SET b TO a CONCATENATED WITH substring of rev_str from cnt_sub TO end
+
+			DECLARE c integer
+			SET c TO integer value of b
+
+			IF NOT (c MODULO k EQUALS 0) THEN
+				SET m TO m PLUS 1
+				CONTINUE
+			END IF
+
+			DECLARE d string
+			LET ch_list []string
+			SET ch_list TO empty list
+
+			DECLARE ind integer
+			SET ind TO 0
+			WHILE ind LESS THAN length of b DO
+				APPEND character at position ind of b TO ch_list
+				SET ind TO ind PLUS 1
+			END WHILE
+
+			SET ch_list TO sort(ch_list)  // ascending order
+
+			LET tmp string
+			SET tmp TO empty string
+			DECLARE ix integer
+			SET ix TO 0
+			WHILE ix LESS THAN length of ch_list DO
+				SET tmp TO tmp CONCATENATED WITH ch_list[ix]
+				SET ix TO ix PLUS 1
+			END WHILE
+
+			IF tmp IN w THEN
+				SET m TO m PLUS 1
+				CONTINUE
+			END IF
+
+			ADD tmp TO w
+
+			DECLARE freq map
+			SET freq TO empty map from string to integer
+
+			DECLARE ch string
+			DECLARE iidx integer
+			SET iidx TO 0
+			WHILE iidx LESS THAN length of tmp DO
+				SET ch TO tmp[iidx]
+				IF ch IN freq THEN
+					SET freq[ch] TO freq[ch] PLUS 1
+				ELSE
+					SET freq[ch] TO 1
+				END IF
+				SET iidx TO iidx PLUS 1
+			END WHILE
+
+			DECLARE res integer
+			IF freq CONTAINS key "0" AND freq["0"] GREATER THAN 0 THEN
+				DECLARE sub_val integer
+				SET sub_val TO n MINUS freq["0"]
+				SET res TO sub_val MULTIPLIED BY u[n MINUS 1]
+			ELSE
+				SET res TO u[n]
+			END IF
+
+			FOREACH val IN freq.values DO
+				SET res TO integer division of res BY u[val]
+			END FOREACH
+
+			SET z TO z PLUS res
+
+			SET m TO m PLUS 1
+		END WHILE
+
+		RETURN z
+	END FUNCTION
+END CLASS

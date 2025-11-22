@@ -1,0 +1,59 @@
+CLASS Solution
+    FUNCTION subsequencePairCount(nums)
+        SET N TO 1000000007
+        SET M TO 0
+        FOR I FROM 0 TO LENGTH(nums) - 1 STEP 1
+            IF nums[I] > M THEN
+                SET M TO nums[I]
+            END IF
+        END FOR
+
+        FUNCTION createMatrix(a, b)
+            SET matrix TO []
+            FOR u FROM 0 TO a DO
+                SET row TO []
+                FOR v FROM 0 TO b DO
+                    APPEND row, 0
+                END FOR
+                APPEND matrix, row
+            END FOR
+            RETURN matrix
+        END FUNCTION
+
+        SET D TO createMatrix(M, M)
+        SET D[0][0] TO 1
+
+        FUNCTION gcd(p, q)
+            WHILE q != 0 DO
+                SET r TO p % q
+                SET p TO q
+                SET q TO r
+            END WHILE
+            RETURN p
+        END FUNCTION
+
+        FOR index FROM 0 TO LENGTH(nums) - 1
+            SET tempDP TO createMatrix(M, M)
+            FOR X_VAR FROM 0 TO M DO
+                FOR Y_VAR FROM 0 TO M DO
+                    SET val TO D[X_VAR][Y_VAR]
+                    SET tempDP[X_VAR][Y_VAR] TO (tempDP[X_VAR][Y_VAR] + val) % N
+
+                    SET newXVal TO gcd(X_VAR, nums[index])
+                    SET tempDP[newXVal][Y_VAR] TO (tempDP[newXVal][Y_VAR] + val) % N
+
+                    SET newYVal TO gcd(Y_VAR, nums[index])
+                    SET tempDP[X_VAR][newYVal] TO (tempDP[X_VAR][newYVal] + val) % N
+                END FOR
+            END FOR
+            SET D TO tempDP
+        END FOR
+
+        SET FINAL_RESULT TO 0
+        FOR G_VAR FROM 1 TO M DO
+            SET FINAL_RESULT TO FINAL_RESULT + D[G_VAR][G_VAR]
+        END FOR
+        SET FINAL_RESULT TO FINAL_RESULT % N
+        RETURN FINAL_RESULT
+    END FUNCTION
+END CLASS

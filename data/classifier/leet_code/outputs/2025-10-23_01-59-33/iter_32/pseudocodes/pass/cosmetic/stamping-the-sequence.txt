@@ -1,0 +1,64 @@
+CLASS Solution  
+    FUNCTION movesToStamp(stamp string, target string) RETURNS list of integers  
+        DEFINE totalStampLen AS LENGTH(stamp)  
+        DEFINE totalTargetLen AS LENGTH(target)  
+        DEFINE incomingEdges AS ARRAY OF SIZE (totalTargetLen - totalStampLen + 1) FILLED WITH totalStampLen  
+        DEFINE processingQueue AS NEW double ended queue (empty)  
+        DEFINE adjacencyList AS ARRAY OF SIZE totalTargetLen EACH CONTAINING EMPTY LIST  
+
+        DEFINE outerIndex AS 0  
+        WHILE outerIndex LESS THAN (totalTargetLen - totalStampLen + 1)  
+            DEFINE innerIndex AS 0  
+            REPEAT  
+                IF innerIndex EQUALS totalStampLen THEN  
+                    BREAK  
+                END IF  
+                DEFINE currentStampChar AS stamp[innerIndex]  
+                IF target[outerIndex + innerIndex] EQUALS currentStampChar THEN  
+                    incomingEdges[outerIndex] ← incomingEdges[outerIndex] - 1  
+                    IF incomingEdges[outerIndex] EQUALS 0 THEN  
+                        processingQueue.APPEND(outerIndex)  
+                    END IF  
+                ELSE  
+                    adjacencyList[outerIndex + innerIndex].APPEND(outerIndex)  
+                END IF  
+                SET innerIndex TO innerIndex + 1  
+            END REPEAT  
+            SET outerIndex TO outerIndex + 1  
+        END WHILE  
+
+        DEFINE result AS EMPTY LIST  
+        DEFINE visited AS ARRAY OF SIZE totalTargetLen FILLED WITH False  
+
+        FUNCTION processQueue() RETURNS VOID  
+            IF processingQueue.IS_EMPTY() THEN RETURN END IF  
+            DEFINE currentIndex AS processingQueue.POP_LEFT()  
+            result.APPEND(currentIndex)  
+            DEFINE idx AS 0  
+            WHILE idx LESS THAN totalStampLen  
+                DEFINE pos AS currentIndex + idx  
+                IF visited[pos] EQUALS False THEN  
+                    visited[pos] ← True  
+                    FOR EACH sourceIndex IN adjacencyList[pos]  
+                        incomingEdges[sourceIndex] ← incomingEdges[sourceIndex] - 1  
+                        IF incomingEdges[sourceIndex] EQUALS 0 THEN  
+                            processingQueue.APPEND(sourceIndex)  
+                        END IF  
+                    END FOR  
+                END IF  
+                SET idx TO idx + 1  
+            END WHILE  
+            processQueue()  
+        END FUNCTION  
+
+        processQueue()  
+
+        FOR marker IN visited  
+            IF marker EQUALS False THEN  
+                RETURN EMPTY LIST  
+            END IF  
+        END FOR
+
+        RETURN REVERSE(result)  
+    END FUNCTION  
+END CLASS

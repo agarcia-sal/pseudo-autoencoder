@@ -1,0 +1,58 @@
+CLASS Solution  
+    FUNCTION longestRepeating(s queryCharacters queryIndices)  
+        FUNCTION merge_intervals()  
+            SET i TO zero  
+            WHILE i LESS THAN the LENGTH OF intervals MINUS one  
+                IF the character element at position three of element at position i of intervals EQUALS the character element at position three of element at position i PLUS one of intervals  
+                    SET element at position i of intervals TO a tuple consisting of element at position one of element at position i of intervals COMMA element at position two of element at position i PLUS one of intervals COMMA character element at position three of element at position i of intervals  
+                    REMOVE element at position i PLUS one FROM intervals  
+                ELSE  
+                    INCREMENT i BY one  
+                END IF  
+            END WHILE  
+        END FUNCTION  
+        
+        SET intervals TO an empty list  
+        SET n TO the LENGTH OF s  
+        SET start TO zero  
+        FOR i FROM one TO n MINUS one  
+            IF element at position i of s NOT EQUALS element at position start of s  
+                APPEND a tuple consisting of start COMMA i MINUS one COMMA element at position start of s TO intervals  
+                SET start TO i  
+            END IF  
+        END FOR  
+        APPEND a tuple consisting of start COMMA n MINUS one COMMA element at position start of s TO intervals  
+        
+        SET results TO an empty list  
+        SET longest TO the maximum value of the difference between end and start PLUS one FOR each tuple of start end char IN intervals  
+        
+        FOR each char idx IN the corresponding pairs of queryCharacters and queryIndices  
+            SET i TO zero  
+            WHILE i LESS THAN the LENGTH OF intervals  
+                SET start end c TO the tuple element at position i of intervals  
+                IF start LESS THAN OR EQUAL TO idx AND idx LESS THAN OR EQUAL TO end  
+                    BREAK  
+                END IF  
+                INCREMENT i BY one  
+            END WHILE  
+            
+            IF idx GREATER THAN start  
+                INSERT a tuple consisting of start COMMA idx MINUS one COMMA c AT position i OF intervals  
+                SET element at position i PLUS one of intervals TO a tuple consisting of idx COMMA end COMMA c  
+            END IF  
+            IF idx LESS THAN end  
+                INSERT a tuple consisting of idx PLUS one COMMA end COMMA c AT position i PLUS one OF intervals  
+                SET element at position i of intervals TO a tuple consisting of start COMMA idx COMMA c  
+            END IF  
+            
+            SET element at position i of intervals TO a tuple consisting of the first element of element at position i of intervals COMMA the second element of element at position i of intervals COMMA char  
+            
+            CALL merge_intervals()  
+            
+            SET longest TO the maximum value of the difference between end and start PLUS one FOR each tuple of start end char IN intervals  
+            APPEND longest TO results  
+        END FOR  
+        
+        RETURN results  
+    END FUNCTION  
+END CLASS

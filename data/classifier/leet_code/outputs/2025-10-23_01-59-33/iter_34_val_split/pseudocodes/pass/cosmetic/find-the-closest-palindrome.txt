@@ -1,0 +1,60 @@
+CLASS Solution
+    FUNCTION nearestPalindromic(n)
+        ASSIGN LENGTH(n) TO lenVal
+        IF NOT (lenVal - 1) THEN
+            ASSIGN TO numVal THE CONVERSION OF n TO INTEGER
+            RETURN CONVERT numVal - 1 TO STRING
+        END IF
+
+        INITIALIZE candidates AS EMPTY LIST
+
+        ASSIGN 10 EXP lenVal TO tenPowLen
+        ASSIGN 10 EXP (lenVal - 1) TO tenPowLenMinusOne
+
+        APPEND tenPowLen + 1 TO candidates
+        APPEND tenPowLenMinusOne - 1 TO candidates
+
+        ASSIGN SUBSTRING n FROM 0 TO ((lenVal + 1) DIV 2) TO prefixStr
+        ASSIGN CONVERT prefixStr TO INTEGER TO prefixNum
+
+        SET iterator TO -1
+        WHILE iterator <= 1 DO
+            ASSIGN prefixNum + iterator TO adjustedPrefixNum
+            ASSIGN CONVERT adjustedPrefixNum TO STRING TO adjustedPrefixStr
+
+            IF lenVal MOD 2 THEN
+                ASSIGN SUBSTRING adjustedPrefixStr FROM 0 TO LENGTH(adjustedPrefixStr) - 1 TO trimStr
+                ASSIGN REVERSE(trimStr) TO revSub
+                ASSIGN CONCATENATE adjustedPrefixStr WITH revSub TO candidateStr
+            ELSE
+                ASSIGN REVERSE(adjustedPrefixStr) TO revFull
+                ASSIGN CONCATENATE adjustedPrefixStr WITH revFull TO candidateStr
+            END IF
+
+            ASSIGN CONVERT candidateStr TO INTEGER TO candidateInt
+            APPEND candidateInt TO candidates
+            INCREMENT iterator BY 1
+        END WHILE
+
+        ASSIGN CONVERT n TO INTEGER TO origNum
+
+        IF origNum IN candidates THEN
+            REMOVE origNum FROM candidates
+        END IF
+
+        ASSIGN NULL TO closestNum
+        ASSIGN POSITIVE_INFINITY TO minDiff
+
+        FOR index FROM 0 TO LENGTH(candidates) - 1 DO
+            ASSIGN candidates[index] TO currNum
+            ASSIGN ABS(currNum - origNum) TO currDiff
+
+            IF (currDiff < minDiff) OR ((currDiff = minDiff) AND (currNum < closestNum OR closestNum IS NULL)) THEN
+                ASSIGN currNum TO closestNum
+                ASSIGN currDiff TO minDiff
+            END IF
+        END FOR
+
+        RETURN CONVERT closestNum TO STRING
+    END FUNCTION
+END CLASS

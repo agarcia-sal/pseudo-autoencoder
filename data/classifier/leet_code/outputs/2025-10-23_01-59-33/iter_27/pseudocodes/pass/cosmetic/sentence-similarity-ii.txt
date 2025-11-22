@@ -1,0 +1,72 @@
+CLASS Solution
+    FUNCTION areSentencesSimilarTwo(sentence1 sentence1 TO sentence1 OF TYPE list OF strings sentence2 sentence2 TO sentence2 OF TYPE list OF strings similarPairs similarPairs TO similarPairs OF TYPE list OF list OF strings) RETURNS boolean
+        IF LENGTH sentence1 == LENGTH sentence2 THEN
+        ELSE
+            RETURN false
+        END IF
+
+        DECLARE registry AS dictionary = {}
+
+        FUNCTION find(element element TO element) RETURNS element
+            DECLARE stack AS list = []
+            DECLARE current AS element = element
+            WHILE current != registry[current] DO
+                PUSH current INTO stack
+                SET current = registry[current]
+            END WHILE
+            FOR each node IN stack DO
+                SET registry[node] = current
+            END FOR
+            RETURN current
+        END FUNCTION
+
+        FUNCTION union(first first TO first second second TO second)
+            DECLARE rootFirst AS first = find(first)
+            DECLARE rootSecond AS second = find(second)
+            IF rootFirst != rootSecond THEN
+                SET registry[rootSecond] = rootFirst
+            END IF
+        END FUNCTION
+
+        DECLARE index1 AS int = 0
+        WHILE index1 < LENGTH similarPairs DO
+            DECLARE couple AS list = similarPairs[index1]
+            DECLARE idxWord AS int = 0
+            WHILE idxWord < LENGTH couple DO
+                DECLARE token AS string = couple[idxWord]
+                IF NOT token IN registry THEN
+                    SET registry[token] = token
+                END IF
+                SET idxWord = idxWord + 1
+            END WHILE
+            SET index1 = index1 + 1
+        END WHILE
+
+        DECLARE idxPair AS int = 0
+        WHILE idxPair < LENGTH similarPairs DO
+            DECLARE a AS string = similarPairs[idxPair][0]
+            DECLARE b AS string = similarPairs[idxPair][1]
+            CALL union(a b)
+            SET idxPair = idxPair + 1
+        END WHILE
+
+        DECLARE pos AS int = 0
+        WHILE pos < LENGTH sentence1 DO
+            DECLARE firstWord AS string = sentence1[pos]
+            DECLARE secondWord AS string = sentence2[pos]
+            IF NOT firstWord IN registry THEN
+                SET registry[firstWord] = firstWord
+            END IF
+            IF NOT secondWord IN registry THEN
+                SET registry[secondWord] = secondWord
+            END IF
+
+            IF find(firstWord) != find(secondWord) THEN
+                RETURN false
+            END IF
+            SET pos = pos + 1
+        END WHILE
+
+        RETURN true
+    END FUNCTION
+END CLASS

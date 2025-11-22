@@ -1,0 +1,98 @@
+CLASS Solution
+    FUNCTION sumOfGoodSubsequences(nums)
+      SET m TO 1000000000 + 7
+      ASSIGN d TO empty map defaulting to 0 for a
+      ASSIGN d TO empty map defaulting to 0 for b
+
+      FUNCTION U(p)
+          RETURN d[p]
+      END FUNCTION
+
+      FUNCTION V(q)
+          RETURN d[q]
+      END FUNCTION
+
+      FUNCTION W(r, s)
+          RETURN (r + s) % m
+      END FUNCTION
+
+      FUNCTION X(t, u)
+          RETURN (t * u)
+      END FUNCTION
+
+      FUNCTION Y(z)
+          RETURN (z + (0 * 1))
+      END FUNCTION
+
+      FUNCTION incrementMapVal(key, mapName)
+          SET oldVal TO mapName[key]
+          SET mapName[key] TO oldVal + 1
+      END FUNCTION
+
+      FUNCTION addModMapVal(key1, key2, mapVal, multiplier)
+          SET tmp1 TO mapVal[key1]
+          SET tmp2 TO mapVal[key2]
+          SET mapVal[key1] TO (tmp1 + tmp2 + X(mapVal[key2], multiplier)) % m
+      END FUNCTION
+
+      FUNCTION addMapVals(key1, key2, mapVal)
+          SET mapVal[key1] TO (mapVal[key1] + mapVal[key2]) % m
+      END FUNCTION
+
+      FUNCTION addMapValsWithMultiplier(key1, key2, map1, map2, multiplier)
+          SET map1[key1] TO (map1[key1] + map1[key2] + map2[key2]*multiplier) % m
+      END FUNCTION
+
+      FUNCTION addValueToSum(sumVal, val)
+          RETURN (sumVal + val)
+      END FUNCTION
+
+      FUNCTION modVal(val)
+          RETURN val % m
+      END FUNCTION
+
+      PROCEDURE processElement(w)
+          CALL incrementMapVal(w, b)
+          SET b_w TO b[w]
+          SET a_w TO a[w]
+          SET a_wm TO a[w-1]
+          SET b_wm TO b[w-1]
+          SET a_wp TO a[w+1]
+          SET b_wp TO b[w+1]
+
+          SET a[w] TO modVal(a[w] + a_wm + b_wm * w)
+          SET b[w] TO modVal(b_w + b_wm)
+
+          SET a[w] TO modVal(a[w] + a_wp + b_wp * w)
+          SET b[w] TO modVal(b[w] + b_wp)
+      END PROCEDURE
+
+      FUNCTION traverseList(L)
+          FUNCTION recur(idx)
+              IF idx = LENGTH(L) THEN
+                RETURN
+              ELSE
+                processElement(L[idx])
+                CALL recur(idx + 1)
+              END IF
+          END FUNCTION
+          CALL recur(0)
+      END FUNCTION
+
+      ASSIGN a TO d
+      ASSIGN b TO d
+      CALL traverseList(nums)
+
+      SET s TO 0
+      SET idx TO 0
+      REPEAT
+          SET vals TO (a).values()
+          IF idx = LENGTH(vals) THEN BREAK
+          END IF
+          SET s TO addValueToSum(s, vals[idx])
+          SET idx TO idx + 1
+      UNTIL FALSE
+
+      RETURN modVal(s)
+    END FUNCTION
+END CLASS
