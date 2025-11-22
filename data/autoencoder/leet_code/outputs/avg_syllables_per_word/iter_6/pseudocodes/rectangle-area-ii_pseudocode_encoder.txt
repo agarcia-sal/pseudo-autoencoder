@@ -1,0 +1,51 @@
+CLASS Solution  
+    FUNCTION rectangleArea(rectangles)  
+        SET MOD TO ten to the power of nine PLUS one  
+        
+        SET y_coords TO empty set  
+        FOR each rectangle IN rectangles  
+            DESTRUCTURE rectangle INTO x1, y1, x2, y2  
+            ADD y1 TO y_coords  
+            ADD y2 TO y_coords  
+        
+        SET y_coords TO sorted list of y_coords  
+        SET y_index TO empty dictionary  
+        FOR index FROM zero TO length of y_coords MINUS one  
+            SET y_index AT y_coords AT index TO index  
+        
+        SET count TO list of zeros with length equal to length of y_coords  
+        
+        SET events TO empty list  
+        FOR each rectangle IN rectangles  
+            DESTRUCTURE rectangle INTO x1, y1, x2, y2  
+            APPEND tuple of x1, one, y1, y2 TO events  
+            APPEND tuple of x2, minus one, y1, y2 TO events  
+        
+        SORT events by first element (x-coordinate)  
+        
+        SET prev_x TO zero  
+        SET area TO zero  
+        
+        FOR each event IN events  
+            DESTRUCTURE event INTO x, eventType, y1, y2  
+            
+            SET current_length TO zero  
+            FOR i FROM one TO length of count MINUS one  
+                IF count AT i MINUS one GREATER THAN zero  
+                    INCREMENT current_length BY y_coords AT i MINUS y_coords AT i MINUS one  
+            
+            INCREMENT area BY current_length MULTIPLIED BY (x MINUS prev_x)  
+            SET area TO area MODULO MOD  
+            
+            IF eventType EQUALS one  
+                FOR i FROM y_index AT y1 TO y_index AT y2 MINUS one  
+                    INCREMENT count AT i BY one  
+            ELSE  
+                FOR i FROM y_index AT y1 TO y_index AT y2 MINUS one  
+                    DECREMENT count AT i BY one  
+            
+            SET prev_x TO x  
+        
+        RETURN area  
+    END FUNCTION  
+END CLASS

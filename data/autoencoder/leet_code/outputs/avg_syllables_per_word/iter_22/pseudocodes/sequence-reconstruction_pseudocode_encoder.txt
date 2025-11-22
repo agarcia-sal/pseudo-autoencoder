@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION sequenceReconstruction(nums SEQUENCE OF INTEGER, sequences SEQUENCE OF SEQUENCE OF INTEGER) RETURNS BOOLEAN  
+        SET n TO the LENGTH OF nums  
+        SET graph TO an empty mapping with default value as empty list  
+        SET indegree TO a list of zeroes with LENGTH n PLUS one  
+        
+        FOR each seq IN sequences  
+            FOR i FROM zero TO the LENGTH OF seq MINUS one MINUS one  
+                SET u TO the element at position i of seq  
+                SET v TO the element at position i PLUS one of seq  
+                APPEND v TO the list mapped by u in graph  
+                INCREMENT the element at position v of indegree BY one  
+            END FOR  
+        END FOR  
+        
+        SET queue TO a deque containing each integer i FROM one TO n WHERE the element at position i of indegree EQUALS zero  
+        
+        IF the LENGTH OF queue NOT EQUALS one THEN  
+            RETURN false  
+        END IF  
+        
+        SET index TO zero  
+        WHILE the LENGTH OF queue GREATER THAN zero  
+            IF the LENGTH OF queue NOT EQUALS one THEN  
+                RETURN false  
+            END IF  
+            
+            REMOVE the leftmost element from queue and ASSIGN it TO node  
+            
+            IF node NOT EQUALS the element at position index of nums THEN  
+                RETURN false  
+            END IF  
+            
+            INCREMENT index BY one  
+            
+            FOR each neighbor IN the list mapped by node in graph  
+                DECREMENT the element at position neighbor of indegree BY one  
+                IF the element at position neighbor of indegree EQUALS zero THEN  
+                    APPEND neighbor TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN the result of index EQUALS n  
+    END FUNCTION  
+END CLASS

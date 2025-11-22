@@ -1,0 +1,64 @@
+CLASS UnionFind  
+    FUNCTION __init__()  
+        SET parent TO an empty dictionary  
+        SET count TO zero  
+    END FUNCTION  
+  
+    FUNCTION make_set(x)  
+        IF element x NOT IN keys of parent THEN  
+            SET the value for key x in parent TO x  
+            INCREMENT count BY one  
+        END IF  
+    END FUNCTION  
+  
+    FUNCTION find(x)  
+        IF the value for key x in parent DOES NOT EQUAL x THEN  
+            SET the value for key x in parent TO the result of calling find with the value for key x in parent  
+        END IF  
+        RETURN the value for key x in parent  
+    END FUNCTION  
+  
+    FUNCTION union(x, y)  
+        SET rootX TO the result of calling find with x  
+        SET rootY TO the result of calling find with y  
+        IF rootX DOES NOT EQUAL rootY THEN  
+            SET the value for key rootX in parent TO rootY  
+            DECREMENT count BY one  
+        END IF  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION numIslands2(m integer, n integer, positions list of list of integer) RETURNS list of integer  
+        FUNCTION is_valid(x integer, y integer) RETURNS boolean  
+            RETURN x IS GREATER THAN OR EQUAL TO zero AND x IS LESS THAN m AND y IS GREATER THAN OR EQUAL TO zero AND y IS LESS THAN n  
+        END FUNCTION  
+  
+        SET directions TO a list containing the tuples of integers one zero, minus one zero, zero one, zero minus one  
+        SET uf TO a new instance of UnionFind  
+        SET grid TO a list containing m elements each being a list of n elements each set TO zero  
+        SET result TO an empty list  
+  
+        FOR each pair r comma c IN positions  
+            IF element at position r of grid AND at position c of that element EQUALS one THEN  
+                APPEND the count attribute of uf TO result  
+                CONTINUE to next iteration  
+            END IF  
+  
+            SET element at position r of grid AND at position c of that element TO one  
+            CALL make_set method of uf with the tuple of r comma c  
+  
+            FOR each pair dr comma dc IN directions  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                IF calling is_valid with nr and nc RETURNS true AND element at position nr of grid AND at position nc of that element EQUALS one THEN  
+                    CALL union method of uf with the tuple of r comma c AND the tuple of nr comma nc  
+                END IF  
+            END FOR  
+  
+            APPEND the count attribute of uf TO result  
+        END FOR  
+  
+        RETURN result  
+    END FUNCTION  
+END CLASS

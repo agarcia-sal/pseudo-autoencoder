@@ -1,0 +1,68 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, n)  
+        SET self.parent TO sequence of integers from zero TO n MINUS one  
+        SET self.rank TO list of zeros with length n  
+    END FUNCTION  
+
+    FUNCTION find(self, x)  
+        IF element at self.parent indexed by x NOT EQUALS x THEN  
+            SET self.parent at x TO result of self.find with argument self.parent at x  
+        END IF  
+        RETURN element at self.parent indexed by x  
+    END FUNCTION  
+
+    FUNCTION union(self, x, y)  
+        SET rootX TO result of self.find with argument x  
+        SET rootY TO result of self.find with argument y  
+        IF rootX NOT EQUALS rootY THEN  
+            IF element at self.rank indexed by rootX GREATER THAN element at self.rank indexed by rootY THEN  
+                SET self.parent at rootY TO rootX  
+            ELSE IF element at self.rank indexed by rootX LESS THAN element at self.rank indexed by rootY THEN  
+                SET self.parent at rootX TO rootY  
+            ELSE  
+                SET self.parent at rootY TO rootX  
+                INCREMENT element at self.rank indexed by rootX BY one  
+            END IF  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION latestDayToCross(self, row, col, cells)  
+        SET grid TO list containing row elements EACH initialized as list of col elements EACH set TO one  
+        SET uf TO new UnionFind with argument row MULTIPLIED BY col PLUS two  
+        SET TOP TO row MULTIPLIED BY col  
+        SET BOTTOM TO row MULTIPLIED BY col PLUS one  
+        SET directions TO list of tuples containing (-1, zero), (one, zero), (zero, -1), (zero, one)  
+
+        FOR day FROM length of cells MINUS one DOWN TO zero DO  
+            SET r TO element zero of cells at index day  
+            SET c TO element one of cells at index day  
+            DECREMENT r BY one  
+            DECREMENT c BY one  
+            SET grid at r indexed by c TO zero  
+
+            FOR each pair dr, dc IN directions DO  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                IF nr GREATER THAN OR EQUAL TO zero AND nr LESS THAN row AND nc GREATER THAN OR EQUAL TO zero AND nc LESS THAN col AND element at grid indexed by nr indexed by nc EQUALS zero THEN  
+                    CALL uf.union with arguments r MULTIPLIED BY col PLUS c AND nr MULTIPLIED BY col PLUS nc  
+                END IF  
+            END FOR  
+
+            IF r EQUALS zero THEN  
+                CALL uf.union with arguments r MULTIPLIED BY col PLUS c AND TOP  
+            END IF  
+
+            IF r EQUALS row MINUS one THEN  
+                CALL uf.union with arguments r MULTIPLIED BY col PLUS c AND BOTTOM  
+            END IF  
+
+            IF result of uf.find with argument TOP EQUALS result of uf.find with argument BOTTOM THEN  
+                RETURN day  
+            END IF  
+        END FOR  
+
+        RETURN zero  
+    END FUNCTION  
+END CLASS

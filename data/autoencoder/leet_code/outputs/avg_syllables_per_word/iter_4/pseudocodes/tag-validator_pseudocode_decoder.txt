@@ -1,0 +1,43 @@
+CLASS Solution
+    FUNCTION isValid(code: string) RETURNS boolean
+        SET cdata_pattern TO '<!\[CDATA\[.*?\]\]>'
+        SET code TO code AFTER REMOVING ALL MATCHES OF cdata_pattern
+        
+        SET stack TO empty list
+        SET i TO 0
+        WHILE i LESS THAN LENGTH OF code
+            IF code[i] EQUALS '<' THEN
+                SET j TO POSITION OF '>' IN code STARTING FROM i + 1
+                IF j IS -1 THEN
+                    RETURN False
+                END IF
+                
+                SET tag_content TO SUBSTRING OF code FROM i + 1 TO j
+                IF tag_content IS EMPTY THEN
+                    RETURN False
+                END IF
+                
+                IF FIRST CHARACTER OF tag_content EQUALS '/' THEN
+                    SET tag_name TO SUBSTRING OF tag_content FROM 1 TO END
+                    IF stack IS EMPTY OR LAST ELEMENT OF stack NOT EQUAL TO tag_name THEN
+                        RETURN False
+                    END IF
+                    REMOVE LAST ELEMENT FROM stack
+                ELSE IF FIRST CHARACTER OF tag_content EQUALS '!' THEN
+                    RETURN False
+                ELSE
+                    IF LENGTH OF tag_content IS LESS THAN 1 OR GREATER THAN 9 OR tag_content CONTAINS NON-UPPERCASE LETTERS THEN
+                        RETURN False
+                    END IF
+                    APPEND tag_content TO stack
+                END IF
+                
+                SET i TO j + 1
+            ELSE
+                INCREMENT i BY 1
+            END IF
+        END WHILE
+        
+        RETURN stack IS EMPTY AND NUMBER OF MATCHES OF PATTERN '<[A-Z]+>.*</[A-Z]+>' IN code IS GREATER THAN 0
+    END FUNCTION
+END CLASS

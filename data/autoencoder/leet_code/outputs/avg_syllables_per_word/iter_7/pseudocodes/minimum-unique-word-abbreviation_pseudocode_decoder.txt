@@ -1,0 +1,73 @@
+CLASS Solution  
+    FUNCTION minAbbreviation(target, dictionary)  
+        FUNCTION is_valid_abbr(s, abbr)  
+            SET i TO 0  
+            SET j TO 0  
+            WHILE i LESS THAN LENGTH OF s AND j LESS THAN LENGTH OF abbr  
+                IF abbr[j] IS A DIGIT THEN  
+                    IF abbr[j] EQUALS '0' THEN  
+                        RETURN False  
+                    END IF  
+                    SET shift TO 0  
+                    WHILE j LESS THAN LENGTH OF abbr AND abbr[j] IS A DIGIT  
+                        SET shift TO shift MULTIPLIED BY 10 PLUS INTEGER VALUE OF abbr[j]  
+                        INCREMENT j BY 1  
+                    END WHILE  
+                    INCREMENT i BY shift  
+                ELSE  
+                    IF s[i] NOT EQUAL TO abbr[j] THEN  
+                        RETURN False  
+                    END IF  
+                    INCREMENT i BY 1  
+                    INCREMENT j BY 1  
+                END IF  
+            END WHILE  
+            RETURN i EQUALS LENGTH OF s AND j EQUALS LENGTH OF abbr  
+        END FUNCTION  
+        
+        FUNCTION generate_abbrs(word, length, abbr, index, skip_count)  
+            IF index EQUALS length THEN  
+                IF skip_count GREATER THAN 0 THEN  
+                    SET abbr TO abbr CONCATENATED WITH STRING REPRESENTATION OF skip_count  
+                END IF  
+                APPEND abbr TO abbrs  
+                RETURN  
+            END IF  
+            generate_abbrs(word, length, abbr, index PLUS 1, skip_count PLUS 1)  
+            IF skip_count GREATER THAN 0 THEN  
+                SET abbr TO abbr CONCATENATED WITH STRING REPRESENTATION OF skip_count  
+            END IF  
+            generate_abbrs(word, length, abbr CONCATENATED WITH word[index], index PLUS 1, 0)  
+        END FUNCTION  
+        
+        FUNCTION find_unique_abbr()  
+            FOR length FROM 1 TO LENGTH OF target  
+                CLEAR abbrs  
+                generate_abbrs(target, LENGTH OF target, empty string, 0, 0)  
+                SET min_abbr TO None  
+                SET min_length TO infinity  
+                FOR EACH abbr IN abbrs  
+                    IF FOR ALL word IN filtered_dict, is_valid_abbr(word, abbr) IS False THEN  
+                        IF LENGTH OF abbr LESS THAN min_length THEN  
+                            SET min_length TO LENGTH OF abbr  
+                            SET min_abbr TO abbr  
+                        END IF  
+                    END IF  
+                END FOR  
+                IF min_abbr IS NOT None THEN  
+                    RETURN min_abbr  
+                END IF  
+            END FOR  
+        END FUNCTION  
+        
+        SET filtered_dict TO EMPTY LIST  
+        FOR EACH word IN dictionary  
+            IF LENGTH OF word EQUALS LENGTH OF target THEN  
+                APPEND word TO filtered_dict  
+            END IF  
+        END FOR  
+        
+        SET abbrs TO EMPTY LIST  
+        RETURN find_unique_abbr()  
+    END FUNCTION  
+END CLASS

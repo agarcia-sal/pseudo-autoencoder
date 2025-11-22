@@ -1,0 +1,62 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val = 0, left = None, right = None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values)
+    IF values IS EMPTY
+        RETURN None
+    SET root TO TreeNode(values[0])
+    SET i TO 1
+    SET queue TO empty deque
+    APPEND root TO queue
+    WHILE queue IS NOT EMPTY
+        SET node TO REMOVE FIRST FROM queue
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.left TO TreeNode(values[i])
+            APPEND node.left TO queue
+        INCREMENT i BY 1
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.right TO TreeNode(values[i])
+            APPEND node.right TO queue
+        INCREMENT i BY 1
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val IS NOT EQUAL TO q.val
+        RETURN False
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+END FUNCTION
+
+CLASS Solution
+    FUNCTION closestKValues(self, root, target, k)
+        FUNCTION inorder_traversal(node)
+            IF node IS None
+                RETURN
+            CALL inorder_traversal(node.left)
+            IF LENGTH OF result < k
+                APPEND node.val TO result
+            ELSE
+                IF ABSOLUTE VALUE OF (node.val - target) < ABSOLUTE VALUE OF (FIRST ITEM IN result - target)
+                    REMOVE FIRST ITEM FROM result
+                    APPEND node.val TO result
+                ELSE
+                    RETURN
+            CALL inorder_traversal(node.right)
+        END FUNCTION
+
+        SET result TO empty deque
+        CALL inorder_traversal(root)
+        RETURN list converted from result
+    END FUNCTION
+END CLASS

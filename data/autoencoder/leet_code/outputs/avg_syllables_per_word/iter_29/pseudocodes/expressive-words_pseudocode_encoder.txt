@@ -1,0 +1,53 @@
+CLASS Solution  
+    FUNCTION expressiveWords(s parameter s, words parameter words) RETURNS integer  
+        
+        FUNCTION compress(word parameter word) RETURNS list  
+            IF word IS EMPTY  
+                RETURN empty list  
+            END IF  
+            SET count TO one  
+            SET compressed TO empty list  
+            FOR index FROM two TO the LENGTH OF word  
+                IF character at position index of word EQUALS character at position index MINUS one of word  
+                    INCREMENT count BY one  
+                ELSE  
+                    APPEND pair of character at position index MINUS one of word AND count TO compressed  
+                    SET count TO one  
+                END IF  
+            END FOR  
+            APPEND pair of character at position LENGTH OF word MINUS one of word AND count TO compressed  
+            RETURN compressed  
+        END FUNCTION  
+        
+        FUNCTION is_stretchy(s_compressed parameter s_compressed, word_compressed parameter word_compressed) RETURNS boolean  
+            IF the LENGTH OF s_compressed NOT EQUALS the LENGTH OF word_compressed  
+                RETURN false  
+            END IF  
+            FOR each pair of elements one_is_sc_and_sc_count IN s_compressed AND the corresponding one_is_wc_and_wc_count IN word_compressed  
+                SET sc TO first element of one_is_sc_and_sc_count  
+                SET sc_count TO second element of one_is_sc_and_sc_count  
+                SET wc TO first element of one_is_wc_and_wc_count  
+                SET wc_count TO second element of one_is_wc_and_wc_count  
+                IF sc NOT EQUALS wc  
+                    RETURN false  
+                END IF  
+                IF sc_count NOT EQUALS wc_count AND (sc_count LESS THAN three OR sc_count LESS THAN wc_count)  
+                    RETURN false  
+                END IF  
+            END FOR  
+            RETURN true  
+        END FUNCTION  
+        
+        SET s_compressed TO the result of calling compress WITH s  
+        SET stretchy_count TO zero  
+        
+        FOR each word IN words  
+            SET word_compressed TO the result of calling compress WITH word  
+            IF is_stretchy CALLED WITH s_compressed AND word_compressed IS true  
+                INCREMENT stretchy_count BY one  
+            END IF  
+        END FOR  
+        
+        RETURN stretchy_count  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,64 @@
+```
+CLASS Solution
+    FUNCTION medianSlidingWindow(nums, k)
+        SET lo TO empty list
+        SET hi TO empty list
+
+        FUNCTION balance_heaps()
+            IF LENGTH OF lo > LENGTH OF hi + 1
+                SET value TO heappop(lo)
+                heappush(hi, NEGATIVE OF value)
+            ELSE IF LENGTH OF hi > LENGTH OF lo
+                SET value TO heappop(hi)
+                heappush(lo, NEGATIVE OF value)
+            END IF
+        END FUNCTION
+
+        FUNCTION add_num(num)
+            IF lo IS EMPTY OR num <= NEGATIVE OF lo[0]
+                heappush(lo, NEGATIVE OF num)
+            ELSE
+                heappush(hi, num)
+            END IF
+            CALL balance_heaps()
+        END FUNCTION
+
+        FUNCTION remove_num(num)
+            IF num <= NEGATIVE OF lo[0]
+                REMOVE NEGATIVE OF num FROM lo
+                IF lo IS NOT EMPTY
+                    APPLY heapify TO lo
+                END IF
+            ELSE
+                REMOVE num FROM hi
+                IF hi IS NOT EMPTY
+                    APPLY heapify TO hi
+                END IF
+            END IF
+            CALL balance_heaps()
+        END FUNCTION
+
+        FUNCTION get_median()
+            IF LENGTH OF lo > LENGTH OF hi
+                RETURN NEGATIVE OF lo[0]
+            ELSE
+                RETURN (NEGATIVE OF lo[0] PLUS hi[0]) DIVIDED BY 2
+            END IF
+        END FUNCTION
+
+        FOR i FROM 0 TO k - 1
+            CALL add_num(nums[i])
+        END FOR
+
+        SET medians TO LIST CONTAINING get_median()
+
+        FOR i FROM k TO LENGTH OF nums MINUS 1
+            CALL add_num(nums[i])
+            CALL remove_num(nums[i MINUS k])
+            APPEND get_median() TO medians
+        END FOR
+
+        RETURN medians
+    END FUNCTION
+END CLASS
+```

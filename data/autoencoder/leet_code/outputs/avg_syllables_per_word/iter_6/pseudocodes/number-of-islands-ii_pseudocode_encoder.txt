@@ -1,0 +1,64 @@
+CLASS UnionFind  
+    FUNCTION __init__()  
+        SET parent TO empty dictionary  
+        SET count TO 0  
+    END FUNCTION  
+  
+    FUNCTION make_set(x)  
+        IF x NOT IN parent THEN  
+            SET parent[x] TO x  
+            INCREMENT count BY 1  
+        END IF  
+    END FUNCTION  
+  
+    FUNCTION find(x)  
+        IF parent[x] NOT EQUALS x THEN  
+            SET parent[x] TO CALL find WITH parent[x]  
+        END IF  
+        RETURN parent[x]  
+    END FUNCTION  
+  
+    FUNCTION union(x, y)  
+        SET rootX TO CALL find WITH x  
+        SET rootY TO CALL find WITH y  
+        IF rootX NOT EQUALS rootY THEN  
+            SET parent[rootX] TO rootY  
+            DECREMENT count BY 1  
+        END IF  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION numIslands2(m, n, positions)  
+        FUNCTION is_valid(x, y)  
+            RETURN x GREATER THAN OR EQUAL TO 0 AND x LESS THAN m AND y GREATER THAN OR EQUAL TO 0 AND y LESS THAN n  
+        END FUNCTION  
+  
+        SET directions TO list containing (1, 0), (-1, 0), (0, 1), (0, -1)  
+        SET uf TO new instance of UnionFind  
+        SET grid TO list of m elements each being a list of n zeros  
+        SET result TO empty list  
+  
+        FOR each (r, c) IN positions  
+            IF grid[r][c] EQUALS 1 THEN  
+                APPEND uf.count TO result  
+                CONTINUE  
+            END IF  
+  
+            SET grid[r][c] TO 1  
+            CALL uf.make_set WITH (r, c)  
+  
+            FOR each (dr, dc) IN directions  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                IF CALL is_valid WITH nr, nc IS TRUE AND grid[nr][nc] EQUALS 1 THEN  
+                    CALL uf.union WITH (r, c), (nr, nc)  
+                END IF  
+            END FOR  
+  
+            APPEND uf.count TO result  
+        END FOR  
+  
+        RETURN result  
+    END FUNCTION  
+END CLASS

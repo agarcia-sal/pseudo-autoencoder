@@ -1,0 +1,34 @@
+CLASS Solution
+    FUNCTION findOrder(numCourses, prerequisites)
+        SET adj_list TO A MAPPING FROM course TO AN EMPTY LIST FOR each course FROM zero TO numCourses MINUS one
+        SET in_degrees TO A LIST OF zero REPEATED numCourses TIMES
+        
+        FOR each pair_of_destination_and_source IN prerequisites
+            SET dest TO element at position zero OF pair_of_destination_and_source
+            SET src TO element at position one OF pair_of_destination_and_source
+            APPEND dest TO the LIST AT key src OF adj_list
+            INCREMENT element at position dest OF in_degrees BY one
+        END FOR
+        
+        SET queue TO A DEQUE CONTAINING each course FROM zero TO numCourses MINUS one WHERE element at position course OF in_degrees EQUALS zero
+        SET topological_order TO AN EMPTY LIST
+        
+        WHILE queue IS NOT EMPTY
+            SET current TO THE FIRST ELEMENT REMOVED FROM queue
+            APPEND current TO topological_order
+            
+            FOR each neighbor IN element at position current OF adj_list
+                DECREMENT element at position neighbor OF in_degrees BY one
+                IF element at position neighbor OF in_degrees EQUALS zero
+                    APPEND neighbor TO queue
+                END IF
+            END FOR
+        END WHILE
+        
+        IF the LENGTH OF topological_order EQUALS numCourses
+            RETURN topological_order
+        ELSE
+            RETURN AN EMPTY LIST
+        END IF
+    END FUNCTION
+END CLASS

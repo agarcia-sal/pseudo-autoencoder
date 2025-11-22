@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION outerTrees(trees)  
+        FUNCTION dist_sq(p1, p2)  
+            RETURN (p1 at index zero MINUS p2 at index zero) SQUARED PLUS (p1 at index one MINUS p2 at index one) SQUARED  
+        END FUNCTION  
+
+        FUNCTION circumcenter(p1, p2, p3)  
+            SET ax TO p1 at index zero  
+            SET ay TO p1 at index one  
+            SET bx TO p2 at index zero  
+            SET by TO p2 at index one  
+            SET cx TO p3 at index zero  
+            SET cy TO p3 at index one  
+            SET d TO two MULTIPLIED BY (ax MULTIPLIED BY (by MINUS cy) PLUS bx MULTIPLIED BY (cy MINUS ay) PLUS cx MULTIPLIED BY (ay MINUS by))  
+            SET ux TO ((ax SQUARED PLUS ay SQUARED) MULTIPLIED BY (by MINUS cy) PLUS (bx SQUARED PLUS by SQUARED) MULTIPLIED BY (cy MINUS ay) PLUS (cx SQUARED PLUS cy SQUARED) MULTIPLIED BY (ay MINUS by)) DIVIDED BY d  
+            SET uy TO ((ax SQUARED PLUS ay SQUARED) MULTIPLIED BY (cx MINUS bx) PLUS (bx SQUARED PLUS by SQUARED) MULTIPLIED BY (ax MINUS cx) PLUS (cx SQUARED PLUS cy SQUARED) MULTIPLIED BY (bx MINUS ax)) DIVIDED BY d  
+            RETURN list containing ux and uy, square root of ((ux MINUS ax) SQUARED PLUS (uy MINUS ay) SQUARED)  
+        END FUNCTION  
+
+        FUNCTION welzl(points, boundary, n)  
+            IF n EQUALS zero OR length of boundary EQUALS three THEN  
+                IF length of boundary EQUALS zero THEN  
+                    RETURN list containing zero and zero, zero  
+                ELSE IF length of boundary EQUALS one THEN  
+                    RETURN boundary at index zero, zero  
+                ELSE IF length of boundary EQUALS two THEN  
+                    SET center TO list containing (boundary at index zero at index zero PLUS boundary at index one at index zero) DIVIDED BY two AND (boundary at index zero at index one PLUS boundary at index one at index one) DIVIDED BY two  
+                    SET radius TO square root of dist_sq applied to boundary at index zero and boundary at index one DIVIDED BY two  
+                    RETURN center, radius  
+                ELSE  
+                    RETURN circumcenter with arguments unpacked from boundary  
+                END IF  
+            END IF  
+            
+            SET p TO points at index (n MINUS one)  
+            SET center, radius TO welzl called with points, boundary, n MINUS one  
+            IF dist_sq applied to center and p LESS THAN OR EQUAL TO radius SQUARED THEN  
+                RETURN center, radius  
+            END IF  
+            
+            RETURN welzl called with points, boundary appended with p, n MINUS one  
+        END FUNCTION  
+
+        CALL random shuffle with trees  
+        SET center, radius TO welzl called with trees, empty list, length of trees  
+        RETURN list containing center at index zero, center at index one, radius  
+    END FUNCTION  
+END CLASS

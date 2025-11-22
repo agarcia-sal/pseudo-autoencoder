@@ -1,0 +1,93 @@
+CLASS Solution  
+    FUNCTION isSolvable(words, result)  
+        SET unique_chars TO the set of all distinct characters found in concatenation of all words PLUS all characters of the result  
+        IF the size of unique_chars IS GREATER THAN ten  
+            RETURN False  
+        END IF  
+        
+        SET non_zero_chars TO the set of first characters of each word in words that have a length GREATER THAN one  
+        IF the length of result IS GREATER THAN one  
+            ADD the first character of result TO non_zero_chars  
+        END IF  
+        
+        SET char_to_digit TO an empty dictionary  
+        SET digit_to_char TO an empty dictionary  
+        
+        FUNCTION can_assign(character, digit)  
+            RETURN character NOT IN char_to_digit AND (digit NOT IN digit_to_char OR digit_to_char[digit] EQUALS character)  
+        END FUNCTION  
+        
+        FUNCTION assign(character, digit)  
+            SET char_to_digit at key character TO digit  
+            SET digit_to_char at key digit TO character  
+        END FUNCTION  
+        
+        FUNCTION unassign(character, digit)  
+            REMOVE character FROM char_to_digit  
+            REMOVE digit FROM digit_to_char  
+        END FUNCTION  
+        
+        FUNCTION word_value(word)  
+            SET total_value TO zero  
+            SET position TO zero  
+            FOR each character IN the reverse order of characters in word  
+                INCREMENT total_value BY char_to_digit at key character MULTIPLIED BY ten RAISED TO the power position  
+                INCREMENT position BY one  
+            END FOR  
+            RETURN total_value  
+        END FUNCTION  
+        
+        FUNCTION backtrack(index, column, sum_column)  
+            SET max_word_length TO the maximum length among all words in words  
+            IF column IS GREATER THAN OR EQUAL TO max_word_length AND column IS GREATER THAN OR EQUAL TO the length of result  
+                RETURN sum_column EQUALS zero  
+            END IF  
+            
+            IF index EQUALS the length of words  
+                IF column IS LESS THAN the length of result  
+                    SET current_char TO the character at position from the end column of result  
+                    IF current_char IS IN char_to_digit  
+                        IF char_to_digit at key current_char EQUALS sum_column MODULO ten  
+                            RETURN backtrack zero column PLUS one sum_column DIVIDED BY ten without remainder  
+                        ELSE  
+                            RETURN False  
+                        END IF  
+                    ELSE IF can_assign current_char sum_column MODULO ten AND (sum_column MODULO ten NOT EQUALS zero OR current_char NOT IN non_zero_chars)  
+                        CALL assign current_char sum_column MODULO ten  
+                        IF backtrack zero column PLUS one sum_column DIVIDED BY ten without remainder  
+                            RETURN True  
+                        END IF  
+                        CALL unassign current_char sum_column MODULO ten  
+                    END IF  
+                ELSE  
+                    RETURN sum_column EQUALS zero  
+                END IF  
+                RETURN False  
+            END IF  
+            
+            SET current_word TO the element at position index of words  
+            IF column IS GREATER THAN OR EQUAL TO the length of current_word  
+                RETURN backtrack index PLUS one column sum_column  
+            END IF  
+            
+            SET current_char TO the character at position from the end column of current_word  
+            IF current_char IS IN char_to_digit  
+                RETURN backtrack index PLUS one column sum_column PLUS char_to_digit at key current_char  
+            END IF  
+            
+            FOR digit FROM zero TO nine  
+                IF can_assign current_char digit AND (digit NOT EQUALS zero OR current_char NOT IN non_zero_chars)  
+                    CALL assign current_char digit  
+                    IF backtrack index PLUS one column sum_column PLUS digit  
+                        RETURN True  
+                    END IF  
+                    CALL unassign current_char digit  
+                END IF  
+            END FOR  
+            
+            RETURN False  
+        END FUNCTION  
+        
+        RETURN backtrack zero zero zero  
+    END FUNCTION  
+END CLASS

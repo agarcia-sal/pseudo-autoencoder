@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION closestNode(n, edges, query)  
+        SET graph TO a mapping with default value as empty list  
+        FOR each element u AND element v IN edges  
+            APPEND element v TO the list at key u in graph  
+            APPEND element u TO the list at key v in graph  
+        END FOR  
+        
+        FUNCTION find_path(start, end)  
+            SET queue TO a double ended queue initialized with a tuple of start and a list containing start  
+            SET visited TO a set containing start  
+            
+            WHILE the queue is not empty  
+                SET node AND path TO the first element removed from the queue  
+                IF node EQUALS end  
+                    RETURN path  
+                END IF  
+                FOR each neighbor IN the list at key node in graph  
+                    IF neighbor NOT IN visited  
+                        ADD neighbor TO visited  
+                        APPEND tuple of neighbor and concatenation of path PLUS list containing neighbor TO the queue  
+                    END IF  
+                END FOR  
+            END WHILE  
+        END FUNCTION  
+        
+        FUNCTION closest_node_on_path(path, node)  
+            SET min_distance TO positive infinity  
+            SET closest_node TO null  
+            FOR each element p IN path  
+                SET distance TO the LENGTH OF the list returned by find_path with parameters p AND node MINUS one  
+                IF distance LESS THAN min_distance  
+                    SET min_distance TO distance  
+                    SET closest_node TO p  
+                END IF  
+            END FOR  
+            RETURN closest_node  
+        END FUNCTION  
+        
+        SET answer TO an empty list  
+        FOR each element start AND element end AND element node IN query  
+            SET path TO the result of find_path with parameters start AND end  
+            APPEND the result of closest_node_on_path with parameters path AND node TO answer  
+        END FOR  
+        
+        RETURN answer  
+    END FUNCTION  
+END CLASS

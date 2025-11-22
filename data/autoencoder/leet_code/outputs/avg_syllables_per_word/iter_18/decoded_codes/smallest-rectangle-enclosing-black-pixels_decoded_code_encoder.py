@@ -1,0 +1,69 @@
+class Solution:
+    def minArea(self, image: list[list[str]], x: int, y: int) -> int:
+        if not image or not image[0]:
+            return 0
+
+        m = len(image)
+        n = len(image[0])
+
+        def hasBlackPixelInRow(row: int) -> bool:
+            for pixel in image[row]:
+                if pixel == '1':
+                    return True
+            return False
+
+        def hasBlackPixelInColumn(col: int) -> bool:
+            for row in range(m):
+                if image[row][col] == '1':
+                    return True
+            return False
+
+        def findTop() -> int:
+            low, high = 0, x
+            while low < high:
+                mid = (low + high) // 2
+                if hasBlackPixelInRow(mid):
+                    high = mid
+                else:
+                    low = mid + 1
+            return low
+
+        def findBottom() -> int:
+            low, high = x, m - 1
+            while low < high:
+                mid = (low + high + 1) // 2
+                if hasBlackPixelInRow(mid):
+                    low = mid
+                else:
+                    high = mid - 1
+            return low
+
+        def findLeft() -> int:
+            low, high = 0, y
+            while low < high:
+                mid = (low + high) // 2
+                if hasBlackPixelInColumn(mid):
+                    high = mid
+                else:
+                    low = mid + 1
+            return low
+
+        def findRight() -> int:
+            low, high = y, n - 1
+            while low < high:
+                mid = (low + high + 1) // 2
+                if hasBlackPixelInColumn(mid):
+                    low = mid
+                else:
+                    high = high - 1
+            return low
+
+        top = findTop()
+        bottom = findBottom()
+        left = findLeft()
+        right = findRight()
+
+        height = bottom - top + 1
+        width = right - left + 1
+
+        return height * width

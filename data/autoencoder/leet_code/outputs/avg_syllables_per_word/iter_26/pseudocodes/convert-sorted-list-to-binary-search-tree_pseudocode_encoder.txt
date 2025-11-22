@@ -1,0 +1,112 @@
+CLASS ListNode
+    FUNCTION __init__(self, val EQUALS zero, next EQUALS none)
+        SET self.val TO val
+        SET self.next TO next
+    END FUNCTION
+END CLASS
+
+FUNCTION list_node(values_list)
+    IF values_list IS empty
+        RETURN none
+    END IF
+    SET head TO A new ListNode WITH value AS element at position zero OF values_list
+    SET p TO head
+    FOR each value IN the SUBLIST FROM position one TO the END OF values_list
+        SET node TO A new ListNode WITH value AS value
+        SET the next property of p TO node
+        SET p TO node
+    END FOR
+    RETURN head
+END FUNCTION
+
+FUNCTION is_same_list(pointer_one, pointer_two)
+    IF pointer_one IS none AND pointer_two IS none
+        RETURN true
+    END IF
+    IF pointer_one IS none OR pointer_two IS none
+        RETURN false
+    END IF
+    RETURN THE COMBINATION USING AND OF 
+        the value property of pointer_one EQUALS the value property of pointer_two
+        AND
+        the RECURSIVE CALL OF is_same_list WITH parameters AS the next property of pointer_one AND the next property of pointer_two
+END FUNCTION
+
+CLASS TreeNode
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values_list)
+    IF values_list IS empty
+        RETURN none
+    END IF
+    SET root TO A new TreeNode WITH value AS element at position zero OF values_list
+    SET index TO one
+    SET queue TO A new empty deque collection
+    APPEND root TO queue
+    WHILE queue IS NOT empty HOLDS
+        SET node TO THE FRONT element REMOVED FROM queue
+        IF index IS LESS THAN THE LENGTH OF values_list AND element at position index OF values_list IS NOT none
+            SET the left property of node TO A new TreeNode WITH value AS element at position index OF values_list
+            APPEND the left property of node TO queue
+        END IF
+        INCREMENT index BY one
+        IF index IS LESS THAN THE LENGTH OF values_list AND element at position index OF values_list IS NOT none
+            SET the right property of node TO A new TreeNode WITH value AS element at position index OF values_list
+            APPEND the right property of node TO queue
+        END IF
+        INCREMENT index BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(pointer_p, pointer_q)
+    IF pointer_p IS none AND pointer_q IS none
+        RETURN true
+    ELSE IF pointer_p IS none OR pointer_q IS none
+        RETURN false
+    ELSE IF the value property of pointer_p IS NOT EQUALS the value property of pointer_q
+        RETURN false
+    ELSE
+        RETURN THE COMBINATION USING AND OF 
+            the RECURSIVE CALL OF is_same_tree WITH parameters AS the left property of pointer_p AND the left property of pointer_q
+            AND
+            the RECURSIVE CALL OF is_same_tree WITH parameters AS the right property of pointer_p AND the right property of pointer_q
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION sortedListToBST(self, head OPTIONAL ListNode)
+        IF head IS none
+            RETURN none
+        END IF
+
+        FUNCTION findMiddle(left, right)
+            SET slow TO left
+            SET fast TO left
+            WHILE fast IS NOT EQUALS right AND the next property of fast IS NOT EQUALS right HOLDS
+                SET slow TO the next property of slow
+                SET fast TO the next property of the next property of fast
+            END WHILE
+            RETURN slow
+        END FUNCTION
+
+        FUNCTION convertListToBST(left, right)
+            IF left IS EQUALS right
+                RETURN none
+            END IF
+
+            SET mid TO findMiddle WITH left AND right
+            SET node TO A new TreeNode WITH value AS the value property of mid
+            SET the left property of node TO convertListToBST WITH parameters AS left AND mid
+            SET the right property of node TO convertListToBST WITH parameters AS the next property of mid AND right
+            RETURN node
+        END FUNCTION
+
+        RETURN convertListToBST WITH parameters AS head AND none
+    END FUNCTION
+END CLASS

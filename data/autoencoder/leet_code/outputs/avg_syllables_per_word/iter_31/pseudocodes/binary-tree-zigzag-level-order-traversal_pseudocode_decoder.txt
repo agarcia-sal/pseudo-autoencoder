@@ -1,0 +1,75 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val left right  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values IS EMPTY  
+        RETURN none  
+    END IF  
+    SET root TO NEW TreeNode WITH value element at position one of values  
+    SET i TO one  
+    SET queue TO NEW empty double ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO REMOVE first element FROM queue  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i of values IS NOT none  
+            SET node.left TO NEW TreeNode WITH value element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i of values IS NOT none  
+            SET node.right TO NEW TreeNode WITH value element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF value of p IS NOT EQUALS TO value of q  
+        RETURN false  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETERS left child of p left child of q AND is_same_tree WITH PARAMETERS right child of p right child of q  
+    END IF  
+END FUNCTION
+
+CLASS Solution  
+    FUNCTION zigzagLevelOrder WITH PARAMETERS self root  
+        IF root IS none  
+            RETURN empty list  
+        END IF  
+        SET result TO empty list  
+        SET queue TO NEW double ended queue CONTAINING root  
+        SET left_to_right TO true  
+        WHILE queue IS NOT EMPTY  
+            SET level_size TO LENGTH OF queue  
+            SET current_level TO NEW empty double ended queue  
+            FOR index FROM one TO level_size  
+                SET node TO REMOVE first element FROM queue  
+                IF left_to_right IS true  
+                    APPEND value of node TO current_level  
+                ELSE  
+                    APPEND value of node TO FRONT OF current_level  
+                END IF  
+                IF left child of node IS NOT none  
+                    APPEND left child of node TO queue  
+                END IF  
+                IF right child of node IS NOT none  
+                    APPEND right child of node TO queue  
+                END IF  
+            END FOR  
+            APPEND list converted from current_level TO result  
+            SET left_to_right TO NOT left_to_right  
+        END WHILE  
+        RETURN result  
+    END FUNCTION  
+END CLASS

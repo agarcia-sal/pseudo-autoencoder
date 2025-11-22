@@ -1,0 +1,51 @@
+CLASS Solution
+    FUNCTION smallestSufficientTeam(self, required_skills AS List OF strings, people AS List OF List OF strings) RETURNS List OF integers
+        SET skill_to_index_dictionary TO an empty dictionary
+        FOR each skill_index AND skill IN required_skills WITH their positions
+            ASSIGN skill_to_index_dictionary element at key skill TO skill_index
+        END FOR
+
+        SET total_skills_count TO the LENGTH OF required_skills
+        SET total_people_count TO the LENGTH OF people
+
+        SET people_skill_bitmask_list TO a list of zeroes with length total_people_count
+
+        FOR each person_index AND skill_set IN people WITH their positions
+            FOR each skill IN skill_set
+                UPDATE the element at person_index IN people_skill_bitmask_list TO the current value BITWISE ORRED WITH one LEFT SHIFTED BY skill_to_index_dictionary element at key skill
+            END FOR
+        END FOR
+
+        SET f_list TO a list filled with infinity value with LENGTH equal to TWO RAISED TO THE POWER OF total_skills_count
+        SET g_list TO a list filled with zeroes with the SAME LENGTH AS f_list
+        SET h_list TO a list filled with zeroes with the SAME LENGTH AS f_list
+
+        SET the element at position zero IN f_list TO zero
+
+        FOR each index_i FROM zero TO TWO RAISED TO THE POWER OF total_skills_count MINUS one INCLUSIVE
+            IF the element at index_i IN f_list EQUALS infinity
+                CONTINUE to the next iteration
+            END IF
+
+            FOR each person_index_j FROM zero TO total_people_count MINUS one INCLUSIVE
+                SET new_skill_set TO the BITWISE OR of index_i AND the element at position person_index_j IN people_skill_bitmask_list
+                IF the element at index_i IN f_list PLUS one LESS THAN the element at new_skill_set IN f_list
+                    SET the element at new_skill_set IN f_list TO the element at index_i IN f_list PLUS one
+                    SET the element at new_skill_set IN g_list TO person_index_j
+                    SET the element at new_skill_set IN h_list TO index_i
+                END IF
+            END FOR
+        END FOR
+
+        SET current_skill_set_index TO TWO RAISED TO THE POWER OF total_skills_count MINUS one
+
+        SET answer_list TO an empty list
+
+        WHILE current_skill_set_index IS NOT zero
+            APPEND the element at current_skill_set_index IN g_list TO answer_list
+            SET current_skill_set_index TO the element at current_skill_set_index IN h_list
+        END WHILE
+
+        RETURN answer_list
+    END FUNCTION
+END CLASS

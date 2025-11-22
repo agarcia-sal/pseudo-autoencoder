@@ -1,0 +1,42 @@
+CLASS Solution
+    FUNCTION minimumTimeRequired(jobs, k)
+        SET n TO the LENGTH OF jobs
+        
+        CALL initialize_subset_sums WITH parameters n and jobs RETURNING subset_sums
+        
+        FUNCTION dp(k_parameter, mask_parameter)
+            IF k_parameter EQUALS one
+                RETURN element at position mask_parameter of subset_sums
+            END IF
+
+            SET result TO positive_infinity
+
+            SET submask TO mask_parameter
+            WHILE submask holds
+                SET candidate_one TO CALL dp WITH parameters k_parameter MINUS one AND mask_parameter BITWISE XOR submask
+                SET candidate_two TO element at position submask of subset_sums
+                SET candidate_max TO the GREATER OF candidate_one AND candidate_two
+                SET result TO the LESSER OF result AND candidate_max
+                SET submask TO submask MINUS one BITWISE AND mask_parameter
+            END WHILE
+
+            RETURN result
+        END FUNCTION
+
+        RETURN CALL dp WITH parameters k AND TWO RAISED TO THE POWER n MINUS one
+    END FUNCTION
+
+    FUNCTION initialize_subset_sums(n, jobs)
+        SET list_length TO TWO RAISED TO THE POWER n
+        SET subset_sums TO a new list OF length list_length WITH all elements INITIALIZED TO zero
+
+        FOR index FROM zero TO n MINUS one
+            FOR mask FROM zero TO TWO RAISED TO THE POWER index MINUS one
+                SET combined_mask TO mask BITWISE OR TWO RAISED TO THE POWER index
+                SET element at position combined_mask of subset_sums TO element at position mask of subset_sums PLUS element at position index of jobs
+            END FOR
+        END FOR
+
+        RETURN subset_sums
+    END FUNCTION
+END CLASS

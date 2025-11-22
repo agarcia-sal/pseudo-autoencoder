@@ -1,0 +1,16 @@
+from typing import List
+
+class Solution:
+    def findLength(self, nums1: List[int], nums2: List[int]) -> int:
+        dp = self.initialize_two_dimensional_list(len(nums1) + 1, len(nums2) + 1)
+        max_length = 0
+        for i in range(1, len(nums1) + 1):
+            for j in range(1, len(nums2) + 1):
+                if nums1[i - 1] == nums2[j - 1]:
+                    dp[i][j] = dp[i - 1][j - 1] + 1
+                    if dp[i][j] > max_length:
+                        max_length = dp[i][j]
+        return max_length
+
+    def initialize_two_dimensional_list(self, rows: int, columns: int) -> List[List[int]]:
+        return [[0]*columns for _ in range(rows)]

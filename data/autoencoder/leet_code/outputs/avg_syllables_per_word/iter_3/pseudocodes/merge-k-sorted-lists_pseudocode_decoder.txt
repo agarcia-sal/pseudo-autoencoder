@@ -1,0 +1,55 @@
+CLASS ListNode
+    FUNCTION __init__(self, val = 0, next = None)
+        SET self.val TO val
+        SET self.next TO next
+    END FUNCTION
+END CLASS
+
+FUNCTION list_node(values: list)
+    IF values IS EMPTY
+        RETURN None
+    SET head TO ListNode(values[0])
+    SET p TO head
+    FOR val IN values FROM SECOND ELEMENT TO END
+        SET node TO ListNode(val)
+        SET p.next TO node
+        SET p TO node
+    END FOR
+    RETURN head
+END FUNCTION
+
+FUNCTION is_same_list(p1, p2)
+    IF p1 IS None AND p2 IS None
+        RETURN True
+    IF p1 IS None OR p2 IS None
+        RETURN False
+    RETURN p1.val EQUALS p2.val AND is_same_list(p1.next, p2.next)
+END FUNCTION
+
+CLASS Solution
+    FUNCTION mergeKLists(lists: List OF ListNode OR None) RETURNS ListNode OR None
+        SET min_heap TO empty list
+
+        FOR i, lst IN ENUMERATE(lists)
+            IF lst IS NOT None
+                INSERT (lst.val, i, lst) INTO min_heap AS MIN-HEAP
+            END IF
+        END FOR
+
+        SET dummy TO new ListNode()
+        SET current TO dummy
+
+        WHILE min_heap IS NOT EMPTY
+            REMOVE smallest_element FROM min_heap
+            SET val, i, node TO smallest_element
+            SET current.next TO node
+            SET current TO current.next
+
+            IF node.next IS NOT None
+                INSERT (node.next.val, i, node.next) INTO min_heap AS MIN-HEAP
+            END IF
+        END WHILE
+
+        RETURN dummy.next
+    END FUNCTION
+END CLASS

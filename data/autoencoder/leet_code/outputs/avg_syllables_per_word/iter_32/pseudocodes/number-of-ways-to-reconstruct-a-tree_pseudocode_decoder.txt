@@ -1,0 +1,52 @@
+CLASS Solution  
+    FUNCTION checkWays(pairs)  
+        SET graph TO an empty mapping from element to a set of elements  
+        FOR each element x AND element y IN pairs  
+            ADD element y TO the set mapped by element x in graph  
+            ADD element x TO the set mapped by element y in graph  
+        END FOR  
+        
+        SET max_degree TO the element in graph whose mapped set has the maximum size  
+        SET n TO the size of graph  
+        
+        IF the size of the set mapped by max_degree in graph NOT EQUALS n MINUS one  
+            RETURN zero  
+        END IF  
+        
+        FUNCTION can_be_parent(u, v)  
+            FOR each neighbor IN the set mapped by element v in graph  
+                IF neighbor IS NOT IN the set mapped by element u in graph AND neighbor NOT EQUALS u  
+                    RETURN false  
+                END IF  
+            END FOR  
+            RETURN true  
+        END FUNCTION  
+        
+        SET ways TO one  
+        
+        FOR each element u IN graph  
+            IF element u EQUALS max_degree  
+                CONTINUE to the next iteration  
+            END IF  
+            
+            SET parent TO null  
+            FOR each element v IN the set mapped by element u in graph  
+                IF element v IS IN graph AND the size of the set mapped by element v in graph GREATER THAN OR EQUAL TO the size of the set mapped by element u in graph AND can_be_parent(v, u) IS true  
+                    IF parent IS null OR the size of the set mapped by element v in graph LESS THAN the size of the set mapped by element parent in graph  
+                        SET parent TO element v  
+                    END IF  
+                END IF  
+            END FOR  
+            
+            IF parent IS null  
+                RETURN zero  
+            END IF  
+            
+            IF the size of the set mapped by element parent in graph EQUALS the size of the set mapped by element u in graph  
+                SET ways TO two  
+            END IF  
+        END FOR  
+        
+        RETURN ways  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,40 @@
+import heapq
+
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+def list_node(values):
+    if not values:
+        return None
+    head = ListNode(values[0])
+    p = head
+    for val in values[1:]:
+        node = ListNode(val)
+        p.next = node
+        p = node
+    return head
+
+def is_same_list(p1, p2):
+    if not p1 and not p2:
+        return True
+    if not p1 or not p2:
+        return False
+    return p1.val == p2.val and is_same_list(p1.next, p2.next)
+
+class Solution:
+    def mergeKLists(self, lists):
+        min_heap = []
+        for i, lst in enumerate(lists):
+            if lst:
+                heapq.heappush(min_heap, (lst.val, i, lst))
+        dummy = ListNode()
+        current = dummy
+        while min_heap:
+            val, i, node = heapq.heappop(min_heap)
+            current.next = node
+            current = current.next
+            if node.next:
+                heapq.heappush(min_heap, (node.next.val, i, node.next))
+        return dummy.next

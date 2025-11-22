@@ -1,0 +1,136 @@
+CLASS Term  
+    FUNCTION __init__(self, coefficient, variables)  
+        SET self.coefficient TO coefficient  
+        SET self.variables TO variables  
+    END FUNCTION  
+
+    FUNCTION __lt__(self, other)  
+        IF LENGTH OF self.variables IS NOT EQUAL TO LENGTH OF other.variables  
+            RETURN LENGTH OF self.variables IS GREATER THAN LENGTH OF other.variables  
+        ELSE  
+            RETURN STRING JOIN OF self.variables WITH '*' IS LESS THAN STRING JOIN OF other.variables WITH '*'  
+    END FUNCTION  
+
+    FUNCTION __repr__(self)  
+        IF self.variables IS EMPTY  
+            RETURN STRING REPRESENTATION OF self.coefficient  
+        ELSE  
+            RETURN STRING REPRESENTATION OF self.coefficient CONCATENATED WITH '*' CONCATENATED WITH STRING JOIN OF self.variables WITH '*'  
+    END FUNCTION  
+END CLASS  
+
+
+CLASS Expression  
+    FUNCTION __init__(self)  
+        SET self.terms TO A NEW DEFAULT DICTIONARY WITH DEFAULT VALUE 0  
+    END FUNCTION  
+
+    FUNCTION add_term(self, term)  
+        SET key TO TUPLE OF SORTED term.variables  
+        INCREMENT self.terms[key] BY term.coefficient  
+    END FUNCTION  
+
+    FUNCTION multiply(self, other)  
+        SET result TO A NEW Expression  
+        FOR EACH vars1, coeff1 IN self.terms  
+            FOR EACH vars2, coeff2 IN other.terms  
+                SET combined_vars TO SORTED LIST OF vars1 CONCATENATED WITH vars2  
+                CALL result.add_term WITH A NEW Term(coeff1 MULTIPLIED BY coeff2, combined_vars)  
+        RETURN result  
+    END FUNCTION  
+
+    FUNCTION add(self, other)  
+        FOR EACH vars, coeff IN other.terms  
+            CALL self.add_term WITH A NEW Term(coeff, LIST OF vars)  
+        RETURN self  
+    END FUNCTION  
+
+    FUNCTION subtract(self, other)  
+        FOR EACH vars, coeff IN other.terms  
+            CALL self.add_term WITH A NEW Term(NEGATION OF coeff, LIST OF vars)  
+        RETURN self  
+    END FUNCTION  
+
+    FUNCTION evaluate(self, var_map)  
+        SET result TO A NEW Expression  
+        FOR EACH vars, coeff IN self.terms  
+            SET new_vars TO AN EMPTY LIST  
+            FOR EACH var IN vars  
+                IF var IS IN var_map  
+                    APPEND STRING REPRESENTATION OF var_map[var] TO new_vars  
+                ELSE  
+                    APPEND var TO new_vars  
+            IF new_vars IS NOT EMPTY  
+                SET new_coeff TO EVALUATION OF CONCATENATION OF new_vars  
+            ELSE  
+                SET new_coeff TO 1  
+            CALL result.add_term WITH A NEW Term(coeff MULTIPLIED BY new_coeff, EMPTY LIST)  
+        RETURN result  
+    END FUNCTION  
+
+    FUNCTION simplify(self)  
+        SET simplified_terms TO LIST OF Terms CREATED FROM self.terms WHERE coeff IS NOT 0  
+        SORT simplified_terms  
+        RETURN simplified_terms  
+    END FUNCTION  
+
+    FUNCTION __repr__(self)  
+        RETURN STRING JOIN WITH ' + ' OF repr OF EACH term IN self.simplify()  
+    END FUNCTION  
+END CLASS  
+
+
+CLASS Solution  
+    FUNCTION basicCalculatorIV(self, expression, evalvars, evalints)  
+        SET var_map TO DICTIONARY MAPPING evalvars TO evalints  
+        SET tokens TO LIST OF TOKENS FROM REGULAR EXPRESSION FINDING '(', ')', '+', '-', '*', DIGITS, OR WORDS IN expression  
+        SET output TO EMPTY LIST  
+        SET operators TO EMPTY LIST  
+
+        FUNCTION apply_operator()  
+            SET right TO POP LAST FROM output  
+            SET left TO POP LAST FROM output  
+            SET op TO POP LAST FROM operators  
+            IF op EQUALS '+'  
+                APPEND left.add(right) TO output  
+            ELSE IF op EQUALS '-'  
+                APPEND left.subtract(right) TO output  
+            ELSE IF op EQUALS '*'  
+                APPEND left.multiply(right) TO output  
+        END FUNCTION  
+
+        SET i TO 0  
+        WHILE i IS LESS THAN LENGTH OF tokens  
+            SET token TO tokens AT INDEX i  
+            IF token IS DIGIT  
+                APPEND A NEW Expression TO output  
+                CALL output LAST ELEMENT add_term WITH A NEW Term WITH coefficient CONVERTED FROM token AND EMPTY VARIABLES  
+            ELSE IF token IS ALPHABETIC  
+                APPEND A NEW Expression TO output  
+                SET coef TO var_map VALUE FOR token OR 1 IF NOT FOUND  
+                IF coef EQUALS 1  
+                    IF token NOT IN var_map  
+                        CALL output LAST ELEMENT add_term WITH A NEW Term WITH COEFFICIENT 1 AND VARIABLES LIST CONTAINING token  
+                    ELSE  
+                        CALL output LAST ELEMENT add_term WITH A NEW Term WITH COEFFICIENT 1 AND EMPTY VARIABLES LIST  
+                ELSE  
+                    CALL output LAST ELEMENT add_term WITH A NEW Term WITH coefficient coef AND EMPTY VARIABLES  
+            ELSE IF token EQUALS '('  
+                APPEND token TO operators  
+            ELSE IF token EQUALS ')'  
+                WHILE operators IS NOT EMPTY AND LAST ELEMENT OF operators IS NOT '('  
+                    CALL apply_operator()  
+                POP LAST ELEMENT FROM operators  // remove '('  
+            ELSE IF token IN '+-*'  
+                WHILE operators IS NOT EMPTY AND LAST ELEMENT OF operators IS NOT '(' AND (token IN '+-' OR LAST ELEMENT OF operators EQUALS '*')  
+                    CALL apply_operator()  
+                APPEND token TO operators  
+            INCREMENT i BY 1  
+
+        WHILE operators IS NOT EMPTY  
+            CALL apply_operator()  
+
+        SET simplified_terms TO output FIRST ELEMENT .simplify()  
+        RETURN LIST OF STRINGS FORMATTED AS "coefficient*variables joined by '*'" IF VARIABLES ARE NOT EMPTY, OTHERWISE STRING OF coefficient FOR EACH term IN simplified_terms  
+    END FUNCTION  
+END CLASS

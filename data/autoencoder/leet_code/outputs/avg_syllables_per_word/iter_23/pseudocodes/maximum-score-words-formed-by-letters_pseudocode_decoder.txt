@@ -1,0 +1,67 @@
+CLASS Solution  
+    FUNCTION maxScoreWords(words LIST OF STR, letters LIST OF STR, score LIST OF INT) RETURNS INT  
+        FUNCTION word_score(word STR, score_map DICTIONARY OF CHAR TO INT) RETURNS INT  
+            SET total_score TO zero  
+            FOR each character IN word  
+                INCREMENT total_score BY the value in score_map at character  
+            END FOR  
+            RETURN total_score  
+        END FUNCTION  
+        
+        FUNCTION can_form(word STR, letter_count DICTIONARY OF CHAR TO INT) RETURNS BOOLEAN  
+            SET word_count TO an empty DICTIONARY OF CHAR TO INT WITH default zero  
+            FOR each character IN word  
+                INCREMENT the count of character in word_count BY one  
+            END FOR  
+            FOR each character AND count IN word_count  
+                IF the count of character in letter_count LESS THAN count THEN  
+                    RETURN false  
+                END IF  
+            END FOR  
+            RETURN true  
+        END FUNCTION  
+        
+        FUNCTION update_letter_count(letter_count DICTIONARY OF CHAR TO INT, word STR, add BOOLEAN)  
+            FOR each character IN word  
+                IF add EQUALS true THEN  
+                    INCREMENT the count of character in letter_count BY one  
+                ELSE  
+                    DECREMENT the count of character in letter_count BY one  
+                END IF  
+            END FOR  
+        END FUNCTION  
+        
+        FUNCTION backtrack(index INT, current_score INT, letter_count DICTIONARY OF CHAR TO INT) RETURNS INT  
+            IF index EQUALS the LENGTH OF words THEN  
+                RETURN current_score  
+            END IF  
+            
+            SET max_score TO current_score  
+            FOR i FROM index TO the LENGTH OF words MINUS one  
+                IF can_form(element at position i of words, letter_count) EQUALS true THEN  
+                    CALL update_letter_count(letter_count, element at position i of words, add EQUALS false)  
+                    SET candidate_score TO backtrack(i PLUS one, current_score PLUS word_score(element at position i of words, score_map), letter_count)  
+                    IF candidate_score GREATER THAN max_score THEN  
+                        SET max_score TO candidate_score  
+                    END IF  
+                    CALL update_letter_count(letter_count, element at position i of words, add EQUALS true)  
+                END IF  
+            END FOR  
+            
+            RETURN max_score  
+        END FUNCTION  
+        
+        SET score_map TO an empty DICTIONARY OF CHAR TO INT  
+        FOR i FROM zero TO the number twenty FIVE  
+            ASSIGN reference TO the character corresponding to the ith position in the alphabet starting from character 'a'  
+            SET the value in score_map at reference TO element at position i of score  
+        END FOR  
+        
+        SET letter_count TO an empty DICTIONARY OF CHAR TO INT WITH default zero  
+        FOR each character IN letters  
+            INCREMENT the count of character in letter_count BY one  
+        END FOR  
+        
+        RETURN backtrack(zero, zero, letter_count)  
+    END FUNCTION  
+END CLASS

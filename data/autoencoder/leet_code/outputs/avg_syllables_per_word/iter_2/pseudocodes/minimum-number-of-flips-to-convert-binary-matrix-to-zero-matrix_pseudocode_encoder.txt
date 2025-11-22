@@ -1,0 +1,48 @@
+CLASS Solution
+    FUNCTION minFlips(mat: List of List of Integer) RETURNS Integer
+        FUNCTION flip(matrix, x, y)
+            SET directions TO list of coordinate pairs [(-1, 0), (1, 0), (0, -1), (0, 1), (0, 0)]
+            FOR each (dx, dy) IN directions
+                SET nx TO x + dx
+                SET ny TO y + dy
+                IF nx IS BETWEEN 0 AND m - 1 AND ny IS BETWEEN 0 AND n - 1
+                    SET matrix[nx][ny] TO 1 MINUS matrix[nx][ny]
+                END IF
+            END FOR
+        END FUNCTION
+
+        FUNCTION matrix_to_tuple(matrix)
+            RETURN tuple of tuples representing rows in matrix
+        END FUNCTION
+
+        SET m TO number of rows in mat
+        SET n TO number of columns in mat
+        SET target TO tuple of tuples filled with 0 of size m by n
+        SET initial_state TO matrix_to_tuple(mat)
+        SET queue TO list containing (initial_state, 0)
+        SET visited TO set containing initial_state
+
+        WHILE queue IS NOT EMPTY
+            SET current_state, steps TO first element in queue and REMOVE it from queue
+            IF current_state EQUALS target
+                RETURN steps
+            END IF
+
+            SET current_matrix TO list of lists converted from current_state
+
+            FOR i FROM 0 TO m - 1
+                FOR j FROM 0 TO n - 1
+                    SET next_matrix TO deep copy of current_matrix
+                    CALL flip(next_matrix, i, j)
+                    SET next_state TO matrix_to_tuple(next_matrix)
+                    IF next_state NOT IN visited
+                        ADD next_state TO visited
+                        APPEND (next_state, steps + 1) TO queue
+                    END IF
+                END FOR
+            END FOR
+        END WHILE
+
+        RETURN -1
+    END FUNCTION
+END CLASS

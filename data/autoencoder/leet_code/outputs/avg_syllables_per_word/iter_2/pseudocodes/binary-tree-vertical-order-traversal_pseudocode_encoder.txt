@@ -1,0 +1,74 @@
+```
+CLASS TreeNode
+    FUNCTION __init__(val = 0, left = None, right = None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values: list)
+    IF values IS EMPTY
+        RETURN None
+    SET root TO TreeNode(values[0])
+    SET i TO 1
+    SET queue TO empty double-ended queue
+    APPEND root TO queue
+
+    WHILE queue IS NOT EMPTY
+        SET node TO queue.popleft()
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.left TO TreeNode(values[i])
+            APPEND node.left TO queue
+        INCREMENT i BY 1
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.right TO TreeNode(values[i])
+            APPEND node.right TO queue
+        INCREMENT i BY 1
+    END WHILE
+
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val IS NOT EQUAL TO q.val
+        RETURN False
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+END FUNCTION
+
+CLASS Solution
+    FUNCTION verticalOrder(root)
+        IF root IS None
+            RETURN empty list
+
+        SET column_table TO dictionary with default empty list
+        SET queue TO empty double-ended queue containing tuple (root, 0)
+        SET min_column TO 0
+        SET max_column TO 0
+
+        WHILE queue IS NOT EMPTY
+            SET node, column_index TO queue.popleft()
+
+            IF node IS NOT None
+                APPEND node.val TO column_table[column_index]
+
+                SET min_column TO MINIMUM OF min_column AND column_index
+                SET max_column TO MAXIMUM OF max_column AND column_index
+
+                APPEND (node.left, column_index MINUS 1) TO queue
+                APPEND (node.right, column_index PLUS 1) TO queue
+        END WHILE
+
+        SET result TO empty list
+        FOR each x FROM min_column TO max_column INCLUSIVE
+            APPEND column_table[x] TO result
+
+        RETURN result
+    END FUNCTION
+END CLASS
+```

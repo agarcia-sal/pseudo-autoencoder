@@ -1,0 +1,82 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS None, right EQUALS None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS
+
+FUNCTION tree_node(values)  
+    IF values EQUALS empty  
+        RETURN None  
+    END IF  
+    SET root TO new TreeNode with value at position zero of values  
+    SET i TO one  
+    SET queue TO an empty collection supporting first-in first-out removal  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO the element removed from the front of queue  
+        IF i LESS THAN the LENGTH OF values AND element at position i of values IS NOT None  
+            SET node.left TO new TreeNode with value at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN the LENGTH OF values AND element at position i of values IS NOT None  
+            SET node.right TO new TreeNode with value at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)  
+    IF p EQUALS None AND q EQUALS None  
+        RETURN True  
+    ELSE IF p EQUALS None OR q EQUALS None  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION
+
+CLASS Solution  
+    FUNCTION verticalTraversal(self, root)  
+        IF root EQUALS None  
+            RETURN an empty list  
+        END IF  
+        SET node_dict TO a mapping from keys to empty lists by default  
+        SET min_col TO zero  
+        SET max_col TO zero
+
+        FUNCTION dfs(node, row, col)  
+            IF node EQUALS None  
+                RETURN  
+            END IF  
+            APPEND a pair of row and node.val TO node_dict at key col  
+            IF col LESS THAN min_col  
+                SET min_col TO col  
+            END IF  
+            IF col GREATER THAN max_col  
+                SET max_col TO col  
+            END IF  
+            CALL dfs with node.left, row PLUS one, col MINUS one  
+            CALL dfs with node.right, row PLUS one, col PLUS one  
+        END FUNCTION
+
+        CALL dfs with root, zero, zero
+
+        SET result TO an empty list  
+        FOR col FROM min_col TO max_col  
+            SET sorted_pairs TO the list at node_dict[col] sorted by first element then second element of each pair  
+            SET col_values TO an empty list  
+            FOR each pair in sorted_pairs  
+                APPEND the second element of pair TO col_values  
+            END FOR  
+            APPEND col_values TO result  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+END CLASS

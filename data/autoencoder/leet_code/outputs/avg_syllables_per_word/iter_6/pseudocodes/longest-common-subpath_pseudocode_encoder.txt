@@ -1,0 +1,49 @@
+CLASS Solution  
+    FUNCTION longestCommonSubpath(n, paths)  
+        FUNCTION hash_subpaths(path, length)  
+            SET P TO 113  
+            SET MOD TO 1000000007  
+            SET hash_value TO 0  
+            SET power TO 1  
+            
+            FOR index FROM 0 TO length MINUS 1  
+                SET hash_value TO (hash_value MULTIPLIED BY P PLUS path AT index) MODULO MOD  
+                SET power TO (power MULTIPLIED BY P) MODULO MOD  
+            
+            SET hashes TO a set containing hash_value  
+            FOR index FROM length TO LENGTH OF path MINUS 1  
+                SET hash_value TO (hash_value MULTIPLIED BY P PLUS path AT index MINUS path AT (index MINUS length) MULTIPLIED BY power) MODULO MOD  
+                ADD hash_value TO hashes  
+            
+            RETURN hashes  
+        END FUNCTION  
+        
+        FUNCTION check_common_subpath(length)  
+            IF length EQUALS 0 THEN  
+                RETURN True  
+            END IF  
+            SET common_hashes TO CALL hash_subpaths WITH paths AT 0 AND length  
+            FOR each path IN paths FROM INDEX 1 TO END  
+                SET current_hashes TO CALL hash_subpaths WITH path AND length  
+                SET common_hashes TO INTERSECTION OF common_hashes AND current_hashes  
+                IF common_hashes IS EMPTY THEN  
+                    RETURN False  
+                END IF  
+            END FOR  
+            RETURN True IF common_hashes IS NOT EMPTY ELSE False  
+        END FUNCTION  
+        
+        SET left TO 0  
+        SET right TO MINIMUM LENGTH AMONG all paths  
+        WHILE left IS LESS THAN right  
+            SET mid TO (left PLUS right PLUS 1) DIVIDED BY 2  
+            IF CALL check_common_subpath WITH mid IS True THEN  
+                SET left TO mid  
+            ELSE  
+                SET right TO right MINUS 1  
+            END IF  
+        END WHILE  
+        
+        RETURN left  
+    END FUNCTION  
+END CLASS

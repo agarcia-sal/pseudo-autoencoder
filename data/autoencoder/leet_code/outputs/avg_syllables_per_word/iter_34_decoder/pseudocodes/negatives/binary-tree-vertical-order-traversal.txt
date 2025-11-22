@@ -1,0 +1,74 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF the LENGTH OF values EQUALS zero  
+        RETURN None  
+    END IF  
+    SET root TO a new TreeNode created with the element at position zero of values  
+    SET i TO one  
+    CREATE an empty deque named queue  
+    APPEND root TO queue  
+    WHILE the LENGTH OF queue IS GREATER THAN zero  
+        REMOVE and ASSIGN the element from the left end of queue TO node  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT None  
+            SET node.left TO a new TreeNode created with the element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT None  
+            SET node.right TO a new TreeNode created with the element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p EQUALS None AND q EQUALS None  
+        RETURN True  
+    ELSE IF p EQUALS None OR q EQUALS None  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN the result of is_same_tree called with p.left and q.left AND the result of is_same_tree called with p.right and q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION verticalOrder(self, root)  
+        IF root EQUALS None  
+            RETURN an empty list  
+        END IF  
+        CREATE a default dictionary named column_table which maps keys to empty lists  
+        CREATE a deque named queue containing the tuple of root and zero  
+        SET min_column TO zero  
+        SET max_column TO zero  
+        WHILE the LENGTH OF queue IS GREATER THAN zero  
+            REMOVE and ASSIGN the element from the left end of queue TO the tuple of node and column_index  
+            IF node IS NOT None  
+                APPEND node.val TO the list associated with column_index in column_table  
+                IF column_index IS LESS THAN min_column  
+                    SET min_column TO column_index  
+                END IF  
+                IF column_index IS GREATER THAN max_column  
+                    SET max_column TO column_index  
+                END IF  
+                APPEND the tuple of node.left and column_index MINUS one TO queue  
+                APPEND the tuple of node.right and column_index PLUS one TO queue  
+            END IF  
+        END WHILE  
+        CREATE an empty list named results  
+        FOR each integer x FROM min_column TO max_column  
+            APPEND the list associated with x in column_table TO results  
+        END FOR  
+        RETURN results  
+    END FUNCTION  
+END CLASS

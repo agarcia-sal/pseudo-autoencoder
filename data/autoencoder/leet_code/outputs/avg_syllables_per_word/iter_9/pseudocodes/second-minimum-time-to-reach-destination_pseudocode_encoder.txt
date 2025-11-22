@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION secondMinimum(self, n, edges, time, change)  
+        SET graph TO a list with n PLUS one empty lists  
+        FOR each pair u, v IN edges  
+            APPEND v TO graph AT index u  
+            APPEND u TO graph AT index v  
+        END FOR  
+
+        SET queue TO a deque containing the tuple of one, zero, zero  
+        SET minTimes TO a list with n PLUS one lists each containing two values of infinity  
+        SET minTimes AT index one AND zero TO zero  
+
+        WHILE queue is not empty  
+            REMOVE first element FROM queue AND DESTRUCTURE into current, currentTime, count  
+
+            IF current EQUALS n AND count EQUALS one THEN  
+                RETURN currentTime  
+            END IF  
+
+            IF currentTime DIVIDED BY change MODULO two EQUALS zero THEN  
+                SET nextTime TO currentTime PLUS time  
+            ELSE  
+                SET nextTime TO the quantity of currentTime DIVIDED BY change PLUS one MULTIPLIED BY change PLUS time  
+            END IF  
+
+            FOR each neighbor IN graph AT index current  
+                IF minTimes AT index neighbor AND zero GREATER THAN nextTime THEN  
+                    SET minTimes AT index neighbor AND one TO minTimes AT index neighbor AND zero  
+                    SET minTimes AT index neighbor AND zero TO nextTime  
+                    APPEND the tuple of neighbor, nextTime, zero TO queue  
+                ELSE IF minTimes AT index neighbor AND zero LESS THAN nextTime AND nextTime LESS THAN minTimes AT index neighbor AND one THEN  
+                    SET minTimes AT index neighbor AND one TO nextTime  
+                    APPEND the tuple of neighbor, nextTime, one TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,55 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val SET TO 0, left SET TO None, right SET TO None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET root TO TreeNode WITH val SET TO first element of values  
+    SET i TO 1  
+    SET queue TO new deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO queue.popleft()  
+        IF i IS LESS THAN length of values AND values at i IS NOT None  
+            SET node.left TO TreeNode WITH val SET TO values at i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i IS LESS THAN length of values AND values at i IS NOT None  
+            SET node.right TO TreeNode WITH val SET TO values at i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION maxPathSum(self, root)  
+        FUNCTION helper(node)  
+            IF node IS None  
+                RETURN negative infinity, negative infinity  
+            SET left_max, left_gain TO helper(node.left)  
+            SET right_max, right_gain TO helper(node.right)  
+            SET current_max TO node.val PLUS maximum of left_gain AND 0 PLUS maximum of right_gain AND 0  
+            SET current_gain TO node.val PLUS maximum of left_gain, right_gain, AND 0  
+            SET global_max TO maximum of left_max, right_max, AND current_max  
+            RETURN global_max, current_gain  
+        END FUNCTION  
+        RETURN first element of helper(root)  
+    END FUNCTION  
+END CLASS

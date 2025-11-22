@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION gridIllumination(n, lamps, queries)  
+        INITIALIZE row_count AS mapping WITH default integer value  
+        INITIALIZE col_count AS mapping WITH default integer value  
+        INITIALIZE diag_count AS mapping WITH default integer value  # key is row MINUS column  
+        INITIALIZE anti_diag_count AS mapping WITH default integer value  # key is row PLUS column  
+        
+        INITIALIZE lamp_positions AS empty set  
+        
+        FOR each r, c IN lamps  
+            IF position (r, c) NOT IN lamp_positions THEN  
+                ADD position (r, c) TO lamp_positions  
+                INCREMENT row_count AT r BY 1  
+                INCREMENT col_count AT c BY 1  
+                INCREMENT diag_count AT (r MINUS c) BY 1  
+                INCREMENT anti_diag_count AT (r PLUS c) BY 1  
+        
+        SET directions TO list of coordinate pairs:  
+            (-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1), (1, -1), (1, 0), (1, 1)  
+        
+        INITIALIZE result AS empty list  
+        
+        FOR each r, c IN queries  
+            IF row_count AT r GREATER THAN 0 OR col_count AT c GREATER THAN 0 OR diag_count AT (r MINUS c) GREATER THAN 0 OR anti_diag_count AT (r PLUS c) GREATER THAN 0 THEN  
+                APPEND 1 TO result  
+            ELSE  
+                APPEND 0 TO result  
+            
+            FOR each dr, dc IN directions  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                IF position (nr, nc) IS IN lamp_positions THEN  
+                    REMOVE position (nr, nc) FROM lamp_positions  
+                    DECREMENT row_count AT nr BY 1  
+                    DECREMENT col_count AT nc BY 1  
+                    DECREMENT diag_count AT (nr MINUS nc) BY 1  
+                    DECREMENT anti_diag_count AT (nr PLUS nc) BY 1  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

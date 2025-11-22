@@ -1,0 +1,57 @@
+CLASS ListNode
+    FUNCTION __init__(val EQUALS zero, next EQUALS None)
+        SET self.val TO val
+        SET self.next TO next
+    END FUNCTION
+END CLASS
+
+FUNCTION list_node(values)
+    IF values IS empty
+        RETURN None
+    END IF
+    SET head TO CALL ListNode WITH element at position zero of values
+    SET p TO head
+    FOR each val IN elements from position one TO end of values
+        SET node TO CALL ListNode WITH val
+        SET p.next TO node
+        SET p TO node
+    END FOR
+    RETURN head
+END FUNCTION
+
+FUNCTION is_same_list(p1, p2)
+    IF p1 IS None AND p2 IS None
+        RETURN True
+    END IF
+    IF p1 IS None OR p2 IS None
+        RETURN False
+    END IF
+    RETURN the value of p1 EQUALS the value of p2 AND CALL is_same_list WITH the next element of p1 AND the next element of p2
+END FUNCTION
+
+CLASS Solution
+    FUNCTION mergeKLists(lists)
+        SET min_heap TO empty list
+
+        FOR each index i FROM zero TO the length of lists MINUS one
+            SET lst TO element at position i of lists
+            IF lst IS NOT None
+                CALL heapq.heappush WITH min_heap AND tuple of (the value of lst, i, lst)
+            END IF
+        END FOR
+
+        SET dummy TO CALL ListNode WITH no parameters
+        SET current TO dummy
+
+        WHILE min_heap IS NOT empty
+            CALL heapq.heappop WITH min_heap AND ASSIGN the unpacked tuple TO val, i, node
+            SET current.next TO node
+            SET current TO the next element of current
+            IF the next element of node IS NOT None
+                CALL heapq.heappush WITH min_heap AND tuple of (the value of the next element of node, i, the next element of node)
+            END IF
+        END WHILE
+
+        RETURN the next element of dummy
+    END FUNCTION
+END CLASS

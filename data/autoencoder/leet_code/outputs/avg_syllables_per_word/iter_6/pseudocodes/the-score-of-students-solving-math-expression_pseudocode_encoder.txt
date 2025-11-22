@@ -1,0 +1,64 @@
+CLASS Solution  
+    FUNCTION scoreOfStudents(s, answers)  
+        FUNCTION evaluate_expression(expression)  
+            SET tokens TO empty list  
+            SET num TO 0  
+            FOR each char IN expression  
+                IF char IS a digit  
+                    SET num TO num MULTIPLIED BY 10 PLUS the integer value of char  
+                ELSE  
+                    APPEND num TO tokens  
+                    APPEND char TO tokens  
+                    SET num TO 0  
+            APPEND num TO tokens  
+            
+            SET i TO 1  
+            WHILE i LESS THAN length of tokens  
+                IF tokens at i EQUALS multiplication symbol  
+                    SET tokens at (i MINUS 1) TO tokens at (i MINUS 1) MULTIPLIED BY tokens at (i PLUS 1)  
+                    REMOVE tokens at positions i and i PLUS 1 FROM tokens  
+                ELSE  
+                    INCREMENT i BY 1  
+            
+            SET result TO tokens at 0  
+            SET i TO 1  
+            WHILE i LESS THAN length of tokens  
+                IF tokens at i EQUALS addition symbol  
+                    SET result TO result PLUS tokens at (i PLUS 1)  
+                INCREMENT i BY 2  
+            
+            RETURN result  
+        END FUNCTION  
+        
+        FUNCTION get_possible_answers(expression)  
+            IF expression CONTAINS only digits  
+                RETURN set containing the integer value of expression  
+            
+            SET results TO empty set  
+            FOR i FROM 1 TO length of expression MINUS 2 STEP 2  
+                SET left_results TO CALL get_possible_answers WITH expression up to index i exclusive  
+                SET right_results TO CALL get_possible_answers WITH expression from index i PLUS 1 to end  
+                FOR each left IN left_results  
+                    FOR each right IN right_results  
+                        IF expression at i EQUALS addition symbol  
+                            SET result TO left PLUS right  
+                        ELSE  
+                            SET result TO left MULTIPLIED BY right  
+                        IF result LESS THAN OR EQUAL TO 1000  
+                            ADD result TO results  
+            RETURN results  
+        END FUNCTION  
+        
+        SET correct_answer TO CALL evaluate_expression WITH s  
+        SET possible_answers TO CALL get_possible_answers WITH s  
+        
+        SET points TO 0  
+        FOR each answer IN answers  
+            IF answer EQUALS correct_answer  
+                INCREMENT points BY 5  
+            ELSE IF answer IS IN possible_answers  
+                INCREMENT points BY 2  
+        
+        RETURN points  
+    END FUNCTION  
+END CLASS

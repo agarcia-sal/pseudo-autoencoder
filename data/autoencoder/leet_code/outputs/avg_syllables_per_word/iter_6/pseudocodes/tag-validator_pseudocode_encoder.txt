@@ -1,0 +1,42 @@
+CLASS Solution  
+    FUNCTION isValid(code)  
+        IMPORT regular expression module AS re  
+        
+        SET cdata_pattern TO string representing CDATA regular expression  
+        
+        SET code TO result of replacing all cdata_pattern matches in code WITH empty string USING re substitution  
+        
+        INITIALIZE stack AS empty list  
+        
+        SET i TO 0  
+        WHILE i LESS THAN length of code  
+            IF character at position i in code EQUALS character less than sign  
+                SET j TO position of next character greater than sign after i in code  
+                IF j EQUALS negative one  
+                    RETURN False  
+                
+                SET tag_content TO substring of code from position i PLUS one TO position j  
+                
+                IF tag_content IS empty  
+                    RETURN False  
+                
+                IF first character of tag_content EQUALS forward slash  
+                    SET tag_name TO substring of tag_content starting from second character  
+                    IF stack IS empty OR last element of stack NOT EQUALS tag_name  
+                        RETURN False  
+                    REMOVE last element from stack  
+                ELSE IF first character of tag_content EQUALS exclamation mark  
+                    RETURN False  
+                ELSE  
+                    IF length of tag_content LESS THAN one OR length GREATER THAN nine OR tag_content IS NOT all uppercase  
+                        RETURN False  
+                    APPEND tag_content TO stack  
+                
+                SET i TO j PLUS one  
+            ELSE  
+                INCREMENT i BY one  
+        
+        SET condition TO logical negation of stack IS empty AND number of matches of pattern representing tags in code GREATER THAN zero  
+        RETURN condition  
+    END FUNCTION  
+END CLASS

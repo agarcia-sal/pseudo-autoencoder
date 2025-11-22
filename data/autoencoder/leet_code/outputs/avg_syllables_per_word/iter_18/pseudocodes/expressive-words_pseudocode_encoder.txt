@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION expressiveWords WITH PARAMETERS s AS string AND words AS list of strings  
+        FUNCTION compress WITH PARAMETER word AS string  
+            IF word EQUALS not existing  
+                RETURN empty list  
+            END IF  
+            SET count TO one  
+            SET compressed TO empty list  
+            FOR index FROM one TO the LENGTH OF word MINUS one  
+                IF character at position index of word EQUALS character at position index MINUS one of word  
+                    INCREMENT count BY one  
+                ELSE  
+                    APPEND tuple of character at position index MINUS one of word AND count TO compressed  
+                    SET count TO one  
+                END IF  
+            END FOR  
+            APPEND tuple of character at last position of word AND count TO compressed  
+            RETURN compressed  
+        END FUNCTION  
+        
+        FUNCTION is_stretchy WITH PARAMETERS s_compressed AS list AND word_compressed AS list  
+            IF the LENGTH OF s_compressed NOT EQUALS the LENGTH OF word_compressed  
+                RETURN false  
+            END IF  
+            FOR each tuple of sc AND sc_count IN s_compressed AND each tuple of wc AND wc_count IN word_compressed in pairs  
+                IF sc NOT EQUALS wc  
+                    RETURN false  
+                END IF  
+                IF sc_count NOT EQUALS wc_count AND (sc_count LESS THAN three OR sc_count LESS THAN wc_count)  
+                    RETURN false  
+                END IF  
+            END FOR  
+            RETURN true  
+        END FUNCTION  
+        
+        SET s_compressed TO the RESULT OF compress WITH PARAMETER s  
+        SET stretchy_count TO zero  
+        
+        FOR each word IN words  
+            SET word_compressed TO the RESULT OF compress WITH PARAMETER word  
+            IF the RESULT OF is_stretchy WITH PARAMETERS s_compressed AND word_compressed  
+                INCREMENT stretchy_count BY one  
+            END IF  
+        END FOR  
+        
+        RETURN stretchy_count  
+    END FUNCTION  
+END CLASS

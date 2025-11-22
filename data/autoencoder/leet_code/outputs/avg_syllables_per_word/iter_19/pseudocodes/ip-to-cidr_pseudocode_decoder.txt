@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION ipToCIDR(ip AS string, n AS integer) RETURNS list of string  
+        FUNCTION ip_to_int(ip AS string) RETURNS integer  
+            SET parts TO list obtained by applying the conversion to integer of each element obtained by splitting ip string by dot delimiter  
+            SET res TO zero  
+            FOR each part IN parts  
+                SET res TO res MULTIPLIED BY two HUNDRED FIFTY SIX PLUS part  
+            END FOR  
+            RETURN res  
+        END FUNCTION  
+        
+        FUNCTION int_to_ip(num AS integer) RETURNS string  
+            SET ip_parts TO empty list  
+            FOR index FROM three TO zero DECREMENT BY one  
+                APPEND the remainder of integer division of num DIVIDED BY two HUNDRED FIFTY SIX raised to index position TO ip_parts  
+            END FOR  
+            COMPOSE ip_string BY joining string representation of each element in ip_parts separated by dot delimiter  
+            RETURN ip_string  
+        END FUNCTION  
+        
+        FUNCTION largest_cidr_size(start AS integer, n AS integer) RETURNS integer  
+            IF the binary AND of start AND one EQUALS one  
+                RETURN one  
+            END IF  
+            SET x TO one  
+            WHILE x IS LESS THAN OR EQUAL TO n AND the binary AND of start AND x MINUS one EQUALS zero  
+                SET x TO x MULTIPLIED BY two  
+            END WHILE  
+            RETURN x DIVIDED BY two  
+        END FUNCTION  
+        
+        SET result TO empty list  
+        SET start_ip TO the result of calling ip_to_int with ip parameter  
+        
+        WHILE n IS GREATER THAN zero  
+            SET size TO the result of calling largest_cidr_size with start_ip and n parameters  
+            SET address TO the result of calling int_to_ip with start_ip parameter  
+            SET prefix_length TO thirty-two MINUS the quantity size represented by its bit length MINUS one  
+            APPEND concatenation of address, forward slash symbol, and string representation of prefix_length TO result  
+            INCREMENT start_ip BY size  
+            DECREMENT n BY size  
+        END WHILE  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

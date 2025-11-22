@@ -1,0 +1,36 @@
+CLASS Solution  
+    FUNCTION palindromePartition(s AS string, k AS integer) RETURNS integer  
+        FUNCTION min_changes_to_palindrome(sub AS string) RETURNS integer  
+            SET left_index TO zero  
+            SET right_index TO the LENGTH OF sub MINUS one  
+            SET changes_count TO zero  
+            WHILE left_index IS LESS THAN right_index  
+                IF character at position left_index of sub IS NOT EQUAL TO character at position right_index of sub  
+                    INCREMENT changes_count BY one  
+                END IF  
+                INCREMENT left_index BY one  
+                DECREMENT right_index BY one  
+            END WHILE  
+            RETURN changes_count  
+        END FUNCTION  
+
+        SET string_length TO the LENGTH OF s  
+        CREATE dp AS a collection of lists each initialized with positive infinity of size k PLUS one with the count of string_length PLUS one  
+        SET the element at position zero of the element at position zero of dp TO zero  
+
+        FOR index_i FROM one TO string_length  
+            FOR index_j FROM one TO the MINIMUM OF k AND index_i  
+                FOR start_position FROM zero TO index_i MINUS one  
+                    SET changes_needed TO CALL min_changes_to_palindrome WITH the substring of s from start_position UP TO index_i  
+                    SET current_minimum TO the element at position index_i of dp at position index_j  
+                    SET compare_value TO the element at position start_position of dp at position index_j MINUS one PLUS changes_needed  
+                    IF compare_value IS LESS THAN current_minimum  
+                        SET the element at position index_i of dp at position index_j TO compare_value  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+
+        RETURN the element at position string_length of dp at position k  
+    END FUNCTION  
+END CLASS

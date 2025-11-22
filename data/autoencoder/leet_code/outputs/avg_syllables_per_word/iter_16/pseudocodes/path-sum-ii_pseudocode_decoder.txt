@@ -1,0 +1,64 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val EQUALS zero left EQUALS none right EQUALS none  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETERS values AS list  
+    IF the LENGTH OF values EQUALS zero  
+        RETURN none  
+    END IF  
+    SET root TO A NEW TreeNode INITIALIZED WITH the ELEMENT at position zero of values  
+    SET i TO one  
+    SET queue TO A NEW deque COLLECTION  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO the ELEMENT REMOVED FROM THE FRONT OF queue  
+        IF i IS LESS THAN the LENGTH OF values AND the ELEMENT at position i of values IS NOT none  
+            SET node.left TO A NEW TreeNode INITIALIZED WITH the ELEMENT at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND the ELEMENT at position i of values IS NOT none  
+            SET node.right TO A NEW TreeNode INITIALIZED WITH the ELEMENT at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN THE RESULT OF is_same_tree WITH PARAMETERS p.left AND q.left AND THE RESULT OF is_same_tree WITH PARAMETERS p.right AND q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION pathSum WITH PARAMETERS self root targetSum  
+        FUNCTION dfs WITH PARAMETERS node current_sum path  
+            IF node IS none  
+                RETURN  
+            END IF  
+            APPEND node.val TO path  
+            SET current_sum TO current_sum PLUS node.val  
+            IF node.left IS none AND node.right IS none AND current_sum EQUALS targetSum  
+                APPEND A COPY OF path TO result  
+            END IF  
+            CALL dfs WITH PARAMETERS node.left current_sum path  
+            CALL dfs WITH PARAMETERS node.right current_sum path  
+            REMOVE THE LAST ELEMENT FROM path  
+        END FUNCTION  
+        SET result TO AN EMPTY LIST  
+        CALL dfs WITH PARAMETERS root zero AN EMPTY LIST  
+        RETURN result  
+    END FUNCTION  
+END CLASS

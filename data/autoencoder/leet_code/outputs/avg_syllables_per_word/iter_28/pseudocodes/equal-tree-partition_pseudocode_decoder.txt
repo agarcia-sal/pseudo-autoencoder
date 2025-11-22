@@ -1,0 +1,77 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF the LENGTH OF values EQUALS zero THEN  
+        RETURN none  
+    END IF  
+    SET root TO a new TreeNode with the element at position one of values  
+    SET i TO one  
+    SET queue TO an empty double ended queue  
+    APPEND root TO queue  
+    WHILE the LENGTH OF queue IS GREATER THAN zero DO  
+        SET node TO the element at the front of queue removed  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT none THEN  
+            SET node.left TO a new TreeNode with the element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT none THEN  
+            SET node.right TO a new TreeNode with the element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS none AND q IS none THEN  
+        RETURN True  
+    ELSE IF p IS none OR q IS none THEN  
+        RETURN False  
+    ELSE IF the val attribute of p IS NOT EQUALS TO the val attribute of q THEN  
+        RETURN False  
+    ELSE  
+        RETURN the result of is_same_tree with the left attribute of p and the left attribute of q AND the result of is_same_tree with the right attribute of p and the right attribute of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION checkEqualTree(self, root)  
+        FUNCTION subtree_sum(node)  
+            IF node IS none THEN  
+                RETURN zero  
+            END IF  
+            RETURN the val attribute of node PLUS the result of subtree_sum with the left attribute of node PLUS the result of subtree_sum with the right attribute of node  
+        END FUNCTION  
+        
+        SET total_sum TO the result of subtree_sum with root  
+        
+        IF total_sum MODULO two IS NOT EQUALS zero THEN  
+            RETURN False  
+        END IF  
+        
+        SET target TO total_sum DIVIDED BY two  
+        SET found TO a list containing one element which is False  
+        
+        FUNCTION can_split(node)  
+            IF node IS none THEN  
+                RETURN zero  
+            END IF  
+            SET current_sum TO the val attribute of node PLUS the result of can_split with the left attribute of node PLUS the result of can_split with the right attribute of node  
+            IF current_sum EQUALS target AND node IS NOT EQUALS root THEN  
+                SET the element at position one of found TO True  
+            END IF  
+            RETURN current_sum  
+        END FUNCTION  
+        
+        CALL can_split with root  
+        RETURN the element at position one of found  
+    END FUNCTION  
+END CLASS

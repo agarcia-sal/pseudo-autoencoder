@@ -1,0 +1,58 @@
+CLASS ListNode
+    FUNCTION __init__(self, val EQUALS zero, next EQUALS none)
+        SET self.val TO val
+        SET self.next TO next
+    END FUNCTION
+END CLASS
+
+FUNCTION list_node(values)
+    IF values EQUALS empty
+        RETURN none
+    END IF
+    SET head TO A new ListNode WITH value AS element at position zero OF values
+    SET p TO head
+    FOR each val IN the SUBLIST OF values FROM position one TO the END
+        SET node TO A new ListNode WITH value AS val
+        SET p.next TO node
+        SET p TO node
+    END FOR
+    RETURN head
+END FUNCTION
+
+FUNCTION is_same_list(p1, p2)
+    IF p1 EQUALS none AND p2 EQUALS none
+        RETURN true
+    END IF
+    IF p1 EQUALS none OR p2 EQUALS none
+        RETURN false
+    END IF
+    RETURN the VALUE OF element val OF p1 EQUALS the VALUE OF element val OF p2 AND the RESULT OF CALLING is_same_list WITH arguments element next OF p1 AND element next OF p2
+END FUNCTION
+
+CLASS Solution
+    FUNCTION mergeKLists(lists)
+        SET min_heap TO an empty list
+        
+        FOR each index i AND lst IN lists WITH index
+            IF lst DOES NOT EQUAL none
+                PERFORM the HEAP PUSH operation ON min_heap WITH the TUPLE consisting of element val OF lst, i, AND lst
+            END IF
+        END FOR
+        
+        SET dummy TO A new ListNode WITH default arguments
+        SET current TO dummy
+        
+        WHILE min_heap IS NOT empty
+            PERFORM the HEAP POP operation ON min_heap TO EXTRACT val, i, AND node
+            
+            SET current.next TO node
+            SET current TO element next OF current
+            
+            IF element next OF node DOES NOT EQUAL none
+                PERFORM the HEAP PUSH operation ON min_heap WITH the TUPLE consisting of the VALUE OF element val OF element next OF node, i, AND element next OF node
+            END IF
+        END WHILE
+        
+        RETURN element next OF dummy
+    END FUNCTION
+END CLASS

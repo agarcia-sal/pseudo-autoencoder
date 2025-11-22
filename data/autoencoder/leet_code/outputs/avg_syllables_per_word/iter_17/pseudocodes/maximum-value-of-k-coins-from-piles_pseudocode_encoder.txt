@@ -1,0 +1,31 @@
+CLASS Solution
+    FUNCTION maxValueOfCoins(piles, k)
+        SET number_of_piles TO the LENGTH OF piles
+        CALL initialize_dp_table WITH number_of_piles AND k RETURNING dp
+
+        FOR index_pile FROM one TO number_of_piles
+            FOR coins_chosen FROM one TO k
+                CALL get_current_pile WITH piles AND index_pile RETURNING current_pile
+                SET accumulated_value TO zero
+                SET maximum_coins_to_take TO the MINIMUM OF coins_chosen AND the LENGTH OF current_pile
+                FOR coins_taken FROM zero TO maximum_coins_to_take
+                    IF coins_taken GREATER THAN zero
+                        INCREMENT accumulated_value BY element at position coins_taken MINUS one OF current_pile
+                    END IF
+                    SET candidate_value TO element at position index_pile MINUS one OF dp AT position coins_chosen MINUS coins_taken PLUS accumulated_value
+                    SET element at position index_pile OF dp AT position coins_chosen TO the MAXIMUM OF element at position index_pile OF dp AT position coins_chosen AND candidate_value
+                END FOR
+            END FOR
+        END FOR
+
+        RETURN element at position number_of_piles OF dp AT position k
+    END FUNCTION
+
+    FUNCTION initialize_dp_table(number_of_piles, maximum_coins)
+        RETURN a two dimensional list of zeros WITH number_of_piles PLUS one rows AND maximum_coins PLUS one columns
+    END FUNCTION
+
+    FUNCTION get_current_pile(piles, index_pile)
+        RETURN element at position index_pile MINUS one OF piles
+    END FUNCTION
+END CLASS

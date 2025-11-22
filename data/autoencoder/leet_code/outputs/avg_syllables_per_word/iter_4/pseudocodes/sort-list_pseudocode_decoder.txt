@@ -1,0 +1,71 @@
+```
+CLASS ListNode
+    FUNCTION __init__(val = 0, next = None)
+        SET self.val TO val
+        SET self.next TO next
+    END FUNCTION
+END CLASS
+
+FUNCTION list_node(values)
+    IF values IS EMPTY
+        RETURN None
+    SET head TO new ListNode(values[0])
+    SET p TO head
+    FOR each val IN values FROM SECOND ELEMENT TO END
+        SET node TO new ListNode(val)
+        SET p.next TO node
+        SET p TO node
+    END FOR
+    RETURN head
+END FUNCTION
+
+FUNCTION is_same_list(p1, p2)
+    IF p1 IS None AND p2 IS None
+        RETURN True
+    IF p1 IS None OR p2 IS None
+        RETURN False
+    RETURN (p1.val EQUALS p2.val) AND is_same_list(p1.next, p2.next)
+END FUNCTION
+
+CLASS Solution
+    FUNCTION sortList(head)
+        IF head IS None OR head.next IS None
+            RETURN head
+
+        FUNCTION split(head)
+            SET slow TO head
+            SET fast TO head.next
+            WHILE fast IS NOT None AND fast.next IS NOT None
+                SET slow TO slow.next
+                SET fast TO fast.next.next
+            END WHILE
+            SET mid TO slow.next
+            SET slow.next TO None
+            RETURN head, mid
+        END FUNCTION
+
+        FUNCTION merge(l1, l2)
+            SET dummy TO new ListNode()
+            SET current TO dummy
+            WHILE l1 IS NOT None AND l2 IS NOT None
+                IF l1.val LESS THAN l2.val
+                    SET current.next TO l1
+                    SET l1 TO l1.next
+                ELSE
+                    SET current.next TO l2
+                    SET l2 TO l2.next
+                END IF
+                SET current TO current.next
+            END WHILE
+            SET current.next TO l1 IF l1 IS NOT None ELSE l2
+            RETURN dummy.next
+        END FUNCTION
+
+        SET left, right TO split(head)
+        SET left TO self.sortList(left)
+        SET right TO self.sortList(right)
+
+        RETURN merge(left, right)
+    END FUNCTION
+END CLASS
+```

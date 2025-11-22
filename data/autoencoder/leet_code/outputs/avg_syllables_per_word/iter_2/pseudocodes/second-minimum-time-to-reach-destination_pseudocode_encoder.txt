@@ -1,0 +1,36 @@
+```
+CLASS Solution
+    FUNCTION secondMinimum(n, edges, time, change)
+        SET graph TO list of empty lists with size n + 1
+        FOR each (u, v) IN edges
+            APPEND v TO graph[u]
+            APPEND u TO graph[v]
+        
+        SET queue TO deque containing tuple (1, 0, 0)
+        SET minTimes TO two-dimensional list size (n + 1) by 2 filled with infinity
+        SET minTimes[1][0] TO 0
+        
+        WHILE queue is not empty
+            SET (current, currentTime, count) TO queue.popleft()
+            
+            IF current EQUALS n AND count EQUALS 1
+                RETURN currentTime
+            
+            IF (currentTime DIVIDED BY change) MODULO 2 EQUALS 0
+                SET nextTime TO currentTime PLUS time
+            ELSE
+                SET nextTime TO ((currentTime DIVIDED BY change) PLUS 1) MULTIPLIED BY change PLUS time
+            
+            FOR each neighbor IN graph[current]
+                IF minTimes[neighbor][0] GREATER THAN nextTime
+                    SET minTimes[neighbor][1] TO minTimes[neighbor][0]
+                    SET minTimes[neighbor][0] TO nextTime
+                    APPEND (neighbor, nextTime, 0) TO queue
+                ELSE IF minTimes[neighbor][0] LESS THAN nextTime AND nextTime LESS THAN minTimes[neighbor][1]
+                    SET minTimes[neighbor][1] TO nextTime
+                    APPEND (neighbor, nextTime, 1) TO queue
+        
+        RETURN -1
+    END FUNCTION
+END CLASS
+```

@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION criticalConnections WITH PARAMETERS n AND connections  
+        FUNCTION dfs WITH PARAMETERS node AND parent AND disc AND low AND time AND graph AND critical  
+            SET element at position node of disc TO the element at position zero of time  
+            SET element at position node of low TO the element at position zero of time  
+            INCREMENT element at position zero of time BY one  
+            
+            FOR each neighbor IN element at position node of graph  
+                IF element at position neighbor of disc EQUALS minus one THEN  
+                    CALL dfs WITH neighbor AND node AND disc AND low AND time AND graph AND critical  
+                    SET element at position node of low TO the lesser of the element at position node of low AND the element at position neighbor of low  
+                    IF element at position neighbor of low GREATER THAN element at position node of disc THEN  
+                        APPEND the list consisting of node AND neighbor TO critical  
+                    END IF  
+                ELSE IF neighbor NOT EQUALS parent THEN  
+                    SET element at position node of low TO the lesser of the element at position node of low AND the element at position neighbor of disc  
+                END IF  
+            END FOR  
+        END FUNCTION  
+        
+        SET graph TO an empty list repeated n times where each element is an empty list  
+        FOR each pair u AND v IN connections  
+            APPEND v TO element at position u of graph  
+            APPEND u TO element at position v of graph  
+        END FOR  
+        
+        SET disc TO a list of n elements each equal to minus one  
+        SET low TO a list of n elements each equal to minus one  
+        SET time TO a list containing zero as the only element  
+        
+        SET critical TO an empty list  
+        
+        FOR node FROM zero TO n minus one  
+            IF element at position node of disc EQUALS minus one THEN  
+                CALL dfs WITH node AND minus one AND disc AND low AND time AND graph AND critical  
+            END IF  
+        END FOR  
+        
+        RETURN critical  
+    END FUNCTION  
+END CLASS

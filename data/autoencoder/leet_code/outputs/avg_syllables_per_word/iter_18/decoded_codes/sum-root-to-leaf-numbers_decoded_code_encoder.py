@@ -1,0 +1,59 @@
+from collections import deque
+from typing import Optional, List
+
+class TreeNode:
+    def __init__(self, val: int = 0, left: Optional['TreeNode'] = None, right: Optional['TreeNode'] = None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+def tree_node(values: List[Optional[int]]) -> Optional[TreeNode]:
+    if not values:
+        return None
+
+    root = TreeNode(values[0])
+    index_counter = 1
+    queue = deque([root])
+
+    while queue:
+        node = queue.popleft()
+
+        if index_counter < len(values) and values[index_counter] is not None:
+            node.left = TreeNode(values[index_counter])
+            queue.append(node.left)
+        index_counter += 1
+
+        if index_counter < len(values) and values[index_counter] is not None:
+            node.right = TreeNode(values[index_counter])
+            queue.append(node.right)
+        index_counter += 1
+
+    return root
+
+def is_same_tree(p: Optional[TreeNode], q: Optional[TreeNode]) -> bool:
+    if p is None and q is None:
+        return True
+    elif p is None or q is None:
+        return False
+    elif p.val != q.val:
+        return False
+    else:
+        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)
+
+class Solution:
+    def sumNumbers(self, root: Optional[TreeNode]) -> int:
+        def dfs(node: Optional[TreeNode], current_number: int) -> int:
+            if node is None:
+                return 0
+
+            current_number = current_number * 10 + node.val
+
+            if node.left is None and node.right is None:
+                return current_number
+
+            left_sum = dfs(node.left, current_number)
+            right_sum = dfs(node.right, current_number)
+
+            return left_sum + right_sum
+
+        return dfs(root, 0)

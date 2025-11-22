@@ -1,0 +1,43 @@
+CLASS Solution  
+    FUNCTION wordsAbbreviation(words)  
+        FUNCTION abbreviate(word, prefix_length)  
+            IF LENGTH OF word MINUS prefix_length LESS THAN OR EQUAL TO 2  
+                RETURN word  
+            RETURN CONCATENATION OF substring of word WITH PREFIX prefix_length, STRING OF (LENGTH OF word MINUS prefix_length MINUS 1), AND last character of word  
+        END FUNCTION  
+
+        FUNCTION get_unique_abbreviations(words_with_indices, prefix_length)  
+            SET abbs TO new mapping with default empty list  
+            FOR each index, word IN words_with_indices  
+                CALL abbreviate WITH word, prefix_length AND APPEND tuple of index, word TO abbs AT KEY of returned abbreviation  
+            RETURN abbs  
+        END FUNCTION  
+
+        SET n TO LENGTH OF words  
+        SET ans TO list of empty strings with size n  
+        SET words_with_indices TO list of tuples with index and word FOR each index, word IN enumeration of words  
+
+        SET abbs TO CALL get_unique_abbreviations WITH words_with_indices, 1  
+
+        FOR each abb, group IN abbs  
+            IF LENGTH OF group EQUALS 1  
+                SET index, word TO group AT POSITION 0  
+                SET ans AT POSITION index TO abb  
+            ELSE  
+                SET new_group TO empty list  
+                FOR each index, word IN group  
+                    APPEND tuple of index, word TO new_group  
+                SET prefix_length TO 2  
+                WHILE LENGTH OF new_group GREATER THAN 0  
+                    SET new_abbs TO CALL get_unique_abbreviations WITH new_group, prefix_length  
+                    SET new_group TO empty list  
+                    FOR each new_abb, new_group_items IN new_abbs  
+                        IF LENGTH OF new_group_items EQUALS 1  
+                            SET index, word TO new_group_items AT POSITION 0  
+                            SET ans AT POSITION index TO new_abb  
+                        ELSE  
+                            EXTEND new_group BY new_group_items  
+                    INCREMENT prefix_length BY 1  
+        RETURN ans  
+    END FUNCTION  
+END CLASS

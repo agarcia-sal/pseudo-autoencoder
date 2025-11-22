@@ -1,0 +1,78 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, n)  
+        SET self.parent TO list of integers from 0 TO n minus 1  
+        SET self.size TO list of 1 repeated n times  
+    END FUNCTION  
+  
+    FUNCTION find(self, u)  
+        IF self.parent at index u IS NOT u  
+            SET self.parent at index u TO self.find(self.parent at index u)  
+        END IF  
+        RETURN self.parent at index u  
+    END FUNCTION  
+  
+    FUNCTION union(self, u, v)  
+        SET root_u TO self.find(u)  
+        SET root_v TO self.find(v)  
+        IF root_u IS NOT root_v  
+            IF self.size at index root_u IS GREATER THAN self.size at index root_v  
+                SET self.parent at index root_v TO root_u  
+                INCREMENT self.size at index root_u BY self.size at index root_v  
+            ELSE  
+                SET self.parent at index root_u TO root_v  
+                INCREMENT self.size at index root_v BY self.size at index root_u  
+            END IF  
+        END IF  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION friendRequests(self, n, restrictions, requests)  
+        SET uf TO new UnionFind with n  
+        SET result TO empty list  
+        SET restriction_map TO empty dictionary  
+  
+        FOR each pair x, y IN restrictions  
+            IF x IS NOT IN restriction_map  
+                SET restriction_map at key x TO empty set  
+            END IF  
+            IF y IS NOT IN restriction_map  
+                SET restriction_map at key y TO empty set  
+            END IF  
+            ADD y TO restriction_map at key x  
+            ADD x TO restriction_map at key y  
+        END FOR  
+  
+        FUNCTION can_union(u, v)  
+            SET root_u TO uf.find(u)  
+            SET root_v TO uf.find(v)  
+  
+            FOR each person IN restriction_map GET root_u WITH default empty set  
+                IF uf.find(person) IS EQUAL TO root_v  
+                    RETURN False  
+                END IF  
+            END FOR  
+  
+            FOR each person IN restriction_map GET root_v WITH default empty set  
+                IF uf.find(person) IS EQUAL TO root_u  
+                    RETURN False  
+                END IF  
+            END FOR  
+  
+            RETURN True  
+        END FUNCTION  
+  
+        FOR each pair u, v IN requests  
+            IF uf.find(u) IS EQUAL TO uf.find(v)  
+                APPEND True TO result  
+            ELSE IF can_union(u, v)  
+                CALL uf.union(u, v)  
+                APPEND True TO result  
+            ELSE  
+                APPEND False TO result  
+            END IF  
+        END FOR  
+  
+        RETURN result  
+    END FUNCTION  
+END CLASS

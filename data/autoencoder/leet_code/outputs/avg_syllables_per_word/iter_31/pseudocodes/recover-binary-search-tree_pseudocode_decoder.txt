@@ -1,0 +1,88 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS None, right EQUALS None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values EQUALS empty THEN  
+        RETURN None  
+    END IF  
+    SET root TO new TreeNode with value element at position one of values  
+    SET i TO one  
+    SET queue TO new empty double ended queue  
+    APPEND root TO queue  
+    WHILE queue is not empty  
+        SET node TO element removed from the left end of queue  
+        IF i LESS THAN the length of values AND element at position i of values NOT EQUALS None THEN  
+            SET node.left TO new TreeNode with value element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN the length of values AND element at position i of values NOT EQUALS None THEN  
+            SET node.right TO new TreeNode with value element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p EQUALS None AND q EQUALS None THEN  
+        RETURN True  
+    ELSE IF p EQUALS None OR q EQUALS None THEN  
+        RETURN False  
+    ELSE IF value of p NOT EQUALS value of q THEN  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(left child of p, left child of q) AND is_same_tree(right child of p, right child of q)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION recoverTree(root)  
+        SET first TO None  
+        SET second TO None  
+        SET prev TO None  
+        SET curr TO root  
+        WHILE curr NOT EQUALS None  
+            IF left child of curr EQUALS None THEN  
+                IF prev NOT EQUALS None AND value of prev GREATER THAN value of curr THEN  
+                    IF first EQUALS None THEN  
+                        SET first TO prev  
+                    END IF  
+                    SET second TO curr  
+                END IF  
+                SET prev TO curr  
+                SET curr TO right child of curr  
+            ELSE  
+                SET pred TO left child of curr  
+                WHILE right child of pred NOT EQUALS None AND right child of pred NOT EQUALS curr  
+                    SET pred TO right child of pred  
+                END WHILE  
+                IF right child of pred EQUALS None THEN  
+                    SET right child of pred TO curr  
+                    SET curr TO left child of curr  
+                ELSE  
+                    SET right child of pred TO None  
+                    IF prev NOT EQUALS None AND value of prev GREATER THAN value of curr THEN  
+                        IF first EQUALS None THEN  
+                            SET first TO prev  
+                        END IF  
+                        SET second TO curr  
+                    END IF  
+                    SET prev TO curr  
+                    SET curr TO right child of curr  
+                END IF  
+            END IF  
+        END WHILE  
+        IF first NOT EQUALS None AND second NOT EQUALS None THEN  
+            SET temp_val TO value of first  
+            SET value of first TO value of second  
+            SET value of second TO temp_val  
+        END IF  
+    END FUNCTION  
+END CLASS

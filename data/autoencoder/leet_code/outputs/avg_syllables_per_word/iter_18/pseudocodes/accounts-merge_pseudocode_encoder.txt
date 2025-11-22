@@ -1,0 +1,60 @@
+CLASS UnionFind  
+    FUNCTION __init__ WITH PARAMETER size  
+        SET root TO a list of elements each element being its own position number from zero TO size MINUS one  
+        SET rank TO a list with size entries each having the value one  
+    END FUNCTION  
+  
+    FUNCTION find WITH PARAMETER x  
+        IF element at position x of root EQUALS x THEN  
+            RETURN x  
+        END IF  
+        SET element at position x of root TO the result of calling find WITH element at position x of root  
+        RETURN element at position x of root  
+    END FUNCTION  
+  
+    FUNCTION union WITH PARAMETERS x and y  
+        SET rootX TO the result of calling find WITH x  
+        SET rootY TO the result of calling find WITH y  
+        IF rootX NOT EQUAL TO rootY THEN  
+            IF element at position rootX of rank GREATER THAN element at position rootY of rank THEN  
+                SET element at position rootY of root TO rootX  
+            ELSE IF element at position rootX of rank LESS THAN element at position rootY of rank THEN  
+                SET element at position rootX of root TO rootY  
+            ELSE  
+                SET element at position rootY of root TO rootX  
+                INCREMENT element at position rootX of rank BY one  
+            END IF  
+        END IF  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION accountsMerge WITH PARAMETER accounts which IS A LIST OF LISTS OF STRINGS  
+        SET email_to_id TO an empty mapping from email string TO account index  
+        SET uf TO a new instance of UnionFind WITH the length of accounts  
+        
+        FOR each index i and tuple unpacking underscore and emails in the enumerated accounts  
+            FOR each email in emails  
+                IF email NOT IN the keys of email_to_id THEN  
+                    SET email_to_id for key email TO i  
+                ELSE  
+                    CALL union on uf WITH parameters i and the value for key email in email_to_id  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET merged_emails TO an empty mapping defaulting to empty list for each new key  
+        FOR each email and account_id in items of email_to_id  
+            SET root_id TO the result of calling find on uf WITH account_id  
+            APPEND email TO the list at key root_id in merged_emails  
+        END FOR  
+        
+        SET result TO an empty list  
+        FOR each account_id and emails in items of merged_emails  
+            SET name TO the element at position zero of the element at position account_id of accounts  
+            APPEND a new list composed of name followed by the emails sorted in ascending order TO result  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

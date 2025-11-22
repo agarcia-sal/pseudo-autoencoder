@@ -1,0 +1,68 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val = 0, left = None, right = None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    END IF  
+    SET root TO NEW TreeNode WITH values at position zero  
+    SET i TO 1  
+    INITIALIZE queue AS new empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO REMOVE FIRST element FROM queue  
+        IF i IS LESS THAN LENGTH OF values AND values at position i IS NOT None  
+            SET node.left TO NEW TreeNode WITH values at position i  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY 1  
+        IF i IS LESS THAN LENGTH OF values AND values at position i IS NOT None  
+            SET node.right TO NEW TreeNode WITH values at position i  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION findFrequentTreeSum(self, root)  
+        INITIALIZE count AS new dictionary with default integer zero  
+
+        FUNCTION subtree_sum(node)  
+            IF node IS None  
+                RETURN 0  
+            END IF  
+            SET current_sum TO node.val PLUS subtree_sum(node.left) PLUS subtree_sum(node.right)  
+            INCREMENT count[current_sum] BY 1  
+            RETURN current_sum  
+        END FUNCTION  
+
+        CALL subtree_sum(root)  
+        SET max_freq TO MAXIMUM value IN count VALUES WITH default zero  
+        SET result TO EMPTY LIST  
+        FOR each key, freq IN count ITEMS  
+            IF freq IS EQUAL TO max_freq  
+                APPEND key TO result  
+            END IF  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+END CLASS

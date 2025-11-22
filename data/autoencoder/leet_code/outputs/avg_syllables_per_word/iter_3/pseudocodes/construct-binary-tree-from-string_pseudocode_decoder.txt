@@ -1,0 +1,87 @@
+CLASS ListNode
+    FUNCTION __init__(val = 0, next = None)
+        SET self.val TO val
+        SET self.next TO next
+    END FUNCTION
+END CLASS
+
+FUNCTION list_node(values: list)
+    IF values IS EMPTY
+        RETURN None
+    SET head TO new ListNode(values[0])
+    SET p TO head
+    FOR val IN values FROM INDEX 1 TO END
+        SET node TO new ListNode(val)
+        SET p.next TO node
+        SET p TO node
+    RETURN head
+END FUNCTION
+
+FUNCTION is_same_list(p1, p2)
+    IF p1 IS None AND p2 IS None
+        RETURN True
+    IF p1 IS None OR p2 IS None
+        RETURN False
+    RETURN (p1.val EQUALS p2.val) AND is_same_list(p1.next, p2.next)
+END FUNCTION
+
+CLASS TreeNode
+    FUNCTION __init__(val = 0, left = None, right = None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values: list)
+    IF values IS EMPTY
+        RETURN None
+    SET root TO new TreeNode(values[0])
+    SET i TO 1
+    SET queue TO empty deque
+    ADD root TO queue
+    WHILE queue IS NOT EMPTY
+        SET node TO REMOVE FIRST FROM queue
+        IF i LESS THAN LENGTH OF values AND values[i] IS NOT None
+            SET node.left TO new TreeNode(values[i])
+            ADD node.left TO queue
+        INCREMENT i BY 1
+        IF i LESS THAN LENGTH OF values AND values[i] IS NOT None
+            SET node.right TO new TreeNode(values[i])
+            ADD node.right TO queue
+        INCREMENT i BY 1
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    IF p IS None OR q IS None
+        RETURN False
+    IF p.val NOT EQUAL TO q.val
+        RETURN False
+    RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+END FUNCTION
+
+CLASS Solution
+    FUNCTION str2tree(s: string) RETURNS Optional<TreeNode>
+        FUNCTION parse_tree(index)
+            IF index GREATER OR EQUAL TO LENGTH OF s
+                RETURN None, index
+            SET start TO index
+            WHILE index LESS THAN LENGTH OF s AND (s[index] IS DIGIT OR s[index] EQUALS '-')
+                INCREMENT index BY 1
+            SET node TO new TreeNode(CONVERT s FROM start TO index TO INTEGER)
+            IF index LESS THAN LENGTH OF s AND s[index] EQUALS '('
+                SET node.left, index TO parse_tree(index + 1)
+            IF index LESS THAN LENGTH OF s AND s[index] EQUALS '('
+                SET node.right, index TO parse_tree(index + 1)
+            IF index LESS THAN LENGTH OF s AND s[index] EQUALS ')'
+                INCREMENT index BY 1
+            RETURN node, index
+        END FUNCTION
+
+        SET root, _ TO parse_tree(0)
+        RETURN root
+    END FUNCTION
+END CLASS

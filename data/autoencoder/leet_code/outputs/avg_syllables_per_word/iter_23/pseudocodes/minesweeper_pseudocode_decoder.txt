@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION updateBoard(board parameter, click parameter)  
+        FUNCTION count_adjacent_mines(r parameter, c parameter)  
+            SET count TO zero  
+            FOR i FROM r MINUS one TO r PLUS one  
+                FOR j FROM c MINUS one TO c PLUS one  
+                    IF i GREATER THAN OR EQUAL TO zero AND i LESS THAN the LENGTH OF board AND j GREATER THAN OR EQUAL TO zero AND j LESS THAN the LENGTH OF element at position zero of board AND element at position i of board EQUALS the element representing a mine  
+                        INCREMENT count BY one  
+                    END IF  
+                END FOR  
+            END FOR  
+            RETURN count  
+        END FUNCTION  
+        
+        FUNCTION dfs(r parameter, c parameter)  
+            IF NOT (r GREATER THAN OR EQUAL TO zero AND r LESS THAN the LENGTH OF board AND c GREATER THAN OR EQUAL TO zero AND c LESS THAN the LENGTH OF element at position zero of board)  
+                RETURN  
+            END IF  
+            IF element at position r of board NOT EQUALS the element representing an empty cell  
+                RETURN  
+            END IF  
+            
+            SET mine_count TO the RESULT OF count_adjacent_mines WITH r AND c  
+            IF mine_count GREATER THAN zero  
+                SET element at position r of board at position c TO the STRING REPRESENTATION OF mine_count  
+            ELSE  
+                SET element at position r of board at position c TO the element representing a blank cell  
+                FOR i FROM r MINUS one TO r PLUS one  
+                    FOR j FROM c MINUS one TO c PLUS one  
+                        CALL dfs WITH i AND j  
+                    END FOR  
+                END FOR  
+            END IF  
+        END FUNCTION  
+        
+        SET row TO the element at position zero of click  
+        SET col TO the element at position one of click  
+        IF element at position row of board at position col EQUALS the element representing a mine  
+            SET element at position row of board at position col TO the element representing an exploded mine  
+            RETURN board  
+        END IF  
+        
+        CALL dfs WITH row AND col  
+        RETURN board  
+    END FUNCTION  
+END CLASS

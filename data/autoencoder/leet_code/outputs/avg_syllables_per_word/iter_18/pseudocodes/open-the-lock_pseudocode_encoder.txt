@@ -1,0 +1,49 @@
+CLASS Solution  
+    FUNCTION openLock WITH PARAMETERS deadends AS List OF strings AND target AS string RETURNS integer  
+        SET deadends_set TO an empty set  
+        FOR each deadend_element IN deadends  
+            ADD deadend_element TO deadends_set  
+        END FOR  
+        
+        IF the string consisting of four zero characters is IN deadends_set  
+            RETURN negative one  
+        END IF  
+        
+        IF target EQUALS the string consisting of four zero characters  
+            RETURN zero  
+        END IF  
+        
+        SET queue TO a new double ended queue initialized with a single tuple consisting of the string of four zero characters AND zero  
+        SET visited TO a new set containing the string of four zero characters  
+        
+        FUNCTION neighbors WITH PARAMETER state AS string RETURNS a list  
+            SET result TO an empty list  
+            FOR each integer position FROM zero TO three  
+                SET digit_character TO the character at position position of state  
+                SET digit TO the integer value of digit_character  
+                FOR each movement_value IN the list consisting of negative one AND one  
+                    SET new_digit TO the remainder of the sum of digit AND movement_value divided by ten  
+                    SET new_state TO the concatenation of the substring of state from start up to position position concatenated WITH the string form of new_digit concatenated WITH the substring of state from position plus one to the end  
+                    APPEND new_state TO result  
+                END FOR  
+            END FOR  
+            RETURN result  
+        END FUNCTION  
+        
+        WHILE the queue is not empty  
+            REMOVE the first element of queue and ASSIGN the components TO current_state AND steps  
+            
+            FOR each neighbor_state IN neighbors of current_state  
+                IF neighbor_state is not IN visited AND neighbor_state is not IN deadends_set  
+                    IF neighbor_state EQUALS target  
+                        RETURN the sum of steps AND one  
+                    END IF  
+                    ADD neighbor_state TO visited  
+                    APPEND the tuple consisting of neighbor_state AND the sum of steps AND one TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

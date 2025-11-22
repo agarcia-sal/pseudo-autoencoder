@@ -1,0 +1,55 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val = 0, left = None, right = None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values)
+    IF values IS EMPTY
+        RETURN None
+    SET root TO TreeNode(values[0])
+    SET i TO 1
+    INITIALIZE queue AS deque
+    APPEND root TO queue
+    WHILE queue IS NOT EMPTY
+        SET node TO queue.popleft()
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.left TO TreeNode(values[i])
+            APPEND node.left TO queue
+        INCREMENT i BY 1
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.right TO TreeNode(values[i])
+            APPEND node.right TO queue
+        INCREMENT i BY 1
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val != q.val
+        RETURN False
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+END FUNCTION
+
+CLASS Solution
+    FUNCTION tree2str(root)
+        FUNCTION helper(node)
+            IF node IS None
+                RETURN EMPTY STRING
+            SET result TO STRING REPRESENTATION OF node.val
+            IF node.left IS NOT None OR node.right IS NOT None
+                SET result TO result CONCATENATED WITH "(" CONCATENATED WITH helper(node.left) CONCATENATED WITH ")"
+            IF node.right IS NOT None
+                SET result TO result CONCATENATED WITH "(" CONCATENATED WITH helper(node.right) CONCATENATED WITH ")"
+            RETURN result
+        END FUNCTION
+        RETURN helper(root)
+    END FUNCTION
+END CLASS

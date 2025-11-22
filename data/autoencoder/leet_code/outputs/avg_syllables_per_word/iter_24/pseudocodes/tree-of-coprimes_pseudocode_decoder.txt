@@ -1,0 +1,50 @@
+CLASS Solution  
+    FUNCTION getCoprimes(nums parameter representing a list of integers, edges parameter representing a list of lists of integers) RETURNS a list of integers  
+        SET n TO the LENGTH OF nums  
+        SET tree TO an empty mapping with default values as empty lists  
+        FOR each pair of elements u AND v IN edges  
+            APPEND element v TO the list at key u in tree  
+            APPEND element u TO the list at key v in tree  
+        END FOR  
+        
+        INITIALIZE a two dimensional array coprime of size fifty times fifty to FALSE  
+        FOR i FROM one TO fifty  
+            FOR j FROM one TO fifty  
+                SET the element at position i AND j of coprime TO the result of whether the greatest common divisor of i AND j EQUALS one  
+            END FOR  
+        END FOR  
+        
+        INITIALIZE result as a list of length n with all elements SET TO negative one  
+        INITIALIZE ancestor_stack as a list of length fifty with all elements SET TO None  
+        
+        FUNCTION dfs(node parameter representing an integer, parent parameter representing an integer, depth parameter representing an integer)  
+            SET closest_ancestor TO negative one  
+            SET max_depth TO negative one  
+            FOR value FROM one TO fifty  
+                IF the element at position nums at position node of coprime IS TRUE AND the element at position value of ancestor_stack IS NOT None  
+                    LET anc_node, anc_depth BE the two elements contained in element at position value of ancestor_stack  
+                    IF anc_depth GREATER THAN max_depth  
+                        SET max_depth TO anc_depth  
+                        SET closest_ancestor TO anc_node  
+                    END IF  
+                END IF  
+            END FOR  
+            SET the element at position node of result TO closest_ancestor  
+            
+            LET original_ancestor BE the element at position nums at position node of ancestor_stack  
+            SET the element at position nums at position node of ancestor_stack TO a tuple containing node AND depth  
+            
+            FOR each child IN the list at key node in tree  
+                IF child NOT EQUALS parent  
+                    CALL dfs WITH arguments child, node, depth PLUS one  
+                END IF  
+            END FOR  
+            
+            SET the element at position nums at position node of ancestor_stack TO original_ancestor  
+        END FUNCTION  
+        
+        CALL dfs WITH arguments zero, negative one, zero  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

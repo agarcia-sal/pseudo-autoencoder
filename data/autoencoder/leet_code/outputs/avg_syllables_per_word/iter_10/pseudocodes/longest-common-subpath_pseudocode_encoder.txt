@@ -1,0 +1,49 @@
+CLASS Solution  
+    FUNCTION longestCommonSubpath(n, paths)  
+        FUNCTION hash_subpaths(path, length)  
+            SET P TO one hundred thirteen  
+            SET MOD TO one billion plus seven  
+            SET hash_value TO zero  
+            SET power TO one  
+            FOR index FROM zero TO length MINUS one  
+                SET hash_value TO hash_value MULTIPLIED BY P PLUS element at position index of path  
+                SET hash_value TO hash_value MODULO MOD  
+                SET power TO power MULTIPLIED BY P MODULO MOD  
+            END FOR  
+            SET hashes TO a new set containing hash_value  
+            FOR index FROM length TO LENGTH OF path MINUS one  
+                SET hash_value TO hash_value MULTIPLIED BY P PLUS element at position index of path MINUS element at position index MINUS length of path MULTIPLIED BY power  
+                SET hash_value TO hash_value MODULO MOD  
+                ADD hash_value TO hashes  
+            END FOR  
+            RETURN hashes  
+        END FUNCTION  
+
+        FUNCTION check_common_subpath(length)  
+            IF length EQUALS zero  
+                RETURN True  
+            END IF  
+            SET common_hashes TO hash_subpaths(element at position zero of paths, length)  
+            FOR each path IN elements of paths starting from position one  
+                SET current_hashes TO hash_subpaths(path, length)  
+                SET common_hashes TO the INTERSECTION of common_hashes AND current_hashes  
+                IF common_hashes IS empty  
+                    RETURN False  
+                END IF  
+            END FOR  
+            RETURN True IF common_hashes IS NOT empty ELSE False  
+        END FUNCTION  
+
+        SET left TO zero  
+        SET right TO the MINIMUM of LENGTH OF each path IN paths  
+        WHILE left LESS THAN right  
+            SET mid TO the INTEGER DIVISION of left PLUS right PLUS one BY two  
+            IF check_common_subpath(mid) IS True  
+                SET left TO mid  
+            ELSE  
+                SET right TO right MINUS one  
+            END IF  
+        END WHILE  
+        RETURN left  
+    END FUNCTION  
+END CLASS

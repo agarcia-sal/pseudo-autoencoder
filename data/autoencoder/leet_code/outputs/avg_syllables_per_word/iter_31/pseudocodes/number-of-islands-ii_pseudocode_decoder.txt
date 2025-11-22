@@ -1,0 +1,68 @@
+CLASS UnionFind  
+    FUNCTION __init__(self)  
+        SET self.parent TO empty mapping  
+        SET self.count TO zero  
+    END FUNCTION  
+  
+    FUNCTION make_set(self, x)  
+        IF x NOT IN the keys of self.parent THEN  
+            SET the element at key x of self.parent TO x  
+            INCREMENT self.count BY one  
+        END IF  
+    END FUNCTION  
+  
+    FUNCTION find(self, x)  
+        IF the element at key x of self.parent NOT EQUALS x THEN  
+            SET the element at key x of self.parent TO the result of calling self.find on the element at key x of self.parent  
+        END IF  
+        RETURN the element at key x of self.parent  
+    END FUNCTION  
+  
+    FUNCTION union(self, x, y)  
+        SET rootX TO the result of calling self.find on x  
+        SET rootY TO the result of calling self.find on y  
+        IF rootX NOT EQUALS rootY THEN  
+            SET the element at key rootX of self.parent TO rootY  
+            DECREMENT self.count BY one  
+        END IF  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION numIslands2(self, m, n, positions)  
+        FUNCTION is_valid(x, y)  
+            RETURN the predicate that zero LESS THAN OR EQUAL TO x AND x LESS THAN m AND zero LESS THAN OR EQUAL TO y AND y LESS THAN n  
+        END FUNCTION  
+  
+        SET directions TO the list consisting of the tuples one and zero MINUS one and zero zero and one zero and MINUS one  
+  
+        ASSIGN reference TO an instance of UnionFind and SET uf TO this reference  
+  
+        SET grid TO a list consisting of m elements each being a list of n elements each being zero  
+  
+        SET result TO empty list  
+  
+        FOR each element consisting of two values r and c IN positions  
+            IF the element at position c of the element at position r of grid EQUALS one THEN  
+                APPEND uf.count TO result  
+                CONTINUE to the next iteration  
+            END IF  
+  
+            SET the element at position c of the element at position r of grid TO one  
+  
+            CALL uf.make_set with the tuple consisting of r and c as argument  
+  
+            FOR each element consisting of two values dr and dc IN directions  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                IF the result of calling is_valid with arguments nr and nc AND the element at position nc of the element at position nr of grid EQUALS one THEN  
+                    CALL uf.union with the tuple of r and c and the tuple of nr and nc as arguments  
+                END IF  
+            END FOR  
+  
+            APPEND uf.count TO result  
+        END FOR  
+  
+        RETURN result  
+    END FUNCTION  
+END CLASS

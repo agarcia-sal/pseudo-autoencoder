@@ -1,0 +1,37 @@
+```
+class UnionFind(size):
+    parent = [0..size-1]
+    rank = [1]*size
+    size_arr = [1]*size
+
+    find(u):
+        if parent[u] != u: parent[u] = find(parent[u])
+        return parent[u]
+
+    union(u,v):
+        ru, rv = find(u), find(v)
+        if ru != rv:
+            if rank[ru] > rank[rv]:
+                parent[rv] = ru; size_arr[ru]+=size_arr[rv]
+            elif rank[ru] < rank[rv]:
+                parent[ru] = rv; size_arr[rv]+=size_arr[ru]
+            else:
+                parent[rv] = ru; rank[ru]+=1; size_arr[ru]+=size_arr[rv]
+
+largestComponentSize(nums):
+    uf = UnionFind(max(nums)+1)
+    prime_to_num = {}
+    for num in nums:
+        for p in prime_factors(num):
+            if p in prime_to_num: uf.union(prime_to_num[p], num)
+            else: prime_to_num[p] = num
+    return max(uf.size_arr[uf.find(num)] for num in nums)
+
+prime_factors(n):
+    f = {}
+    while n%2==0: f[2]=1; n/=2
+    for i=3 to sqrt(n) step 2:
+        while n%i==0: f[i]=1; n/=i
+    if n>2: f[n]=1
+    return keys(f)
+```

@@ -1,0 +1,9 @@
+def xorGame(nums):
+    total_xor = 0
+    for n in nums:
+        total_xor ^= n
+    if total_xor == 0:
+        return True
+    if len(nums) % 2 == 0:
+        return True
+    return False

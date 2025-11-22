@@ -1,0 +1,58 @@
+CLASS Solution
+    FUNCTION medianSlidingWindow(list_of_numbers OF INTEGERS, window_size OF INTEGER) RETURNS list_of_floats
+        SET max_heap TO empty list
+        SET min_heap TO empty list
+
+        FUNCTION balance_heaps()
+            IF the LENGTH OF max_heap IS GREATER THAN the LENGTH OF min_heap PLUS one
+                CALL heappush WITH parameters min_heap AND negative OF element at position zero of max_heap REMOVED BY heappop
+            ELSE IF the LENGTH OF min_heap IS GREATER THAN the LENGTH OF max_heap
+                CALL heappush WITH parameters max_heap AND negative OF element at position zero of min_heap REMOVED BY heappop
+            END IF
+        END FUNCTION
+
+        FUNCTION add_num(number)
+            IF max_heap IS empty OR number IS LESS THAN OR EQUAL TO negative OF element at position zero of max_heap
+                CALL heappush WITH parameters max_heap AND negative OF number
+            ELSE
+                CALL heappush WITH parameters min_heap AND number
+            END IF
+            CALL balance_heaps WITH no parameters
+        END FUNCTION
+
+        FUNCTION remove_num(number)
+            IF number IS LESS THAN OR EQUAL TO negative OF element at position zero of max_heap
+                REMOVE negative OF number FROM max_heap
+                IF max_heap IS NOT empty
+                    CALL heapify WITH parameter max_heap
+                END IF
+            ELSE
+                REMOVE number FROM min_heap
+                IF min_heap IS NOT empty
+                    CALL heapify WITH parameter min_heap
+                END IF
+            END IF
+            CALL balance_heaps WITH no parameters
+        END FUNCTION
+
+        FUNCTION get_median()
+            IF the LENGTH OF max_heap IS GREATER THAN the LENGTH OF min_heap
+                RETURN negative OF element at position zero of max_heap
+            RETURN the SUM OF negative OF element at position zero of max_heap AND element at position zero of min_heap DIVIDED BY two
+        END FUNCTION
+
+        FOR index FROM zero TO window_size MINUS one
+            CALL add_num WITH parameter element at position index of list_of_numbers
+        END FOR
+
+        SET medians TO a new list CONTAINING element at position zero OF get_median CALLED WITH no parameters
+
+        FOR index FROM window_size TO the LENGTH OF list_of_numbers MINUS one
+            CALL add_num WITH parameter element at position index of list_of_numbers
+            CALL remove_num WITH parameter element at position index MINUS window_size of list_of_numbers
+            APPEND get_median CALLED WITH no parameters TO medians
+        END FOR
+
+        RETURN medians
+    END FUNCTION
+END CLASS

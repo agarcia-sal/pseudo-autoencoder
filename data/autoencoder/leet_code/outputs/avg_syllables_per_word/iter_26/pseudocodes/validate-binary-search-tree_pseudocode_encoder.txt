@@ -1,0 +1,59 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values)
+    IF values IS EMPTY
+        RETURN none
+    END IF
+    SET root TO NEW TreeNode WITH val EQUALS element at position zero OF values
+    SET i TO one
+    SET queue TO A NEW DEQUE COLLECTION
+    APPEND root TO queue
+    WHILE queue HOLDS ELEMENTS
+        SET node TO THE FIRST ELEMENT REMOVED FROM queue
+        IF i LESS THAN LENGTH OF values AND element at position i OF values IS NOT none
+            SET node.left TO NEW TreeNode WITH val EQUALS element at position i OF values
+            APPEND node.left TO queue
+        END IF
+        INCREMENT i BY one
+        IF i LESS THAN LENGTH OF values AND element at position i OF values IS NOT none
+            SET node.right TO NEW TreeNode WITH val EQUALS element at position i OF values
+            APPEND node.right TO queue
+        END IF
+        INCREMENT i BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS none AND q IS none
+        RETURN TRUE
+    ELSE IF p IS none OR q IS none
+        RETURN FALSE
+    ELSE IF p.val NOT EQUALS q.val
+        RETURN FALSE
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION isValidBST(self, root)
+        FUNCTION validate(node, low EQUALS negative infinity, high EQUALS positive infinity)
+            IF node IS none
+                RETURN TRUE
+            END IF
+            IF node.val LESS THAN OR EQUAL TO low OR node.val GREATER THAN OR EQUAL TO high
+                RETURN FALSE
+            END IF
+            RETURN validate(node.left, low, node.val) AND validate(node.right, node.val, high)
+        END FUNCTION
+
+        RETURN validate(root)
+    END FUNCTION
+END CLASS

@@ -1,0 +1,56 @@
+CLASS Solution  
+    FUNCTION maxScoreWords(words LIST OF STRING letters LIST OF STRING score LIST OF INTEGER) RETURNS INTEGER  
+        FUNCTION word_score(word STRING score_map MAPPING OF CHARACTER TO INTEGER) RETURNS INTEGER  
+            SET total_score TO zero  
+            FOR each character IN word  
+                INCREMENT total_score BY the value at character IN score_map  
+            END FOR  
+            RETURN total_score  
+        END FUNCTION  
+        
+        FUNCTION can_form(word STRING letter_count MAPPING OF CHARACTER TO INTEGER) RETURNS BOOLEAN  
+            SET word_count TO the frequency counts of each character IN word  
+            FOR each character AND count IN word_count  
+                IF the value at character IN letter_count IS LESS THAN count THEN  
+                    RETURN false  
+                END IF  
+            END FOR  
+            RETURN true  
+        END FUNCTION  
+        
+        FUNCTION update_letter_count(letter_count MAPPING OF CHARACTER TO INTEGER word STRING add BOOLEAN)  
+            FOR each character IN word  
+                IF add IS true THEN  
+                    INCREMENT the value at character IN letter_count BY one  
+                ELSE  
+                    DECREMENT the value at character IN letter_count BY one  
+                END IF  
+            END FOR  
+        END FUNCTION  
+        
+        FUNCTION backtrack(index INTEGER current_score INTEGER letter_count MAPPING OF CHARACTER TO INTEGER) RETURNS INTEGER  
+            IF index EQUALS the LENGTH OF words THEN  
+                RETURN current_score  
+            END IF  
+            
+            SET max_score TO current_score  
+            FOR i FROM index TO the LENGTH OF words MINUS one  
+                IF can_form(the element at position i of words letter_count) IS true THEN  
+                    CALL update_letter_count(letter_count the element at position i of words false)  
+                    SET recursive_score TO the result of calling backtrack WITH i PLUS one current_score PLUS word_score(the element at position i of words score_map) letter_count  
+                    IF recursive_score IS GREATER THAN max_score THEN  
+                        SET max_score TO recursive_score  
+                    END IF  
+                    CALL update_letter_count(letter_count the element at position i of words true)  
+                END IF  
+            END FOR  
+            
+            RETURN max_score  
+        END FUNCTION  
+        
+        SET score_map TO a MAPPING FROM characters a THROUGH z TO corresponding elements IN score BY their POSITION  
+        SET letter_count TO the frequency counts of each character IN letters  
+        
+        RETURN the result of calling backtrack WITH zero zero letter_count  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,53 @@
+CLASS Solution  
+    FUNCTION wordsAbbreviation(words)  
+        FUNCTION abbreviate(word, prefix_length)  
+            IF the LENGTH OF word MINUS prefix_length IS LESS THAN OR EQUAL TO two  
+                RETURN word  
+            END IF  
+            SET abbreviation TO substring from position zero TO position prefix_length OF word PLUS the LENGTH OF word MINUS prefix_length MINUS one PLUS element at position negative one OF word  
+            RETURN abbreviation  
+        END FUNCTION  
+        
+        FUNCTION get_unique_abbreviations(words_with_indices, prefix_length)  
+            ASSIGN reference TO a new mapping with default empty list named abbs  
+            FOR each pair of index and word IN words_with_indices  
+                APPEND the pair of index and word TO abbs AT the key abbreviate(word, prefix_length)  
+            END FOR  
+            RETURN abbs  
+        END FUNCTION  
+        
+        SET n TO the LENGTH OF words  
+        SET ans TO a collection with n empty strings  
+        SET words_with_indices TO collection of pairs of index and word FOR each index and word FROM enumerating words  
+        
+        SET abbs TO get_unique_abbreviations(words_with_indices, one)  
+        
+        FOR each abbreviation and group IN abbs  
+            IF the LENGTH OF group EQUALS one  
+                SET index and word TO the first element of group  
+                SET ans at position index TO abbreviation  
+            ELSE  
+                ASSIGN reference TO an empty collection named new_group  
+                FOR each index and word IN group  
+                    APPEND the pair of index and word TO new_group  
+                END FOR  
+                SET prefix_length TO two  
+                WHILE the LENGTH OF new_group IS GREATER THAN zero  
+                    SET new_abbs TO get_unique_abbreviations(new_group, prefix_length)  
+                    ASSIGN reference TO an empty collection named new_group  
+                    FOR each new_abbreviation and new_group_items IN new_abbs  
+                        IF the LENGTH OF new_group_items EQUALS one  
+                            SET index and word TO the first element of new_group_items  
+                            SET ans at position index TO new_abbreviation  
+                        ELSE  
+                            EXTEND new_group BY new_group_items  
+                        END IF  
+                    END FOR  
+                    INCREMENT prefix_length BY one  
+                END WHILE  
+            END IF  
+        END FOR  
+        
+        RETURN ans  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,67 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS None, right EQUALS None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values)
+    IF values EQUALS empty OR values IS None
+        RETURN None
+    END IF
+    SET root TO A NEW TreeNode WITH value EQUALS element at position zero OF values
+    SET i TO one
+    SET queue TO A NEW deque
+    APPEND root TO queue
+    WHILE queue IS NOT empty
+        SET node TO THE FIRST ELEMENT REMOVED FROM queue
+        IF i LESS THAN LENGTH OF values AND element at position i OF values IS NOT None
+            SET node.left TO A NEW TreeNode WITH value EQUALS element at position i OF values
+            APPEND node.left TO queue
+        END IF
+        INCREMENT i BY one
+        IF i LESS THAN LENGTH OF values AND element at position i OF values IS NOT None
+            SET node.right TO A NEW TreeNode WITH value EQUALS element at position i OF values
+            APPEND node.right TO queue
+        END IF
+        INCREMENT i BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF value OF p NOT EQUALS value OF q
+        RETURN False
+    ELSE
+        RETURN is_same_tree(left child OF p, left child OF q) AND is_same_tree(right child OF p, right child OF q)
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION addOneRow(self, root, val, depth)
+        IF depth EQUALS one
+            RETURN A NEW TreeNode WITH value EQUALS val AND left child EQUALS root
+        END IF
+        SET queue TO A NEW deque CONTAINING root AND integer one AS A TUPLE
+        WHILE queue IS NOT empty
+            SET node, level TO THE FIRST ELEMENT REMOVED FROM queue
+            IF level EQUALS depth MINUS one
+                SET node.left TO A NEW TreeNode WITH value EQUALS val AND left child EQUALS node.left
+                SET node.right TO A NEW TreeNode WITH value EQUALS val AND right child EQUALS node.right
+            ELSE IF level LESS THAN depth MINUS one
+                IF node.left IS NOT None
+                    APPEND node.left AND level PLUS one AS A TUPLE TO queue
+                END IF
+                IF node.right IS NOT None
+                    APPEND node.right AND level PLUS one AS A TUPLE TO queue
+                END IF
+            END IF
+        END WHILE
+        RETURN root
+    END FUNCTION
+END CLASS

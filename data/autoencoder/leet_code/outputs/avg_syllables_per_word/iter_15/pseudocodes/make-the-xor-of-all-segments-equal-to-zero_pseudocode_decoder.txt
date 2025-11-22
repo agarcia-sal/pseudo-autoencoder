@@ -1,0 +1,37 @@
+CLASS Solution  
+    FUNCTION minChanges(nums AS List OF Integer, k AS Integer)  
+        SET groups TO an empty mapping from integer TO list  
+        FOR each index FROM zero TO the LENGTH OF nums MINUS one  
+            APPEND element at position index of nums TO the list at key index MODULO k in groups  
+        END FOR  
+
+        SET freq TO a list of length k each element being an empty mapping from integer TO integer  
+        SET min_size TO a list of length k each element being positive infinity  
+        FOR each index FROM zero TO k MINUS one  
+            FOR each number IN the list at key index in groups  
+                INCREMENT the value at key number in freq at position index BY one  
+            END FOR  
+            SET the element at position index in min_size TO the LENGTH OF the list at key index in groups  
+        END FOR  
+
+        SET dp TO a list of length two RAISED TO THE power ten each element being positive infinity  
+        SET the element at position zero in dp TO zero  
+
+        FOR each index FROM zero TO k MINUS one  
+            SET new_dp TO a list of length two RAISED TO_THE power ten each element being positive infinity  
+            SET min_dp TO the minimum value in dp  
+            FOR each state FROM zero TO two RAISED TO_THE power ten MINUS one  
+                SET the element at position state in new_dp TO min_dp PLUS the element at position index in min_size  
+                FOR each pair number AND count IN the mappings at position index in freq  
+                    SET candidate_value TO the sum of the element at position state XOR number in dp PLUS the element at position index in min_size MINUS count  
+                    IF candidate_value IS LESS THAN the element at position state in new_dp THEN  
+                        SET the element at position state in new_dp TO candidate_value  
+                    END IF  
+                END FOR  
+            END FOR  
+            SET dp TO new_dp  
+        END FOR  
+
+        RETURN the element at position zero in dp  
+    END FUNCTION  
+END CLASS

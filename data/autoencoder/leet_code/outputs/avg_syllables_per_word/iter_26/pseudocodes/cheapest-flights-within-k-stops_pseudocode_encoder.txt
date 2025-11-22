@@ -1,0 +1,36 @@
+CLASS Solution
+    FUNCTION findCheapestPrice(parameter n, parameter flights, parameter src, parameter dst, parameter k)
+        SET graph TO an empty dictionary mapping each index from zero TO parameter n MINUS one TO an empty list
+        FOR each triple of elements u, v, w IN parameter flights
+            APPEND the tuple consisting of element v AND element w TO the list associated with key u IN graph
+        END FOR
+
+        SET min_heap TO a list containing a single tuple consisting of zero cost, minus one stops, AND parameter src
+
+        SET min_cost TO a dictionary with key parameter src AND value minus one
+
+        WHILE min_heap HOLDS
+            ASSIGN cost, stops, city TO the result of extracting the smallest element FROM min_heap
+
+            IF city EQUALS parameter dst
+                RETURN cost
+            END IF
+
+            IF stops GREATER THAN OR EQUAL TO parameter k
+                CONTINUE TO the next iteration
+            END IF
+
+            FOR each tuple neighbor, price IN the list associated with key city IN graph
+                SET next_cost TO cost PLUS price
+                SET next_stops TO stops PLUS one
+
+                IF neighbor NOT IN keys of min_cost OR next_stops LESS THAN the value associated with key neighbor IN min_cost OR next_cost LESS THAN the first element of the smallest tuple in min_heap
+                    SET the value associated with key neighbor IN min_cost TO next_stops
+                    INSERT the tuple consisting of next_cost, next_stops, neighbor INTO min_heap maintaining heap property
+                END IF
+            END FOR
+        END WHILE
+
+        RETURN minus one
+    END FUNCTION
+END CLASS

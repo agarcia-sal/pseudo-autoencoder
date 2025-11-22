@@ -1,0 +1,55 @@
+CLASS TrieNode  
+    FUNCTION __init__ with no parameters  
+        SET children TO a default dictionary mapping each key to a new TrieNode  
+        SET deleted TO False  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION deleteDuplicateFolder with parameter paths which is a list of lists of strings  
+        SET ans TO an empty list  
+        SET root TO a new TrieNode  
+        SET subtreeToNodes TO a default dictionary mapping each key to an empty list  
+
+        FOR each path IN the list of paths sorted in ascending order  
+            SET node TO root  
+            FOR each string s IN path  
+                SET node TO the child corresponding to s in node children  
+            END FOR  
+        END FOR  
+
+        FUNCTION buildSubtreeToRoots with parameter node of type TrieNode returning a string  
+            SET subtree TO the string concatenation of opening parenthesis WITH  
+            the concatenation for each string s in node children in ascending order of s of s concatenated WITH recursive call to buildSubtreeToRoots of the child corresponding to s in node children  
+            concatenated WITH closing parenthesis  
+            IF subtree is not equal to opening parenthesis followed immediately by closing parenthesis  
+                APPEND node TO the list corresponding to key subtree in subtreeToNodes  
+            END IF  
+            RETURN subtree  
+        END FUNCTION  
+
+        CALL buildSubtreeToRoots with root as argument  
+
+        FOR each list of nodes IN the values of subtreeToNodes  
+            IF the length of nodes is greater than one  
+                FOR each node IN nodes  
+                    SET node deleted TO True  
+                END FOR  
+            END IF  
+        END FOR  
+
+        FUNCTION constructPath with parameters node of type TrieNode and path which is a list of strings returning nothing  
+            FOR each key s and child node child in the items of node children  
+                IF child deleted is False  
+                    CALL constructPath with child and the concatenation of path with s appended as argument  
+                END IF  
+            END FOR  
+            IF path is not empty  
+                APPEND path TO ans  
+            END IF  
+        END FUNCTION  
+
+        CALL constructPath with root and an empty list as arguments  
+        RETURN ans  
+    END FUNCTION  
+END CLASS

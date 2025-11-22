@@ -1,0 +1,50 @@
+CLASS Solution  
+    FUNCTION minWindow(s STRING_PARAMETER t STRING_PARAMETER) RETURNS STRING  
+        IMPORT Counter FROM collections  
+        
+        SET t_count TO Counter created from t  
+        SET required TO the LENGTH OF t_count  
+        
+        SET left TO zero  
+        SET right TO zero  
+        SET formed TO zero  
+        SET window_counts TO an empty Counter  
+        
+        SET min_length TO positive infinity  
+        SET min_start TO zero  
+        
+        WHILE right IS LESS THAN the LENGTH OF s  
+            SET current_character TO the element at position right of s  
+            INCREMENT the count of current_character in window_counts BY one  
+            
+            IF window_counts at current_character EQUALS t_count at current_character AND current_character IS IN t_count THEN  
+                INCREMENT formed BY one  
+            END IF  
+            
+            WHILE left IS LESS THAN OR EQUAL TO right AND formed EQUALS required  
+                SET character_at_left TO the element at position left of s  
+                
+                IF right MINUS left PLUS one IS LESS THAN min_length THEN  
+                    SET min_length TO right MINUS left PLUS one  
+                    SET min_start TO left  
+                END IF  
+                
+                DECREMENT the count of character_at_left in window_counts BY one  
+                
+                IF character_at_left IS IN t_count AND window_counts at character_at_left IS LESS THAN t_count at character_at_left THEN  
+                    DECREMENT formed BY one  
+                END IF  
+                
+                INCREMENT left BY one  
+            END WHILE  
+            
+            INCREMENT right BY one  
+        END WHILE  
+        
+        IF min_length IS EQUAL TO positive infinity THEN  
+            RETURN an empty string  
+        ELSE  
+            RETURN the substring of s from position min_start TO position min_start PLUS min_length MINUS one  
+        END IF  
+    END FUNCTION  
+END CLASS

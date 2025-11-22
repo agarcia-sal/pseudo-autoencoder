@@ -1,0 +1,52 @@
+CLASS ListNode  
+    FUNCTION __init__ WITH PARAMETERS val DEFAULT zero AND next DEFAULT none  
+        SET self.val TO val  
+        SET self.next TO next  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION list_node WITH PARAMETER values  
+    IF values IS EMPTY  
+        RETURN none  
+    END IF  
+    SET head TO A NEW ListNode INITIALIZED WITH element at position zero OF values  
+    SET p TO head  
+    FOR each val IN elements FROM position one TO THE END OF values  
+        SET node TO A NEW ListNode INITIALIZED WITH val  
+        SET p.next TO node  
+        SET p TO node  
+    END FOR  
+    RETURN head  
+END FUNCTION  
+
+FUNCTION is_same_list WITH PARAMETERS p1 AND p2  
+    IF p1 IS none AND p2 IS none  
+        RETURN true  
+    END IF  
+    IF p1 IS none OR p2 IS none  
+        RETURN false  
+    END IF  
+    RETURN BOOLEAN RESULT OF (p1.val EQUAL TO p2.val AND is_same_list WITH PARAMETERS p1.next AND p2.next)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION mergeKLists WITH PARAMETER lists  
+        SET min_heap TO AN EMPTY LIST  
+        FOR each index i AND element lst IN lists  
+            IF lst IS NOT none  
+                PUSH TUPLE OF (lst.val, i, lst) INTO min_heap USING HEAP INSERT OPERATION  
+            END IF  
+        END FOR  
+        SET dummy TO A NEW ListNode WITH DEFAULT PARAMETERS  
+        SET current TO dummy  
+        WHILE min_heap IS NOT EMPTY  
+            POP THE TUPLE (val, i, node) WITH THE SMALLEST FIRST ELEMENT FROM min_heap USING HEAP REMOVE OPERATION  
+            SET current.next TO node  
+            SET current TO current.next  
+            IF node.next IS NOT none  
+                PUSH TUPLE OF (node.next.val, i, node.next) INTO min_heap USING HEAP INSERT OPERATION  
+            END IF  
+        END WHILE  
+        RETURN dummy.next  
+    END FUNCTION  
+END CLASS

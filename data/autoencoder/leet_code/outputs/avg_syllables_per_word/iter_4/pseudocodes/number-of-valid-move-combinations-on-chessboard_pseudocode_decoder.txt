@@ -1,0 +1,61 @@
+CLASS Solution
+    FUNCTION countCombinations(pieces: List of String, positions: List of List of Integer) RETURNS Integer
+        SET directions TO DICTIONARY WITH
+            KEY "rook" MAPPING TO LIST OF (1, 0), (-1, 0), (0, 1), (0, -1)
+            KEY "queen" MAPPING TO LIST OF (1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (-1, 1), (1, -1), (-1, -1)
+            KEY "bishop" MAPPING TO LIST OF (1, 1), (-1, 1), (1, -1), (-1, -1)
+        
+        SET positions TO LIST OF (r MINUS 1, c MINUS 1) FOR EACH (r, c) IN positions
+        
+        FUNCTION get_destinations(start: Tuple of Integer, piece_type: String) RETURNS List of Tuple of Integer
+            SET r, c TO start
+            SET dests TO LIST CONTAINING start
+            FOR EACH (dr, dc) IN directions[piece_type]
+                SET nr TO r PLUS dr
+                SET nc TO c PLUS dc
+                WHILE nr GREATER OR EQUAL TO 0 AND nr LESS THAN 8 AND nc GREATER OR EQUAL TO 0 AND nc LESS THAN 8
+                    APPEND (nr, nc) TO dests
+                    INCREMENT nr BY dr
+                    INCREMENT nc BY dc
+            RETURN dests
+        END FUNCTION
+        
+        SET all_destinations TO LIST OF get_destinations(pos, piece) FOR EACH pos, piece IN ZIP OF positions AND pieces
+        
+        FUNCTION is_valid_combination(combination: List of Tuple of Integer) RETURNS Boolean
+            SET pos TO COPY OF positions
+            SET n TO LENGTH OF pos
+            WHILE TRUE
+                IF LENGTH OF SET OF pos LESS THAN n THEN
+                    RETURN FALSE
+                SET all_reached TO TRUE
+                FOR i FROM 0 TO n MINUS 1
+                    IF pos[i] EQUALS combination[i] THEN
+                        CONTINUE TO NEXT i
+                    SET all_reached TO FALSE
+                    SET r, c TO pos[i]
+                    IF combination[i][0] GREATER THAN r THEN
+                        SET dr TO 1
+                    ELSE IF combination[i][0] LESS THAN r THEN
+                        SET dr TO -1
+                    ELSE
+                        SET dr TO 0
+                    IF combination[i][1] GREATER THAN c THEN
+                        SET dc TO 1
+                    ELSE IF combination[i][1] LESS THAN c THEN
+                        SET dc TO -1
+                    ELSE
+                        SET dc TO 0
+                    SET pos[i] TO (r PLUS dr, c PLUS dc)
+                IF all_reached THEN
+                    RETURN TRUE
+        END FUNCTION
+        
+        SET valid_count TO 0
+        FOR EACH combination IN CARTESIAN PRODUCT OF all_destinations
+            IF is_valid_combination(combination) THEN
+                INCREMENT valid_count BY 1
+        
+        RETURN valid_count
+    END FUNCTION
+END CLASS

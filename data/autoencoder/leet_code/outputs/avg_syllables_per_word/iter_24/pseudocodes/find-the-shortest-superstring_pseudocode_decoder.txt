@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION shortestSuperstring WITH PARAMETER words  
+        SET n TO the LENGTH OF words  
+        
+        FUNCTION overlap WITH PARAMETERS i AND j  
+            FOR k FROM the MINIMUM OF the LENGTH OF element at position i of words AND the LENGTH OF element at position j of words DOWN TO one  
+                IF the substring consisting of the last k elements of element at position i of words EQUALS the substring consisting of the first k elements of element at position j of words THEN  
+                    RETURN k  
+                END IF  
+            END FOR  
+            RETURN zero  
+        END FUNCTION  
+        
+        FUNCTION dp WITH PARAMETERS mask AND i  
+            IF mask EQUALS the NUMBER with n ONES in binary representation THEN  
+                RETURN zero AND an empty string  
+            END IF  
+            
+            SET min_len TO positive infinity  
+            SET best_path TO an empty string  
+            FOR j FROM zero TO n MINUS one  
+                IF the binary AND of mask AND the number with bit j SET TO one EQUALS zero THEN  
+                    SET length AND path TO THE RESULT OF dp WITH mask SET TO the binary OR of mask AND the number with bit j SET TO one AND i SET TO j  
+                    SET length TO length PLUS the LENGTH OF element at position j of words MINUS overlap of i AND j  
+                    IF length LESS THAN min_len THEN  
+                        SET min_len TO length  
+                        SET best_path TO the substring from position overlap of i AND j PLUS one TO the END of element at position j of words CONCATENATED WITH path  
+                    END IF  
+                END IF  
+            END FOR  
+            
+            RETURN min_len AND best_path  
+        END FUNCTION  
+        
+        SET min_len TO positive infinity  
+        SET shortest_path TO an empty string  
+        FOR i FROM zero TO n MINUS one  
+            SET length AND path TO THE RESULT OF dp WITH mask SET TO the number with bit i SET TO one AND i SET TO i  
+            SET length TO length PLUS the LENGTH OF element at position i of words  
+            IF length LESS THAN min_len THEN  
+                SET min_len TO length  
+                SET shortest_path TO element at position i of words CONCATENATED WITH path  
+            END IF  
+        END FOR  
+        
+        RETURN shortest_path  
+    END FUNCTION  
+END CLASS

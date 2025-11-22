@@ -1,0 +1,50 @@
+```
+maxInvitations(fav):
+  n = len(fav)
+  graph = {i: [] for i in range(n)}
+  indeg = [0]*n
+  for i in range(n):
+    graph[fav[i]].append(i)
+    indeg[fav[i]] += 1
+
+  mutual_sum = 0
+  visited = [F]*n
+  for i in range(n):
+    if fav[fav[i]]==i and i < fav[i]:
+      a,b = i,fav[i]
+      mutual_sum += chainLen(a,graph,visited) + chainLen(b,graph,visited)
+
+  longest_cyc = 0
+  visited = [F]*n
+  for i in range(n):
+    if not visited[i]:
+      longest_cyc = max(longest_cyc, cycleLen(i,graph,visited,fav))
+
+  return max(mutual_sum,longest_cyc)
+
+
+chainLen(s,g,v):
+  l=0
+  q=[s]
+  v[s]=T
+  while q:
+    c=q.pop(0)
+    for n in g[c]:
+      if not v[n]:
+        v[n]=T
+        q.append(n)
+        l += 1
+  return l
+
+
+cycleLen(s,g,v,f):
+  if v[s]: return 0
+  stk=[]
+  c=s
+  while not v[c]:
+    v[c] = T
+    stk.append(c)
+    c = f[c]
+  if c not in stk: return 0
+  return len(stk)-stk.index(c)
+```

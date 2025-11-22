@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION closestNode(n, edges, query)  
+        ASSIGN pointer TO a new mapping with default value as empty list NAMED graph  
+        FOR each two elements u AND v IN edges  
+            APPEND element v TO the element in graph at position u  
+            APPEND element u TO the element in graph at position v  
+        END FOR  
+        
+        FUNCTION find_path(start, end)  
+            ASSIGN pointer TO a new double-ended queue initialized with one element being a tuple of start AND a list containing start NAMED queue  
+            ASSIGN pointer TO a new set initialized containing start NAMED visited  
+            
+            WHILE queue is not empty  
+                REMOVE the first element from queue NAMED node AND path  
+                IF node EQUALS end  
+                    RETURN path  
+                END IF  
+                FOR each neighbor IN the element in graph at position node  
+                    IF neighbor is not in visited  
+                        ADD neighbor to visited  
+                        APPEND a tuple of neighbor AND the list obtained by adding neighbor to path TO queue  
+                    END IF  
+                END FOR  
+            END WHILE  
+        END FUNCTION  
+        
+        FUNCTION closest_node_on_path(path, node)  
+            SET min_distance TO infinity  
+            SET closest_node TO None  
+            FOR each element p IN path  
+                SET distance TO the length of the list returned by calling find_path with arguments p AND node MINUS one  
+                IF distance LESS THAN min_distance  
+                    SET min_distance TO distance  
+                    SET closest_node TO p  
+                END IF  
+            END FOR  
+            RETURN closest_node  
+        END FUNCTION  
+        
+        SET answer TO an empty list  
+        FOR each three elements start AND end AND node IN query  
+            SET path TO the list returned by find_path called with arguments start AND end  
+            APPEND the result of calling closest_node_on_path with arguments path AND node TO answer  
+        END FOR  
+        
+        RETURN answer  
+    END FUNCTION  
+END CLASS

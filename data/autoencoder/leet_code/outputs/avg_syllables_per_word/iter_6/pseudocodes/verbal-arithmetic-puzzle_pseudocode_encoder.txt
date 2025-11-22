@@ -1,0 +1,79 @@
+CLASS Solution  
+    FUNCTION isSolvable(words, result)  
+        SET unique_chars TO set of all characters from concatenation of words and result  
+        IF length of unique_chars GREATER THAN 10 THEN  
+            RETURN false  
+        
+        SET non_zero_chars TO set of first characters of words with length GREATER THAN 1  
+        IF length of result GREATER THAN 1 THEN  
+            ADD first character of result TO non_zero_chars  
+        
+        SET char_to_digit TO empty dictionary  
+        SET digit_to_char TO empty dictionary  
+        
+        FUNCTION can_assign(char, digit)  
+            RETURN char NOT IN char_to_digit AND (digit NOT IN digit_to_char OR digit_to_char[digit] EQUALS char)  
+        END FUNCTION  
+        
+        FUNCTION assign(char, digit)  
+            SET char_to_digit[char] TO digit  
+            SET digit_to_char[digit] TO char  
+        END FUNCTION  
+        
+        FUNCTION unassign(char, digit)  
+            REMOVE char FROM char_to_digit  
+            REMOVE digit FROM digit_to_char  
+        END FUNCTION  
+        
+        FUNCTION word_value(word)  
+            SET total_value TO 0  
+            SET position TO 0  
+            FOR each character IN reverse order of word  
+                INCREMENT total_value BY char_to_digit[character] MULTIPLIED BY 10 RAISED TO position  
+                INCREMENT position BY 1  
+            RETURN total_value  
+        END FUNCTION  
+        
+        FUNCTION backtrack(index, column, carry_sum)  
+            IF column GREATER THAN OR EQUAL TO maximum length among words AND column GREATER THAN OR EQUAL TO length of result THEN  
+                RETURN carry_sum EQUALS 0  
+            
+            IF index EQUALS length of words THEN  
+                IF column LESS THAN length of result THEN  
+                    SET result_char TO character at position (length of result MINUS 1 MINUS column) IN result  
+                    IF result_char IN char_to_digit THEN  
+                        IF char_to_digit[result_char] EQUALS remainder of carry_sum DIVIDED BY 10 THEN  
+                            RETURN CALL backtrack WITH 0, column PLUS 1, carry_sum DIVIDED BY 10 (integer division)  
+                        ELSE  
+                            RETURN false  
+                    ELSE IF can_assign(result_char, remainder of carry_sum DIVIDED BY 10) AND  
+                            (remainder of carry_sum DIVIDED BY 10 NOT EQUALS 0 OR result_char NOT IN non_zero_chars) THEN  
+                        CALL assign WITH result_char, remainder of carry_sum DIVIDED BY 10  
+                        IF CALL backtrack WITH 0, column PLUS 1, carry_sum DIVIDED BY 10 (integer division) RETURNS true THEN  
+                            RETURN true  
+                        CALL unassign WITH result_char, remainder of carry_sum DIVIDED BY 10  
+                ELSE  
+                    RETURN carry_sum EQUALS 0  
+                RETURN false  
+            
+            SET current_word TO words at index  
+            IF column GREATER THAN OR EQUAL TO length of current_word THEN  
+                RETURN CALL backtrack WITH index PLUS 1, column, carry_sum  
+            
+            SET character TO character at position (length of current_word MINUS 1 MINUS column) IN current_word  
+            IF character IN char_to_digit THEN  
+                RETURN CALL backtrack WITH index PLUS 1, column, carry_sum PLUS char_to_digit[character]  
+            
+            FOR digit FROM 0 TO 9  
+                IF can_assign(character, digit) AND (digit NOT EQUALS 0 OR character NOT IN non_zero_chars) THEN  
+                    CALL assign WITH character, digit  
+                    IF CALL backtrack WITH index PLUS 1, column, carry_sum PLUS digit RETURNS true THEN  
+                        RETURN true  
+                    CALL unassign WITH character, digit  
+            
+            RETURN false  
+        END FUNCTION  
+        
+        RETURN CALL backtrack WITH 0, 0, 0  
+    END FUNCTION  
+END CLASS

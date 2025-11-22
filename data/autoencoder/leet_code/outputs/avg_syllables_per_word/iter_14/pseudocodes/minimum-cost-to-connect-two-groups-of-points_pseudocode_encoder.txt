@@ -1,0 +1,38 @@
+CLASS Solution  
+    FUNCTION connectTwoGroups(cost)  
+        SET size1 TO the LENGTH OF cost  
+        SET size2 TO the LENGTH OF the element at position zero OF cost  
+        
+        CALL auxiliary FUNCTION initialize_dp_table WITH PARAMETERS size1 AND size2  
+        SET dp TO the RESULT OF initialize_dp_table  
+        SET the element at position zero AND zero OF dp TO zero  
+        
+        FOR i FROM zero TO size1 MINUS one  
+            FOR mask FROM zero TO two TO the power OF size2 MINUS one  
+                
+                FOR j FROM zero TO size2 MINUS one  
+                    SET new_mask TO the result of BITWISE OR BETWEEN mask AND two TO the power OF j  
+                    SET potential_cost TO the element at position i AND j OF cost PLUS the element at position i AND mask OF dp  
+                    SET the element at position i PLUS one AND new_mask OF dp TO the MINIMUM OF its CURRENT VALUE AND potential_cost  
+                END FOR  
+                
+                FOR j FROM zero TO size2 MINUS one  
+                    IF the result of BITWISE AND BETWEEN mask AND two TO the power OF j IS NOT EQUAL TO zero  
+                        SET alternate_mask TO the result of BITWISE XOR BETWEEN mask AND two TO the power OF j  
+                        SET potential_cost TO the element at position i PLUS one AND alternate_mask OF dp PLUS the element at position i AND j OF cost  
+                        SET the element at position i PLUS one AND mask OF dp TO the MINIMUM OF its CURRENT VALUE AND potential_cost  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+        
+        SET all_connected_mask TO two TO the power OF size2 MINUS one  
+        RETURN the element at position size1 AND all_connected_mask OF dp  
+    END FUNCTION  
+        
+    FUNCTION initialize_dp_table(size1, size2)  
+        CREATE a two-dimensional list CALLED dp WITH size1 PLUS one ROWS  
+        EACH ROW CONTAINS two TO the power OF size2 ELEMENTS INITIALIZED TO infinity  
+        RETURN dp  
+    END FUNCTION  
+END CLASS

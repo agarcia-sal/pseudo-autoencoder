@@ -1,0 +1,67 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val EQUALS zero left EQUALS none right EQUALS none  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETERS values  
+    IF values IS EMPTY  
+        RETURN none  
+    END IF  
+    SET root TO NEW TreeNode WITH PARAMETERS element at position zero OF values  
+    SET i TO one  
+    SET queue TO NEW deque  
+    CALL APPEND WITH PARAMETERS root ON queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO RESULT OF CALLING popleft ON queue  
+        IF i IS LESS THAN LENGTH OF values AND element at position i OF values IS NOT none  
+            SET node.left TO NEW TreeNode WITH PARAMETERS element at position i OF values  
+            CALL APPEND WITH PARAMETERS node.left ON queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN LENGTH OF values AND element at position i OF values IS NOT none  
+            SET node.right TO NEW TreeNode WITH PARAMETERS element at position i OF values  
+            CALL APPEND WITH PARAMETERS node.right ON queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN RESULT OF CALLING is_same_tree WITH PARAMETERS p.left q.left AND RESULT OF CALLING is_same_tree WITH PARAMETERS p.right q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION addOneRow WITH PARAMETERS self root val depth  
+        IF depth EQUALS one  
+            RETURN NEW TreeNode WITH PARAMETERS val left EQUALS root  
+        END IF  
+        SET queue TO NEW deque WITH ELEMENT root AND one AS TUPLE  
+        WHILE queue IS NOT EMPTY  
+            SET node TO FIRST ELEMENT AND level TO SECOND ELEMENT OF RESULT OF CALLING popleft ON queue  
+            IF level EQUALS depth MINUS one  
+                SET node.left TO NEW TreeNode WITH PARAMETERS val left EQUALS node.left  
+                SET node.right TO NEW TreeNode WITH PARAMETERS val right EQUALS node.right  
+            ELSE IF level IS LESS THAN depth MINUS one  
+                IF node.left IS NOT none  
+                    CALL APPEND WITH PARAMETERS node.left AND level PLUS one AS TUPLE ON queue  
+                END IF  
+                IF node.right IS NOT none  
+                    CALL APPEND WITH PARAMETERS node.right AND level PLUS one AS TUPLE ON queue  
+                END IF  
+            END IF  
+        END WHILE  
+        RETURN root  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,45 @@
+CLASS Solution  
+    FUNCTION ipToCIDR(ip PARAMETER ip OF TYPE string, ip PARAMETER n OF TYPE integer) RETURNS list of string  
+        
+        FUNCTION ip_to_int(ip PARAMETER ip OF TYPE string) RETURNS integer  
+            SET parts TO list of the integer values obtained by splitting ip AT each period and converting each segment TO integer  
+            SET res TO zero  
+            FOR each part IN parts  
+                SET res TO res MULTIPLIED BY two HUNDRED FIFTY-SIX PLUS part  
+            END FOR  
+            RETURN res  
+        END FUNCTION  
+        
+        FUNCTION int_to_ip(num PARAMETER num OF TYPE integer) RETURNS string  
+            CREATE list_of_segments AS an empty list  
+            FOR index FROM three DOWN TO zero  
+                SET segment_value TO the element at position index of num DIVIDED BY two HUNDRED FIFTY-SIX raised TO THE POWER OF index MODULO two HUNDRED FIFTY-SIX  
+                APPEND string representation of segment_value TO list_of_segments  
+            END FOR  
+            RETURN concatenation of list_of_segments WITH period BETWEEN each element  
+        END FUNCTION  
+        
+        FUNCTION largest_cidr_size(start PARAMETER start OF TYPE integer, n PARAMETER n OF TYPE integer) RETURNS integer  
+            IF the bitwise AND of start AND one EQUALS one  
+                RETURN one  
+            END IF  
+            SET x TO one  
+            WHILE x IS LESS THAN OR EQUAL TO n AND the bitwise AND of start AND (x MINUS one) EQUALS zero  
+                SET x TO x MULTIPLIED BY two  
+            END WHILE  
+            RETURN x DIVIDED BY two  
+        END FUNCTION  
+        
+        SET result TO an empty list  
+        SET start_ip TO the result of calling ip_to_int WITH ip  
+        
+        WHILE n IS GREATER THAN zero  
+            SET size TO the result of calling largest_cidr_size WITH start_ip AND n  
+            APPEND concatenation of the result of calling int_to_ip WITH start_ip, forward slash character, AND thirty-two MINUS (bit length of size MINUS one) TO result  
+            SET start_ip TO start_ip PLUS size  
+            SET n TO n MINUS size  
+        END WHILE  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

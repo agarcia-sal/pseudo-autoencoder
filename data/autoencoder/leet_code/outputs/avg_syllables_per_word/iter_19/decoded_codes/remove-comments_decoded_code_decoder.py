@@ -1,0 +1,33 @@
+from typing import List
+
+class Solution:
+    def removeComments(self, source: List[str]) -> List[str]:
+        in_block_comment = False
+        result = []
+        current_line = []
+
+        for line in source:
+            i = 0
+            while i < len(line):
+                if in_block_comment:
+                    # End of block comment detected
+                    if i + 1 < len(line) and line[i] == '*' and line[i + 1] == '/':
+                        in_block_comment = False
+                        i += 1  # Skip '/' as well
+                else:
+                    # Check for line comment
+                    if i + 1 < len(line) and line[i] == '/' and line[i + 1] == '/':
+                        break  # Ignore rest of the line
+                    # Start of block comment
+                    elif i + 1 < len(line) and line[i] == '/' and line[i + 1] == '*':
+                        in_block_comment = True
+                        i += 1  # Skip '*' as well
+                    else:
+                        current_line.append(line[i])
+                i += 1
+
+            if current_line and not in_block_comment:
+                result.append("".join(current_line))
+                current_line = []
+
+        return result

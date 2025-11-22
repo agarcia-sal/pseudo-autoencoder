@@ -1,0 +1,30 @@
+CLASS Solution  
+    FUNCTION minimumTimeRequired(jobs parameter NAMED jobs AS list of integers k parameter NAMED k AS integer) RETURNS integer  
+        SET number_of_jobs TO the LENGTH OF jobs  
+        SET subset_sums TO a list of LENGTH two RAISED TO THE POWER OF number_of_jobs FILLED WITH zero  
+        FOR index FROM zero TO number_of_jobs MINUS one  
+            FOR mask FROM zero TO two RAISED TO THE POWER OF index MINUS one  
+                SET new_mask TO mask PLUS two RAISED TO THE POWER OF index  
+                SET element at position new_mask OF subset_sums TO the element at position mask OF subset_sums PLUS the element at position index OF jobs  
+            END FOR  
+        END FOR  
+
+        FUNCTION dp(parameter k AS integer parameter mask AS integer) RETURNS integer  
+            IF k EQUALS one  
+                RETURN the element at position mask OF subset_sums  
+            END IF  
+            SET result TO positive infinity  
+            SET submask TO mask  
+            WHILE submask GREATER THAN zero  
+                SET candidate_one TO the result of FUNCTION dp WITH PARAMETERS k MINUS one AND mask XOR submask  
+                SET candidate_two TO the element at position submask OF subset_sums  
+                SET maximum_value TO the greater of candidate_one AND candidate_two  
+                SET result TO the lesser of result AND maximum_value  
+                SET submask TO submask MINUS one ANDed WITH mask  
+            END WHILE  
+            RETURN result  
+        END FUNCTION  
+
+        RETURN the result of FUNCTION dp WITH PARAMETERS k AND two RAISED TO THE POWER OF number_of_jobs MINUS one  
+    END FUNCTION  
+END CLASS

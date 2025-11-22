@@ -1,0 +1,38 @@
+CLASS Solution
+    FUNCTION stoneGameV(stoneValue)
+        DEFINE FUNCTION get_range_sum(left, right)
+            RETURN the ELEMENT AT position right PLUS ONE OF prefix_sum MINUS the ELEMENT AT position left OF prefix_sum
+        END FUNCTION
+
+        DEFINE FUNCTION dp(left, right)
+            IF left EQUALS right THEN
+                RETURN zero
+            END IF
+
+            SET max_score TO zero
+
+            FOR i FROM left TO right MINUS one INCLUSIVE
+                SET left_sum TO get_range_sum(left, i)
+                SET right_sum TO get_range_sum(i PLUS one, right)
+
+                IF left_sum LESS THAN right_sum THEN
+                    SET max_score TO the MAXIMUM OF max_score AND left_sum PLUS dp(left, i)
+                ELSE IF left_sum GREATER THAN right_sum THEN
+                    SET max_score TO the MAXIMUM OF max_score AND right_sum PLUS dp(i PLUS one, right)
+                ELSE
+                    SET max_score TO the MAXIMUM OF max_score AND left_sum PLUS dp(left, i) AND right_sum PLUS dp(i PLUS one, right)
+                END IF
+            END FOR
+
+            RETURN max_score
+        END FUNCTION
+
+        SET prefix_sum TO a LIST OF zero REPEATED the LENGTH OF stoneValue PLUS one TIMES
+
+        FOR i FROM zero TO the LENGTH OF stoneValue MINUS one INCLUSIVE
+            SET the ELEMENT AT position i PLUS one OF prefix_sum TO the ELEMENT AT position i OF prefix_sum PLUS the ELEMENT AT position i OF stoneValue
+        END FOR
+
+        RETURN dp(zero, the LENGTH OF stoneValue MINUS one)
+    END FUNCTION
+END CLASS

@@ -1,0 +1,52 @@
+CLASS Solution  
+    FUNCTION smallestMissingValueSubtree(parents, nums)  
+        CALL initialize empty mapping tree FROM default list  
+        SET n TO LENGTH OF parents  
+        
+        FOR index FROM 1 TO n MINUS 1  
+            APPEND index TO tree AT KEY parents AT index  
+        
+        SET node_with_one TO MINUS 1  
+        FOR index FROM 0 TO n MINUS 1  
+            IF nums AT index EQUALS 1  
+                SET node_with_one TO index  
+                BREAK  
+        
+        IF node_with_one EQUALS MINUS 1  
+            RETURN list OF 1 REPEATED n TIMES  
+        
+        SET result TO list OF 1 REPEATED n TIMES  
+        SET visited TO empty set  
+        
+        FUNCTION dfs(node)  
+            ADD node TO visited  
+            SET genetic_values TO set CONTAINING nums AT node  
+            
+            FOR each child IN tree AT node  
+                IF child NOT IN visited  
+                    SET child_values TO CALL dfs WITH child  
+                    ADD all elements of child_values TO genetic_values  
+            
+            SET smallest_missing TO 1  
+            WHILE smallest_missing IS IN genetic_values  
+                INCREMENT smallest_missing BY 1  
+            
+            SET result AT node TO smallest_missing  
+            RETURN genetic_values  
+        END FUNCTION  
+        
+        SET path TO empty list  
+        SET current TO node_with_one  
+        WHILE current NOT EQUALS MINUS 1  
+            APPEND current TO path  
+            SET current TO parents AT current  
+        
+        SET path_set TO set CONTAINING all elements IN path  
+        FOR each node IN path IN REVERSED ORDER  
+            IF node IN visited  
+                CONTINUE  
+            CALL dfs WITH node  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

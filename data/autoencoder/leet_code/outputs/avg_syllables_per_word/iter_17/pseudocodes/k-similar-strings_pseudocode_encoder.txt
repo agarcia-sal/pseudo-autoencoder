@@ -1,0 +1,31 @@
+CLASS Solution
+    FUNCTION kSimilarity(string_s1, string_s2)
+        FUNCTION neighbors(string_s)
+            SET index_i TO zero
+            WHILE index_i LESS THAN the LENGTH OF string_s AND element at position index_i of string_s EQUALS element at position index_i of string_s2
+                INCREMENT index_i BY one
+            END WHILE
+            FOR index_j FROM index_i PLUS one TO the LENGTH OF string_s MINUS one
+                IF element at position index_j of string_s EQUALS element at position index_i of string_s2 AND element at position index_j of string_s NOT EQUALS element at position index_j of string_s2
+                    CALL yield WITH string_concatenation_of substring from position zero TO index_i MINUS one of string_s PLUS element at position index_j of string_s PLUS substring from position index_i PLUS one TO index_j MINUS one of string_s PLUS element at position index_i of string_s PLUS substring from position index_j PLUS one TO end of string_s
+                END IF
+            END FOR
+        END FUNCTION
+
+        ASSIGN queue TO deque INITIALIZED WITH tuple of string_s1 AND zero
+        ASSIGN visited TO set INITIALIZED WITH element string_s1
+
+        WHILE queue is not empty
+            DESTRUCTURE queue.popleft TO string_s AND integer_swaps
+            IF string_s EQUALS string_s2
+                RETURN integer_swaps
+            END IF
+            FOR each neighbor_string IN neighbors CALLED WITH string_s
+                IF neighbor_string NOT IN visited
+                    ADD neighbor_string TO visited
+                    APPEND tuple of neighbor_string AND integer_swaps PLUS one TO queue
+                END IF
+            END FOR
+        END WHILE
+    END FUNCTION
+END CLASS

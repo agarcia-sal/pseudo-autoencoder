@@ -1,0 +1,31 @@
+CLASS Solution  
+    FUNCTION minChanges(nums, k)  
+        SET groups TO new mapping with default empty list  
+        FOR i FROM 0 TO LENGTH OF nums MINUS 1  
+            APPEND nums AT i TO groups AT key i MODULO k  
+        
+        SET freq TO list of k new mappings with default zero  
+        SET min_size TO list of k elements each SET TO infinity  
+        
+        FOR i FROM 0 TO k MINUS 1  
+            FOR each num IN groups AT i  
+                INCREMENT freq AT i FOR key num BY 1  
+            SET min_size AT i TO LENGTH OF groups AT i  
+        
+        SET dp TO list of size 2 POWER 10 filled with infinity  
+        SET dp AT 0 TO 0  
+        
+        FOR i FROM 0 TO k MINUS 1  
+            SET new_dp TO list of size 2 POWER 10 filled with infinity  
+            SET min_dp TO minimum VALUE IN dp  
+            FOR j FROM 0 TO 2 POWER 10 MINUS 1  
+                SET new_dp AT j TO min_dp PLUS min_size AT i  
+                FOR each num, count IN freq AT i  
+                    SET alternative TO dp AT (j XOR num) PLUS min_size AT i MINUS count  
+                    IF alternative LESS THAN new_dp AT j  
+                        SET new_dp AT j TO alternative  
+            SET dp TO new_dp  
+        
+        RETURN dp AT 0  
+    END FUNCTION  
+END CLASS

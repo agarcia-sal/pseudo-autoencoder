@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION trapRainWater(heightMap)  
+        IF heightMap IS EMPTY OR heightMap AT ZERO INDEX IS EMPTY  
+            RETURN 0  
+        
+        SET m TO LENGTH OF heightMap  
+        SET n TO LENGTH OF heightMap AT ZERO INDEX  
+        SET visited TO new 2D list of size m BY n FILLED WITH False  
+        SET min_heap TO empty list  
+        
+        FOR index i FROM 0 TO m MINUS 1  
+            CALL heap push ON min_heap WITH (heightMap AT i AT ZERO INDEX, i, ZERO)  
+            CALL heap push ON min_heap WITH (heightMap AT i AT n MINUS 1, i, n MINUS 1)  
+            SET visited AT i AT ZERO INDEX TO True  
+            SET visited AT i AT n MINUS 1 TO True  
+        
+        FOR index j FROM 0 TO n MINUS 1  
+            CALL heap push ON min_heap WITH (heightMap AT ZERO INDEX AT j, ZERO, j)  
+            CALL heap push ON min_heap WITH (heightMap AT m MINUS 1 AT j, m MINUS 1, j)  
+            SET visited AT ZERO INDEX AT j TO True  
+            SET visited AT m MINUS 1 AT j TO True  
+        
+        SET directions TO list containing (-1, 0), (1, 0), (0, -1), (0, 1)  
+        SET water_trapped TO 0  
+        
+        WHILE min_heap IS NOT EMPTY  
+            CALL heap pop FROM min_heap AND ASSIGN TO (height, x, y)  
+            
+            FOR each (dx, dy) IN directions  
+                SET nx TO x PLUS dx  
+                SET ny TO y PLUS dy  
+                
+                IF nx IS GREATER THAN OR EQUAL TO 0 AND nx IS LESS THAN m AND ny IS GREATER THAN OR EQUAL TO 0 AND ny IS LESS THAN n AND visited AT nx AT ny IS False  
+                    SET visited AT nx AT ny TO True  
+                    IF height IS GREATER THAN heightMap AT nx AT ny  
+                        INCREMENT water_trapped BY height MINUS heightMap AT nx AT ny  
+                    CALL heap push ON min_heap WITH (maximum of height AND heightMap AT nx AT ny, nx, ny)  
+        
+        RETURN water_trapped  
+    END FUNCTION  
+END CLASS

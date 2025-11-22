@@ -1,0 +1,34 @@
+CLASS Solution  
+    FUNCTION wordBreak(s STRING, wordDict LIST OF STRING) RETURNS LIST OF STRING  
+        SET wordSet TO CONVERT wordDict TO A SET TO ALLOW CONSTANT TIME MEMBERSHIP CHECKS  
+        SET memo TO AN EMPTY DICTIONARY TO STORE SENTENCES THAT CAN BE FORMED STARTING FROM EACH INDEX  
+        
+        FUNCTION backtrack(start INTEGER) RETURNS LIST OF STRING  
+            IF start EXISTS AS A KEY IN memo  
+                RETURN THE VALUE ASSOCIATED WITH start IN memo  
+            END IF  
+            IF start EQUALS THE LENGTH OF s  
+                RETURN A LIST CONTAINING AN EMPTY STRING  
+            END IF  
+            
+            SET res TO AN EMPTY LIST  
+            FOR end FROM start PLUS ONE TO THE LENGTH OF s INCLUSIVE  
+                SET word TO THE SUBSTRING FROM POSITION start UP TO BUT NOT INCLUDING POSITION end OF s  
+                IF word EXISTS IN wordSet  
+                    FOR each sentence IN backtrack(end)  
+                        IF sentence IS A NON-EMPTY STRING  
+                            APPEND THE CONCATENATION OF word, A SINGLE SPACE, AND sentence TO res  
+                        ELSE  
+                            APPEND word TO res  
+                        END IF  
+                    END FOR  
+                END IF  
+            END FOR  
+            
+            SET memo AT KEY start TO res  
+            RETURN res  
+        END FUNCTION  
+        
+        RETURN backtrack WITH PARAMETER zero  
+    END FUNCTION  
+END CLASS

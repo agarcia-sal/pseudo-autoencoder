@@ -1,0 +1,69 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val EQUALS zero left EQUALS none right EQUALS none  
+        SET self dot val TO val  
+        SET self dot left TO left  
+        SET self dot right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETERS values OF TYPE list  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO NEW INSTANCE OF TreeNode WITH PARAMETER element at position zero of values  
+    SET index_counter TO one  
+    SET node_queue TO NEW DEQUE  
+    APPEND root TO node_queue  
+    WHILE node_queue IS NOT empty  
+        SET current_node TO REMOVE first element FROM node_queue  
+        IF index_counter IS LESS THAN the LENGTH OF values AND element at position index_counter of values IS NOT none  
+            SET current_node dot left TO NEW INSTANCE OF TreeNode WITH PARAMETER element at position index_counter of values  
+            APPEND current_node dot left TO node_queue  
+        END IF  
+        INCREMENT index_counter BY one  
+        IF index_counter IS LESS THAN the LENGTH OF values AND element at position index_counter of values IS NOT none  
+            SET current_node dot right TO NEW INSTANCE OF TreeNode WITH PARAMETER element at position index_counter of values  
+            APPEND current_node dot right TO node_queue  
+        END IF  
+        INCREMENT index_counter BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF the val attribute of p IS NOT EQUALS TO the val attribute of q  
+        RETURN false  
+    ELSE  
+        RETURN the result of calling is_same_tree WITH PARAMETERS the left attribute of p AND the left attribute of q AND the result of calling is_same_tree WITH PARAMETERS the right attribute of p AND the right attribute of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION rightSideView WITH PARAMETERS self root  
+        IF root IS none  
+            RETURN an empty list  
+        END IF  
+        SET right_side_view TO an empty list  
+        SET node_queue TO NEW DEQUE INITIALIZED WITH root  
+        WHILE node_queue IS NOT empty  
+            SET level_length TO the LENGTH OF node_queue  
+            FOR index_counter FROM zero TO level_length MINUS one  
+                SET current_node TO REMOVE first element FROM node_queue  
+                IF index_counter EQUALS level_length MINUS one  
+                    APPEND the val attribute of current_node TO right_side_view  
+                END IF  
+                IF the left attribute of current_node IS NOT none  
+                    APPEND the left attribute of current_node TO node_queue  
+                END IF  
+                IF the right attribute of current_node IS NOT none  
+                    APPEND the right attribute of current_node TO node_queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        RETURN right_side_view  
+    END FUNCTION  
+END CLASS

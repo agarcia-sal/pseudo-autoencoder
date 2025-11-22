@@ -1,0 +1,68 @@
+```
+CLASS UnionFind
+    FUNCTION __init__(self, n)
+        SET self.parent TO list of integers from 0 to n - 1
+        SET self.rank TO list of zeros of length n
+    END FUNCTION
+
+    FUNCTION find(self, x)
+        IF self.parent[x] IS NOT x THEN
+            SET self.parent[x] TO self.find(self.parent[x])
+        END IF
+        RETURN self.parent[x]
+    END FUNCTION
+
+    FUNCTION union(self, x, y)
+        SET rootX TO self.find(x)
+        SET rootY TO self.find(y)
+        IF rootX IS NOT rootY THEN
+            IF self.rank[rootX] > self.rank[rootY] THEN
+                SET self.parent[rootY] TO rootX
+            ELSE IF self.rank[rootX] < self.rank[rootY] THEN
+                SET self.parent[rootX] TO rootY
+            ELSE
+                SET self.parent[rootY] TO rootX
+                INCREMENT self.rank[rootX] BY 1
+            END IF
+        END IF
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION latestDayToCross(self, row, col, cells)
+        SET grid TO a 2D list with dimensions row by col, all initialized to 1
+        SET uf TO new UnionFind with size row * col + 2
+        SET TOP TO row * col
+        SET BOTTOM TO row * col + 1
+        SET directions TO list of tuples: (-1, 0), (1, 0), (0, -1), (0, 1)
+        
+        FOR day FROM length of cells - 1 DOWN TO 0
+            SET r TO cells[day][0] MINUS 1
+            SET c TO cells[day][1] MINUS 1
+            SET grid[r][c] TO 0
+            
+            FOR each (dr, dc) IN directions
+                SET nr TO r PLUS dr
+                SET nc TO c PLUS dc
+                IF nr IS BETWEEN 0 AND row - 1 AND nc IS BETWEEN 0 AND col - 1 AND grid[nr][nc] EQUALS 0 THEN
+                    CALL uf.union WITH (r * col + c, nr * col + nc)
+                END IF
+            END FOR
+            
+            IF r EQUALS 0 THEN
+                CALL uf.union WITH (r * col + c, TOP)
+            END IF
+            
+            IF r EQUALS row MINUS 1 THEN
+                CALL uf.union WITH (r * col + c, BOTTOM)
+            END IF
+            
+            IF uf.find(TOP) EQUALS uf.find(BOTTOM) THEN
+                RETURN day
+            END IF
+        END FOR
+        
+        RETURN 0
+    END FUNCTION
+END CLASS
+```

@@ -1,0 +1,43 @@
+CLASS Solution
+    FUNCTION reversePairs(nums)
+        FUNCTION merge_and_count(nums, start, end)
+            IF start >= end THEN
+                RETURN 0
+            END IF
+
+            SET mid TO (start + end) DIVIDED BY 2
+            SET count TO merge_and_count(nums, start, mid) + merge_and_count(nums, mid + 1, end)
+
+            SET j TO mid + 1
+            FOR i FROM start TO mid
+                WHILE j <= end AND nums[i] > 2 * nums[j] DO
+                    INCREMENT j BY 1
+                END WHILE
+                INCREMENT count BY j - (mid + 1)
+            END FOR
+
+            SET merged TO empty list
+            SET left TO start
+            SET right TO mid + 1
+
+            WHILE left <= mid AND right <= end DO
+                IF nums[left] <= nums[right] THEN
+                    APPEND nums[left] TO merged
+                    INCREMENT left BY 1
+                ELSE
+                    APPEND nums[right] TO merged
+                    INCREMENT right BY 1
+                END IF
+            END WHILE
+
+            APPEND elements from nums[left TO mid] TO merged
+            APPEND elements from nums[right TO end] TO merged
+
+            SET elements from nums[start TO end] TO merged
+
+            RETURN count
+        END FUNCTION
+
+        RETURN merge_and_count(nums, 0, LENGTH OF nums - 1)
+    END FUNCTION
+END CLASS

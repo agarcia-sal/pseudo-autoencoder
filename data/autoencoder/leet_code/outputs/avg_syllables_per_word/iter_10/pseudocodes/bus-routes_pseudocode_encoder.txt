@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION numBusesToDestination(routes, source, target)  
+        IF source EQUALS target  
+            RETURN zero  
+        END IF  
+
+        SET stop_to_buses TO a new mapping from stop TO list of buses  
+        FOR each bus WITH index bus IN routes  
+            FOR each stop IN routes at position bus  
+                APPEND bus TO the list at stop_to_buses for key stop  
+            END FOR  
+        END FOR  
+
+        SET bus_queue TO a new double-ended queue  
+        SET visited_buses TO an empty set  
+        SET visited_stops TO an empty set  
+
+        FOR each bus IN the list at stop_to_buses for key source  
+            APPEND the tuple of bus and one TO bus_queue  
+            ADD bus TO visited_buses  
+            ADD source TO visited_stops  
+        END FOR  
+
+        WHILE bus_queue is not empty  
+            REMOVE first element FROM bus_queue and SET it TO current_bus and bus_count  
+
+            FOR each stop IN routes at position current_bus  
+                IF stop EQUALS target  
+                    RETURN bus_count  
+                END IF  
+
+                IF stop NOT IN visited_stops  
+                    ADD stop TO visited_stops  
+                    FOR each next_bus IN the list at stop_to_buses for key stop  
+                        IF next_bus NOT IN visited_buses  
+                            ADD next_bus TO visited_buses  
+                            APPEND the tuple of next_bus and bus_count PLUS one TO bus_queue  
+                        END IF  
+                    END FOR  
+                END IF  
+            END FOR  
+        END WHILE  
+
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,21 @@
+CLASS Solution
+    FUNCTION getHint(secret, guess)
+        SET bulls TO zero
+        SET cows TO zero
+        CALL initialize_default_dictionary WITH parameter integer_type RETURNING secret_count
+        CALL initialize_default_dictionary WITH parameter integer_type RETURNING guess_count
+        FOR each pair element s AND g IN parallel elements FROM secret AND guess
+            IF s EQUALS g
+                INCREMENT bulls BY one
+            ELSE
+                INCREMENT the element at position s OF secret_count BY one
+                INCREMENT the element at position g OF guess_count BY one
+            END IF
+        END FOR
+        FOR each element digit IN the collection of keys FROM secret_count
+            INCREMENT cows BY the MINIMUM OF the element at position digit OF secret_count AND the element at position digit OF guess_count
+        END FOR
+        CALL format_result_string WITH parameters bulls AND cows RETURNING result
+        RETURN result
+    END FUNCTION
+END CLASS

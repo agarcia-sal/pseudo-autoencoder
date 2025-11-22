@@ -1,0 +1,54 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN None  
+    SET root TO TreeNode WITH val values AT index 0  
+    SET i TO 1  
+    INITIALIZE queue AS empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO REMOVE first element FROM queue  
+        IF i IS LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.left TO TreeNode WITH val values AT i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i IS LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.right TO TreeNode WITH val values AT i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION largestBSTSubtree(self, root)  
+        FUNCTION dfs(node)  
+            IF node IS None  
+                RETURN positive infinity, negative infinity, 0  
+            SET left_min, left_max, left_size TO dfs(node.left)  
+            SET right_min, right_max, right_size TO dfs(node.right)  
+            IF left_max IS LESS THAN node.val AND node.val IS LESS THAN right_min  
+                RETURN minimum OF node.val AND left_min, maximum OF node.val AND right_max, left_size PLUS right_size PLUS 1  
+            RETURN negative infinity, positive infinity, maximum OF left_size AND right_size  
+        END FUNCTION  
+        RETURN dfs(root) AT index 2  
+    END FUNCTION  
+END CLASS

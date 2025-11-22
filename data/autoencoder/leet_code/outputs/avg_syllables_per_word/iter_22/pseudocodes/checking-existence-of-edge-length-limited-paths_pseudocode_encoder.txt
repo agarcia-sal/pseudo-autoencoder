@@ -1,0 +1,63 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.parent TO list of elements from zero to size MINUS one  
+        SET self.rank TO list of size elements each SET TO one  
+    END FUNCTION  
+  
+    FUNCTION find(self, p)  
+        IF element at position p of self.parent NOT EQUALS p  
+            SET element at position p of self.parent TO self.find(element at position p of self.parent)  
+        END IF  
+        RETURN element at position p of self.parent  
+    END FUNCTION  
+  
+    FUNCTION union(self, p, q)  
+        SET rootP TO self.find(p)  
+        SET rootQ TO self.find(q)  
+        IF rootP EQUALS rootQ  
+            RETURN False  
+        END IF  
+        IF element at position rootP of self.rank GREATER THAN element at position rootQ of self.rank  
+            SET element at position rootQ of self.parent TO rootP  
+        ELSE IF element at position rootP of self.rank LESS THAN element at position rootQ of self.rank  
+            SET element at position rootP of self.parent TO rootQ  
+        ELSE  
+            SET element at position rootQ of self.parent TO rootP  
+            INCREMENT element at position rootP of self.rank BY one  
+        END IF  
+        RETURN True  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION distanceLimitedPathsExist(self, n, edgeList, queries)  
+        SORT edgeList BY the third element of each element in ascending order  
+  
+        SET indexedQueries TO empty list  
+        FOR each index i FROM zero TO the LENGTH OF queries MINUS one  
+            LET p, q, limit BE the first element, second element, and third element respectively of element at position i of queries  
+            APPEND tuple of limit, p, q, i TO indexedQueries  
+        END FOR  
+        SORT indexedQueries BY the first element of each tuple in ascending order  
+  
+        SET uf TO new UnionFind OBJECT INITIALIZED WITH n  
+  
+        SET edgeIndex TO zero  
+        SET numEdges TO the LENGTH OF edgeList  
+        SET results TO list of LENGTH OF queries elements each SET TO False  
+  
+        FOR each tuple of limit, p, q, originalIndex IN indexedQueries  
+            WHILE edgeIndex LESS THAN numEdges AND the third element of element at position edgeIndex of edgeList LESS THAN limit  
+                LET u, v BE the first element and second element respectively of element at position edgeIndex of edgeList  
+                PERFORM uf.union WITH u AND v  
+                INCREMENT edgeIndex BY one  
+            END WHILE  
+  
+            IF uf.find(p) EQUALS uf.find(q)  
+                SET element at position originalIndex of results TO True  
+            END IF  
+        END FOR  
+  
+        RETURN results  
+    END FUNCTION  
+END CLASS

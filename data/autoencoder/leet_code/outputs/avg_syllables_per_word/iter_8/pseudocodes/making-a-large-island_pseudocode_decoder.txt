@@ -1,0 +1,52 @@
+CLASS Solution  
+    FUNCTION largestIsland(grid)  
+        IF grid IS EMPTY OR first element of grid IS EMPTY  
+            RETURN 0  
+        
+        SET n TO LENGTH OF grid  
+        SET directions TO list of (0,1), (1,0), (0,-1), (-1,0)  
+        
+        FUNCTION is_valid(x, y)  
+            RETURN 0 LESS THAN OR EQUAL TO x AND x LESS THAN n AND 0 LESS THAN OR EQUAL TO y AND y LESS THAN n  
+        END FUNCTION  
+        
+        FUNCTION dfs(x, y, index)  
+            SET area TO 1  
+            SET grid at position (x, y) TO index  
+            FOR each (dx, dy) IN directions  
+                SET nx TO x PLUS dx  
+                SET ny TO y PLUS dy  
+                IF is_valid(nx, ny) AND grid at position (nx, ny) EQUALS 1  
+                    SET area TO area PLUS dfs(nx, ny, index)  
+            RETURN area  
+        END FUNCTION  
+        
+        SET island_areas TO empty mapping  
+        SET index TO 2  
+        
+        FOR i FROM 0 TO n MINUS 1  
+            FOR j FROM 0 TO n MINUS 1  
+                IF grid at position (i, j) EQUALS 1  
+                    SET island_areas at key index TO dfs(i, j, index)  
+                    INCREMENT index BY 1  
+        
+        IF island_areas IS EMPTY  
+            RETURN 1  
+        
+        SET max_island_size TO maximum value in island_areas  
+        
+        FOR i FROM 0 TO n MINUS 1  
+            FOR j FROM 0 TO n MINUS 1  
+                IF grid at position (i, j) EQUALS 0  
+                    SET neighbors TO empty set  
+                    FOR each (dx, dy) IN directions  
+                        SET nx TO i PLUS dx  
+                        SET ny TO j PLUS dy  
+                        IF is_valid(nx, ny) AND grid at position (nx, ny) GREATER THAN 1  
+                            ADD grid at position (nx, ny) TO neighbors  
+                    SET current_island_size TO 1 PLUS sum of island_areas at keys in neighbors  
+                    SET max_island_size TO greater of max_island_size AND current_island_size  
+        
+        RETURN max_island_size  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,51 @@
+CLASS Solution  
+    FUNCTION shoppingOffers(price WITH TYPE List of integers, special WITH TYPE List of Lists of integers, needs WITH TYPE List of integers) RETURNS integer  
+        SET filtered_special TO empty list  
+        FOR each offer IN special  
+            SET total_items_in_offer TO zero  
+            FOR each index FROM zero TO the LENGTH OF offer MINUS one  
+                INCREMENT total_items_in_offer BY element at position index of offer  
+            END FOR  
+            SET offer_cost TO element at the last position of offer  
+            SET price_sum TO zero  
+            FOR each index FROM zero TO the LENGTH OF price MINUS one  
+                INCREMENT price_sum BY element at position index of price MULTIPLIED BY element at position index of offer  
+            END FOR  
+            IF total_items_in_offer GREATER THAN zero AND offer_cost LESS THAN price_sum  
+                APPEND offer TO filtered_special  
+            END IF  
+        END FOR  
+        SET special TO filtered_special  
+        
+        FUNCTION dfs(current_needs WITH TYPE tuple of integers) RETURNS integer  
+            SET min_cost TO zero  
+            FOR each index FROM zero TO the LENGTH OF price MINUS one  
+                INCREMENT min_cost BY element at position index of price MULTIPLIED BY element at position index of current_needs  
+            END FOR  
+            
+            FOR each offer IN special  
+                SET new_needs TO empty list  
+                FOR each index FROM zero TO the LENGTH OF current_needs MINUS one  
+                    SET remaining TO element at position index of current_needs MINUS element at position index of offer  
+                    APPEND remaining TO new_needs  
+                END FOR  
+                SET can_use_offer TO true  
+                FOR each n IN new_needs  
+                    IF n LESS THAN zero  
+                        SET can_use_offer TO false  
+                        BREAK  
+                    END IF  
+                END FOR  
+                IF can_use_offer IS true  
+                    SET cost_with_offer TO element at the last position of offer PLUS dfs(tuple formed by new_needs)  
+                    IF cost_with_offer LESS THAN min_cost  
+                        SET min_cost TO cost_with_offer  
+                    END IF  
+                END IF  
+            END FOR  
+            RETURN min_cost  
+        END FUNCTION  
+        
+        RETURN dfs(tuple formed by needs)  
+    END FUNCTION  
+END CLASS

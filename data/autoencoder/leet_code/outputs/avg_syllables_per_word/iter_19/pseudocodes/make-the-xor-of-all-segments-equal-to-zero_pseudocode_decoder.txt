@@ -1,0 +1,37 @@
+CLASS Solution  
+    FUNCTION minChanges(nums AS List OF Integer, k AS Integer) RETURNS Integer  
+        SET groups TO a new mapping from Integer TO list of Integer with default empty list  
+        FOR index FROM zero TO the LENGTH OF nums MINUS one  
+            APPEND the element at position index of nums TO the list at position index MODULO k of groups  
+        END FOR  
+  
+        SET freq TO a list containing k new mappings from Integer TO Integer with default zero  
+        SET min_size TO a list of k elements each initialized to positive infinite  
+        FOR position FROM zero TO k MINUS one  
+            FOR each number IN the list at position position of groups  
+                INCREMENT the value at position number of the mapping at position position of freq BY one  
+            END FOR  
+            SET the element at position position of min_size TO the LENGTH OF the list at position position of groups  
+        END FOR  
+  
+        SET dp TO a list of size two RAISED TO the power of ten each initialized to positive infinite  
+        SET the element at position zero of dp TO zero  
+  
+        FOR position FROM zero TO k MINUS one  
+            SET new_dp TO a list of size two RAISED TO the power of ten each initialized to positive infinite  
+            SET min_dp TO the minimum value found in dp  
+            FOR mask FROM zero TO two RAISED TO the power of ten MINUS one  
+                SET the element at position mask of new_dp TO min_dp PLUS the element at position position of min_size  
+                FOR each pair number and count IN the mapping at position position of freq  
+                    SET possible_value TO the element at position the exclusive OR of mask and number of dp PLUS the element at position position of min_size MINUS count  
+                    IF possible_value IS LESS THAN the element at position mask of new_dp  
+                        SET the element at position mask of new_dp TO possible_value  
+                    END IF  
+                END FOR  
+            END FOR  
+            ASSIGN dp TO new_dp  
+        END FOR  
+  
+        RETURN the element at position zero of dp  
+    END FUNCTION  
+END CLASS

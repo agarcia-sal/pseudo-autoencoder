@@ -1,0 +1,41 @@
+CLASS Solution
+    FUNCTION criticalConnections(n, connections)
+        FUNCTION dfs(node, parent, disc, low, time, graph, critical)
+            SET element at position node of list disc TO element at position zero of list time
+            SET element at position node of list low TO element at position zero of list time
+            INCREMENT element at position zero of list time BY one
+
+            FOR each neighbor IN element at position node of list graph
+                IF element at position neighbor of list disc EQUALS negative one
+                    CALL dfs WITH parameters neighbor, node, disc, low, time, graph, critical
+                    SET element at position node of list low TO the MINIMUM OF element at position node of list low AND element at position neighbor of list low
+                    IF element at position neighbor of list low GREATER THAN element at position node of list disc
+                        APPEND list containing node AND neighbor TO list critical
+                    END IF
+                ELSE IF neighbor NOT EQUAL TO parent
+                    SET element at position node of list low TO the MINIMUM OF element at position node of list low AND element at position neighbor of list disc
+                END IF
+            END FOR
+        END FUNCTION
+
+        SET graph TO an empty list repeated n times
+        FOR each pair u, v IN list connections
+            APPEND v TO element at position u of list graph
+            APPEND u TO element at position v of list graph
+        END FOR
+
+        SET disc TO list of negative one repeated n times
+        SET low TO list of negative one repeated n times
+        SET time TO list containing zero
+
+        SET critical TO empty list
+
+        FOR node FROM zero TO n MINUS one
+            IF element at position node of list disc EQUALS negative one
+                CALL dfs WITH parameters node, negative one, disc, low, time, graph, critical
+            END IF
+        END FOR
+
+        RETURN critical
+    END FUNCTION
+END CLASS

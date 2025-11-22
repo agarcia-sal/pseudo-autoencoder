@@ -1,0 +1,79 @@
+CLASS Solution  
+    FUNCTION minimumOperations(grid)  
+        FUNCTION bfs()  
+            SET queue TO an empty double ended queue  
+            FOR u FROM zero TO n MINUS one  
+                IF element at position u of match EQUALS negative one  
+                    SET element at position u of dist TO zero  
+                    APPEND u TO queue  
+                ELSE  
+                    SET element at position u of dist TO infinity  
+                END IF  
+            END FOR  
+            SET element at position negative one of dist TO infinity  
+            WHILE queue is not empty  
+                REMOVE element from the left end of queue AND SET TO u  
+                IF element at position u of dist LESS THAN element at position negative one of dist  
+                    FOR each v IN element at position u of graph  
+                        IF element at position element at position v of match of dist EQUALS infinity  
+                            SET element at position element at position v of match of dist TO element at position u of dist PLUS one  
+                            APPEND element at position v of match TO queue  
+                        END IF  
+                    END FOR  
+                END IF  
+            END WHILE  
+            RETURN element at position negative one of dist LESS THAN infinity  
+        END FUNCTION  
+        
+        FUNCTION dfs(u)  
+            IF u NOT EQUALS negative one  
+                FOR each v IN element at position u of graph  
+                    IF element at position element at position v of match of dist EQUALS element at position u of dist PLUS one  
+                        IF dfs(element at position v of match)  
+                            SET element at position v of match TO u  
+                            SET element at position u of match TO v  
+                            RETURN True  
+                        END IF  
+                    END IF  
+                END FOR  
+                SET element at position u of dist TO infinity  
+                RETURN False  
+            END IF  
+            RETURN True  
+        END FUNCTION  
+        
+        SET rows TO the LENGTH OF grid  
+        SET cols TO the LENGTH OF element at position zero of grid  
+        SET n TO rows MULTIPLIED BY cols  
+        SET graph TO a list containing n PLUS one empty sets  
+        SET match TO a list containing n PLUS one negative ones  
+        SET dist TO a list containing n PLUS one zeros  
+        
+        FOR r FROM zero TO rows MINUS one  
+            FOR c FROM zero TO cols MINUS one  
+                IF element at position r of grid AT position c EQUALS one  
+                    SET u TO r MULTIPLIED BY cols PLUS c  
+                    FOR each pair dr and dc IN the list of pairs negative one and zero PLUS one and zero zero and negative one zero and plus one  
+                        SET nr TO r PLUS dr  
+                        SET nc TO c PLUS dc  
+                        IF nr GREATER THAN OR EQUAL TO zero AND nr LESS THAN rows AND nc GREATER THAN OR EQUAL TO zero AND nc LESS THAN cols AND element at position nr of grid AT position nc EQUALS one  
+                            SET v TO nr MULTIPLIED BY cols PLUS nc  
+                            ADD v TO element at position u of graph  
+                        END IF  
+                    END FOR  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET matching TO zero  
+        WHILE bfs()  
+            FOR u FROM zero TO n MINUS one  
+                IF element at position u of match EQUALS negative one AND dfs(u)  
+                    INCREMENT matching BY one  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN matching  
+    END FUNCTION  
+END CLASS

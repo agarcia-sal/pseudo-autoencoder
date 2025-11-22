@@ -1,0 +1,60 @@
+CLASS Solution
+    FUNCTION cherryPickup(grid)
+        SET n TO the LENGTH OF grid
+        IF element at position zero of element at position zero of grid EQUALS negative one OR element at position n MINUS one of element at position n MINUS one of grid EQUALS negative one
+            RETURN zero
+        END IF
+
+        CALL InitializeDPTable WITH n RETURNS dp
+        SET element at position zero of element at position zero of element at position zero of dp TO element at position zero of element at position zero of grid
+
+        CALL GetDirections FOR right AND down RETURNS directions
+
+        FOR t FROM one TO (two MULTIPLIED BY n) MINUS one
+            FOR i1 FROM the MAXIMUM OF zero AND (t MINUS (n MINUS one)) TO the MINIMUM OF n AND (t PLUS one) MINUS one
+                FOR i2 FROM the MAXIMUM OF zero AND (t MINUS (n MINUS one)) TO the MINIMUM OF n AND (t PLUS one) MINUS one
+                    SET j1 TO t MINUS i1
+                    SET j2 TO t MINUS i2
+
+                    IF element at position i1 of element at position j1 of grid EQUALS negative one OR element at position i2 of element at position j2 of grid EQUALS negative one
+                        CONTINUE TO next iteration
+                    END IF
+
+                    SET prev_max TO negative one
+
+                    FOR each direction_one IN directions
+                        FOR each direction_two IN directions
+                            SET pi1 TO i1 MINUS the first element of direction_one
+                            SET pj1 TO j1 MINUS the second element of direction_one
+                            SET pi2 TO i2 MINUS the first element of direction_two
+                            SET pj2 TO j2 MINUS the second element of direction_two
+
+                            IF pi1 GREATER THAN OR EQUAL TO zero AND pi1 LESS THAN n AND pj1 GREATER THAN OR EQUAL TO zero AND pj1 LESS THAN n AND pi2 GREATER THAN OR EQUAL TO zero AND pi2 LESS THAN n AND pj2 GREATER THAN OR EQUAL TO zero AND pj2 LESS THAN n
+                                SET prev_max TO the MAXIMUM OF prev_max AND element at position pi1 of element at position pi2 of element at position pj1 of dp
+                            END IF
+                        END FOR
+                    END FOR
+
+                    IF prev_max GREATER THAN OR EQUAL TO zero
+                        IF i1 EQUALS i2
+                            SET cherries TO element at position i1 of element at position j1 of grid
+                        ELSE
+                            SET cherries TO element at position i1 of element at position j1 of grid PLUS element at position i2 of element at position j2 of grid
+                        END IF
+                        SET element at position i1 of element at position i2 of element at position j1 of dp TO prev_max PLUS cherries
+                    END IF
+                END FOR
+            END FOR
+        END FOR
+
+        RETURN the MAXIMUM OF zero AND element at position n MINUS one of element at position n MINUS one of element at position n MINUS one of dp
+    END FUNCTION
+
+    FUNCTION InitializeDPTable WITH n
+        RETURN auxiliary data structure representing three dimensional list with dimensions n BY n BY n filled with negative one
+    END FUNCTION
+
+    FUNCTION GetDirections
+        RETURN list containing pairs zero and one, one and zero
+    END FUNCTION
+END CLASS

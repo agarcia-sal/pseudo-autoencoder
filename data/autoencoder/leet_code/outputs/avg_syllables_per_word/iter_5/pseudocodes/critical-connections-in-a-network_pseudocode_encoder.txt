@@ -1,0 +1,38 @@
+CLASS Solution  
+    FUNCTION criticalConnections(n, connections)  
+        FUNCTION dfs(node, parent, disc, low, time, graph, critical)  
+            SET disc AT node TO time AT index zero  
+            SET low AT node TO time AT index zero  
+            INCREMENT time AT index zero BY one  
+            
+            FOR each neighbor IN graph AT node  
+                IF disc AT neighbor EQUALS negative one THEN  
+                    CALL dfs WITH neighbor, node, disc, low, time, graph, critical  
+                    SET low AT node TO minimum OF low AT node AND low AT neighbor  
+                    IF low AT neighbor GREATER THAN disc AT node THEN  
+                        APPEND list of node and neighbor TO critical  
+                ELSE IF neighbor NOT EQUAL TO parent THEN  
+                    SET low AT node TO minimum OF low AT node AND disc AT neighbor  
+        END FUNCTION  
+        
+        FUNCTION buildGraph(n, connections)  
+            SET graph TO list OF empty lists OF length n  
+            FOR each u, v IN connections  
+                APPEND v TO graph AT u  
+                APPEND u TO graph AT v  
+            RETURN graph  
+        END FUNCTION  
+        
+        SET graph TO buildGraph WITH n, connections  
+        SET disc TO list OF negative one REPEATED n TIMES  
+        SET low TO list OF negative one REPEATED n TIMES  
+        SET time TO list WITH single element zero  
+        SET critical TO empty list  
+        
+        FOR node FROM zero TO n MINUS one  
+            IF disc AT node EQUALS negative one THEN  
+                CALL dfs WITH node, negative one, disc, low, time, graph, critical  
+        
+        RETURN critical  
+    END FUNCTION  
+END CLASS

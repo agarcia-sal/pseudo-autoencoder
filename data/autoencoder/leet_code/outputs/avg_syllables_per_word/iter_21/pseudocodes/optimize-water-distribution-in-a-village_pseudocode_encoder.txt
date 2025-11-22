@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION minCostToSupplyWater(n, wells, pipes)  
+        FOR index FROM zero TO n MINUS one  
+            CALL append A LIST CONTAINING zero, index PLUS one, and element at position index OF wells TO pipes  
+        END FOR  
+        
+        CALL sort pipes BY the third element OF each sublist IN pipes  
+        
+        SET parent TO A LIST OF INTEGERS FROM zero TO n INCLUSIVE  
+        
+        FUNCTION find(x)  
+            IF element at position x OF parent NOT EQUALS x  
+                SET element at position x OF parent TO CALL find WITH PARAMETERS element at position x OF parent  
+            END IF  
+            RETURN element at position x OF parent  
+        END FUNCTION  
+        
+        FUNCTION union(x, y)  
+            SET rootX TO CALL find WITH PARAMETERS x  
+            SET rootY TO CALL find WITH PARAMETERS y  
+            IF rootX NOT EQUALS rootY  
+                SET element at position rootX OF parent TO rootY  
+                RETURN True  
+            END IF  
+            RETURN False  
+        END FUNCTION  
+        
+        SET min_cost TO zero  
+        FOR each sublist IN pipes  
+            SET house1 TO element at position zero OF sublist  
+            SET house2 TO element at position one OF sublist  
+            SET cost TO element at position two OF sublist  
+            IF CALL union WITH PARAMETERS house1, house2 RETURNS True  
+                INCREMENT min_cost BY cost  
+            END IF  
+        END FOR  
+        
+        RETURN min_cost  
+    END FUNCTION  
+END CLASS

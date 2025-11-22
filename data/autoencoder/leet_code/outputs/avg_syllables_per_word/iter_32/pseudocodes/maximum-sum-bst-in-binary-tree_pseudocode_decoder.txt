@@ -1,0 +1,71 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values EQUALS empty  
+        RETURN none  
+    END IF  
+    SET root TO a new TreeNode with value equal to element at position one of values  
+    SET i TO one  
+    SET queue TO an empty double ended queue  
+    APPEND root TO queue  
+    WHILE queue is not empty  
+        SET node TO element removed from the left of queue  
+        IF i LESS THAN length of values AND element at position i of values NOT EQUALS none  
+            SET node.left TO a new TreeNode with value equal to element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN length of values AND element at position i of values NOT EQUALS none  
+            SET node.right TO a new TreeNode with value equal to element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p EQUALS none AND q EQUALS none  
+        RETURN true  
+    ELSE IF p EQUALS none OR q EQUALS none  
+        RETURN false  
+    ELSE IF value of p NOT EQUALS value of q  
+        RETURN false  
+    ELSE  
+        RETURN is_same_tree(left child of p, left child of q) AND is_same_tree(right child of p, right child of q)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION maxSumBST(self, root)  
+        SET self.max_sum TO zero  
+        
+        FUNCTION helper(node)  
+            IF node EQUALS none  
+                RETURN true AND zero AND positive infinity AND negative infinity  
+            END IF  
+            
+            SET left_is_bst, left_sum, left_min, left_max TO helper(left child of node)  
+            SET right_is_bst, right_sum, right_min, right_max TO helper(right child of node)  
+            
+            IF left_is_bst EQUALS true AND right_is_bst EQUALS true AND left_max LESS THAN value of node AND value of node LESS THAN right_min  
+                SET current_sum TO left_sum PLUS right_sum PLUS value of node  
+                SET current_min TO the smaller value between value of node AND left_min  
+                SET current_max TO the larger value between value of node AND right_max  
+                SET self.max_sum TO the larger value between self.max_sum AND current_sum  
+                RETURN true AND current_sum AND current_min AND current_max  
+            END IF  
+            
+            RETURN false AND zero AND positive infinity AND negative infinity  
+        END FUNCTION  
+        
+        CALL helper with root  
+        RETURN self.max_sum  
+    END FUNCTION  
+END CLASS

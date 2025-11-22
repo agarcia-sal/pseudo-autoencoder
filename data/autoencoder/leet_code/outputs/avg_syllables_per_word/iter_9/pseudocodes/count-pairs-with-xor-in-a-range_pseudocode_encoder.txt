@@ -1,0 +1,56 @@
+CLASS TrieNode
+    FUNCTION __init__(self)
+        SET self.children TO empty map
+        SET self.count TO zero
+    END FUNCTION
+END CLASS
+
+CLASS Trie
+    FUNCTION __init__(self, bit_length)
+        SET self.root TO new TrieNode
+        SET self.bit_length TO bit_length
+    END FUNCTION
+
+    FUNCTION insert(self, num)
+        SET node TO self.root
+        FOR i FROM self.bit_length DOWN TO zero
+            SET bit TO the bit at position i of num
+            IF bit NOT IN node.children THEN
+                SET node.children[bit] TO new TrieNode
+            END IF
+            SET node TO node.children[bit]
+            INCREMENT node.count BY one
+        END FOR
+    END FUNCTION
+
+    FUNCTION count_less_than(self, num, threshold)
+        SET count TO zero
+        SET node TO self.root
+        FOR i FROM self.bit_length DOWN TO zero
+            IF node IS null THEN
+                BREAK LOOP
+            END IF
+            SET bit TO the bit at position i of num
+            SET threshold_bit TO the bit at position i of threshold
+            IF threshold_bit EQUALS one THEN
+                INCREMENT count BY count of node.children at bit or zero if absent
+                SET node TO node.children at bit flipped by one
+            ELSE
+                SET node TO node.children at bit
+            END IF
+        END FOR
+        RETURN count
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION countPairs(self, nums, low, high)
+        SET trie TO new Trie with bit_length equal to fifteen
+        SET nice_pairs TO zero
+        FOR each num IN nums
+            INCREMENT nice_pairs BY trie.count_less_than(num, high incremented by one) MINUS trie.count_less_than(num, low)
+            CALL trie.insert(num)
+        END FOR
+        RETURN nice_pairs
+    END FUNCTION
+END CLASS

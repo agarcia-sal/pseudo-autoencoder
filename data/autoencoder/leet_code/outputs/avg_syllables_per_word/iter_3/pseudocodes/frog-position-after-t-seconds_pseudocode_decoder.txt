@@ -1,0 +1,39 @@
+CLASS Solution
+    FUNCTION frogPosition(n, edges, t, target)
+        IF n EQUALS 1 THEN
+            RETURN 1.0
+        END IF
+
+        SET graph TO default dictionary of list
+        FOR EACH (u, v) IN edges
+            APPEND v TO graph[u]
+            APPEND u TO graph[v]
+        END FOR
+
+        SET queue TO deque containing tuple (1, 1.0, 0)
+        SET visited TO set containing 1
+
+        WHILE queue IS NOT EMPTY
+            SET current_node, current_probability, current_time TO queue.popleft()
+
+            IF current_time EQUALS t OR (current_node NOT EQUAL 1 AND LENGTH OF graph[current_node] EQUALS 1) THEN
+                IF current_node EQUALS target THEN
+                    RETURN current_probability
+                ELSE
+                    CONTINUE
+                END IF
+            END IF
+
+            SET possible_moves TO LENGTH OF graph[current_node] MINUS (1 IF current_node NOT EQUAL 1 ELSE 0)
+
+            FOR EACH neighbor IN graph[current_node]
+                IF neighbor NOT IN visited THEN
+                    ADD neighbor TO visited
+                    APPEND (neighbor, current_probability DIVIDED BY possible_moves, current_time PLUS 1) TO queue
+                END IF
+            END FOR
+        END WHILE
+
+        RETURN 0.0
+    END FUNCTION
+END CLASS

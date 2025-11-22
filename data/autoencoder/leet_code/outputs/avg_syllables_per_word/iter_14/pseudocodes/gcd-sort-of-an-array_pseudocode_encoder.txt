@@ -1,0 +1,55 @@
+CLASS UnionFind  
+    FUNCTION __init__ with parameter size  
+        SET self.parent TO a list containing integers from zero up to size MINUS one inclusive  
+        SET self.rank TO a list containing the integer one repeated size times  
+    END FUNCTION  
+
+    FUNCTION find with parameter p  
+        IF element at position p OF self.parent IS NOT EQUAL TO p  
+            SET element at position p OF self.parent TO the result of calling self.find with parameter element at position p OF self.parent  
+        END IF  
+        RETURN element at position p OF self.parent  
+    END FUNCTION  
+
+    FUNCTION union with parameters p AND q  
+        SET rootP TO the result of calling self.find with parameter p  
+        SET rootQ TO the result of calling self.find with parameter q  
+        IF rootP IS EQUAL TO rootQ  
+            RETURN False  
+        END IF  
+        IF element at position rootP OF self.rank IS GREATER THAN element at position rootQ OF self.rank  
+            SET element at position rootQ OF self.parent TO rootP  
+        ELSE IF element at position rootP OF self.rank IS LESS THAN element at position rootQ OF self.rank  
+            SET element at position rootP OF self.parent TO rootQ  
+        ELSE  
+            SET element at position rootQ OF self.parent TO rootP  
+            INCREMENT element at position rootP OF self.rank BY one  
+        END IF  
+        RETURN True  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION gcdSort with parameter nums  
+        SET sorted_nums TO nums arranged in ascending order  
+        SET max_val TO the greatest element IN nums  
+        SET uf TO a new UnionFind object initialized with max_val PLUS one  
+        
+        FOR each num IN nums  
+            FOR each factor FROM two TO the integer part of the square root of num PLUS one  
+                IF num modulo factor IS EQUAL TO zero  
+                    CALL uf.union with parameters num AND factor  
+                    CALL uf.union with parameters num AND num divided by factor using integer division  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        FOR each index FROM zero TO length of nums MINUS one  
+            IF the result of calling uf.find with parameter element at position index OF nums IS NOT EQUAL TO the result of calling uf.find with parameter element at position index OF sorted_nums  
+                RETURN False  
+            END IF  
+        END FOR  
+        
+        RETURN True  
+    END FUNCTION  
+END CLASS

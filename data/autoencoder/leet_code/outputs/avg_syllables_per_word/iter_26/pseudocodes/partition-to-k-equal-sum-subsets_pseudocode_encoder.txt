@@ -1,0 +1,33 @@
+CLASS Solution
+    FUNCTION canPartitionKSubsets(list_of_numbers, number_of_subsets)
+        SET total_sum TO the SUM OF list_of_numbers
+        IF the REMAINDER OF total_sum DIVIDED BY number_of_subsets NOT EQUALS zero
+            RETURN FALSE
+        END IF
+        SET target_value TO total_sum DIVIDED BY number_of_subsets
+        SORT list_of_numbers IN descending order
+
+        FUNCTION can_partition(current_index, remaining_subsets, current_subset_sum, usage_list)
+            IF remaining_subsets EQUALS zero
+                RETURN TRUE
+            END IF
+            IF current_subset_sum EQUALS target_value
+                RETURN can_partition(starting AT zero, remaining_subsets MINUS one, zero, usage_list)
+            END IF
+
+            FOR each iterator FROM current_index TO the LENGTH OF list_of_numbers MINUS one INCLUSIVE
+                IF the element at position iterator OF usage_list EQUALS FALSE AND current_subset_sum PLUS the element at position iterator OF list_of_numbers LESS THAN OR EQUAL TO target_value
+                    SET the element at position iterator OF usage_list TO TRUE
+                    IF can_partition(iterator PLUS one, remaining_subsets, current_subset_sum PLUS the element at position iterator OF list_of_numbers, usage_list)
+                        RETURN TRUE
+                    END IF
+                    SET the element at position iterator OF usage_list TO FALSE
+                END IF
+            END FOR
+            RETURN FALSE
+        END FUNCTION
+
+        SET usage_list TO a LIST OF FALSE VALUES WITH length EQUAL TO the LENGTH OF list_of_numbers
+        RETURN can_partition(zero, number_of_subsets, zero, usage_list)
+    END FUNCTION
+END CLASS

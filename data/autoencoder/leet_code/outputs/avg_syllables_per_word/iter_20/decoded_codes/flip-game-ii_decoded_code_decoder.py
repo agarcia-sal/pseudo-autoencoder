@@ -1,0 +1,19 @@
+class Solution:
+    def canWin(self, currentState: str) -> bool:
+        memo = {}
+
+        def can_win_helper(state: str) -> bool:
+            if state in memo:
+                return memo[state]
+
+            for index in range(len(state) - 1):
+                if state[index:index + 2] == "++":
+                    new_state = state[:index] + "--" + state[index + 2:]
+                    if not can_win_helper(new_state):
+                        memo[state] = True
+                        return True
+
+            memo[state] = False
+            return False
+
+        return can_win_helper(currentState)

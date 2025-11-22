@@ -1,0 +1,48 @@
+CLASS Solution
+    FUNCTION ipToCIDR(ip AS string, n AS integer) RETURNS list of string
+
+        FUNCTION ip_to_int(ip AS string) RETURNS integer
+            SET parts TO list obtained by converting each element obtained by splitting ip BY the dot character INTO integer
+            SET result TO zero
+            FOR each part IN parts
+                SET result TO result MULTIPLIED BY two TO THE POWER OF eight PLUS part
+            END FOR
+            RETURN result
+        END FUNCTION
+
+        FUNCTION int_to_ip(num AS integer) RETURNS string
+            SET octets TO empty list
+            FOR i FROM three DOWN TO zero
+                SET shifted_value TO num DIVIDED BY two TO THE POWER OF (eight MULTIPLIED BY i)
+                SET octet TO shifted_value MODULO two hundred fifty six
+                APPEND the string conversion OF octet TO octets
+            END FOR
+            RETURN concatenation OF octets SEPARATED BY the dot character
+        END FUNCTION
+
+        FUNCTION largest_cidr_size(start AS integer, n AS integer) RETURNS integer
+            IF start BITWISE AND one IS EQUAL TO one
+                RETURN one
+            END IF
+            SET x TO one
+            WHILE x IS LESS THAN OR EQUAL TO n AND (start BITWISE AND (x MINUS one)) IS EQUAL TO zero
+                SET x TO x MULTIPLIED BY two
+            END WHILE
+            RETURN x DIVIDED BY two
+        END FUNCTION
+
+        SET result TO empty list
+        SET start_ip TO ip_to_int of ip
+
+        WHILE n IS GREATER THAN zero
+            SET size TO largest_cidr_size of start_ip AND n
+            SET prefix_length TO thirty two MINUS (bit length OF size MINUS one)
+            SET cidr_string TO concatenation OF int_to_ip of start_ip, the forward slash character, AND prefix_length converted to string
+            APPEND cidr_string TO result
+            SET start_ip TO start_ip PLUS size
+            SET n TO n MINUS size
+        END WHILE
+
+        RETURN result
+    END FUNCTION
+END CLASS

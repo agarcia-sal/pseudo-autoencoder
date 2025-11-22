@@ -1,0 +1,68 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN None  
+    END IF  
+    SET root TO new TreeNode with val as element at position zero of values  
+    SET i TO one  
+    SET queue TO an empty double ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        REMOVE first element FROM queue AND SET TO node  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT None  
+            SET node.left TO new TreeNode with val as element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT None  
+            SET node.right TO new TreeNode with val as element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUALS TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION addOneRow(self, root, val, depth)  
+        IF depth EQUALS one  
+            RETURN new TreeNode with val set to val AND left set to root  
+        END IF  
+        SET queue TO an empty double ended queue  
+        APPEND tuple of root AND one TO queue  
+        WHILE queue IS NOT empty  
+            REMOVE first element FROM queue AND DESTRUCTURE TO node AND level  
+            IF level EQUALS depth MINUS one  
+                SET node.left TO new TreeNode with val set to val AND left set to node.left  
+                SET node.right TO new TreeNode with val set to val AND right set to node.right  
+            ELSE IF level IS LESS THAN depth MINUS one  
+                IF node.left IS NOT None  
+                    APPEND tuple of node.left AND level PLUS one TO queue  
+                END IF  
+                IF node.right IS NOT None  
+                    APPEND tuple of node.right AND level PLUS one TO queue  
+                END IF  
+            END IF  
+        END WHILE  
+        RETURN root  
+    END FUNCTION  
+END CLASS

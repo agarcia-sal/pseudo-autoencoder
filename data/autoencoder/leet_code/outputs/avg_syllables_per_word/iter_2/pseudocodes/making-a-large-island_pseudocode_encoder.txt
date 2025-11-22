@@ -1,0 +1,64 @@
+CLASS Solution
+    FUNCTION largestIsland(grid)
+        IF grid IS EMPTY OR grid[0] IS EMPTY
+            RETURN 0
+        END IF
+
+        SET n TO LENGTH OF grid
+        SET directions TO LIST OF (0,1), (1,0), (0,-1), (-1,0)
+
+        FUNCTION is_valid(x, y)
+            RETURN x IS AT LEAST 0 AND LESS THAN n AND y IS AT LEAST 0 AND LESS THAN n
+        END FUNCTION
+
+        FUNCTION dfs(x, y, index)
+            SET area TO 1
+            SET grid[x][y] TO index
+            FOR EACH (dx, dy) IN directions
+                SET nx TO x PLUS dx
+                SET ny TO y PLUS dy
+                IF is_valid(nx, ny) AND grid[nx][ny] EQUALS 1
+                    INCREMENT area BY dfs(nx, ny, index)
+                END IF
+            END FOR
+            RETURN area
+        END FUNCTION
+
+        SET island_areas TO EMPTY DICTIONARY
+        SET index TO 2
+
+        FOR i FROM 0 TO n MINUS 1
+            FOR j FROM 0 TO n MINUS 1
+                IF grid[i][j] EQUALS 1
+                    SET island_areas[index] TO dfs(i, j, index)
+                    INCREMENT index BY 1
+                END IF
+            END FOR
+        END FOR
+
+        IF island_areas IS EMPTY
+            RETURN 1
+        END IF
+
+        SET max_island_size TO MAXIMUM VALUE IN island_areas
+
+        FOR i FROM 0 TO n MINUS 1
+            FOR j FROM 0 TO n MINUS 1
+                IF grid[i][j] EQUALS 0
+                    SET neighbors TO EMPTY SET
+                    FOR EACH (dx, dy) IN directions
+                        SET nx TO i PLUS dx
+                        SET ny TO j PLUS dy
+                        IF is_valid(nx, ny) AND grid[nx][ny] GREATER THAN 1
+                            ADD grid[nx][ny] TO neighbors
+                        END IF
+                    END FOR
+                    SET current_island_size TO 1 PLUS SUM OF island_areas FOR EACH index IN neighbors
+                    SET max_island_size TO MAXIMUM OF max_island_size AND current_island_size
+                END IF
+            END FOR
+        END FOR
+
+        RETURN max_island_size
+    END FUNCTION
+END CLASS

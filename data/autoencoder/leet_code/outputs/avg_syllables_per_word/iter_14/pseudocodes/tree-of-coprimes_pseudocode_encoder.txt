@@ -1,0 +1,54 @@
+CLASS Solution  
+    FUNCTION getCoprimes(nums, edges)  
+        SET n TO the LENGTH OF nums  
+        SET tree TO a DEFAULT DICTIONARY mapping to EMPTY LIST  
+        
+        FOR each pair u AND v IN edges  
+            APPEND v TO the LIST at key u IN tree  
+            APPEND u TO the LIST at key v IN tree  
+        END FOR  
+        
+        SET coprime TO a LIST of LISTS of Boolean FALSE VALUES with SIZE fifty PLUS one by fifty PLUS one  
+        
+        FOR i FROM one TO fifty  
+            FOR j FROM one TO fifty  
+                SET coprime AT i AND j TO the RESULT OF WHETHER gcd OF i AND j IS EQUAL TO one  
+            END FOR  
+        END FOR  
+        
+        SET result TO a LIST OF SIZE n FILLED WITH minus one  
+        SET ancestor_stack TO a LIST OF SIZE fifty PLUS one FILLED WITH None  
+        
+        FUNCTION dfs(node, parent, depth)  
+            SET closest_ancestor TO minus one  
+            SET max_depth TO minus one  
+            
+            FOR value FROM one TO fifty  
+                IF coprime AT nums AT node AND value IS TRUE AND ancestor_stack AT value IS NOT None THEN  
+                    SET anc_node, anc_depth TO ancestor_stack AT value  
+                    IF anc_depth IS GREATER THAN max_depth THEN  
+                        SET max_depth TO anc_depth  
+                        SET closest_ancestor TO anc_node  
+                    END IF  
+                END IF  
+            END FOR  
+            
+            SET result AT node TO closest_ancestor  
+            
+            SET original_ancestor TO ancestor_stack AT nums AT node  
+            SET ancestor_stack AT nums AT node TO A TUPLE OF node AND depth  
+            
+            FOR each child IN tree AT node  
+                IF child IS NOT EQUAL TO parent THEN  
+                    CALL dfs WITH child, node, depth PLUS one  
+                END IF  
+            END FOR  
+            
+            SET ancestor_stack AT nums AT node TO original_ancestor  
+        END FUNCTION  
+        
+        CALL dfs WITH zero, minus one, zero  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

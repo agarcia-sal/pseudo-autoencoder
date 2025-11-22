@@ -1,0 +1,51 @@
+CLASS Solution  
+    FUNCTION slidingPuzzle(board)  
+        SET start TO a tuple of tuples obtained by converting each row in board into a tuple  
+        SET target TO a tuple containing a tuple of one and two and three and a tuple of four and five and zero  
+        
+        SET neighbors TO a mapping of positions to their possible moves such that  
+            position zero maps to a set containing one and three  
+            position one maps to a set containing zero and two and four  
+            position two maps to a set containing one and five  
+            position three maps to a set containing zero and four  
+            position four maps to a set containing one and three and five  
+            position five maps to a set containing two and four  
+        
+        FOR i FROM zero TO one  
+            FOR j FROM zero TO two  
+                IF element at position j of element at position i of start IS EQUAL TO zero  
+                    SET zero_pos TO i MULTIPLIED BY three PLUS j  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET queue TO a double ended queue initialized with a tuple containing start and zero_pos and zero  
+        SET visited TO a set initialized with start  
+        
+        WHILE queue IS NOT EMPTY  
+            SET state and zero_pos and moves TO the first element removed from queue  
+            
+            IF state IS EQUAL TO target  
+                RETURN moves  
+            END IF  
+            
+            FOR each neighbor IN the set mapped by zero_pos in neighbors  
+                SET new_state TO a list of lists obtained by converting each tuple row in state to a list  
+                SET i TO zero_pos INTEGER DIVIDED BY three  
+                SET j TO zero_pos MODULO three  
+                SET ni TO neighbor INTEGER DIVIDED BY three  
+                SET nj TO neighbor MODULO three  
+                
+                SWAP element at position j of element at position i of new_state WITH element at position nj of element at position ni of new_state  
+                SET new_tuple_state TO a tuple of tuples obtained by converting each row in new_state into a tuple  
+                
+                IF new_tuple_state IS NOT IN visited  
+                    ADD new_tuple_state TO visited  
+                    APPEND a tuple containing new_tuple_state and neighbor and moves PLUS one TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

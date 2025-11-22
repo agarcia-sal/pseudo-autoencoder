@@ -1,0 +1,36 @@
+CLASS Solution  
+    FUNCTION minimumTime(n, relations, time)  
+        INITIALIZE graph AS a mapping from course TO list of prerequisite courses  
+        FOR each pair prevCourse, nextCourse IN relations  
+            APPEND prevCourse TO graph[nextCourse]  
+        
+        INITIALIZE memo AS a list of size n plus one FILLED WITH -1  
+        
+        FUNCTION dfs(course)  
+            IF memo[course] IS NOT EQUAL TO -1 THEN  
+                RETURN memo[course]  
+            END IF  
+            
+            SET max_prerequisite_time TO 0  
+            FOR each prevCourse IN graph[course]  
+                SET prerequisite_time TO dfs(prevCourse)  
+                IF prerequisite_time IS GREATER THAN max_prerequisite_time THEN  
+                    SET max_prerequisite_time TO prerequisite_time  
+                END IF  
+            END FOR  
+            
+            SET memo[course] TO max_prerequisite_time PLUS time AT index course MINUS 1  
+            RETURN memo[course]  
+        END FUNCTION  
+        
+        SET total_minimum_time TO 0  
+        FOR course FROM 1 TO n  
+            SET course_time TO dfs(course)  
+            IF course_time IS GREATER THAN total_minimum_time THEN  
+                SET total_minimum_time TO course_time  
+            END IF  
+        END FOR  
+        
+        RETURN total_minimum_time  
+    END FUNCTION  
+END CLASS

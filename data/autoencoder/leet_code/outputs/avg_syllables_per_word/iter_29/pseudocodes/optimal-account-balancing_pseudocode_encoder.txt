@@ -1,0 +1,55 @@
+CLASS Solution  
+    FUNCTION minTransfers(transactions)  
+        SET balance TO empty mapping from person TO net amount  
+        FOR each transaction IN transactions  
+            SET sender TO the first element of transaction  
+            SET receiver TO the second element of transaction  
+            SET amount TO the third element of transaction  
+            IF sender EXISTS in balance  
+                DECREMENT balance at sender BY amount  
+            ELSE  
+                SET balance at sender TO negative amount  
+            END IF  
+            IF receiver EXISTS in balance  
+                INCREMENT balance at receiver BY amount  
+            ELSE  
+                SET balance at receiver TO amount  
+            END IF  
+        END FOR  
+        
+        SET balances TO empty list  
+        FOR each net_value IN the values of balance  
+            IF net_value NOT EQUALS zero  
+                APPEND net_value TO balances  
+            END IF  
+        END FOR  
+        
+        IF the LENGTH OF balances EQUALS zero  
+            RETURN zero  
+        END IF  
+        
+        FUNCTION settle(start, count)  
+            WHILE start LESS THAN the LENGTH OF balances AND element at position start of balances EQUALS zero  
+                INCREMENT start BY one  
+            END WHILE  
+            
+            IF start EQUALS the LENGTH OF balances  
+                RETURN count  
+            END IF  
+            
+            SET minimum_count TO a very large number representing infinity  
+            
+            FOR index FROM start PLUS one TO the LENGTH OF balances MINUS one  
+                IF element at position start of balances MULTIPLIED BY element at position index of balances LESS THAN zero  
+                    INCREMENT element at position index of balances BY element at position start of balances  
+                    SET minimum_count TO the smaller value between minimum_count AND the result of settle with parameters start PLUS one AND count PLUS one  
+                    DECREMENT element at position index of balances BY element at position start of balances  
+                END IF  
+            END FOR  
+            
+            RETURN minimum_count  
+        END FUNCTION  
+        
+        RETURN settle with parameters zero AND zero  
+    END FUNCTION  
+END CLASS

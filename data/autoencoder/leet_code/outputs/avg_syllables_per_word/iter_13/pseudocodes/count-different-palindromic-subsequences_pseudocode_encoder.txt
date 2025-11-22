@@ -1,0 +1,55 @@
+CLASS Solution  
+    FUNCTION countPalindromicSubsequences(s)  
+        SET MOD TO one billion plus seven  
+        SET n TO the LENGTH OF s  
+        
+        SET next_occurrence TO a two dimensional list with four rows each containing n elements all set TO negative one  
+        SET prev_occurrence TO a two dimensional list with four rows each containing n elements all set TO negative one  
+        
+        FOR c FROM zero TO three  
+            SET char TO the character at ASCII code of letter a PLUS c  
+            SET last TO negative one  
+            FOR i FROM zero TO n MINUS one  
+                IF the element at position i of s EQUALS char  
+                    SET last TO i  
+                END IF  
+                SET the element at position i of the list at position c of prev_occurrence TO last  
+            END FOR  
+            
+            SET last TO negative one  
+            FOR i FROM n MINUS one DOWN TO zero  
+                IF the element at position i of s EQUALS char  
+                    SET last TO i  
+                END IF  
+                SET the element at position i of the list at position c of next_occurrence TO last  
+            END FOR  
+        END FOR  
+        
+        SET dp TO a two dimensional list with n rows each containing n elements all set TO zero  
+        
+        FOR i FROM zero TO n MINUS one  
+            SET the element at position i of the list at position i of dp TO one  
+        END FOR  
+        
+        FOR length FROM two TO n  
+            FOR i FROM zero TO n MINUS length  
+                SET j TO i PLUS length MINUS one  
+                FOR c FROM zero TO three  
+                    SET char TO the character at ASCII code of letter a PLUS c  
+                    SET left TO the element at position i of the list at position c of next_occurrence  
+                    SET right TO the element at position j of the list at position c of prev_occurrence  
+                    
+                    IF left GREATER THAN j OR right LESS THAN i  
+                        CONTINUE TO the next iteration OF the c loop  
+                    ELSE IF left EQUALS right  
+                        SET the element at position j of the list at position i of dp TO the remainder of (the element at position j of the list at position i of dp PLUS one) DIVIDED BY MOD  
+                    ELSE  
+                        SET the element at position j of the list at position i of dp TO the remainder of (the element at position j of the list at position i of dp PLUS the element at position right MINUS one of the list at position left PLUS one of dp PLUS two) DIVIDED BY MOD  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+        
+        RETURN the element at position n MINUS one of the list at position zero of dp  
+    END FUNCTION  
+END CLASS

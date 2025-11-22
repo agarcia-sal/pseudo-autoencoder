@@ -1,0 +1,67 @@
+CLASS Solution
+    FUNCTION totalStrength(strength)
+        SET MOD TO one billion PLUS seven
+        SET n TO the LENGTH OF strength
+
+        CALL initialize_prefix_sums WITH strength n MOD TO prefix prefix_prefix
+
+        CALL initialize_previous_and_next_smaller WITH strength n TO prev_smaller next_smaller_or_equal
+
+        SET total_strength TO zero
+        FOR i FROM zero TO n MINUS one
+            SET left TO element at position i of prev_smaller PLUS one
+            SET right TO element at position i of next_smaller_or_equal
+
+            SET sum_left TO (i MINUS left PLUS one) MULTIPLIED BY (element at position right PLUS one of prefix_prefix MINUS element at position i PLUS one of prefix_prefix) MODULO MOD
+            SET sum_right TO (right MINUS i) MULTIPLIED BY (element at position i PLUS one of prefix_prefix MINUS element at position left of prefix_prefix) MODULO MOD
+
+            SET contribution TO element at position i of strength MULTIPLIED BY (sum_left MINUS sum_right) MODULO MOD
+            SET total_strength TO (total_strength PLUS contribution) MODULO MOD
+        END FOR
+
+        RETURN total_strength
+    END FUNCTION
+
+    FUNCTION initialize_prefix_sums(strength n MOD)
+        SET prefix TO list of zero repeated n PLUS one times
+        FOR i FROM zero TO n MINUS one
+            SET element at position i PLUS one of prefix TO (element at position i of prefix PLUS element at position i of strength) MODULO MOD
+        END FOR
+
+        SET prefix_prefix TO list of zero repeated n PLUS two times
+        FOR i FROM zero TO n
+            SET element at position i PLUS one of prefix_prefix TO (element at position i of prefix_prefix PLUS element at position i of prefix) MODULO MOD
+        END FOR
+
+        RETURN prefix prefix_prefix
+    END FUNCTION
+
+    FUNCTION initialize_previous_and_next_smaller(strength n)
+        SET prev_smaller TO list of negative one repeated n times
+        SET next_smaller_or_equal TO list of n repeated n times
+
+        SET stack TO empty list
+        FOR i FROM zero TO n MINUS one
+            WHILE stack IS NOT empty AND element at position last of stack IN strength GREATER THAN OR EQUAL TO element at position i of strength
+                REMOVE element at position last of stack
+            END WHILE
+            IF stack IS NOT empty
+                SET element at position i of prev_smaller TO element at position last of stack
+            END IF
+            APPEND i TO stack
+        END FOR
+
+        SET stack TO empty list
+        FOR i FROM n MINUS one DOWNTO zero
+            WHILE stack IS NOT empty AND element at position last of stack IN strength GREATER THAN element at position i of strength
+                REMOVE element at position last of stack
+            END WHILE
+            IF stack IS NOT empty
+                SET element at position i of next_smaller_or_equal TO element at position last of stack
+            END IF
+            APPEND i TO stack
+        END FOR
+
+        RETURN prev_smaller next_smaller_or_equal
+    END FUNCTION
+END CLASS

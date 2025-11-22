@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION possibleToStamp(grid, stampHeight, stampWidth)  
+        SET m TO LENGTH OF grid  
+        SET n TO LENGTH OF grid AT INDEX 0  
+        
+        FUNCTION prefix_sum(matrix)  
+            SET p TO MATRIX OF ZEROS WITH SIZE (m PLUS 1) BY (n PLUS 1)  
+            FOR r FROM 1 TO m  
+                FOR c FROM 1 TO n  
+                    SET p AT r c TO VALUE OF matrix AT r MINUS 1 c MINUS 1 PLUS p AT r MINUS 1 c PLUS p AT r c MINUS 1 MINUS p AT r MINUS 1 c MINUS 1  
+            RETURN p  
+        END FUNCTION  
+        
+        FUNCTION submatrix_sum(p, r1, c1, r2, c2)  
+            RETURN p AT r2 PLUS 1 c2 PLUS 1 MINUS p AT r2 PLUS 1 c1 MINUS p AT r1 c2 PLUS 1 PLUS p AT r1 c1  
+        END FUNCTION  
+        
+        SET p_grid TO prefix_sum(grid)  
+        
+        SET p_stamps TO MATRIX OF ZEROS WITH SIZE (m PLUS 1) BY (n PLUS 1)  
+        
+        FOR r FROM 0 TO m MINUS 1  
+            FOR c FROM 0 TO n MINUS 1  
+                IF grid AT r c EQUALS 0 THEN  
+                    IF r PLUS stampHeight LESS THAN OR EQUAL TO m AND c PLUS stampWidth LESS THAN OR EQUAL TO n THEN  
+                        IF submatrix_sum(p_grid, r, c, r PLUS stampHeight MINUS 1, c PLUS stampWidth MINUS 1) EQUALS 0 THEN  
+                            INCREMENT p_stamps AT r c BY 1  
+                        END IF  
+                    END IF  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET p_stamps TO prefix_sum(p_stamps)  
+        
+        FOR r FROM 0 TO m MINUS 1  
+            FOR c FROM 0 TO n MINUS 1  
+                IF grid AT r c EQUALS 0 THEN  
+                    IF submatrix_sum(p_stamps, MAXIMUM OF 0 AND r MINUS stampHeight PLUS 1, MAXIMUM OF 0 AND c MINUS stampWidth PLUS 1, r, c) EQUALS 0 THEN  
+                        RETURN False  
+                    END IF  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        RETURN True  
+    END FUNCTION  
+END CLASS

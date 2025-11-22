@@ -1,0 +1,47 @@
+CLASS Solution  
+    FUNCTION minimumIncompatibility(nums k)  
+        SET n TO the LENGTH OF nums  
+        SET subset_size TO n DIVIDED BY k  
+        
+        IF there EXISTS an element count IN the values of the COUNTER created FROM nums SUCH THAT count IS GREATER THAN k  
+            RETURN minus one  
+        END IF  
+        
+        SET subset_incompatibility TO an empty dictionary  
+        
+        FOR mask FROM zero TO two RAISED TO THE POWER OF n MINUS one  
+            IF the NUMBER OF ONES IN the BINARY REPRESENTATION OF mask EQUALS subset_size  
+                SET elements TO an empty list  
+                FOR i FROM zero TO n MINUS one  
+                    IF the BITWISE AND OF mask AND two RAISED TO THE POWER OF i IS NOT ZERO  
+                        APPEND the element at position i OF nums TO elements  
+                    END IF  
+                END FOR  
+                IF the NUMBER OF UNIQUE elements IN elements EQUALS subset_size  
+                    SET incompatibility TO the MAXIMUM value IN elements MINUS the MINIMUM value IN elements  
+                    ASSIGN incompatibility TO subset_incompatibility AT KEY mask  
+                END IF  
+            END IF  
+        END FOR  
+        
+        SET dp TO a list OF two RAISED TO THE POWER OF n ELEMENTS EACH SET TO infinity  
+        SET the ELEMENT at POSITION zero OF dp TO zero  
+        
+        FOR mask FROM zero TO two RAISED TO THE POWER OF n MINUS one  
+            IF the NUMBER OF ONES IN the BINARY REPRESENTATION OF mask MODULO subset_size DOES NOT EQUAL zero  
+                CONTINUE TO the next iteration  
+            END IF  
+            FOR each subset_mask IN the KEYS OF subset_incompatibility  
+                IF the BITWISE AND OF mask AND subset_mask EQUALS subset_mask  
+                    SET dp AT POSITION mask TO the MINIMUM OF dp AT POSITION mask AND dp AT POSITION the BITWISE XOR OF mask AND subset_mask PLUS subset_incompatibility AT KEY subset_mask  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        IF dp AT POSITION two RAISED TO THE POWER OF n MINUS one DOES NOT EQUAL infinity  
+            RETURN dp AT POSITION two RAISED TO THE POWER OF n MINUS one  
+        ELSE  
+            RETURN minus one  
+        END IF  
+    END FUNCTION  
+END CLASS

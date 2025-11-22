@@ -1,0 +1,67 @@
+CLASS Solution  
+    FUNCTION minAbbreviation(target_parameter WITH LIST OF strings CALLED dictionary_parameter)  
+        FUNCTION is_valid_abbr(string_s_parameter WITH string_parameter, string_abbr_parameter WITH string_parameter)  
+            SET integer_i TO zero  
+            SET integer_j TO zero  
+            WHILE integer_i LESS THAN the LENGTH OF string_s_parameter AND integer_j LESS THAN the LENGTH OF string_abbr_parameter  
+                IF character at position integer_j of string_abbr_parameter IS a digit  
+                    IF character at position integer_j of string_abbr_parameter EQUALS character ZERO  
+                        RETURN False  
+                    END IF  
+                    SET integer_shift TO zero  
+                    WHILE integer_j LESS THAN the LENGTH OF string_abbr_parameter AND character at position integer_j of string_abbr_parameter IS a digit  
+                        SET integer_shift TO integer_shift MULTIPLIED BY ten PLUS the numeric value represented by character at position integer_j of string_abbr_parameter  
+                        INCREMENT integer_j BY one  
+                    END WHILE  
+                    INCREMENT integer_i BY integer_shift  
+                ELSE  
+                    IF character at position integer_i of string_s_parameter NOT EQUALS character at position integer_j of string_abbr_parameter  
+                        RETURN False  
+                    END IF  
+                    INCREMENT integer_i BY one  
+                    INCREMENT integer_j BY one  
+                END IF  
+            END WHILE  
+            RETURN the comparison that integer_i EQUALS the LENGTH OF string_s_parameter AND integer_j EQUALS the LENGTH OF string_abbr_parameter  
+        END FUNCTION  
+        
+        FUNCTION generate_abbrs(string_word_parameter WITH string_parameter, integer_length_parameter WITH integer_parameter, string_abbr_parameter WITH string_parameter DEFAULT empty string, integer_index_parameter WITH integer_parameter DEFAULT zero, integer_skip_count_parameter WITH integer_parameter DEFAULT zero)  
+            IF integer_index_parameter EQUALS integer_length_parameter  
+                IF integer_skip_count_parameter GREATER THAN zero  
+                    SET string_abbr_parameter TO string_abbr_parameter CONCATENATED WITH the string representation of integer_skip_count_parameter  
+                END IF  
+                APPEND string_abbr_parameter TO the COLLECTION OF abbrs  
+                RETURN  
+            END IF  
+            CALL generate_abbrs WITH string_word_parameter WITH integer_length_parameter WITH string_abbr_parameter WITH integer_index_parameter PLUS one WITH integer_skip_count_parameter PLUS one  
+            IF integer_skip_count_parameter GREATER THAN zero  
+                SET string_abbr_parameter TO string_abbr_parameter CONCATENATED WITH the string representation of integer_skip_count_parameter  
+            END IF  
+            CALL generate_abbrs WITH string_word_parameter WITH integer_length_parameter WITH string_abbr_parameter CONCATENATED WITH character at position integer_index_parameter of string_word_parameter WITH integer_index_parameter PLUS one WITH zero  
+        END FUNCTION  
+        
+        FUNCTION find_unique_abbr()  
+            FOR integer_length FROM one TO the LENGTH OF target_parameter  
+                CLEAR the COLLECTION OF abbrs  
+                CALL generate_abbrs WITH target_parameter WITH the LENGTH OF target_parameter  
+                SET string_min_abbr TO null  
+                SET integer_min_length TO positive infinity  
+                FOR each string_abbr IN the COLLECTION OF abbrs  
+                    IF for all each string_word IN filtered_dict it is NOT that is_valid_abbr WITH string_word parameter WITH string_abbr parameter RETURNS True  
+                        IF the LENGTH OF string_abbr LESS THAN integer_min_length  
+                            SET integer_min_length TO the LENGTH OF string_abbr  
+                            SET string_min_abbr TO string_abbr  
+                        END IF  
+                    END IF  
+                END FOR  
+                IF string_min_abbr IS NOT null  
+                    RETURN string_min_abbr  
+                END IF  
+            END FOR  
+        END FUNCTION  
+        
+        SET filtered_dict TO the COLLECTION OF each string_word IN dictionary_parameter WHERE the LENGTH OF string_word EQUALS the LENGTH OF target_parameter  
+        INITIALIZE the COLLECTION OF abbrs AS empty  
+        RETURN find_unique_abbr()  
+    END FUNCTION  
+END CLASS

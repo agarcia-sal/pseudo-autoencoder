@@ -1,0 +1,39 @@
+CLASS Solution
+    FUNCTION maxTaskAssign(tasks, workers, pills, strength)
+        CALL tasks.sort
+        CALL workers.sort
+        
+        FUNCTION canAssignTasks(k)
+            SET available_workers TO COPY OF LAST k ELEMENTS OF workers
+            SET pills_used TO 0
+            
+            FOR i FROM k MINUS 1 DOWNTO 0
+                SET task TO tasks AT INDEX i
+                SET worker_idx TO CALL bisect_left ON available_workers WITH task
+                
+                IF worker_idx LESS THAN LENGTH OF available_workers THEN
+                    REMOVE ELEMENT AT worker_idx FROM available_workers
+                ELSE IF pills_used LESS THAN pills THEN
+                    SET worker_idx TO CALL bisect_left ON available_workers WITH task MINUS strength
+                    IF worker_idx LESS THAN LENGTH OF available_workers THEN
+                        REMOVE ELEMENT AT worker_idx FROM available_workers
+                        INCREMENT pills_used BY 1
+                    ELSE
+                        RETURN FALSE
+                ELSE
+                    RETURN FALSE
+            RETURN TRUE
+        END FUNCTION
+        
+        SET left TO 0
+        SET right TO MINIMUM OF LENGTH OF tasks AND LENGTH OF workers PLUS 1
+        
+        WHILE left LESS THAN right
+            SET mid TO left PLUS right DIVIDED BY 2 USING INTEGER DIVISION
+            IF CALL canAssignTasks WITH mid IS TRUE THEN
+                SET left TO mid PLUS 1
+            ELSE
+                SET right TO mid
+        RETURN left MINUS 1
+    END FUNCTION
+END CLASS

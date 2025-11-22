@@ -1,0 +1,49 @@
+CLASS Solution  
+    FUNCTION minPushBox(grid)  
+        SET directions TO list OF four elements each describing row change MINUS one zero zero zero and column change zero one MINUS one zero zero one  
+        FOR i FROM zero TO the LENGTH OF grid MINUS one  
+            FOR j FROM zero TO the LENGTH OF element at position zero of grid MINUS one  
+                IF element at position i of grid at position j EQUALS character S  
+                    SET player_start TO pair of i and j  
+                ELSE IF element at position i of grid at position j EQUALS character B  
+                    SET box_start TO pair of i and j  
+                ELSE IF element at position i of grid at position j EQUALS character T  
+                    SET target TO pair of i and j  
+                END IF  
+            END FOR  
+        END FOR  
+        SET queue TO a new double ended queue initialized with tuple of player_start box_start zero  
+        SET visited TO an empty set  
+        ADD tuple of player_start and box_start TO visited  
+        WHILE queue is not empty  
+            REMOVE and ASSIGN leftmost element of queue TO player_pos box_pos push_count  
+            IF box_pos EQUALS target  
+                RETURN push_count  
+            END IF  
+            FOR each direction delta_row delta_column IN directions  
+                SET new_player_pos TO pair of first element of player_pos PLUS delta_row and second element of player_pos PLUS delta_column  
+                IF call FUNCTION is_valid_position WITH new_player_pos and grid RETURNS true  
+                    IF new_player_pos EQUALS box_pos  
+                        SET new_box_pos TO pair of first element of box_pos PLUS delta_row and second element of box_pos PLUS delta_column  
+                        IF call FUNCTION is_valid_position WITH new_box_pos and grid RETURNS true AND tuple of new_player_pos and new_box_pos is NOT IN visited  
+                            ADD tuple of new_player_pos and new_box_pos TO visited  
+                            APPEND tuple of new_player_pos new_box_pos push_count PLUS one TO queue  
+                        END IF  
+                    ELSE  
+                        IF tuple of new_player_pos and box_pos is NOT IN visited  
+                            ADD tuple of new_player_pos and box_pos TO visited  
+                            APPEND tuple of new_player_pos box_pos push_count TO queue  
+                        END IF  
+                    END IF  
+                END IF  
+            END FOR  
+        END WHILE  
+        RETURN negative one  
+    END FUNCTION  
+  
+    FUNCTION is_valid_position(position grid)  
+        SET x TO first element of position  
+        SET y TO second element of position  
+        RETURN x GREATER THAN OR EQUAL TO zero AND x LESS THAN the LENGTH OF grid AND y GREATER THAN OR EQUAL TO zero AND y LESS THAN the LENGTH OF element at position zero of grid AND element at position x of grid at position y NOT EQUALS character hash  
+    END FUNCTION  
+END CLASS

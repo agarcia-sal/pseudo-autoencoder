@@ -1,0 +1,42 @@
+CLASS Solution  
+    FUNCTION waysToBuildRooms WITH PARAMETER prevRoom AS list of integers  
+        FROM the COLLECTIONS IMPORT the DEFAULT DICTIONARY FUNCTION
+        
+        SET n TO the LENGTH OF prevRoom  
+        SET graph TO a DEFAULT DICTIONARY THAT RETURNS an empty list FOR every new key
+        
+        FOR each room FROM one TO n MINUS one  
+            APPEND room TO the LIST ASSOCIATED WITH the ELEMENT AT position room OF prevRoom IN graph  
+        END FOR
+        
+        FUNCTION dp WITH PARAMETER node  
+            IF the LIST ASSOCIATED WITH node IN graph IS empty  
+                RETURN one AND one  
+            END IF
+            
+            SET total_ways TO one  
+            SET total_size TO one  
+            
+            SET child_results TO an empty list
+            
+            FOR each child IN the LIST ASSOCIATED WITH node IN graph  
+                SET ways AND size TO THE RESULT OF CALLING dp WITH child  
+                APPEND the TUPLE ways AND size TO child_results  
+                INCREMENT total_size BY size  
+            END FOR
+            
+            SET current_size TO one
+            
+            FOR each ways AND size IN child_results  
+                SET combination_value TO THE RESULT OF COMBINING current_size PLUS size MINUS one AND size  
+                SET total_ways TO total_ways MULTIPLIED BY combination_value MULTIPLIED BY ways  
+                SET total_ways TO total_ways MODULO MOD  
+                INCREMENT current_size BY size  
+            END FOR
+            
+            RETURN total_ways AND total_size  
+        END FUNCTION
+        
+        RETURN THE FIRST ELEMENT OF THE RESULT OF CALLING dp WITH zero  
+    END FUNCTION  
+END CLASS

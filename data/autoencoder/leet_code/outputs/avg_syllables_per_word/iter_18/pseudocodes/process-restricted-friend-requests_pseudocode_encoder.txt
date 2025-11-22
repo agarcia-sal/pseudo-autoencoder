@@ -1,0 +1,78 @@
+CLASS UnionFind  
+    FUNCTION __init__(self comma n)  
+        SET self.parent TO list of integers FROM zero TO n MINUS one  
+        SET self.size TO list containing the integer one repeated n times  
+    END FUNCTION  
+
+    FUNCTION find(self comma u)  
+        IF element at position u of self.parent NOT EQUALS u THEN  
+            SET element at position u of self.parent TO the result of calling find FUNCTION on element at position u of self.parent  
+        END IF  
+        RETURN element at position u of self.parent  
+    END FUNCTION  
+
+    FUNCTION union(self comma u comma v)  
+        SET root_u TO the result of calling find FUNCTION on u  
+        SET root_v TO the result of calling find FUNCTION on v  
+        IF root_u NOT EQUALS root_v THEN  
+            IF element at position root_u of self.size GREATER THAN element at position root_v of self.size THEN  
+                SET element at position root_v of self.parent TO root_u  
+                INCREMENT element at position root_u of self.size BY element at position root_v of self.size  
+            ELSE  
+                SET element at position root_u of self.parent TO root_v  
+                INCREMENT element at position root_v of self.size BY element at position root_u of self.size  
+            END IF  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION friendRequests(self comma n comma restrictions comma requests)  
+        ASSIGN reference TO a new UnionFind object initialized with n  
+        SET result TO empty list  
+        SET restriction_map TO empty mapping  
+
+        FOR each x and y IN restrictions  
+            IF x NOT IN restriction_map THEN  
+                SET value at key x in restriction_map TO empty set  
+            END IF  
+            IF y NOT IN restriction_map THEN  
+                SET value at key y in restriction_map TO empty set  
+            END IF  
+            APPEND y TO the set at key x in restriction_map  
+            APPEND x TO the set at key y in restriction_map  
+        END FOR  
+
+        FUNCTION can_union(u comma v)  
+            SET root_u TO result of calling uf.find on u  
+            SET root_v TO result of calling uf.find on v  
+
+            FOR each person IN the set at key root_u in restriction_map OR empty set if key absent  
+                IF result of calling uf.find on person EQUALS root_v THEN  
+                    RETURN False  
+                END IF  
+            END FOR  
+
+            FOR each person IN the set at key root_v in restriction_map OR empty set if key absent  
+                IF result of calling uf.find on person EQUALS root_u THEN  
+                    RETURN False  
+                END IF  
+            END FOR  
+
+            RETURN True  
+        END FUNCTION  
+
+        FOR each u and v IN requests  
+            IF result of calling uf.find on u EQUALS result of calling uf.find on v THEN  
+                APPEND True TO result  
+            ELSE IF result of calling can_union on u and v IS True THEN  
+                CALL uf.union on u and v  
+                APPEND True TO result  
+            ELSE  
+                APPEND False TO result  
+            END IF  
+        END FOR  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

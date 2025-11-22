@@ -1,0 +1,73 @@
+CLASS Solution
+    FUNCTION countCombinations(list_of_pieces, list_of_positions)
+        SET directions TO a map with key rook and value a list of pairs one zero and negative one zero and zero one and zero negative one and key queen and value a list of pairs one zero and negative one zero and zero one and zero negative one and one one and negative one one and one negative one and negative one negative one and key bishop and value a list of pairs one one and negative one one and one negative one and negative one negative one and negative one negative one
+        
+        SET list_of_positions TO a new list formed by FOR each pair row comma column IN list_of_positions SET new_row TO row MINUS one SET new_column TO column MINUS one and COLLECT the pair of new_row and new_column
+        
+        FUNCTION get_destinations(start_position, piece_type)
+            SET row TO the first element of start_position
+            SET column TO the second element of start_position
+            SET destinations TO a new list containing start_position
+            FOR each pair delta_row comma delta_column IN the list found by accessing directions AT piece_type
+                SET new_row TO row PLUS delta_row
+                SET new_column TO column PLUS delta_column
+                WHILE new_row GREATER THAN OR EQUAL TO zero AND new_row LESS THAN eight AND new_column GREATER THAN OR EQUAL TO zero AND new_column LESS THAN eight HOLDS
+                    APPEND the pair of new_row and new_column TO destinations
+                    INCREMENT new_row BY delta_row
+                    INCREMENT new_column BY delta_column
+                END WHILE
+            END FOR
+            RETURN destinations
+        END FUNCTION
+        
+        SET all_destinations TO a new list formed by FOR each pair position comma piece IN ZIP of list_of_positions and list_of_pieces CALL get_destinations with position and piece
+        
+        FUNCTION is_valid_combination(candidate_combination)
+            SET current_positions TO a shallow copy of list_of_positions
+            SET number_of_pieces TO the LENGTH OF current_positions
+            WHILE true HOLDS
+                IF the LENGTH OF the set formed from current_positions LESS THAN number_of_pieces
+                    RETURN false
+                END IF
+                SET all_pieces_reached TO true
+                FOR index FROM zero TO number_of_pieces MINUS one INCLUSIVE
+                    IF the element at position index OF current_positions EQUALS the element at position index OF candidate_combination
+                        CONTINUE
+                    END IF
+                    SET all_pieces_reached TO false
+                    SET current_row TO the first element at position index OF current_positions
+                    SET current_column TO the second element at position index OF current_positions
+                    SET target_row TO the first element at position index OF candidate_combination
+                    SET target_column TO the second element at position index OF candidate_combination
+                    IF target_row GREATER THAN current_row
+                        SET delta_row TO one
+                    ELSE IF target_row LESS THAN current_row
+                        SET delta_row TO negative one
+                    ELSE
+                        SET delta_row TO zero
+                    END IF
+                    IF target_column GREATER THAN current_column
+                        SET delta_column TO one
+                    ELSE IF target_column LESS THAN current_column
+                        SET delta_column TO negative one
+                    ELSE
+                        SET delta_column TO zero
+                    END IF
+                    SET element at position index OF current_positions TO the pair of current_row PLUS delta_row and current_column PLUS delta_column
+                END FOR
+                IF all_pieces_reached IS true
+                    RETURN true
+                END IF
+            END WHILE
+        END FUNCTION
+        
+        SET valid_count TO zero
+        FOR each combination IN the Cartesian product of all elements in all_destinations
+            IF is_valid_combination WITH combination HOLDS
+                INCREMENT valid_count BY one
+            END IF
+        END FOR
+        
+        RETURN valid_count
+    END FUNCTION
+END CLASS

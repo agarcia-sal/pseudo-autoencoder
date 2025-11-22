@@ -1,0 +1,61 @@
+CLASS Solution  
+    FUNCTION evaluate(expression)  
+        FUNCTION get_tokens(expression)  
+            SET tokens TO empty list  
+            SET buf TO empty string  
+            SET depth TO zero  
+            FOR each character IN expression  
+                IF character EQUALS space AND depth EQUALS zero  
+                    APPEND buf TO tokens  
+                    SET buf TO empty string  
+                ELSE  
+                    IF character EQUALS open parenthesis  
+                        INCREMENT depth BY one  
+                    ELSE IF character EQUALS close parenthesis  
+                        DECREMENT depth BY one  
+                    END IF  
+                    APPEND character TO buf  
+                END IF  
+            END FOR  
+            IF buf NOT EQUALS empty string  
+                APPEND buf TO tokens  
+            END IF  
+            RETURN tokens  
+        END FUNCTION  
+
+        FUNCTION evaluate_expression(tokens context)  
+            IF element at position zero of tokens EQUALS the word add  
+                RETURN evaluate_expression element at position one of tokens AND context PLUS evaluate_expression element at position two of tokens AND context  
+            ELSE IF element at position zero of tokens EQUALS the word mult  
+                RETURN evaluate_expression element at position one of tokens AND context MULTIPLIED BY evaluate_expression element at position two of tokens AND context  
+            ELSE IF element at position zero of tokens EQUALS the word let  
+                SET new_context TO a copy of context  
+                SET i TO one  
+                WHILE i LESS THAN the length of tokens MINUS one  
+                    SET var TO element at position i of tokens  
+                    SET expr TO element at position i PLUS one of tokens  
+                    ASSIGN to new_context at key var the result of evaluate_expression expr AND new_context  
+                    INCREMENT i BY two  
+                END WHILE  
+                RETURN evaluate_expression element at the last position of tokens AND new_context  
+            ELSE  
+                TRY  
+                    RETURN the integer value of element at position zero of tokens  
+                CATCH failure to convert  
+                    RETURN value at key of element at position zero of tokens in context  
+                END TRY  
+            END IF  
+        END FUNCTION  
+
+        FUNCTION parse_expression(expression)  
+            IF element at position zero of expression NOT EQUALS open parenthesis  
+                RETURN expression  
+            END IF  
+            SET tokens TO get_tokens substring of expression from position one TO position negative one  
+            RETURN list of parse_expression applied to each token in tokens  
+        END FUNCTION  
+
+        SET parsed_expression TO parse_expression expression  
+        RETURN evaluate_expression parsed_expression AND empty mapping  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,98 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.parent TO list of integers from zero TO size MINUS one  
+        SET self.rank TO list of zero repeated size times  
+        SET self.size TO list of one repeated size times  
+    END FUNCTION  
+
+    FUNCTION find(self, u)  
+        IF element at position u of self.parent NOT EQUALS u  
+            SET element at position u of self.parent TO self.find(element at position u of self.parent)  
+        END IF  
+        RETURN element at position u of self.parent  
+    END FUNCTION  
+
+    FUNCTION union(self, u, v)  
+        SET rootU TO self.find(u)  
+        SET rootV TO self.find(v)  
+        IF rootU NOT EQUALS rootV  
+            IF element at position rootU of self.rank GREATER THAN element at position rootV of self.rank  
+                SET element at position rootV of self.parent TO rootU  
+                INCREMENT element at position rootU of self.size BY element at position rootV of self.size  
+            ELSE IF element at position rootU of self.rank LESS THAN element at position rootV of self.rank  
+                SET element at position rootU of self.parent TO rootV  
+                INCREMENT element at position rootV of self.size BY element at position rootU of self.size  
+            ELSE  
+                SET element at position rootV of self.parent TO rootU  
+                INCREMENT element at position rootU of self.size BY element at position rootV of self.size  
+                INCREMENT element at position rootU of self.rank BY one  
+            END IF  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION groupStrings(self, words)  
+        FUNCTION bitmask(word)  
+            SET mask TO zero  
+            FOR each char IN word  
+                SET mask TO mask OR ONE LEFT SHIFTED BY ordinal value of char MINUS ordinal value of 'a'  
+            END FOR  
+            RETURN mask  
+        END FUNCTION  
+
+        SET word_map TO empty mapping from default list  
+        SET n TO the LENGTH OF words  
+        SET uf TO new UnionFind initialized with n  
+
+        FOR each index i AND word IN words  
+            SET mask TO bitmask(word)  
+            APPEND i TO list at key mask in word_map  
+        END FOR  
+
+        FOR each index i AND word IN words  
+            SET mask TO bitmask(word)  
+            FOR each integer j FROM zero TO twenty five  
+                SET new_mask TO mask XOR ONE LEFT SHIFTED BY j  # Delete one letter  
+                IF new_mask EXISTS AS key IN word_map  
+                    FOR each k IN list at key new_mask in word_map  
+                        CALL uf.union(i, k)  
+                    END FOR  
+                END IF  
+
+                IF mask AND ONE LEFT SHIFTED BY j EQUALS zero  # Add one letter  
+                    SET new_mask TO mask OR ONE LEFT SHIFTED BY j  
+                    IF new_mask EXISTS AS key IN word_map  
+                        FOR each k IN list at key new_mask in word_map  
+                            CALL uf.union(i, k)  
+                        END FOR  
+                    END IF  
+                END IF  
+
+                IF mask AND ONE LEFT SHIFTED BY j NOT EQUALS zero  # Replace one letter  
+                    FOR each integer k FROM zero TO twenty five  
+                        IF mask AND ONE LEFT SHIFTED BY k EQUALS zero  
+                            SET new_mask TO mask XOR ONE LEFT SHIFTED BY j OR ONE LEFT SHIFTED BY k  
+                            IF new_mask EXISTS AS key IN word_map  
+                                FOR each l IN list at key new_mask in word_map  
+                                    CALL uf.union(i, l)  
+                                END FOR  
+                            END IF  
+                        END IF  
+                    END FOR  
+                END IF  
+            END FOR  
+        END FOR  
+
+        SET root_sizes TO empty mapping from default integer  
+        FOR each integer i FROM zero TO n MINUS one  
+            SET root TO uf.find(i)  
+            INCREMENT element at key root in root_sizes BY one  
+        END FOR  
+
+        SET max_group_size TO maximum value among values in root_sizes  
+        SET num_groups TO the LENGTH OF root_sizes  
+
+        RETURN list containing num_groups AND max_group_size  
+    END FUNCTION  
+END CLASS

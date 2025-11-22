@@ -1,0 +1,49 @@
+CLASS Trie
+    FUNCTION __init__()
+        SET self.children TO list of size 26 initialized with None
+        SET self.ref TO -1
+    END FUNCTION
+
+    FUNCTION insert(w, ref)
+        SET node TO self
+        FOR each character c IN w
+            SET idx TO numeric value of c minus numeric value of 'a'
+            IF node.children[idx] IS None THEN
+                SET node.children[idx] TO new Trie instance
+            SET node TO node.children[idx]
+        SET node.ref TO ref
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION findWords(board, words)
+        FUNCTION dfs(node, i, j)
+            SET idx TO numeric value of board[i][j] minus numeric value of 'a'
+            IF node.children[idx] IS None THEN
+                RETURN
+            SET node TO node.children[idx]
+            IF node.ref IS GREATER THAN OR EQUAL TO 0 THEN
+                APPEND words[node.ref] TO ans
+                SET node.ref TO -1
+            SET c TO board[i][j]
+            SET board[i][j] TO '#'
+            FOR each consecutive pair (a, b) IN sequence (-1, 0, 1, 0, -1)
+                SET x TO i PLUS a
+                SET y TO j PLUS b
+                IF x IS WITHIN range 0 TO m-1 AND y IS WITHIN range 0 TO n-1 AND board[x][y] IS NOT '#'
+                    CALL dfs(node, x, y)
+            SET board[i][j] TO c
+        END FUNCTION
+
+        SET tree TO new Trie instance
+        FOR each index i AND word w IN words
+            CALL tree.insert(w, i)
+        SET m TO number of rows in board
+        SET n TO number of columns in board
+        SET ans TO empty list
+        FOR i FROM 0 TO m-1
+            FOR j FROM 0 TO n-1
+                CALL dfs(tree, i, j)
+        RETURN ans
+    END FUNCTION
+END CLASS

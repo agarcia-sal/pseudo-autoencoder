@@ -1,0 +1,39 @@
+CLASS Solution
+    FUNCTION maxVacationDays(flights, days)
+        SET number_of_cities TO the LENGTH OF flights
+        SET number_of_weeks TO the LENGTH OF element at position zero of days
+
+        SET dp TO a list of number_of_cities elements each set TO minus one
+        SET element at position zero of dp TO zero
+
+        SET graph TO an empty dictionary with keys FROM zero TO number_of_cities MINUS one each having an empty list as value
+
+        FOR city_index FROM zero TO number_of_cities MINUS one
+            FOR destination_index FROM zero TO number_of_cities MINUS one
+                IF element at position city_index of element at position destination_index of flights EQUALS one
+                    APPEND destination_index TO element at position city_index of graph
+                END IF
+            END FOR
+        END FOR
+
+        FOR week_index FROM zero TO number_of_weeks MINUS one
+            SET new_dp TO a list of number_of_cities elements each set TO minus one
+
+            FOR city_index FROM zero TO number_of_cities MINUS one
+                IF element at position city_index of dp EQUALS minus one
+                    CONTINUE
+                END IF
+
+                SET element at position city_index of new_dp TO the maximum of element at position city_index of new_dp AND element at position city_index of dp PLUS element at position city_index of element at position week_index of days
+
+                FOR reachable_city IN element at position city_index of graph
+                    SET element at position reachable_city of new_dp TO the maximum of element at position reachable_city of new_dp AND element at position city_index of dp PLUS element at position reachable_city of element at position week_index of days
+                END FOR
+            END FOR
+
+            SET dp TO new_dp
+        END FOR
+
+        RETURN the maximum value IN dp
+    END FUNCTION
+END CLASS

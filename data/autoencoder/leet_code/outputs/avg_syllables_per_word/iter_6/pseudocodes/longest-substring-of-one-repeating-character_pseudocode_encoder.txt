@@ -1,0 +1,56 @@
+CLASS Solution  
+    FUNCTION longestRepeating(s, queryCharacters, queryIndices)  
+        FUNCTION merge_intervals()  
+            SET i TO 0  
+            WHILE i IS LESS THAN LENGTH OF intervals MINUS 1  
+                IF character OF intervals AT i EQUALS character OF intervals AT i PLUS 1  
+                    SET intervals AT i TO tuple WITH start FROM intervals AT i, end FROM intervals AT i PLUS 1, character FROM intervals AT i  
+                    REMOVE element AT i PLUS 1 FROM intervals  
+                ELSE  
+                    INCREMENT i BY 1  
+            END WHILE  
+        END FUNCTION  
+
+        SET intervals TO empty list  
+        SET n TO LENGTH OF s  
+        SET start TO 0  
+        FOR i FROM 1 TO n MINUS 1  
+            IF character s AT i NOT EQUALS character s AT start  
+                APPEND tuple WITH start, i MINUS 1, character s AT start TO intervals  
+                SET start TO i  
+        END FOR  
+        APPEND tuple WITH start, n MINUS 1, character s AT start TO intervals  
+
+        SET results TO empty list  
+        SET longest TO maximum OF (end MINUS start PLUS 1) FOR each start, end, character IN intervals  
+
+        FOR each char, idx IN queryCharacters AND queryIndices  
+            SET i TO 0  
+            WHILE i IS LESS THAN LENGTH OF intervals  
+                GET start, end, c FROM intervals AT i  
+                IF start IS LESS THAN OR EQUAL TO idx AND idx IS LESS THAN OR EQUAL TO end  
+                    BREAK  
+                INCREMENT i BY 1  
+            END WHILE  
+
+            IF idx IS GREATER THAN start  
+                INSERT tuple WITH start, idx MINUS 1, c INTO intervals AT i  
+                SET intervals AT i PLUS 1 TO tuple WITH idx, end, c  
+            END IF  
+
+            IF idx IS LESS THAN end  
+                INSERT tuple WITH idx PLUS 1, end, c INTO intervals AT i PLUS 1  
+                SET intervals AT i TO tuple WITH start, idx, c  
+            END IF  
+
+            SET intervals AT i TO tuple WITH intervals AT i START, intervals AT i END, char  
+
+            CALL merge_intervals()  
+
+            SET longest TO maximum OF (end MINUS start PLUS 1) FOR each start, end, character IN intervals  
+            APPEND longest TO results  
+        END FOR  
+
+        RETURN results  
+    END FUNCTION  
+END CLASS

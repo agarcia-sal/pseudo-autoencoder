@@ -1,0 +1,33 @@
+```
+class UF:
+  init(n): parent=[0..n-1], rank=[1]*n
+  find(u): parent[u]=find(parent[u]) if parent[u]!=u else u; return parent[u]
+  union(u,v):
+    ru,rv=find(u),find(v)
+    if ru!=rv:
+      if rank[ru]>rank[rv]: parent[rv]=ru
+      elif rank[ru]<rank[rv]: parent[ru]=rv
+      else: parent[rv]=ru; rank[ru]+=1
+      return True
+    return False
+
+func findCriticalPseudo(n, edges):
+  for i,e in enumerate(edges): e.append(i)
+  edges.sort by weight
+  func mst(exclude=None, include=None):
+    uf=UF(n); w=0
+    if include: uf.union(include[0],include[1]); w+=include[2]
+    for u,v,wi,idx in edges:
+      if idx==exclude: continue
+      if uf.union(u,v): w+=wi
+    r=uf.find(0)
+    for i in 0..n-1: if uf.find(i)!=r: return ∞
+    return w
+
+  base=mst()
+  critical, pseudo=[], []
+  for u,v,w,i in edges:
+    if mst(exclude=i)>base: critical.append(i)
+    else if mst(include=(u,v,w))==base: pseudo.append(i)
+  return [critical,pseudo]
+```

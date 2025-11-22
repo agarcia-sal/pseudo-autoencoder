@@ -1,0 +1,47 @@
+CLASS Solution  
+    FUNCTION minWastedSpace(packages AS list_of_integers, boxes AS list_of_list_of_integers) RETURNS integer  
+        SET MOD TO ten POWERED BY nine PLUS one  
+        SORT packages INTO ascending order  
+        SET n TO the LENGTH OF packages  
+        
+        INITIALIZE prefix_sum AS a list of zeros with the LENGTH OF n PLUS one  
+        FOR index FROM zero TO n MINUS one  
+            SET element at position index PLUS one OF prefix_sum TO element at position index OF prefix_sum PLUS element at position index OF packages  
+        END FOR  
+        
+        SET min_wasted_space TO positive infinity  
+        
+        FOR each box_supplier IN boxes  
+            SORT box_supplier INTO ascending order  
+            IF the last element of box_supplier IS LESS THAN the last element of packages THEN  
+                CONTINUE to the next iteration of the outer loop  
+            END IF  
+            
+            SET total_wasted TO zero  
+            SET last_index TO zero  
+            
+            FOR each box_size IN box_supplier  
+                SET index TO last_index  
+                WHILE index IS LESS THAN n AND element at position index OF packages IS LESS THAN OR EQUAL TO box_size  
+                    INCREMENT index BY one  
+                END WHILE  
+                
+                IF index IS GREATER THAN last_index THEN  
+                    SET wasted_for_current_box TO the quantity of index MINUS last_index MULTIPLIED BY box_size MINUS the difference between element at position index OF prefix_sum MINUS element at position last_index OF prefix_sum  
+                    INCREMENT total_wasted BY wasted_for_current_box  
+                    SET last_index TO index  
+                END IF  
+            END FOR  
+            
+            IF last_index EQUALS n THEN  
+                SET min_wasted_space TO the smaller value BETWEEN min_wasted_space AND total_wasted  
+            END IF  
+        END FOR  
+        
+        IF min_wasted_space IS NOT EQUAL TO positive infinity THEN  
+            RETURN min_wasted_space MODULO MOD  
+        ELSE  
+            RETURN negative one  
+        END IF  
+    END FUNCTION  
+END CLASS

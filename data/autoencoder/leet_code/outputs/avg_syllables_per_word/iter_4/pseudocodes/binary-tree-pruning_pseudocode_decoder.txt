@@ -1,0 +1,60 @@
+CLASS TreeNode
+    FUNCTION __init__(val = 0, left = None, right = None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values: list)
+    IF values IS EMPTY
+        RETURN None
+    END IF
+    SET root TO TreeNode(values[0])
+    SET i TO 1
+    CREATE queue AS empty deque
+    APPEND root TO queue
+    WHILE queue IS NOT EMPTY
+        SET node TO REMOVE FIRST element FROM queue
+        IF i LESS THAN LENGTH OF values AND values[i] IS NOT None
+            SET node.left TO TreeNode(values[i])
+            APPEND node.left TO queue
+        END IF
+        INCREMENT i BY 1
+        IF i LESS THAN LENGTH OF values AND values[i] IS NOT None
+            SET node.right TO TreeNode(values[i])
+            APPEND node.right TO queue
+        END IF
+        INCREMENT i BY 1
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val NOT EQUAL q.val
+        RETURN False
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION pruneTree(root: Optional[TreeNode]) RETURNS Optional[TreeNode]
+        IF root IS None
+            RETURN None
+        END IF
+        
+        SET root.left TO self.pruneTree(root.left)
+        SET root.right TO self.pruneTree(root.right)
+        
+        IF root.val EQUALS 0 AND root.left IS None AND root.right IS None
+            RETURN None
+        END IF
+        
+        RETURN root
+    END FUNCTION
+END CLASS

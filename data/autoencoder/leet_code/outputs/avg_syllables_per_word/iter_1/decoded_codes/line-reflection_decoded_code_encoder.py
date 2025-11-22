@@ -1,0 +1,8 @@
+def is_symmetric(points):
+    unique_pts = set(points)
+    min_x, max_x = min(x for x,_ in unique_pts), max(x for x,_ in unique_pts)
+    line = (min_x + max_x) / 2
+    for (x, y) in unique_pts:
+        if (2 * line - x, y) not in unique_pts:
+            return False
+    return True

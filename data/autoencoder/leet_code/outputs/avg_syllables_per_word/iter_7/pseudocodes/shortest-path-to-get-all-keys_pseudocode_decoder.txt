@@ -1,0 +1,49 @@
+CLASS Solution  
+    FUNCTION shortestPathAllKeys(grid)  
+        SET directions TO list of (0, 1), (0, -1), (1, 0), (-1, 0)  
+        SET m TO LENGTH OF grid  
+        SET n TO LENGTH OF grid AT 0  
+        SET start TO None  
+        SET num_keys TO 0  
+
+        FOR i FROM 0 TO m MINUS 1  
+            FOR j FROM 0 TO n MINUS 1  
+                IF grid AT i AT j IS '@'  
+                    SET start TO tuple of i and j  
+                ELSE IF grid AT i AT j IS lowercase letter  
+                    INCREMENT num_keys BY 1  
+
+        SET queue TO new deque containing tuple of start x, start y, 0, 0  
+        SET visited TO new set containing tuple of start x, start y, 0  
+
+        WHILE queue IS NOT empty  
+            SET x, y, keys, steps TO REMOVE FIRST ELEMENT FROM queue  
+
+            FOR each dx, dy IN directions  
+                SET nx TO x PLUS dx  
+                SET ny TO y PLUS dy  
+
+                IF nx IS GREATER THAN OR EQUAL TO 0 AND nx IS LESS THAN m AND ny IS GREATER THAN OR EQUAL TO 0 AND ny IS LESS THAN n  
+                    SET cell TO grid AT nx AT ny  
+
+                    IF cell IS '#'  
+                        CONTINUE TO NEXT iteration  
+
+                    IF cell IS uppercase letter  
+                        SET key_needed TO 1 LEFT SHIFTED BY (ASCII VALUE OF lowercase of cell MINUS ASCII VALUE OF 'a')  
+                        IF keys BITWISE AND key_needed EQUALS 0  
+                            CONTINUE TO NEXT iteration  
+
+                    IF cell IS lowercase letter  
+                        SET new_keys TO keys BITWISE OR 1 LEFT SHIFTED BY (ASCII VALUE OF cell MINUS ASCII VALUE OF 'a')  
+                        IF new_keys EQUALS (1 LEFT SHIFTED BY num_keys) MINUS 1  
+                            RETURN steps PLUS 1  
+                    ELSE  
+                        SET new_keys TO keys  
+
+                    IF tuple of nx, ny, new_keys IS NOT IN visited  
+                        ADD tuple of nx, ny, new_keys TO visited  
+                        ADD tuple of nx, ny, new_keys, steps PLUS 1 TO queue  
+
+        RETURN -1  
+END CLASS

@@ -1,0 +1,82 @@
+CLASS Solution  
+    FUNCTION containVirus(isInfected)  
+        FUNCTION neighbors(r, c)  
+            RETURN list of pairs consisting of position one greater than r and c, position one less than r and c, position r and one greater than c, position r and one less than c  
+        END FUNCTION  
+
+        FUNCTION bfs(r, c)  
+            SET infected TO empty set  
+            SET threatened TO empty set  
+            SET queue TO double ended queue initialized with pair r and c  
+            SET visited TO set initialized with pair r and c  
+            WHILE queue is not empty  
+                SET x, y TO first element removed from queue  
+                ADD pair x and y TO infected  
+                FOR each pair nx, ny IN neighbors of x and y  
+                    IF nx is greater than or equal to zero AND nx is less than m AND ny is greater than or equal to zero AND ny is less than n AND pair nx and ny is not in visited  
+                        ADD pair nx and ny TO visited  
+                        IF value at position nx and ny of isInfected EQUALS one  
+                            ADD pair nx and ny TO queue  
+                        ELSE IF value at position nx and ny of isInfected EQUALS zero  
+                            ADD pair nx and ny TO threatened  
+                        END IF  
+                    END IF  
+                END FOR  
+            END WHILE  
+            RETURN pair infected and threatened  
+        END FUNCTION  
+
+        FUNCTION build_walls(infected)  
+            SET walls TO zero  
+            FOR each pair x, y IN infected  
+                FOR each pair nx, ny IN neighbors of x and y  
+                    IF nx is greater than or equal to zero AND nx is less than m AND ny is greater than or equal to zero AND ny is less than n AND value at position nx and ny of isInfected EQUALS zero  
+                        INCREMENT walls BY one  
+                    END IF  
+                END FOR  
+            END FOR  
+            RETURN walls  
+        END FUNCTION  
+
+        FUNCTION spread_virus(threatened)  
+            FOR each pair x, y IN threatened  
+                SET value at position x and y of isInfected TO one  
+            END FOR  
+        END FUNCTION  
+
+        SET m TO the length of isInfected  
+        SET n TO the length of element at position zero of isInfected  
+        SET total_walls TO zero  
+
+        WHILE true  
+            SET regions TO empty list  
+            SET visited TO empty set  
+            FOR r FROM zero TO m minus one  
+                FOR c FROM zero TO n minus one  
+                    IF value at position r and c of isInfected EQUALS one AND pair r and c is not in visited  
+                        SET infected, threatened TO result of bfs for r and c  
+                        APPEND pair infected and threatened TO regions  
+                        ASSIGN union of visited and infected TO visited  
+                    END IF  
+                END FOR  
+            END FOR  
+
+            IF regions is empty  
+                BREAK  
+            END IF  
+
+            SORT regions in descending order by length of threatened set contained in each pair  
+
+            INCREMENT total_walls BY result of build_walls for infected set in first element of regions  
+            FOR each pair x, y IN infected set in first element of regions  
+                SET value at position x and y of isInfected TO minus one  
+            END FOR  
+
+            FOR i FROM one TO length of regions minus one  
+                CALL spread_virus for threatened set in element i of regions  
+            END FOR  
+        END WHILE  
+
+        RETURN total_walls  
+    END FUNCTION  
+END CLASS

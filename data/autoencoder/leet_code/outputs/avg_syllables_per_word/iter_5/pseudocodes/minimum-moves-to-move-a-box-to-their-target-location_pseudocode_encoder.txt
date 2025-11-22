@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION minPushBox(grid)  
+        SET directions TO list of tuples: up, down, left, right movements  
+        
+        FOR i FROM 0 TO length of grid MINUS 1  
+            FOR j FROM 0 TO length of grid at 0 MINUS 1  
+                IF grid at i, j EQUALS 'S'  
+                    SET player_start TO tuple i, j  
+                ELSE IF grid at i, j EQUALS 'B'  
+                    SET box_start TO tuple i, j  
+                ELSE IF grid at i, j EQUALS 'T'  
+                    SET target TO tuple i, j  
+        
+        SET queue TO deque containing tuple of player_start, box_start, and 0  
+        SET visited TO set containing tuple of player_start, box_start  
+        
+        WHILE queue is not empty  
+            REMOVE leftmost element from queue INTO player_pos, box_pos, push_count  
+            
+            IF box_pos EQUALS target  
+                RETURN push_count  
+            
+            FOR each dx, dy IN directions  
+                SET new_player_pos TO tuple of player_pos first element PLUS dx, player_pos second element PLUS dy  
+                
+                IF is_valid_position(new_player_pos, grid) IS true  
+                    IF new_player_pos EQUALS box_pos  
+                        SET new_box_pos TO tuple of box_pos first element PLUS dx, box_pos second element PLUS dy  
+                        
+                        IF is_valid_position(new_box_pos, grid) IS true AND tuple of new_player_pos, new_box_pos NOT IN visited  
+                            ADD tuple of new_player_pos, new_box_pos TO visited  
+                            APPEND tuple of new_player_pos, new_box_pos, push_count PLUS 1 TO queue  
+                    ELSE  
+                        IF tuple of new_player_pos, box_pos NOT IN visited  
+                            ADD tuple of new_player_pos, box_pos TO visited  
+                            APPEND tuple of new_player_pos, box_pos, push_count TO queue  
+        
+        RETURN negative one  
+    END FUNCTION  
+    
+    FUNCTION is_valid_position(position, grid)  
+        SET x TO position first element  
+        SET y TO position second element  
+        RETURN x GREATER THAN OR EQUAL TO zero AND x LESS THAN length of grid AND y GREATER THAN OR EQUAL TO zero AND y LESS THAN length of grid at 0 AND grid at x, y NOT EQUAL TO '#'  
+    END FUNCTION  
+END CLASS

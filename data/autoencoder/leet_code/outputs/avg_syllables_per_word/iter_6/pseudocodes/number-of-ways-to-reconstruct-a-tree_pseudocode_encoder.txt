@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION checkWays(pairs)  
+        CREATE graph AS a mapping with default empty set for each key  
+        FOR each x, y IN pairs  
+            ADD y TO graph at key x  
+            ADD x TO graph at key y  
+        
+        SET max_degree TO node in graph with maximum size of connected nodes  
+        SET n TO size of graph keys  
+        
+        IF size of graph at max_degree NOT EQUALS n MINUS 1  
+            RETURN 0  
+        
+        FUNCTION can_be_parent(u, v)  
+            FOR each neighbor IN graph at key v  
+                IF neighbor NOT IN graph at key u AND neighbor NOT EQUALS u  
+                    RETURN FALSE  
+            RETURN TRUE  
+        END FUNCTION  
+        
+        SET ways TO 1  
+        
+        FOR each u IN graph keys  
+            IF u EQUALS max_degree  
+                CONTINUE  
+            
+            SET parent TO null  
+            FOR each v IN graph at key u  
+                IF v IN graph AND size of graph at v GREATER THAN OR EQUAL TO size of graph at u AND CALL can_be_parent WITH u AS v AND v AS u RETURNS TRUE  
+                    IF parent IS null OR size of graph at v LESS THAN size of graph at parent  
+                        SET parent TO v  
+            
+            IF parent IS null  
+                RETURN 0  
+            
+            IF size of graph at parent EQUALS size of graph at u  
+                SET ways TO 2  
+        
+        RETURN ways  
+    END FUNCTION  
+END CLASS

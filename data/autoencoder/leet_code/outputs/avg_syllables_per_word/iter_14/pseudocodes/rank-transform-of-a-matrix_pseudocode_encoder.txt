@@ -1,0 +1,61 @@
+CLASS UnionFind  
+    FUNCTION __init__ WITH PARAMETER size  
+        SET self.parent TO list OF all integers FROM zero TO size MINUS one  
+    END FUNCTION  
+
+    FUNCTION find WITH PARAMETER u  
+        IF element at position u OF self.parent IS NOT EQUAL TO u  
+            SET element at position u OF self.parent TO the RESULT OF find WITH PARAMETER element at position u OF self.parent  
+        END IF  
+        RETURN element at position u OF self.parent  
+    END FUNCTION  
+
+    FUNCTION union WITH PARAMETERS u v  
+        SET root_u TO the RESULT OF find WITH PARAMETER u  
+        SET root_v TO the RESULT OF find WITH PARAMETER v  
+        IF root_u IS NOT EQUAL TO root_v  
+            SET element at position root_u OF self.parent TO root_v  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION matrixRankTransform WITH PARAMETER matrix  
+        SET m TO the LENGTH OF matrix  
+        SET n TO the LENGTH OF element at position zero OF matrix  
+        SET value_to_indices TO a new empty default dictionary with list as default value  
+        
+        FOR each r FROM zero TO m MINUS one  
+            FOR each c FROM zero TO n MINUS one  
+                APPEND the pair CONSISTING OF r AND c TO the list stored at key element at position r OF matrix AND position c OF matrix IN value_to_indices  
+            END FOR  
+        END FOR  
+        
+        SET row_rank TO a list OF m zeros  
+        SET col_rank TO a list OF n zeros  
+        SET result TO a two-dimensional list OF m lists EACH consisting OF n zeros  
+        
+        FOR each value IN the keys of value_to_indices ARRANGED IN ascending order  
+            SET uf TO a new UnionFind OBJECT INITIALIZED WITH parameter m PLUS n  
+            SET rank TO a new empty default dictionary with integer default value  
+            
+            FOR each pair r c IN the list stored at key value IN value_to_indices  
+                CALL union ON uf WITH PARAMETERS r AND c PLUS m  
+            END FOR  
+            
+            FOR each pair r c IN the list stored at key value IN value_to_indices  
+                SET root TO the RESULT OF find ON uf WITH PARAMETER r  
+                SET element at key root IN rank TO the GREATER OF element at key root IN rank AND the GREATER OF element at position r OF row_rank AND element at position c OF col_rank PLUS one  
+            END FOR  
+            
+            FOR each pair r c IN the list stored at key value IN value_to_indices  
+                SET root TO the RESULT OF find ON uf WITH PARAMETER r  
+                SET element at position r AND c OF result TO element at key root IN rank  
+                SET element at position r OF row_rank TO element at key root IN rank  
+                SET element at position c OF col_rank TO element at key root IN rank  
+            END FOR  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

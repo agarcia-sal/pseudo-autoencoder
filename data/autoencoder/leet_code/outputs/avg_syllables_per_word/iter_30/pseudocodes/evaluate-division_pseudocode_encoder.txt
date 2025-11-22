@@ -1,0 +1,39 @@
+CLASS Solution  
+    FUNCTION calcEquation(equations, values, queries)  
+        SET graph TO a new mapping from key to mapping from key to value  
+        FOR each pair a and b AND each value IN parallel ITERATION of equations and values  
+            SET the value at key b in the mapping at key a in graph TO value  
+            SET the value at key a in the mapping at key b in graph TO one DIVIDED BY value  
+        END FOR  
+        
+        FUNCTION dfs(start, end, visited)  
+            IF start NOT IN graph OR end NOT IN graph  
+                RETURN negative one  
+            END IF  
+            IF start EQUALS end  
+                RETURN one  
+            END IF  
+            ADD start TO visited  
+            FOR each neighbor and weight IN the mapping at key start in graph  
+                IF neighbor NOT IN visited  
+                    SET result TO dfs(neighbor, end, visited)  
+                    IF result NOT EQUALS negative one  
+                        RETURN weight MULTIPLIED BY result  
+                    END IF  
+                END IF  
+            END FOR  
+            REMOVE start FROM visited  
+            RETURN negative one  
+        END FUNCTION  
+        
+        SET results TO an empty collection  
+        FOR each query IN queries  
+            SET start TO element at position zero OF query  
+            SET end TO element at position one OF query  
+            SET visited TO an empty collection of unique elements  
+            SET result TO dfs(start, end, visited)  
+            APPEND result TO results  
+        END FOR  
+        RETURN results  
+    END FUNCTION  
+END CLASS

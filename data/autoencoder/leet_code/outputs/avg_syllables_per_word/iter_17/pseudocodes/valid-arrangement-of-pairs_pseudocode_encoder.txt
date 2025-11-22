@@ -1,0 +1,49 @@
+CLASS Solution
+    FUNCTION validArrangement(pairs)
+        SET graph TO CALL create_defaultdict WITH parameter list
+        SET out_degree TO CALL create_counter
+        SET in_degree TO CALL create_counter
+
+        FOR each pair IN pairs
+            DECOMPOSE pair INTO u AND v
+            APPEND v TO element at position u of graph
+            INCREMENT element at position u of out_degree BY one
+            INCREMENT element at position v of in_degree BY one
+        END FOR
+
+        SET start_node TO none
+        FOR each node IN graph
+            IF element at position node of out_degree EQUALS element at position node of in_degree PLUS one
+                SET start_node TO node
+                BREAK
+            END IF
+        END FOR
+
+        IF start_node IS none
+            SET start_node TO CALL next_element OF the ITERATOR OVER graph
+        END IF
+
+        SET path TO empty list
+        SET stack TO list containing start_node
+
+        WHILE length of stack GREATER THAN zero
+            SET u TO element at last position of stack
+            IF element at position u of graph IS NOT empty
+                SET v TO last element REMOVED FROM element at position u of graph
+                APPEND v TO stack
+            ELSE
+                APPEND last element REMOVED FROM stack TO path
+            END IF
+        END WHILE
+
+        CALL reverse ON path
+
+        SET result TO empty list
+        FOR index FROM zero TO length of path MINUS two
+            SET pair TO list containing element at position index of path AND element at position index PLUS one of path
+            APPEND pair TO result
+        END FOR
+
+        RETURN result
+    END FUNCTION
+END CLASS

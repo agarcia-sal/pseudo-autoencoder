@@ -1,0 +1,65 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val = 0, left = None, right = None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN None  
+    SET root TO NEW TreeNode WITH val AS values AT index 0  
+    SET i TO 1  
+    SET queue TO NEW empty queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO REMOVE first element FROM queue  
+        IF i IS LESS THAN LENGTH OF values AND values AT index i IS NOT None  
+            SET node.left TO NEW TreeNode WITH val AS values AT index i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i IS LESS THAN LENGTH OF values AND values AT index i IS NOT None  
+            SET node.right TO NEW TreeNode WITH val AS values AT index i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION printTree(self, root)  
+        FUNCTION getHeight(node)  
+            IF node IS None  
+                RETURN 0  
+            RETURN 1 PLUS MAXIMUM OF getHeight(node.left) AND getHeight(node.right)  
+        END FUNCTION  
+
+        SET height TO getHeight(root)  
+        SET width TO 2 RAISED TO height MINUS 1  
+        SET res TO TWO DIMENSIONAL LIST WITH height ROWS AND width COLUMNS FILLED WITH empty string  
+
+        FUNCTION placeNode(node, row, left, right)  
+            IF node IS None  
+                RETURN  
+            SET mid TO (left PLUS right) DIVIDED BY 2  
+            SET res AT row AND mid TO STRING REPRESENTATION OF node.val  
+            CALL placeNode(node.left, row PLUS 1, left, mid)  
+            CALL placeNode(node.right, row PLUS 1, mid, right)  
+        END FUNCTION  
+
+        CALL placeNode(root, 0, 0, width)  
+        RETURN res  
+    END FUNCTION  
+END CLASS

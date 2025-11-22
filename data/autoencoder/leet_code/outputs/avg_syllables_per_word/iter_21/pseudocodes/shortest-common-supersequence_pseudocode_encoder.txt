@@ -1,0 +1,82 @@
+CLASS Solution  
+    FUNCTION shortestCommonSupersequence(str1, str2)  
+        SET m TO the LENGTH OF str1  
+        SET n TO the LENGTH OF str2  
+        
+        CALL create_2D_list WITH PARAMETERS m PLUS one AND n PLUS one AND zero  
+        ASSIGN reference TO variable dp  
+        
+        FOR i FROM one TO m  
+            FOR j FROM one TO n  
+                IF element at position i MINUS one OF str1 EQUALS element at position j MINUS one OF str2  
+                    SET element at position i AND j OF dp TO element at position i MINUS one AND j MINUS one OF dp PLUS one  
+                ELSE  
+                    SET element at position i AND j OF dp TO the GREATER VALUE BETWEEN element at position i MINUS one AND j OF dp AND element at position i AND j MINUS one OF dp  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET i TO m  
+        SET j TO n  
+        INITIALIZE empty list scs  
+        
+        WHILE i GREATER THAN zero AND j GREATER THAN zero HOLDS  
+            IF element at position i MINUS one OF str1 EQUALS element at position j MINUS one OF str2  
+                APPEND element at position i MINUS one OF str1 TO scs  
+                DECREMENT i BY one  
+                DECREMENT j BY one  
+            ELSE IF element at position i MINUS one AND j OF dp GREATER THAN element at position i AND j MINUS one OF dp  
+                APPEND element at position i MINUS one OF str1 TO scs  
+                DECREMENT i BY one  
+            ELSE  
+                APPEND element at position j MINUS one OF str2 TO scs  
+                DECREMENT j BY one  
+            END IF  
+        END WHILE  
+        
+        WHILE i GREATER THAN zero HOLDS  
+            APPEND element at position i MINUS one OF str1 TO scs  
+            DECREMENT i BY one  
+        END WHILE  
+        
+        WHILE j GREATER THAN zero HOLDS  
+            APPEND element at position j MINUS one OF str2 TO scs  
+            DECREMENT j BY one  
+        END WHILE  
+        
+        CALL reverse_list WITH PARAMETER scs  
+        
+        SET result_string TO CALL join_characters_of_list WITH PARAMETER scs  
+        RETURN result_string  
+    END FUNCTION  
+    
+    FUNCTION create_2D_list(rows, columns, initial_value)  
+        INITIALIZE empty list two_dimensional_list  
+        FOR each index FROM zero TO rows MINUS one  
+            INITIALIZE empty list row_list  
+            FOR each inner_index FROM zero TO columns MINUS one  
+                APPEND initial_value TO row_list  
+            END FOR  
+            APPEND row_list TO two_dimensional_list  
+        END FOR  
+        RETURN two_dimensional_list  
+    END FUNCTION  
+    
+    FUNCTION reverse_list(list_to_reverse)  
+        SET left_index TO zero  
+        SET right_index TO the LENGTH OF list_to_reverse MINUS one  
+        WHILE left_index LESS THAN right_index HOLDS  
+            SWAP element at left_index OF list_to_reverse WITH element at right_index OF list_to_reverse  
+            INCREMENT left_index BY one  
+            DECREMENT right_index BY one  
+        END WHILE  
+    END FUNCTION  
+    
+    FUNCTION join_characters_of_list(character_list)  
+        SET combined_string TO empty string  
+        FOR each character IN character_list  
+            SET combined_string TO combined_string PLUS character  
+        END FOR  
+        RETURN combined_string  
+    END FUNCTION  
+END CLASS

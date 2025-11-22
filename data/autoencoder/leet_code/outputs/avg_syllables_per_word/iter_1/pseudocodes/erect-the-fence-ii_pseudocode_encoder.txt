@@ -1,0 +1,28 @@
+```
+dist_sq(p1,p2) = (p1.x - p2.x)^2 + (p1.y - p2.y)^2
+
+circumcenter(a,b,c):
+  d = 2*(a.x*(b.y - c.y) + b.x*(c.y - a.y) + c.x*(a.y - b.y))
+  ux = ((a.x² + a.y²)*(b.y - c.y) + (b.x² + b.y²)*(c.y - a.y) + (c.x² + c.y²)*(a.y - b.y)) / d
+  uy = ((a.x² + a.y²)*(c.x - b.x) + (b.x² + b.y²)*(a.x - c.x) + (c.x² + c.y²)*(b.x - a.x)) / d
+  r = sqrt((ux - a.x)² + (uy - a.y)²)
+  return (ux, uy), r
+
+welzl(pts, boundary, n):
+  if n=0 or |boundary|=3:
+    if |boundary|=0: return (0,0),0
+    if |boundary|=1: return boundary[0],0
+    if |boundary|=2: c = midpoint(boundary[0],boundary[1])
+                 r = dist_sq(boundary[0],boundary[1])^(0.5)/2
+                 return c,r
+    return circumcenter(boundary[0],boundary[1],boundary[2])
+  
+  p = pts[n-1]
+  c,r = welzl(pts, boundary, n-1)
+  if dist_sq(c,p) ≤ r²: return c,r
+  return welzl(pts, boundary+[p], n-1)
+
+shuffle(trees)
+center,radius = welzl(trees, [], len(trees))
+return [center.x, center.y, radius]
+```

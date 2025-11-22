@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION maxStudents(seats)  
+        SET m TO the LENGTH OF seats  
+        SET n TO the LENGTH OF element at position zero OF seats  
+        SET broken TO a list of zero repeated m times  
+        FOR i FROM zero TO m MINUS one  
+            FOR j FROM zero TO n MINUS one  
+                IF element at position j OF element at position i OF seats EQUALS the character hash  
+                    INCREMENT broken at position i BY two RAISED TO THE POWER OF j  
+                END IF  
+            END FOR  
+        END FOR  
+
+        FUNCTION is_valid(arrangement)  
+            RETURN arrangement AND arrangement DIVIDED BY two EQUALS zero  
+        END FUNCTION  
+
+        SET dp TO a list of empty DICTIONARIES repeated m times  
+
+        FOR arrangement FROM zero TO two RAISED TO THE POWER OF n MINUS one  
+            IF is_valid(arrangement) AND arrangement AND element at position zero OF broken EQUALS zero  
+                SET dp at position zero with key arrangement TO the COUNT OF one characters IN THE BINARY REPRESENTATION OF arrangement  
+            END IF  
+        END FOR  
+
+        FOR i FROM one TO m MINUS one  
+            FOR arrangement FROM zero TO two RAISED TO THE POWER OF n MINUS one  
+                IF is_valid(arrangement) AND arrangement AND element at position i OF broken EQUALS zero  
+                    SET max_students TO zero  
+                    FOR each prev_arrangement IN KEYS OF dp at position i MINUS one  
+                        IF arrangement AND prev_arrangement DIVIDED BY two EQUALS zero AND arrangement AND prev_arrangement MULTIPLIED BY two EQUALS zero  
+                            IF dp at position i MINUS one with key prev_arrangement GREATER THAN max_students  
+                                SET max_students TO dp at position i MINUS one with key prev_arrangement  
+                            END IF  
+                        END IF  
+                    END FOR  
+                    SET dp at position i with key arrangement TO max_students PLUS the COUNT OF one characters IN THE BINARY REPRESENTATION OF arrangement  
+                END IF  
+            END FOR  
+        END FOR  
+
+        IF dp at position m MINUS one IS NOT empty  
+            RETURN the MAXIMUM VALUE IN THE VALUES OF dp at position m MINUS one  
+        ELSE  
+            RETURN zero  
+        END IF  
+    END FUNCTION  
+END CLASS

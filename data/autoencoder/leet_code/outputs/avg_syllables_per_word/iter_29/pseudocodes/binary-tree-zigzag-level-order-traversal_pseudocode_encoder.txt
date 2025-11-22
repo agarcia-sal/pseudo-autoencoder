@@ -1,0 +1,75 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self val TO val  
+        SET self left TO left  
+        SET self right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY THEN  
+        RETURN nothing  
+    END IF  
+    SET root TO a new TreeNode initialized with the element at position one of values  
+    SET i TO one  
+    SET queue TO an empty double ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY DO  
+        SET node TO the element removed from the front of queue  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT nothing THEN  
+            SET node left TO a new TreeNode initialized with the element at position i of values  
+            APPEND node left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT nothing THEN  
+            SET node right TO a new TreeNode initialized with the element at position i of values  
+            APPEND node right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS nothing AND q IS nothing THEN  
+        RETURN true  
+    ELSE IF p IS nothing OR q IS nothing THEN  
+        RETURN false  
+    ELSE IF the val property of p IS NOT EQUAL TO the val property of q THEN  
+        RETURN false  
+    ELSE  
+        RETURN the result of is_same_tree with arguments p left AND q left AND the result of is_same_tree with arguments p right AND q right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION zigzagLevelOrder(self, root)  
+        IF root IS nothing THEN  
+            RETURN an empty list  
+        END IF  
+        SET result TO an empty list  
+        SET queue TO a double ended queue initialized with root  
+        SET left_to_right TO true  
+        WHILE queue IS NOT EMPTY DO  
+            SET level_size TO the LENGTH OF queue  
+            SET current_level TO an empty double ended queue  
+            FOR each index FROM one TO level_size DO  
+                SET node TO the element removed from the front of queue  
+                IF left_to_right IS true THEN  
+                    APPEND the val property of node TO current_level  
+                ELSE  
+                    APPEND TO THE FRONT of current_level the val property of node  
+                END IF  
+                IF the left property of node IS NOT nothing THEN  
+                    APPEND the left property of node TO queue  
+                END IF  
+                IF the right property of node IS NOT nothing THEN  
+                    APPEND the right property of node TO queue  
+                END IF  
+            END FOR  
+            APPEND the conversion of current_level TO list TO result  
+            SET left_to_right TO the negation of left_to_right  
+        END WHILE  
+        RETURN result  
+    END FUNCTION  
+END CLASS

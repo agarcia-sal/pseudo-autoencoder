@@ -1,0 +1,50 @@
+CLASS Solution  
+    FUNCTION maxStudents(seats)  
+        SET number_of_rows TO the LENGTH OF seats  
+        SET number_of_columns TO the LENGTH OF element at position zero of seats  
+        
+        SET broken_seats TO a list consisting of number_of_rows elements each initialized TO zero  
+        
+        FOR index_row FROM zero TO number_of_rows MINUS one  
+            FOR index_column FROM zero TO number_of_columns MINUS one  
+                IF character at position index_column of element at position index_row of seats EQUALS the symbol representing a broken seat  
+                    SET broken_seats at position index_row TO the BITWISE OR of broken_seats at position index_row WITH one SHIFTED LEFT BY index_column positions  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        FUNCTION is_valid(arrangement)  
+            RETURN the result of the BITWISE AND of arrangement WITH arrangement SHIFTED RIGHT BY one position EQUALS zero  
+        END FUNCTION  
+        
+        SET dynamic_programming_table TO a list consisting of number_of_rows empty mappings  
+        
+        FOR arrangement FROM zero TO ONE SHIFTED LEFT BY number_of_columns MINUS one  
+            IF is_valid(arrangement) AND the BITWISE AND of arrangement WITH element at position zero of broken_seats EQUALS zero  
+                SET the entry in dynamic_programming_table at position zero with key arrangement TO the COUNT OF ones in binary representation of arrangement  
+            END IF  
+        END FOR  
+        
+        FOR index_row FROM one TO number_of_rows MINUS one  
+            FOR arrangement FROM zero TO ONE SHIFTED LEFT BY number_of_columns MINUS one  
+                IF is_valid(arrangement) AND the BITWISE AND of arrangement WITH element at position index_row of broken_seats EQUALS zero  
+                    SET maximum_students TO zero  
+                    FOR each previous_arrangement IN the keys of dynamic_programming_table at position index_row MINUS one  
+                        IF the BITWISE AND of arrangement WITH previous_arrangement SHIFTED RIGHT BY one position EQUALS zero AND the BITWISE AND of arrangement WITH previous_arrangement SHIFTED LEFT BY one position EQUALS zero  
+                            IF the value in dynamic_programming_table at position index_row MINUS one with key previous_arrangement GREATER THAN maximum_students  
+                                SET maximum_students TO that value  
+                            END IF  
+                        END IF  
+                    END FOR  
+                    SET the entry in dynamic_programming_table at position index_row with key arrangement TO maximum_students PLUS the COUNT OF ones in binary representation of arrangement  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        IF the mapping at the last position of dynamic_programming_table IS NOT empty  
+            RETURN the MAXIMUM of the values in the mapping at the last position of dynamic_programming_table  
+        ELSE  
+            RETURN zero  
+        END IF  
+    END FUNCTION  
+END CLASS

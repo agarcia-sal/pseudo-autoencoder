@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION criticalConnections(n, connections)  
+        FUNCTION dfs(node, parent, disc, low, time, graph, critical)  
+            SET element at position node of disc TO element at position zero of time  
+            SET element at position node of low TO element at position zero of time  
+            INCREMENT element at position zero of time BY one  
+              
+            FOR each neighbor IN element at position node of graph  
+                IF element at position neighbor of disc EQUALS minus one THEN  
+                    CALL dfs WITH parameters neighbor parent disc low time graph critical  
+                    SET element at position node of low TO the MINIMUM OF element at position node of low AND element at position neighbor of low  
+                    IF element at position neighbor of low GREATER THAN element at position node of disc THEN  
+                        APPEND list containing node and neighbor TO critical  
+                    END IF  
+                ELSE IF neighbor NOT EQUALS parent THEN  
+                    SET element at position node of low TO the MINIMUM OF element at position node of low AND element at position neighbor of disc  
+                END IF  
+            END FOR  
+        END FUNCTION  
+      
+        SET graph TO a new list of empty lists with size n  
+        FOR each pair u AND v IN connections  
+            APPEND v TO element at position u of graph  
+            APPEND u TO element at position v of graph  
+        END FOR  
+      
+        SET disc TO a new list of minus one repeated n times  
+        SET low TO a new list of minus one repeated n times  
+        SET time TO a new list containing zero as only element  
+      
+        SET critical TO a new empty list  
+      
+        FOR each node FROM zero TO n MINUS one  
+            IF element at position node of disc EQUALS minus one THEN  
+                CALL dfs WITH parameters node minus one disc low time graph critical  
+            END IF  
+        END FOR  
+      
+        RETURN critical  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,75 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty THEN  
+        RETURN None  
+    END IF  
+    SET root TO new TreeNode with val AS element at position one of values AND left AS None AND right AS None  
+    SET i TO one  
+    CREATE an empty double-ended queue named queue  
+    APPEND root TO queue  
+    WHILE queue is not empty  
+        REMOVE the element from the front of queue AND ASSIGN it TO node  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT None THEN  
+            SET node.left TO new TreeNode with val AS element at position i of values AND left AS None AND right AS None  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT None THEN  
+            SET node.right TO new TreeNode with val AS element at position i of values AND left AS None AND right AS None  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None THEN  
+        RETURN True  
+    ELSE IF p IS None OR q IS None THEN  
+        RETURN False  
+    ELSE IF the val of p IS NOT EQUAL TO the val of q THEN  
+        RETURN False  
+    ELSE  
+        RETURN the result of is_same_tree with p.left AND q.left AND the result of is_same_tree with p.right AND q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION verticalTraversal(self, root)  
+        IF root IS None THEN  
+            RETURN an empty list  
+        END IF  
+        CREATE a dictionary named node_dict that maps keys to empty lists by default  
+        SET min_col TO zero  
+        SET max_col TO zero  
+
+        FUNCTION dfs(node, row, col)  
+            IF node IS None THEN  
+                RETURN  
+            END IF  
+            APPEND the pair consisting of row and node.val TO the list at key col in node_dict  
+            SET min_col TO the lesser of min_col AND col  
+            SET max_col TO the greater of max_col AND col  
+            CALL dfs with node.left AND row PLUS one AND col MINUS one  
+            CALL dfs with node.right AND row PLUS one AND col PLUS one  
+        END FUNCTION  
+
+        CALL dfs with root AND zero AND zero  
+
+        CREATE an empty list named result  
+        FOR each column_value FROM min_col TO max_col INCLUSIVE  
+            SORT the list at key column_value in node_dict FIRST BY the row value AND THEN BY the node value  
+            EXTRACT the node values in sorted order INTO a list  
+            APPEND this list TO result  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+END CLASS

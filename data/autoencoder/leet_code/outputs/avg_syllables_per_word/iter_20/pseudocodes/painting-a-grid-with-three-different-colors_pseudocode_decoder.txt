@@ -1,0 +1,60 @@
+CLASS Solution  
+    FUNCTION colorTheGrid WITH PARAMETERS m AND n  
+        SET MOD TO ten TO THE POWER OF nine PLUS seven  
+        
+        FUNCTION generate_valid_columns WITH PARAMETER prev_col  
+            SET colors TO list containing one two three  
+            SET valid_cols TO empty list  
+            
+            FUNCTION backtrack WITH PARAMETERS col AND row  
+                IF row EQUALS m THEN  
+                    APPEND col CONVERTED TO tuple TO valid_cols  
+                    RETURN  
+                END IF  
+                FOR each color IN colors  
+                    IF col IS empty OR element at position last of col NOT EQUALS color THEN  
+                        IF prev_col IS NOT NONE AND element at position row of prev_col EQUALS color THEN  
+                            CONTINUE TO next iteration  
+                        END IF  
+                        APPEND color TO col  
+                        CALL backtrack WITH col AND row PLUS one  
+                        REMOVE last element FROM col  
+                    END IF  
+                END FOR  
+            END FUNCTION  
+            
+            CALL backtrack WITH empty list AND zero  
+            RETURN valid_cols  
+        END FUNCTION  
+        
+        SET all_valid_cols TO CALL generate_valid_columns WITH argument NONE  
+        SET num_valid_cols TO the LENGTH OF all_valid_cols  
+        
+        SET compatible_cols TO mapping FROM each integer i FROM zero TO num_valid_cols MINUS one TO empty list  
+        FOR each integer i FROM zero TO num_valid_cols MINUS one  
+            FOR each integer j FROM zero TO num_valid_cols MINUS one  
+                IF FOR each integer k FROM zero TO m MINUS one element at position k of all_valid_cols AT i NOT EQUALS element at position k of all_valid_cols AT j THEN  
+                    APPEND j TO element at position i of compatible_cols  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET dp TO list of ones REPEATED num_valid_cols TIMES  
+        
+        FOR each integer _ FROM one TO n MINUS one  
+            SET next_dp TO list of zeros REPEATED num_valid_cols TIMES  
+            FOR each integer i FROM zero TO num_valid_cols MINUS one  
+                FOR each integer j IN element at position i of compatible_cols  
+                    SET next_dp AT position j TO the REMAINDER of the SUM of element at position j of next_dp PLUS element at position i of dp DIVIDED BY MOD  
+                END FOR  
+            END FOR  
+            SET dp TO next_dp  
+        END FOR  
+        
+        SET total_ways TO zero  
+        FOR each value IN dp  
+            INCREMENT total_ways BY value  
+        END FOR  
+        RETURN the REMAINDER of total_ways DIVIDED BY MOD  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,89 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val EQUALS zero left EQUALS none right EQUALS none  
+        SET the property val OF self TO val  
+        SET the property left OF self TO left  
+        SET the property right OF self TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF the collection values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO A NEW INSTANCE OF TreeNode WITH the element at position zero of values  
+    SET i TO one  
+    SET queue TO A NEW DEQUE COLLECTION  
+    APPEND root TO queue  
+    WHILE the collection queue HOLDS any elements  
+        SET node TO REMOVE the FIRST ELEMENT FROM queue  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT none  
+            SET the property left OF node TO A NEW INSTANCE OF TreeNode WITH the element at position i of values  
+            APPEND the property left OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT none  
+            SET the property right OF node TO A NEW INSTANCE OF TreeNode WITH the element at position i of values  
+            APPEND the property right OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF the property val OF p IS NOT EQUAL TO the property val OF q  
+        RETURN False  
+    ELSE  
+        RETURN the RESULT OF is_same_tree WITH PARAMETERS the property left OF p AND the property left OF q AND THE RESULT OF is_same_tree WITH PARAMETERS the property right OF p AND the property right OF q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION recoverTree WITH PARAMETERS self root  
+        SET first TO none  
+        SET second TO none  
+        SET prev TO none  
+        SET curr TO root  
+        WHILE curr IS NOT none  
+            IF the property left OF curr IS none  
+                IF prev IS NOT none AND the property val OF prev IS GREATER THAN the property val OF curr  
+                    IF first IS none  
+                        SET first TO prev  
+                    END IF  
+                    SET second TO curr  
+                END IF  
+                SET prev TO curr  
+                SET curr TO the property right OF curr  
+            ELSE  
+                SET pred TO the property left OF curr  
+                WHILE the property right OF pred IS NOT none AND the property right OF pred IS NOT curr  
+                    SET pred TO the property right OF pred  
+                END WHILE  
+                IF the property right OF pred IS none  
+                    SET the property right OF pred TO curr  
+                    SET curr TO the property left OF curr  
+                ELSE  
+                    SET the property right OF pred TO none  
+                    IF prev IS NOT none AND the property val OF prev IS GREATER THAN the property val OF curr  
+                        IF first IS none  
+                            SET first TO prev  
+                        END IF  
+                        SET second TO curr  
+                    END IF  
+                    SET prev TO curr  
+                    SET curr TO the property right OF curr  
+                END IF  
+            END IF  
+        END WHILE  
+        IF first IS NOT none AND second IS NOT none  
+            SET a temporary variable temp TO the property val OF first  
+            SET the property val OF first TO the property val OF second  
+            SET the property val OF second TO temp  
+        END IF  
+        RETURN none  
+    END FUNCTION  
+END CLASS

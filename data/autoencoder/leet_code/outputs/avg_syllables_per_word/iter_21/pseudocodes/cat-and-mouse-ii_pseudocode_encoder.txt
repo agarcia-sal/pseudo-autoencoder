@@ -1,0 +1,113 @@
+CLASS Solution  
+    FUNCTION canMouseWin(grid, catJump, mouseJump)  
+        SET m TO the LENGTH OF grid  
+        SET n TO the LENGTH OF element at position zero OF grid  
+        SET cat_start TO zero  
+        SET mouse_start TO zero  
+        SET food TO zero  
+        SET dirs TO the SEQUENCE consisting of minus one, zero, one, zero, minus one  
+        SET g_mouse TO a LIST OF LISTS with m MULTIPLIED BY n EMPTY LISTS  
+        SET g_cat TO a LIST OF LISTS with m MULTIPLIED BY n EMPTY LISTS  
+        FOR each i, row IN AN ENUMERATION OF grid  
+            FOR each j, c IN AN ENUMERATION OF row  
+                IF c EQUALS the character for a wall  
+                    CONTINUE to next iteration  
+                END IF  
+                SET v TO i MULTIPLIED BY n PLUS j  
+                IF c EQUALS the character for cat  
+                    SET cat_start TO v  
+                ELSE IF c EQUALS the character for mouse  
+                    SET mouse_start TO v  
+                ELSE IF c EQUALS the character for food  
+                    SET food TO v  
+                END IF  
+                FOR each a, b IN PAIRS OF adjacent elements OF dirs  
+                    FOR k FROM zero TO mouseJump INCLUSIVE  
+                        SET x TO i PLUS k MULTIPLIED BY a  
+                        SET y TO j PLUS k MULTIPLIED BY b  
+                        IF x IS LESS THAN zero OR x IS GREATER THAN OR EQUAL TO m OR y IS LESS THAN zero OR y IS GREATER THAN OR EQUAL TO n OR element at position x and y OF grid EQUALS the character for a wall  
+                            BREAK the loop  
+                        END IF  
+                        APPEND x MULTIPLIED BY n PLUS y TO list at position v OF g_mouse  
+                    END FOR  
+                    FOR k FROM zero TO catJump INCLUSIVE  
+                        SET x TO i PLUS k MULTIPLIED BY a  
+                        SET y TO j PLUS k MULTIPLIED BY b  
+                        IF x IS LESS THAN zero OR x IS GREATER THAN OR EQUAL TO m OR y IS LESS THAN zero OR y IS GREATER THAN OR EQUAL TO n OR element at position x and y OF grid EQUALS the character for a wall  
+                            BREAK the loop  
+                        END IF  
+                        APPEND x MULTIPLIED BY n PLUS y TO list at position v OF g_cat  
+                    END FOR  
+                END FOR  
+            END FOR  
+        END FOR  
+        RETURN CALL calc WITH PARAMETERS g_mouse, g_cat, mouse_start, cat_start, food EQUALS one  
+    END FUNCTION  
+      
+    FUNCTION calc(g_mouse, g_cat, mouse_start, cat_start, hole)  
+        FUNCTION get_prev_states(state)  
+            SET m TO element at position zero OF state  
+            SET c TO element at position one OF state  
+            SET t TO element at position two OF state  
+            SET pt TO t EXCLUSIVE OR one  
+            SET pre TO an EMPTY LIST  
+            IF pt EQUALS one  
+                FOR each pc IN list at position c OF g_cat  
+                    IF element at position m, pc, one OF ans EQUALS zero  
+                        APPEND the TUPLE consisting of m, pc, pt TO pre  
+                    END IF  
+                END FOR  
+            ELSE  
+                FOR each pm IN list at position m OF g_mouse  
+                    IF element at position pm, c, zero OF ans EQUALS zero  
+                        APPEND the TUPLE consisting of pm, c, zero TO pre  
+                    END IF  
+                END FOR  
+            END IF  
+            RETURN pre  
+        END FUNCTION  
+          
+        SET n TO the LENGTH OF g_mouse  
+        SET degree TO a THREE-DIMENSIONAL LIST of size n BY n BY two FILLED WITH zero  
+        FOR i FROM zero TO n MINUS one  
+            FOR j FROM zero TO n MINUS one  
+                SET element at position i, j, zero OF degree TO the LENGTH OF list at position i OF g_mouse  
+                SET element at position i, j, one OF degree TO the LENGTH OF list at position j OF g_cat  
+            END FOR  
+        END FOR  
+          
+        SET ans TO a THREE-DIMENSIONAL LIST of size n BY n BY two FILLED WITH zero  
+        SET q TO an EMPTY DEQUE  
+        FOR i FROM zero TO n MINUS one  
+            SET element at position hole, i, one OF ans TO one  
+            SET element at position i, hole, zero OF ans TO two  
+            SET element at position i, i, one OF ans TO two  
+            SET element at position i, i, zero OF ans TO two  
+            APPEND the TUPLE consisting of hole, i, one TO q  
+            APPEND the TUPLE consisting of i, hole, zero TO q  
+            APPEND the TUPLE consisting of i, i, zero TO q  
+            APPEND the TUPLE consisting of i, i, one TO q  
+        END FOR  
+          
+        WHILE q IS NOT EMPTY  
+            SET state TO the FIRST ELEMENT REMOVED FROM THE LEFT OF q  
+            SET t TO element at position zero, one, two OF ans ACCORDING TO state  
+            FOR each prev_state IN CALL get_prev_states WITH PARAMETER state  
+                SET pm TO element at position zero OF prev_state  
+                SET pc TO element at position one OF prev_state  
+                SET pt TO element at position two OF prev_state  
+                IF pt EQUALS t MINUS one  
+                    SET element at position pm, pc, pt OF ans TO t  
+                    APPEND prev_state TO q  
+                ELSE  
+                    DECREMENT element at position pm, pc, pt OF degree BY one  
+                    IF element at position pm, pc, pt OF degree EQUALS zero  
+                        SET element at position pm, pc, pt OF ans TO t  
+                        APPEND prev_state TO q  
+                    END IF  
+                END IF  
+            END FOR  
+        END WHILE  
+        RETURN element at position mouse_start, cat_start, zero OF ans  
+    END FUNCTION  
+END CLASS

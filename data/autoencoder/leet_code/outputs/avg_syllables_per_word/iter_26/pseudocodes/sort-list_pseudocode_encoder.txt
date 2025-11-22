@@ -1,0 +1,77 @@
+CLASS ListNode
+    FUNCTION __init__(self, val EQUALS zero, next EQUALS none)
+        SET self.val TO val
+        SET self.next TO next
+    END FUNCTION
+END CLASS
+
+FUNCTION list_node(values)
+    IF values IS NOT PRESENT
+        RETURN none
+    END IF
+    SET head TO A NEW ListNode WITH value equal TO element at position zero OF values
+    SET p TO head
+    FOR each val IN elements of values FROM position one TO THE END
+        SET node TO A NEW ListNode WITH value equal TO val
+        SET p.next TO node
+        SET p TO node
+    END FOR
+    RETURN head
+END FUNCTION
+
+FUNCTION is_same_list(p1, p2)
+    IF p1 IS none AND p2 IS none
+        RETURN True
+    END IF
+    IF p1 IS NOT PRESENT OR p2 IS NOT PRESENT
+        RETURN False
+    END IF
+    RETURN THE value AT p1 EQUALS THE value AT p2 AND is_same_list(the next element of p1, the next element of p2)
+END FUNCTION
+
+CLASS Solution
+    FUNCTION sortList(self, head)
+        IF head IS NOT PRESENT OR the next element OF head IS NOT PRESENT
+            RETURN head
+        END IF
+
+        FUNCTION split(head)
+            SET slow TO head
+            SET fast TO the next element OF head
+            WHILE fast IS PRESENT AND the next element OF fast IS PRESENT
+                SET slow TO the next element OF slow
+                SET fast TO the next element OF the next element OF fast
+            END WHILE
+            SET mid TO the next element OF slow
+            SET slow.next TO none
+            RETURN head, mid
+        END FUNCTION
+
+        FUNCTION merge(l1, l2)
+            SET dummy TO A NEW ListNode WITH default values
+            SET current TO dummy
+            WHILE l1 IS PRESENT AND l2 IS PRESENT
+                IF the value AT l1 IS LESS THAN the value AT l2
+                    SET current.next TO l1
+                    SET l1 TO the next element OF l1
+                ELSE
+                    SET current.next TO l2
+                    SET l2 TO the next element OF l2
+                END IF
+                SET current TO the next element OF current
+            END WHILE
+            IF l1 IS PRESENT
+                SET current.next TO l1
+            ELSE
+                SET current.next TO l2
+            END IF
+            RETURN the next element OF dummy
+        END FUNCTION
+
+        SET left, right TO split(head)
+        SET left TO self.sortList(left)
+        SET right TO self.sortList(right)
+
+        RETURN merge(left, right)
+    END FUNCTION
+END CLASS

@@ -1,0 +1,46 @@
+CLASS Solution
+    FUNCTION minimumDifference(nums: List of int) RETURNS int
+        SET n TO LENGTH OF nums DIVIDED BY 2
+        SET total_sum TO SUM OF nums
+        SET target TO total_sum DIVIDED BY 2
+        SET min_diff TO infinity
+
+        SET left_half TO FIRST n ELEMENTS OF nums
+        SET right_half TO ELEMENTS OF nums FROM n TO END
+
+        SET left_sums TO LIST OF EMPTY DICTIONARIES WITH LENGTH n + 1
+        SET right_sums TO LIST OF EMPTY DICTIONARIES WITH LENGTH n + 1
+
+        FOR i FROM 0 TO n INCLUSIVE
+            FOR each combo IN ALL COMBINATIONS OF left_half TAKEN i AT A TIME
+                SET subset_sum TO SUM OF combo
+                IF subset_sum NOT IN left_sums[i]
+                    SET left_sums[i][subset_sum] TO 0
+                INCREMENT left_sums[i][subset_sum] BY 1
+
+            FOR each combo IN ALL COMBINATIONS OF right_half TAKEN i AT A TIME
+                SET subset_sum TO SUM OF combo
+                IF subset_sum NOT IN right_sums[i]
+                    SET right_sums[i][subset_sum] TO 0
+                INCREMENT right_sums[i][subset_sum] BY 1
+
+        FOR i FROM 0 TO n INCLUSIVE
+            SET left_values TO SORTED KEYS OF left_sums[i]
+            SET right_values TO SORTED KEYS OF right_sums[n - i]
+
+            SET j TO 0
+            SET k TO LENGTH OF right_values MINUS 1
+            WHILE j LESS THAN LENGTH OF left_values AND k GREATER OR EQUAL TO 0
+                SET current_sum TO left_values[j] PLUS right_values[k]
+                SET min_diff TO MINIMUM OF min_diff AND ABSOLUTE VALUE OF (total_sum MINUS 2 TIMES current_sum)
+
+                IF current_sum LESS THAN target
+                    INCREMENT j BY 1
+                ELSE IF current_sum GREATER THAN target
+                    DECREMENT k BY 1
+                ELSE
+                    RETURN 0
+
+        RETURN min_diff
+    END FUNCTION
+END CLASS

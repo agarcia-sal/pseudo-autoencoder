@@ -1,0 +1,57 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val left right  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETERS values  
+    IF values EQUALS empty  
+        RETURN None  
+    END IF  
+    SET root TO new TreeNode with element at position zero of values  
+    SET i TO one  
+    SET queue TO new empty double ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO first element removed from queue  
+        IF i LESS THAN LENGTH OF values AND element at position i of values NOT EQUALS None  
+            SET node.left TO new TreeNode with element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN LENGTH OF values AND element at position i of values NOT EQUALS None  
+            SET node.right TO new TreeNode with element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p EQUALS None AND q EQUALS None  
+        RETURN True  
+    ELSE IF p EQUALS None OR q EQUALS None  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree with parameters p.left AND q.left AND is_same_tree with parameters p.right AND q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION buildTree WITH PARAMETERS self preorder inorder  
+        IF preorder EQUALS empty OR inorder EQUALS empty  
+            RETURN None  
+        END IF  
+        SET root_val TO element at position zero of preorder  
+        SET root TO new TreeNode with root_val  
+        SET root_index_inorder TO position of root_val IN inorder  
+        SET root.left TO result of calling buildTree on self WITH parameters elements from position one TO position root_index_inorder PLUS one of preorder AND elements from position zero TO position root_index_inorder of inorder  
+        SET root.right TO result of calling buildTree on self WITH parameters elements from position root_index_inorder PLUS one TO end of preorder AND elements from position root_index_inorder PLUS one TO end of inorder  
+        RETURN root  
+    END FUNCTION  
+END CLASS

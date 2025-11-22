@@ -1,0 +1,63 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val EQUALS zero left EQUALS none right EQUALS none  
+        SET the property val OF this instance TO val  
+        SET the property left OF this instance TO left  
+        SET the property right OF this instance TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETERS values AS list  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO A NEW INSTANCE OF TreeNode INITIALIZED WITH the element at position zero of values  
+    SET i TO one  
+    SET queue TO A NEW EMPTY DEQUE  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO THE FIRST ELEMENT REMOVED FROM queue  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT none  
+            SET the property left OF node TO A NEW INSTANCE OF TreeNode INITIALIZED WITH the element at position i of values  
+            APPEND the property left OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT none  
+            SET the property right OF node TO A NEW INSTANCE OF TreeNode INITIALIZED WITH the element at position i of values  
+            APPEND the property right OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF the property val OF p IS NOT EQUALS TO the property val OF q  
+        RETURN false  
+    ELSE  
+        RETURN THE RESULT OF is_same_tree WITH PARAMETERS the property left OF p AND the property left OF q  
+            AND THE RESULT OF is_same_tree WITH PARAMETERS the property right OF p AND the property right OF q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION tree2str WITH PARAMETERS root AS Optional OF TreeNode  
+        FUNCTION helper WITH PARAMETERS node  
+            IF node IS none  
+                RETURN EMPTY STRING  
+            END IF  
+            SET result TO THE STRING REPRESENTATION OF the property val OF node  
+            IF the property left OF node IS NOT none OR the property right OF node IS NOT none  
+                SET result TO result CONCATENATED WITH OPENING PARENTHESIS CONCATENATED WITH THE RESULT OF helper WITH THE PROPERTY left OF node CONCATENATED WITH CLOSING PARENTHESIS  
+            END IF  
+            IF the property right OF node IS NOT none  
+                SET result TO result CONCATENATED WITH OPENING PARENTHESIS CONCATENATED WITH THE RESULT OF helper WITH THE PROPERTY right OF node CONCATENATED WITH CLOSING PARENTHESIS  
+            END IF  
+            RETURN result  
+        END FUNCTION  
+        RETURN THE RESULT OF helper WITH PARAMETERS root  
+    END FUNCTION  
+END CLASS

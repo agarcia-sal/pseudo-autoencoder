@@ -1,0 +1,39 @@
+CLASS Solution
+    FUNCTION numPermsDISequence(s)
+        SET MOD TO one billion PLUS seven
+        SET n TO the LENGTH OF s
+        # dp at position i and j MEANS the NUMBER OF valid permutations OF LENGTH i plus one ENDING WITH number j
+        SET dp TO a LIST OF LISTS containing zero WITH dimensions n plus one BY n plus one
+        
+        # Base case: THERE IS ONLY one WAY TO arrange a SINGLE number ZERO
+        FOR j FROM zero TO n INCLUSIVE
+            SET element at position j OF the first LIST IN dp TO one
+        END FOR
+        
+        # Fill the dp TABLE
+        FOR i FROM one TO n INCLUSIVE
+            SET prefix_sum TO zero
+            IF the element at position i MINUS one OF s EQUALS character I THEN
+                # IF the element at position i MINUS one OF s IS character I THEN count increasing sequences
+                FOR j FROM zero TO n MINUS i INCLUSIVE
+                    SET prefix_sum TO prefix_sum PLUS the element at position j OF the LIST at position i MINUS one OF dp MODULO MOD
+                    SET element at position j OF the LIST at position i OF dp TO prefix_sum
+                END FOR
+            ELSE
+                # ELSE IF the element at position i MINUS one OF s IS character D THEN count decreasing sequences
+                FOR j FROM n MINUS i DOWN TO zero INCLUSIVE
+                    SET prefix_sum TO prefix_sum PLUS the element at position j PLUS one OF the LIST at position i MINUS one OF dp MODULO MOD
+                    SET element at position j OF the LIST at position i OF dp TO prefix_sum
+                END FOR
+            END IF
+        END FOR
+        
+        # THE result IS the SUM OF ALL elements IN the LIST at position n OF dp MODULO MOD
+        SET result TO zero
+        FOR each element IN the LIST at position n OF dp
+            INCREMENT result BY element
+        END FOR
+        SET result TO result MODULO MOD
+        RETURN result
+    END FUNCTION
+END CLASS

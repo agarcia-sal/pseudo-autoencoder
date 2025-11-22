@@ -1,0 +1,66 @@
+CLASS Solution  
+    FUNCTION cutOffTree(forest)  
+        IF forest EQUALS empty OR element at position zero of forest EQUALS empty  
+            RETURN the negative of one  
+        END IF  
+        
+        SET trees TO empty list  
+        FOR index i FROM zero TO the LENGTH OF forest MINUS one  
+            FOR index j FROM zero TO the LENGTH OF element at position i of forest MINUS one  
+                IF element at position j of element at position i of forest GREATER THAN one  
+                    APPEND the triple consisting of the element at position j of element at position i of forest PLUS i PLUS j TO trees  
+                END IF  
+            END FOR  
+        END FOR  
+        SORT trees IN ascending order BY the first element of each triple  
+        
+        FUNCTION bfs(start, end)  
+            IF start EQUALS end  
+                RETURN zero  
+            END IF  
+            SET m TO the LENGTH OF forest  
+            SET n TO the LENGTH OF element at position zero of forest  
+            SET queue TO a new deque initialized with start  
+            SET visited TO a new set initialized with start  
+            SET steps TO zero  
+            
+            WHILE the LENGTH OF queue GREATER THAN zero  
+                SET current_length TO the LENGTH OF queue  
+                FOR count FROM one TO current_length  
+                    SET element x TO the first component of the result of removing the first element from queue  
+                    SET element y TO the second component of the result of removing the first element from queue  
+                    FOR each pair dx dy IN the list of pairs consisting of negative one zero PLUS one zero PLUS zero negative one PLUS zero one  
+                        SET nx TO x PLUS dx  
+                        SET ny TO y PLUS dy  
+                        IF nx GREATER THAN OR EQUAL TO zero AND nx LESS THAN m AND ny GREATER THAN OR EQUAL TO zero AND ny LESS THAN n AND the pair nx ny NOT IN visited AND element at position ny of element at position nx of forest NOT EQUALS zero  
+                            IF the pair nx ny EQUALS end  
+                                RETURN steps PLUS one  
+                            END IF  
+                            ADD the pair nx ny TO visited  
+                            APPEND the pair nx ny TO queue  
+                        END IF  
+                    END FOR  
+                END FOR  
+                INCREMENT steps BY one  
+            END WHILE  
+            
+            RETURN the negative of one  
+        END FUNCTION  
+        
+        SET x TO zero  
+        SET y TO zero  
+        SET total_steps TO zero  
+        
+        FOR each triple height tx ty IN trees  
+            SET steps TO bfs with argument the pair x y AND the pair tx ty  
+            IF steps EQUALS the negative of one  
+                RETURN the negative of one  
+            END IF  
+            INCREMENT total_steps BY steps  
+            SET x TO tx  
+            SET y TO ty  
+        END FOR  
+        
+        RETURN total_steps  
+    END FUNCTION  
+END CLASS

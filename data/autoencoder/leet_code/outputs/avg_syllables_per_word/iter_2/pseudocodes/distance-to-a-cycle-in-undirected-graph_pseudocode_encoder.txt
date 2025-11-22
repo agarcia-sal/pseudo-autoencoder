@@ -1,0 +1,60 @@
+CLASS Solution
+    FUNCTION distanceToCycle(n, edges)
+        SET graph TO empty mapping with default list
+        FOR each pair (u, v) IN edges
+            APPEND v TO graph[u]
+            APPEND u TO graph[v]
+        
+        FUNCTION dfs(node, parent, path, visited)
+            IF node IS IN visited THEN
+                SET cycle_start TO index of node IN path
+                RETURN subset of path FROM cycle_start TO end
+            END IF
+            ADD node TO visited
+            APPEND node TO path
+            FOR each neighbor IN graph[node]
+                IF neighbor IS NOT parent THEN
+                    SET cycle TO dfs(neighbor, node, path, visited)
+                    IF cycle IS NOT null THEN
+                        RETURN cycle
+                    END IF
+                END IF
+            END FOR
+            REMOVE last element FROM path
+            RETURN null
+        END FUNCTION
+        
+        SET visited TO empty set
+        SET cycle TO null
+        FOR node FROM 0 TO n - 1
+            IF node IS NOT IN visited THEN
+                SET cycle TO dfs(node, -1, empty list, visited)
+                IF cycle IS NOT null THEN
+                    BREAK loop
+                END IF
+            END IF
+        END FOR
+        
+        SET distance TO list of zeros WITH length n
+        SET queue TO new deque initialized with cycle elements
+        SET visited TO set containing elements of cycle
+        
+        SET level TO 0
+        WHILE queue IS NOT empty
+            SET count TO length of queue
+            FOR i FROM 1 TO count
+                SET node TO queue REMOVE FRONT
+                SET distance[node] TO level
+                FOR each neighbor IN graph[node]
+                    IF neighbor IS NOT IN visited THEN
+                        ADD neighbor TO visited
+                        ADD neighbor TO queue
+                    END IF
+                END FOR
+            END FOR
+            INCREMENT level BY 1
+        END WHILE
+        
+        RETURN distance
+    END FUNCTION
+END CLASS

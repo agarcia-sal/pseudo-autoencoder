@@ -1,0 +1,75 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF the LENGTH OF values EQUALS zero  
+        RETURN none  
+    END IF  
+    SET root TO NEW TreeNode WITH val AS element at position zero of values AND left AS none AND right AS none  
+    SET i TO one  
+    SET queue TO an empty double ended queue  
+    APPEND root TO queue  
+    WHILE the LENGTH OF queue IS GREATER THAN zero  
+        SET node TO and REMOVE first element FROM queue  
+        IF i LESS THAN the LENGTH OF values AND element at position i of values IS NOT none  
+            SET node.left TO NEW TreeNode WITH val AS element at position i of values AND left AS none AND right AS none  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN the LENGTH OF values AND element at position i of values IS NOT none  
+            SET node.right TO NEW TreeNode WITH val AS element at position i of values AND left AS none AND right AS none  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN false  
+    ELSE  
+        SET left_same TO is_same_tree WITH PARAMETERS p.left AND q.left  
+        SET right_same TO is_same_tree WITH PARAMETERS p.right AND q.right  
+        RETURN left_same AND right_same  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION widthOfBinaryTree(self, root)  
+        IF root IS none  
+            RETURN zero  
+        END IF  
+        SET queue TO a new double ended queue containing a pair of root AND zero  
+        SET max_width TO zero  
+        WHILE the LENGTH OF queue IS GREATER THAN zero  
+            SET level_length TO the LENGTH OF queue  
+            SET first_index TO the second element of the first pair in queue  
+            FOR each index counter FROM zero TO level_length MINUS one  
+                SET node, index TO and REMOVE first pair FROM queue  
+                IF index counter EQUALS level_length MINUS one  
+                    SET current_width TO index MINUS first_index PLUS one  
+                    IF current_width GREATER THAN max_width  
+                        SET max_width TO current_width  
+                    END IF  
+                END IF  
+                IF node.left IS NOT none  
+                    APPEND the pair of node.left AND index MULTIPLIED BY two TO queue  
+                END IF  
+                IF node.right IS NOT none  
+                    APPEND the pair of node.right AND index MULTIPLIED BY two PLUS one TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        RETURN max_width  
+    END FUNCTION  
+END CLASS  

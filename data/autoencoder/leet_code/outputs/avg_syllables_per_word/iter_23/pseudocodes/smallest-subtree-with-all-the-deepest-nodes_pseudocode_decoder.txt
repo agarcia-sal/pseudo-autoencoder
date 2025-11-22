@@ -1,0 +1,63 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val left right  
+        SET attribute val TO parameter val  
+        SET attribute left TO parameter left  
+        SET attribute right TO parameter right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF the collection values is empty THEN  
+        RETURN nothing  
+    END IF  
+    SET variable root TO a new TreeNode with the element at position one of values  
+    SET variable i TO one  
+    SET variable queue TO an empty double-ended queue  
+    APPEND root TO queue  
+    WHILE queue is not empty DO  
+        SET variable node TO the element removed from the front of queue  
+        IF i is less than the length of values AND the element at position i of values is not nothing THEN  
+            SET the attribute left of node TO a new TreeNode with the element at position i of values  
+            APPEND the attribute left of node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i is less than the length of values AND the element at position i of values is not nothing THEN  
+            SET the attribute right of node TO a new TreeNode with the element at position i of values  
+            APPEND the attribute right of node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p is nothing AND q is nothing THEN  
+        RETURN True  
+    ELSE IF p is nothing OR q is nothing THEN  
+        RETURN False  
+    ELSE IF the attribute val of p NOT EQUALS the attribute val of q THEN  
+        RETURN False  
+    ELSE  
+        RETURN the result of is_same_tree with parameters the attribute left of p and the attribute left of q AND the result of is_same_tree with parameters the attribute right of p and the attribute right of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION subtreeWithAllDeepest WITH PARAMETERS root  
+        FUNCTION dfs WITH PARAMETER node  
+            IF node is nothing THEN  
+                RETURN node AND zero  
+            END IF  
+            SET left_node AND left_depth TO the result of dfs with the attribute left of node  
+            SET right_node AND right_depth TO the result of dfs with the attribute right of node  
+            IF left_depth GREATER THAN right_depth THEN  
+                RETURN left_node AND left_depth PLUS one  
+            ELSE IF right_depth GREATER THAN left_depth THEN  
+                RETURN right_node AND right_depth PLUS one  
+            ELSE  
+                RETURN node AND left_depth PLUS one  
+            END IF  
+        END FUNCTION  
+        RETURN the first element of the result of dfs with parameter root  
+    END FUNCTION  
+END CLASS

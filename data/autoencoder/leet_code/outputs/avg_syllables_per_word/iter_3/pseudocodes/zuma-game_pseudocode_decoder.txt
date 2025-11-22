@@ -1,0 +1,44 @@
+CLASS Solution
+    FUNCTION findMinStep(board, hand)
+        FUNCTION clean(board)
+            SET stack TO empty list
+            FOR each ball IN board
+                IF stack is not empty AND last ball in stack is different from ball AND count of last ball is at least 3
+                    REMOVE last element from stack
+                IF stack is empty OR last ball in stack is different from ball
+                    APPEND [ball, 1] TO stack
+                ELSE
+                    INCREMENT count of last element in stack BY 1
+            IF stack is not empty AND count of last ball in stack is at least 3
+                REMOVE last element from stack
+            RETURN concatenation of each ball repeated count times from stack
+        END FUNCTION
+
+        FUNCTION dfs(board, hand_counter)
+            IF board is empty
+                RETURN 0
+            SET min_steps TO infinity
+            SET i TO 0
+            WHILE i less than length of board
+                SET j TO i + 1
+                WHILE j less than length of board AND board[j] equals board[i]
+                    INCREMENT j BY 1
+                SET increment TO 3 minus (j minus i)
+                IF hand_counter for board[i] is at least increment
+                    SET new_hand_counter TO copy of hand_counter
+                    DECREMENT new_hand_counter for board[i] BY increment
+                    SET new_board TO clean(concatenation of board from start to i and board from j to end)
+                    SET steps TO dfs(new_board, new_hand_counter)
+                    IF steps is at least 0
+                        SET min_steps TO minimum of min_steps and steps plus increment
+                SET i TO j
+            IF min_steps equals infinity
+                RETURN -1
+            ELSE
+                RETURN min_steps
+        END FUNCTION
+
+        SET hand_counter TO count occurrences of each character in hand
+        RETURN dfs(board, hand_counter)
+    END FUNCTION
+END CLASS

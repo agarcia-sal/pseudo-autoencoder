@@ -1,0 +1,19 @@
+import math
+
+class Solution:
+    def countPrimes(self, n: int) -> int:
+        if n <= 2:
+            return 0
+        is_prime = [True] * n
+        is_prime[0] = False
+        is_prime[1] = False
+        limit = int(math.isqrt(n)) + 1
+        for start in range(2, limit):
+            if is_prime[start]:
+                for multiple in range(start * start, n, start):
+                    is_prime[multiple] = False
+        prime_count = 0
+        for prime_status in is_prime:
+            if prime_status:
+                prime_count += 1
+        return prime_count

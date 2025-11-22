@@ -1,0 +1,61 @@
+CLASS Solution  
+    FUNCTION evaluate(expression)  
+        FUNCTION get_tokens(expression)  
+            SET tokens TO empty list  
+            SET buf TO empty string  
+            SET depth TO 0  
+            FOR each char IN expression  
+                IF char EQUALS space AND depth EQUALS 0  
+                    APPEND buf TO tokens  
+                    SET buf TO empty string  
+                ELSE  
+                    IF char EQUALS '('  
+                        INCREMENT depth BY 1  
+                    ELSE IF char EQUALS ')'  
+                        DECREMENT depth BY 1  
+                    END IF  
+                    APPEND char TO buf  
+                END IF  
+            END FOR  
+            IF buf IS NOT empty  
+                APPEND buf TO tokens  
+            END IF  
+            RETURN tokens  
+        END FUNCTION  
+
+        FUNCTION evaluate_expression(tokens, context)  
+            IF tokens AT 0 EQUALS 'add'  
+                RETURN CALL evaluate_expression WITH tokens AT 1 AND context PLUS CALL evaluate_expression WITH tokens AT 2 AND context  
+            ELSE IF tokens AT 0 EQUALS 'mult'  
+                RETURN CALL evaluate_expression WITH tokens AT 1 AND context MULTIPLIED BY CALL evaluate_expression WITH tokens AT 2 AND context  
+            ELSE IF tokens AT 0 EQUALS 'let'  
+                SET new_context TO COPY OF context  
+                SET i TO 1  
+                WHILE i LESS THAN LENGTH OF tokens MINUS 1  
+                    SET var TO tokens AT i  
+                    SET expr TO tokens AT i PLUS 1  
+                    SET new_context AT var TO CALL evaluate_expression WITH expr AND new_context  
+                    INCREMENT i BY 2  
+                END WHILE  
+                RETURN CALL evaluate_expression WITH tokens AT LAST POSITION AND new_context  
+            ELSE  
+                TRY  
+                    RETURN CONVERT tokens AT 0 TO integer  
+                CATCH error  
+                    RETURN context AT tokens AT 0  
+                END TRY  
+            END IF  
+        END FUNCTION  
+
+        FUNCTION parse_expression(expression)  
+            IF character AT expression AT 0 NOT EQUALS '('  
+                RETURN expression  
+            END IF  
+            SET tokens TO CALL get_tokens WITH substring OF expression FROM 1 TO SECOND LAST  
+            RETURN LIST CREATED BY CALLING parse_expression WITH each token IN tokens  
+        END FUNCTION  
+
+        SET parsed_expression TO CALL parse_expression WITH expression  
+        RETURN CALL evaluate_expression WITH parsed_expression AND empty dictionary  
+    END FUNCTION  
+END CLASS

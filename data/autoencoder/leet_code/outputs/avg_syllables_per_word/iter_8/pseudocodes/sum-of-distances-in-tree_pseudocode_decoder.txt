@@ -1,0 +1,36 @@
+CLASS Solution  
+    FUNCTION sumOfDistancesInTree(n, edges)  
+        SET graph TO a mapping with default empty list  
+        FOR each pair a, b IN edges  
+            APPEND b TO graph at key a  
+            APPEND a TO graph at key b  
+
+        SET count TO a list of length n with all elements set to 1  
+        SET dist TO a list of length n with all elements set to 0  
+
+        FUNCTION dfs1(u, p)  
+            FOR each v IN graph at key u  
+                IF v is not equal to p THEN  
+                    CALL dfs1 with parameters v and u  
+                    INCREMENT count at index u BY count at index v  
+                    INCREMENT dist at index u BY dist at index v PLUS count at index v  
+                END IF  
+            END FOR  
+        END FUNCTION  
+
+        CALL dfs1 with parameters 0 and negative 1  
+
+        FUNCTION dfs2(u, p)  
+            FOR each v IN graph at key u  
+                IF v is not equal to p THEN  
+                    SET dist at index v TO dist at index u MINUS count at index v PLUS n MINUS count at index v  
+                    CALL dfs2 with parameters v and u  
+                END IF  
+            END FOR  
+        END FUNCTION  
+
+        CALL dfs2 with parameters 0 and negative 1  
+
+        RETURN dist  
+    END FUNCTION  
+END CLASS

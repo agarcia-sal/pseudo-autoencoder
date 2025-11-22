@@ -1,0 +1,37 @@
+CLASS Solution  
+    FUNCTION waysToBuildRooms WITH prevRoom AS List OF integer  
+        IMPORT the default dictionary data structure from collections  
+        SET n TO the LENGTH OF prevRoom  
+        SET graph TO a new default dictionary where each key maps TO an empty list  
+        FOR each room FROM one TO n MINUS one  
+            APPEND the room TO the list at the key which is element at position room of prevRoom in graph  
+        END FOR  
+
+        FUNCTION dp WITH node AS integer  
+            IF the list at key node in graph is empty THEN  
+                RETURN one AND one for number of ways and size of subtree respectively  
+            END IF  
+            
+            SET total_ways TO one  
+            SET total_size TO one to count the current node itself  
+            SET child_results TO an empty list  
+            FOR each child IN the list at key node in graph  
+                CALL dp with child and SET ways AND size TO the returned values  
+                APPEND the tuple of ways and size TO child_results  
+                INCREMENT total_size BY size  
+            END FOR  
+
+            SET current_size TO one  
+            FOR each tuple of ways AND size IN child_results  
+                SET combination_result TO the number of combinations of current_size PLUS size MINUS one choose size  
+                SET total_ways TO total_ways MULTIPLIED BY combination_result MULTIPLIED BY ways  
+                SET total_ways TO total_ways MODULO MOD  
+                INCREMENT current_size BY size  
+            END FOR  
+
+            RETURN total_ways AND total_size  
+        END FUNCTION  
+
+        RETURN the first element of the tuple returned by calling dp with zero  
+    END FUNCTION  
+END CLASS

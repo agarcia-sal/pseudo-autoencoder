@@ -1,0 +1,5 @@
+shift = 0
+while left < right:
+    right, left = right >> 1, left >> 1
+    shift += 1
+return left << shift

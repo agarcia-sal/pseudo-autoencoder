@@ -1,0 +1,61 @@
+CLASS Solution  
+    FUNCTION minimumOperations(grid)  
+        FUNCTION bfs()  
+            INITIALIZE queue AS empty deque  
+            FOR u FROM 0 TO n MINUS 1  
+                IF match[u] EQUALS -1  
+                    SET dist[u] TO 0  
+                    APPEND u TO queue  
+                ELSE  
+                    SET dist[u] TO infinity  
+            SET dist[-1] TO infinity  
+            WHILE queue IS NOT EMPTY  
+                REMOVE FIRST ELEMENT FROM queue AND SET TO u  
+                IF dist[u] LESS THAN dist[-1]  
+                    FOR each v IN graph[u]  
+                        IF dist[match[v]] EQUALS infinity  
+                            SET dist[match[v]] TO dist[u] PLUS 1  
+                            APPEND match[v] TO queue  
+            RETURN dist[-1] LESS THAN infinity  
+        END FUNCTION  
+        
+        FUNCTION dfs(u)  
+            IF u NOT EQUALS -1  
+                FOR each v IN graph[u]  
+                    IF dist[match[v]] EQUALS dist[u] PLUS 1  
+                        IF CALL dfs WITH u AS match[v] RETURNS TRUE  
+                            SET match[v] TO u  
+                            SET match[u] TO v  
+                            RETURN TRUE  
+                SET dist[u] TO infinity  
+                RETURN FALSE  
+            RETURN TRUE  
+        END FUNCTION  
+        
+        SET rows TO LENGTH OF grid  
+        SET cols TO LENGTH OF grid[0]  
+        SET n TO rows MULTIPLIED BY cols  
+        INITIALIZE graph AS list of empty sets WITH n PLUS 1 ELEMENTS  
+        INITIALIZE match AS list FILLED WITH -1 OF LENGTH n PLUS 1  
+        INITIALIZE dist AS list FILLED WITH 0 OF LENGTH n PLUS 1  
+        
+        FOR r FROM 0 TO rows MINUS 1  
+            FOR c FROM 0 TO cols MINUS 1  
+                IF grid[r][c] EQUALS 1  
+                    SET u TO r MULTIPLIED BY cols PLUS c  
+                    FOR each dr, dc IN list of (-1, 0), (1, 0), (0, -1), (0, 1)  
+                        SET nr TO r PLUS dr  
+                        SET nc TO c PLUS dc  
+                        IF nr GREATER THAN OR EQUAL TO 0 AND nr LESS THAN rows AND nc GREATER THAN OR EQUAL TO 0 AND nc LESS THAN cols AND grid[nr][nc] EQUALS 1  
+                            SET v TO nr MULTIPLIED BY cols PLUS nc  
+                            ADD v TO graph[u]  
+        
+        SET matching TO 0  
+        WHILE CALL bfs() IS TRUE  
+            FOR u FROM 0 TO n MINUS 1  
+                IF match[u] EQUALS -1 AND CALL dfs WITH u RETURNS TRUE  
+                    INCREMENT matching BY 1  
+        
+        RETURN matching  
+    END FUNCTION  
+END CLASS

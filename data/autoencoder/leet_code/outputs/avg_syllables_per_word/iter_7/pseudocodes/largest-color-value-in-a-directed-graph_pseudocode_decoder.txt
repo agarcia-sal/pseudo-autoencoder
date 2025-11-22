@@ -1,0 +1,34 @@
+CLASS Solution  
+    FUNCTION largestPathValue(colors, edges)  
+        SET n TO LENGTH OF colors  
+        SET graph TO new mapping with default empty list  
+        SET in_degree TO list of zeros with length n  
+        
+        FOR each pair u, v IN edges  
+            APPEND v TO graph[u]  
+            INCREMENT in_degree[v] BY 1  
+        
+        SET queue TO new deque containing all indices i FROM 0 TO n MINUS 1 WHERE in_degree[i] EQUALS 0  
+        SET dp TO list of length n WHERE each element is a list of 26 zeros  
+        SET visited TO 0  
+        SET max_color_value TO 0  
+        
+        WHILE queue IS NOT empty  
+            SET node TO REMOVE first element from queue  
+            INCREMENT dp[node][ASCII value of colors[node] MINUS ASCII value of 'a'] BY 1  
+            SET max_color_value TO GREATER OF max_color_value AND dp[node][ASCII value of colors[node] MINUS ASCII value of 'a']  
+            INCREMENT visited BY 1  
+            
+            FOR each neighbor IN graph[node]  
+                FOR c FROM 0 TO 25  
+                    SET dp[neighbor][c] TO GREATER OF dp[neighbor][c] AND dp[node][c]  
+                DECREMENT in_degree[neighbor] BY 1  
+                IF in_degree[neighbor] EQUALS 0  
+                    APPEND neighbor TO queue  
+        
+        IF visited EQUALS n  
+            RETURN max_color_value  
+        ELSE  
+            RETURN minus 1  
+    END FUNCTION  
+END CLASS

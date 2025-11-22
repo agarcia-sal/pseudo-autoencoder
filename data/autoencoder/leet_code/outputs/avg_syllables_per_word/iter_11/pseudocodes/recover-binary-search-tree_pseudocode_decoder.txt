@@ -1,0 +1,86 @@
+CLASS TreeNode  
+    FUNCTION __init__ with parameters val EQUALS zero, left EQUALS none, right EQUALS none  
+        SET the attribute val TO val  
+        SET the attribute left TO left  
+        SET the attribute right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node with parameter values  
+    IF values EQUALS empty  
+        RETURN none  
+    END IF  
+    SET root TO a new TreeNode with value equal to element at position zero of values  
+    SET i TO one  
+    SET queue TO a new deque  
+    APPEND root TO queue  
+    WHILE queue is not empty  
+        SET node TO the first element removed from queue  
+        IF i LESS THAN the length of values AND element at position i of values NOT EQUALS none  
+            SET node.left TO a new TreeNode with value equal to element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN the length of values AND element at position i of values NOT EQUALS none  
+            SET node.right TO a new TreeNode with value equal to element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree with parameters p, q  
+    IF p EQUALS none AND q EQUALS none  
+        RETURN true  
+    ELSE IF p EQUALS none OR q EQUALS none  
+        RETURN false  
+    ELSE IF attribute val of p NOT EQUALS attribute val of q  
+        RETURN false  
+    ELSE  
+        RETURN the result of is_same_tree called with attribute left of p and attribute left of q AND the result of is_same_tree called with attribute right of p and attribute right of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION recoverTree with parameter root  
+        SET first TO none  
+        SET second TO none  
+        SET prev TO none  
+        SET curr TO root  
+        WHILE curr NOT EQUALS none  
+            IF attribute left of curr EQUALS none  
+                IF prev NOT EQUALS none AND attribute val of prev GREATER THAN attribute val of curr  
+                    IF first EQUALS none  
+                        SET first TO prev  
+                    END IF  
+                    SET second TO curr  
+                END IF  
+                SET prev TO curr  
+                SET curr TO attribute right of curr  
+            ELSE  
+                SET pred TO attribute left of curr  
+                WHILE attribute right of pred NOT EQUALS none AND attribute right of pred NOT EQUALS curr  
+                    SET pred TO attribute right of pred  
+                END WHILE  
+                IF attribute right of pred EQUALS none  
+                    SET attribute right of pred TO curr  
+                    SET curr TO attribute left of curr  
+                ELSE  
+                    SET attribute right of pred TO none  
+                    IF prev NOT EQUALS none AND attribute val of prev GREATER THAN attribute val of curr  
+                        IF first EQUALS none  
+                            SET first TO prev  
+                        END IF  
+                        SET second TO curr  
+                    END IF  
+                    SET prev TO curr  
+                    SET curr TO attribute right of curr  
+                END IF  
+            END IF  
+        END WHILE  
+        IF first NOT EQUALS none AND second NOT EQUALS none  
+            SWAP attribute val of first WITH attribute val of second  
+        END IF  
+    END FUNCTION  
+END CLASS

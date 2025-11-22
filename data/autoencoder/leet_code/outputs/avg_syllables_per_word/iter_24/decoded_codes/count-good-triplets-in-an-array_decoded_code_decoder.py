@@ -1,0 +1,48 @@
+from typing import List
+
+class BIT:
+    def __init__(self, n: int):
+        self.size = n
+        self.tree = [0] * (n + 1)
+
+    def update(self, idx: int, delta: int) -> None:
+        while idx <= self.size:
+            self.tree[idx] += delta
+            idx += idx & (-idx)
+
+    def query(self, idx: int) -> int:
+        result = 0
+        while idx > 0:
+            result += self.tree[idx]
+            idx -= idx & (-idx)
+        return result
+
+
+class Solution:
+    def goodTriplets(self, nums1: List[int], nums2: List[int]) -> int:
+        n = len(nums1)
+        pos = [0] * n
+        for i, num in enumerate(nums1):
+            pos[num] = i
+
+        compressed = [pos[num] for num in nums2]
+
+        bit = BIT(n)
+        smaller_count = [0] * n
+        for i in range(n):
+            idx = compressed[i]
+            smaller_count[i] = bit.query(idx)
+            bit.update(idx + 1, 1)
+
+        bit = BIT(n)
+        larger_count = [0] * n
+        for i in range(n - 1, -1, -1):
+            idx = compressed[i]
+            larger_count[i] = bit.query(n) - bit.query(idx + 1)
+            bit.update(idx + 1, 1)
+
+        good_triplets = 0
+        for i in range(n):
+            good_triplets += smaller_count[i] * larger_count[i]
+
+        return good_triplets

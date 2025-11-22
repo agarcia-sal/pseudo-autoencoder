@@ -1,0 +1,50 @@
+CLASS Solution
+    FUNCTION palindromePairs(words)
+        FUNCTION is_palindrome(string_to_check)
+            RETURN string_to_check EQUALS the REVERSED FORM OF string_to_check
+        END FUNCTION
+
+        SET word_dict TO an EMPTY DICTIONARY
+        FOR index FROM zero TO the LENGTH OF words MINUS one INCLUSIVE
+            ASSIGN reference TO the element at position index OF words
+            SET word_dict AT word TO index
+        END FOR
+
+        SET result TO an EMPTY LIST
+
+        FOR index FROM zero TO the LENGTH OF words MINUS one INCLUSIVE
+            ASSIGN reference TO the element at position index OF words
+
+            IF the element at position index OF words EQUALS the EMPTY STRING
+                CONTINUE TO the next iteration
+            END IF
+
+            IF the EMPTY STRING is A KEY IN word_dict AND is_palindrome(element at position index OF words) HOLDS
+                APPEND A LIST CONTAINING index AND word_dict AT the EMPTY STRING TO result
+                APPEND A LIST CONTAINING word_dict AT the EMPTY STRING AND index TO result
+            END IF
+
+            SET reversed_word TO the REVERSED FORM OF element at position index OF words
+            IF reversed_word IS A KEY IN word_dict AND word_dict AT reversed_word NOT EQUALS index
+                APPEND A LIST CONTAINING index AND word_dict AT reversed_word TO result
+            END IF
+
+            FOR cut_position FROM one TO the LENGTH OF element at position index OF words MINUS one INCLUSIVE
+                SET prefix TO the SUBSTRING FROM position zero TO position cut_position MINUS one OF element at position index OF words
+                SET suffix TO the SUBSTRING FROM position cut_position TO the END OF element at position index OF words
+                SET reversed_prefix TO the REVERSED FORM OF prefix
+                SET reversed_suffix TO the REVERSED FORM OF suffix
+
+                IF is_palindrome(suffix) HOLDS AND reversed_prefix IS A KEY IN word_dict
+                    APPEND A LIST CONTAINING index AND word_dict AT reversed_prefix TO result
+                END IF
+
+                IF is_palindrome(prefix) HOLDS AND reversed_suffix IS A KEY IN word_dict
+                    APPEND A LIST CONTAINING word_dict AT reversed_suffix AND index TO result
+                END IF
+            END FOR
+        END FOR
+
+        RETURN result
+    END FUNCTION
+END CLASS

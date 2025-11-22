@@ -1,0 +1,60 @@
+CLASS Solution  
+    FUNCTION pathsWithMaxScore(board)  
+        SET MODULO TO ten raised to the power of nine PLUS one  
+        SET dimension_n TO the LENGTH OF board  
+        
+        FUNCTION create_dp_structure(size)  
+            CREATE a two dimensional list of size by size  
+            EACH element is a list containing two elements  
+            THE first element is NEGATIVE infinity constant  
+            THE second element is zero  
+            RETURN this two dimensional list  
+        END FUNCTION  
+        
+        SET dp TO create_dp_structure(dimension_n)  
+        SET element at position dimension_n MINUS one of dp  
+        AT position dimension_n MINUS one TO a list containing zero and one  
+        
+        FOR index_i FROM dimension_n MINUS one DOWN TO zero INCLUSIVE DECREMENT by one  
+            FOR index_j FROM dimension_n MINUS one DOWN TO zero INCLUSIVE DECREMENT by one  
+                SET character_at_position TO element at position index_j OF element at position index_i OF board  
+                
+                IF character_at_position IS EQUAL TO character X OR character_at_position IS EQUAL TO character S  
+                    CONTINUE to next iteration  
+                END IF  
+                
+                IF character_at_position IS NOT EQUAL TO character E  
+                    CONVERT character_at_position TO integer value AND SET TO current_value  
+                ELSE  
+                    SET current_value TO zero  
+                END IF  
+                
+                FOR each pair_of_offsets IN list containing lists [one zero] [zero one] [one one]  
+                    SET offset_x TO first element of pair_of_offsets  
+                    SET offset_y TO second element of pair_of_offsets  
+                    SET neighbor_i TO index_i PLUS offset_x  
+                    SET neighbor_j TO index_j PLUS offset_y  
+                    
+                    IF neighbor_i IS GREATER THAN OR EQUAL TO zero AND neighbor_i IS LESS THAN dimension_n AND neighbor_j IS GREATER THAN OR EQUAL TO zero AND neighbor_j IS LESS THAN dimension_n  
+                        SET neighbor_score TO element at position zero OF element at position neighbor_j OF element at position neighbor_i OF dp  
+                        SET current_score TO element at position zero OF element at position index_j OF element at position index_i OF dp  
+                        
+                        IF neighbor_score IS GREATER THAN current_score  
+                            SET element at position zero OF element at position index_j OF element at position index_i OF dp TO neighbor_score PLUS current_value  
+                            SET element at position one OF element at position index_j OF element at position index_i OF dp TO element at position one OF element at position neighbor_j OF element at position neighbor_i OF dp  
+                        ELSE IF neighbor_score IS EQUAL TO current_score  
+                            SET element at position one OF element at position index_j OF element at position index_i OF dp TO the SUM OF element at position one OF element at position index_j OF element at position index_i OF dp PLUS element at position one OF element at position neighbor_j OF element at position neighbor_i OF dp  
+                            SET element at position one OF element at position index_j OF element at position index_i OF dp TO element at position one OF element at position index_j OF element at position index_i OF dp MODULO BY MODULO  
+                        END IF  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+        
+        IF element at position zero OF element at position zero OF dp IS EQUAL TO NEGATIVE infinity constant  
+            RETURN a list containing zero and zero  
+        END IF  
+        
+        RETURN a list containing element at position zero OF element at position zero OF dp AND element at position one OF element at position zero OF dp  
+    END FUNCTION  
+END CLASS

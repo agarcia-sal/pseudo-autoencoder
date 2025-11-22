@@ -1,0 +1,49 @@
+CLASS Solution
+    FUNCTION smallestMissingValueSubtree(parents: List[int], nums: List[int]) RETURNS List[int]
+        SET n TO LENGTH OF parents
+        INITIALIZE tree AS map FROM int TO list of int
+        
+        FOR i FROM 1 TO n - 1
+            APPEND i TO tree[parents[i]]
+        
+        SET node_with_one TO -1
+        FOR i FROM 0 TO n - 1
+            IF nums[i] EQUALS 1
+                SET node_with_one TO i
+                BREAK
+        
+        IF node_with_one EQUALS -1
+            RETURN list of 1 repeated n times
+        
+        SET result TO list of 1 repeated n times
+        
+        FUNCTION dfs(node)
+            ADD node TO visited
+            SET genetic_values TO set containing nums[node]
+            FOR each child IN tree[node]
+                IF child NOT IN visited
+                    UPDATE genetic_values WITH dfs(child)
+            SET smallest_missing TO 1
+            WHILE smallest_missing IN genetic_values
+                INCREMENT smallest_missing BY 1
+            SET result[node] TO smallest_missing
+            RETURN genetic_values
+        END FUNCTION
+        
+        SET visited TO empty set
+        
+        SET path TO empty list
+        SET current TO node_with_one
+        WHILE current NOT EQUAL TO -1
+            APPEND current TO path
+            SET current TO parents[current]
+        
+        SET path_set TO set of elements in path
+        FOR each node IN reverse order of path
+            IF node IN visited
+                CONTINUE
+            CALL dfs(node)
+        
+        RETURN result
+    END FUNCTION
+END CLASS

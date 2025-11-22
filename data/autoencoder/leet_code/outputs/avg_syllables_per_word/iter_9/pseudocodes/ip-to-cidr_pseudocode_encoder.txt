@@ -1,0 +1,43 @@
+CLASS Solution  
+    FUNCTION ipToCIDR(self, ip, n)  
+        FUNCTION ip_to_int(ip)  
+            SET parts TO list of integers obtained by splitting ip using period  
+            SET res TO zero  
+            FOR each part IN parts  
+                SET res TO res MULTIPLIED BY two HUNDRED FIFTY-SIX PLUS part  
+            END FOR  
+            RETURN res  
+        END FUNCTION  
+      
+        FUNCTION int_to_ip(num)  
+            CREATE empty list ip_segments  
+            FOR i FROM three DOWN TO zero  
+                APPEND string of integer part of (num DIVIDED BY (256 RAISED TO i)) MODULO 256 TO ip_segments  
+            END FOR  
+            RETURN concatenation of ip_segments with period as separator  
+        END FUNCTION  
+      
+        FUNCTION largest_cidr_size(start, n)  
+            IF bitwise AND of start and one EQUALS one THEN  
+                RETURN one  
+            END IF  
+            SET x TO one  
+            WHILE x LESS THAN OR EQUAL TO n AND bitwise AND of start and (x MINUS one) EQUALS zero  
+                SET x TO x MULTIPLIED BY two  
+            END WHILE  
+            RETURN x DIVIDED BY two  
+        END FUNCTION  
+      
+        SET result TO empty list  
+        SET start_ip TO call ip_to_int with ip  
+      
+        WHILE n GREATER THAN zero  
+            SET size TO call largest_cidr_size with start_ip and n  
+            APPEND string of int_to_ip(start_ip) CONCATENATED WITH slash CONCATENATED WITH string of (thirty-two MINUS (bit length of size MINUS one)) TO result  
+            SET start_ip TO start_ip PLUS size  
+            SET n TO n MINUS size  
+        END WHILE  
+      
+        RETURN result  
+    END FUNCTION  
+END CLASS

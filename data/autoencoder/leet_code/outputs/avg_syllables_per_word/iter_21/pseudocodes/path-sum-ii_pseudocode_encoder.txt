@@ -1,0 +1,64 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS None, right EQUALS None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN None  
+    END IF  
+    SET root TO NEW TreeNode WITH PARAMETERS val EQUALS element at position zero OF values  
+    SET i TO one  
+    SET queue TO NEW deque  
+    CALL queue APPEND WITH PARAMETERS root  
+    WHILE queue IS NOT empty  
+        SET node TO CALL queue POP LEFT WITH NO PARAMETERS  
+        IF i LESS THAN LENGTH OF values AND element at position i OF values IS NOT None  
+            SET node.left TO NEW TreeNode WITH PARAMETERS val EQUALS element at position i OF values  
+            CALL queue APPEND WITH PARAMETERS node.left  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN LENGTH OF values AND element at position i OF values IS NOT None  
+            SET node.right TO NEW TreeNode WITH PARAMETERS val EQUALS element at position i OF values  
+            CALL queue APPEND WITH PARAMETERS node.right  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN CALL is_same_tree WITH PARAMETERS p.left AND q.left AND CALL is_same_tree WITH PARAMETERS p.right AND q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION pathSum(self, root, targetSum)  
+        FUNCTION dfs(node, current_sum, path)  
+            IF node IS None  
+                RETURN  
+            END IF  
+            CALL path APPEND WITH PARAMETERS node.val  
+            SET current_sum TO current_sum PLUS node.val  
+            IF node.left IS None AND node.right IS None AND current_sum EQUALS targetSum  
+                CALL result APPEND WITH PARAMETERS COPY OF path  
+            END IF  
+            CALL dfs WITH PARAMETERS node.left, current_sum, path  
+            CALL dfs WITH PARAMETERS node.right, current_sum, path  
+            REMOVE last element FROM path  
+        END FUNCTION  
+        SET result TO empty list  
+        CALL dfs WITH PARAMETERS root, zero, empty list  
+        RETURN result  
+    END FUNCTION  
+END CLASS

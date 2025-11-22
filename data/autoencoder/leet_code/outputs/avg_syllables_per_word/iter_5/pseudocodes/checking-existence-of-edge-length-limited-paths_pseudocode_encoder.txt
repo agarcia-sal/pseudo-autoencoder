@@ -1,0 +1,54 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.parent TO list of integers from 0 to size minus 1  
+        SET self.rank TO list of size elements each initialized to 1  
+    END FUNCTION  
+
+    FUNCTION find(self, p)  
+        IF self.parent at position p is not equal to p THEN  
+            SET self.parent at position p TO self.find of self.parent at position p  
+        END IF  
+        RETURN self.parent at position p  
+    END FUNCTION  
+
+    FUNCTION union(self, p, q)  
+        SET rootP TO self.find of p  
+        SET rootQ TO self.find of q  
+        IF rootP equals rootQ THEN  
+            RETURN False  
+        END IF  
+        IF self.rank at rootP is greater than self.rank at rootQ THEN  
+            SET self.parent at rootQ TO rootP  
+        ELSE IF self.rank at rootP is less than self.rank at rootQ THEN  
+            SET self.parent at rootP TO rootQ  
+        ELSE  
+            SET self.parent at rootQ TO rootP  
+            INCREMENT self.rank at rootP BY 1  
+        END IF  
+        RETURN True  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION distanceLimitedPathsExist(self, n, edgeList, queries)  
+        SORT edgeList by the third element of each edge in ascending order  
+        SET indexedQueries TO list of tuples each containing (limit, p, q, original index) extracted from queries  
+        SORT indexedQueries in ascending order by their first element (limit)  
+        INITIALIZE uf AS new UnionFind with size n  
+        SET edgeIndex TO 0  
+        SET numEdges TO length of edgeList  
+        SET results TO list of length equal to queries filled with False  
+        FOR each limit, p, q, originalIndex IN indexedQueries DO  
+            WHILE edgeIndex is less than numEdges AND third element of edgeList at edgeIndex is less than limit DO  
+                SET u TO first element of edgeList at edgeIndex  
+                SET v TO second element of edgeList at edgeIndex  
+                CALL uf.union with u and v  
+                INCREMENT edgeIndex BY 1  
+            END WHILE  
+            IF uf.find of p equals uf.find of q THEN  
+                SET results at originalIndex TO True  
+            END IF  
+        END FOR  
+        RETURN results  
+    END FUNCTION  
+END CLASS

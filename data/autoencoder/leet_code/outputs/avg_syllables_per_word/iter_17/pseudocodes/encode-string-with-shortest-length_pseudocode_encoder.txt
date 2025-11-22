@@ -1,0 +1,42 @@
+CLASS Solution
+    FUNCTION encode(s)
+        FUNCTION get_encoded_length(count, substring)
+            RETURN the LENGTH OF the string REPRESENTATION OF count PLUS the LENGTH OF substring PLUS two
+        END FUNCTION
+
+        FUNCTION dp(i, j)
+            SET substring TO substring from position i TO j of s
+            SET n TO j MINUS i PLUS one
+
+            IF n LESS THAN five
+                RETURN substring
+            END IF
+
+            SET shortest TO substring
+
+            FOR k FROM one TO the INTEGER DIVISION OF n BY two
+                IF n MODULO k EQUALS zero
+                    SET repeat_count TO n DIVIDED BY k
+                    IF substring EQUALS substring from position zero TO k MINUS one MULTIPLIED BY repeat_count
+                        SET encoded_candidate TO the string REPRESENTATION OF repeat_count APPENDED TO an opening bracket APPENDED TO CALL dp WITH i AND i PLUS k MINUS one APPENDED TO a closing bracket
+                        IF the LENGTH OF encoded_candidate LESS THAN the LENGTH OF shortest
+                            SET shortest TO encoded_candidate
+                        END IF
+                    END IF
+                END IF
+            END FOR
+
+            FOR k FROM i TO j MINUS one
+                SET left_encoded TO CALL dp WITH i AND k
+                SET right_encoded TO CALL dp WITH k PLUS one AND j
+                SET combined TO left_encoded APPENDED TO right_encoded
+                IF the LENGTH OF combined LESS THAN the LENGTH OF shortest
+                    SET shortest TO combined
+                END IF
+            END FOR
+
+            RETURN shortest
+        END FUNCTION
+
+        RETURN CALL dp WITH zero AND the LENGTH OF s MINUS one
+END CLASS

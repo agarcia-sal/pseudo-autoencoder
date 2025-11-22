@@ -1,0 +1,49 @@
+CLASS Solution  
+    FUNCTION closestNode(n PARAMETER, edges PARAMETER, query PARAMETER)  
+        SET graph TO an automatically defaulting mapping from any key to an empty list  
+        
+        FOR each element named u AND each element named v IN edges  
+            APPEND element v TO the list accessed by key u IN graph  
+            APPEND element u TO the list accessed by key v IN graph  
+        END FOR  
+        
+        FUNCTION find_path(start PARAMETER, end PARAMETER)  
+            DECLARE queue AS a double ended queue initialized with a tuple consisting of start AND a list containing start  
+            DECLARE visited AS a set containing start  
+            
+            WHILE the queue holds any elements  
+                SET current_node AND current_path TO the tuple obtained by removing the leftmost element of queue  
+                IF the current_node EQUALS the end  
+                    RETURN current_path  
+                END IF  
+                FOR each neighbor IN the list accessed by key current_node IN graph  
+                    IF neighbor is NOT contained by visited  
+                        ADD neighbor TO visited  
+                        APPEND a tuple consisting of neighbor AND a concatenation of current_path PLUS a list with neighbor TO queue  
+                    END IF  
+                END FOR  
+            END WHILE  
+        END FUNCTION  
+        
+        FUNCTION closest_node_on_path(path PARAMETER, node PARAMETER)  
+            SET min_distance TO infinite floating point number  
+            SET closest_node TO no value  
+            FOR each element p IN path  
+                SET distance TO the length of the result returned by find_path with parameter p AND node MINUS one  
+                IF distance IS LESS THAN min_distance  
+                    SET min_distance TO distance  
+                    SET closest_node TO p  
+                END IF  
+            END FOR  
+            RETURN closest_node  
+        END FUNCTION  
+        
+        SET answer TO an empty list  
+        FOR each element start AND each element end AND each element node IN query  
+            SET path TO the result returned by find_path with start AND end as parameters  
+            APPEND the result returned by closest_node_on_path with path AND node as parameters TO answer  
+        END FOR  
+        
+        RETURN answer  
+    END FUNCTION  
+END CLASS

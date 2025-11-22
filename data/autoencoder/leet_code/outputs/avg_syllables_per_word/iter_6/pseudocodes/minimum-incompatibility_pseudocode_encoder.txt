@@ -1,0 +1,37 @@
+CLASS Solution  
+    FUNCTION minimumIncompatibility(nums, k)  
+        IMPORT Counter FROM collections  
+        
+        SET n TO LENGTH OF nums  
+        SET subset_size TO n DIVIDED BY k  
+        
+        IF any count FROM Counter(nums).values() IS GREATER THAN k  
+            RETURN -1  
+        
+        SET subset_incompatibility TO empty map  
+        FOR mask FROM 0 TO (2 RAISED TO n) MINUS 1  
+            IF count of set bits in mask EQUALS subset_size  
+                SET elements TO empty list  
+                FOR i FROM 0 TO n MINUS 1  
+                    IF bit i in mask IS SET  
+                        APPEND nums at index i TO elements  
+                IF LENGTH OF SET OF elements EQUALS subset_size  
+                    SET incompatibility TO maximum of elements MINUS minimum of elements  
+                    SET subset_incompatibility at key mask TO incompatibility  
+        
+        SET dp TO list with length (2 RAISED TO n) FILLED WITH infinity  
+        SET dp at index 0 TO 0  
+        
+        FOR mask FROM 0 TO (2 RAISED TO n) MINUS 1  
+            IF count of set bits in mask MODULO subset_size NOT EQUAL TO 0  
+                CONTINUE  
+            FOR each subset_mask IN keys of subset_incompatibility  
+                IF bitwise AND of mask and subset_mask EQUALS subset_mask  
+                    SET dp at index mask TO minimum of dp at index mask AND dp at index (mask XOR subset_mask) PLUS subset_incompatibility at subset_mask  
+        
+        IF dp at index (2 RAISED TO n) MINUS 1 IS NOT infinity  
+            RETURN dp at index (2 RAISED TO n) MINUS 1  
+        ELSE  
+            RETURN -1  
+    END FUNCTION  
+END CLASS

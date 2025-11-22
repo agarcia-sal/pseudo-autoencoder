@@ -1,0 +1,30 @@
+CLASS Solution
+    FUNCTION loudAndRich(richer AS list_of_list_of_integers, quiet AS list_of_integers) RETURNS list_of_integers
+        ASSIGN graph TO CALL defaultdict WITH parameters list
+        FOR each pair OF integers a AND b IN richer
+            APPEND element a TO element at position b OF graph
+        END FOR
+
+        SET n TO the LENGTH OF quiet
+        SET answer TO a list consisting of negative one REPEATED n times
+
+        FUNCTION dfs(person AS integer) RETURNS integer
+            IF element at position person OF answer EQUALS negative one
+                SET element at position person OF answer TO person
+                FOR each neighbor IN element at position person OF graph
+                    SET candidate TO CALL dfs WITH parameter neighbor
+                    IF element at position candidate OF quiet LESS THAN element at position element at position person OF answer OF quiet
+                        SET element at position person OF answer TO candidate
+                    END IF
+                END FOR
+            END IF
+            RETURN element at position person OF answer
+        END FUNCTION
+
+        FOR i FROM zero TO n MINUS one
+            CALL dfs WITH parameter i
+        END FOR
+
+        RETURN answer
+    END FUNCTION
+END CLASS

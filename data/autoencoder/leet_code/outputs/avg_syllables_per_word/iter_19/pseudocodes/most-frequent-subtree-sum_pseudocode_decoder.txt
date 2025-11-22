@@ -1,0 +1,66 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS None, right EQUALS None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN None  
+    END IF  
+    ASSIGN root TO A NEW TreeNode WITH parameter value as element at position zero of values  
+    SET i TO one  
+    ASSIGN queue TO A new deque collection  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        ASSIGN node TO the element removed from the left of queue  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT None  
+            ASSIGN node.left TO A NEW TreeNode WITH parameter value as element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT None  
+            ASSIGN node.right TO A NEW TreeNode WITH parameter value as element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(node p.left, node q.left) AND is_same_tree(node p.right, node q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION findFrequentTreeSum(self, root)  
+        FUNCTION subtree_sum(node)  
+            IF node IS None  
+                RETURN zero  
+            END IF  
+            SET current_sum TO the value of node.val PLUS the result of subtree_sum(node.left) PLUS the result of subtree_sum(node.right)  
+            INCREMENT count of current_sum BY one  
+            RETURN current_sum  
+        END FUNCTION  
+        ASSIGN count TO a new mapping with integer default values each initially zero  
+        CALL subtree_sum(root)  
+        SET max_freq TO the maximum value among all values in count OR zero if count is empty  
+        ASSIGN result TO an empty list  
+        FOR each key AND frequency IN all pairs of keys and values in count items  
+            IF frequency EQUALS max_freq  
+                APPEND key TO result  
+            END IF  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+END CLASS

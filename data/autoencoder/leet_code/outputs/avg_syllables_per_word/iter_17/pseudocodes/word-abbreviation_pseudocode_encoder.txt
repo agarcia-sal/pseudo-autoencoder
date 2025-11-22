@@ -1,0 +1,54 @@
+CLASS Solution
+    FUNCTION wordsAbbreviation(list_of_words)
+        FUNCTION abbreviate(word, prefix_length)
+            IF the LENGTH OF word MINUS prefix_length IS LESS THAN OR EQUAL TO two
+                RETURN word
+            END IF
+            RETURN the SUBSTRING from position zero TO prefix_length MINUS one of word CONCATENATED WITH the LENGTH OF word MINUS prefix_length MINUS one CONCATENATED WITH the ELEMENT at position negative one of word
+        END FUNCTION
+
+        FUNCTION get_unique_abbreviations(list_of_word_index_pairs, prefix_length)
+            SET abbreviation_map TO a new DEFAULTDICTIONARY of empty LISTS
+            FOR each pair IN list_of_word_index_pairs
+                SET current_index TO the ELEMENT at position zero of pair
+                SET current_word TO the ELEMENT at position one of pair
+                APPEND the tuple of current_index and current_word TO the LIST at key abbreviate(current_word, prefix_length) of abbreviation_map
+            END FOR
+            RETURN abbreviation_map
+        END FUNCTION
+
+        SET total_words TO the LENGTH OF list_of_words
+        SET answer_list TO a LIST of empty STRINGS of size total_words
+        SET word_index_pairs TO a LIST of tuples each containing index and word FOR index FROM zero TO total_words MINUS one AND word FROM list_of_words
+
+        SET abbreviations TO CALL get_unique_abbreviations WITH word_index_pairs AND prefix_length one
+
+        FOR each abbreviation_key, group_list IN abbreviations
+            IF the LENGTH OF group_list EQUALS one
+                SET single_index TO the ELEMENT at position zero of the ELEMENT at position zero of group_list
+                SET answer_list at position single_index TO abbreviation_key
+            ELSE
+                SET current_group TO an empty LIST
+                FOR each item IN group_list
+                    APPEND item TO current_group
+                END FOR
+                SET current_prefix_length TO two
+                WHILE the LENGTH OF current_group IS GREATER THAN zero
+                    SET new_abbreviations TO CALL get_unique_abbreviations WITH current_group AND current_prefix_length
+                    SET current_group TO an empty LIST
+                    FOR each new_abbreviation_key, new_group_list IN new_abbreviations
+                        IF the LENGTH OF new_group_list EQUALS one
+                            SET unique_index TO the ELEMENT at position zero of the ELEMENT at position zero of new_group_list
+                            SET answer_list at position unique_index TO new_abbreviation_key
+                        ELSE
+                            EXTEND current_group BY new_group_list
+                        END IF
+                    END FOR
+                    INCREMENT current_prefix_length BY one
+                END WHILE
+            END IF
+        END FOR
+
+        RETURN answer_list
+    END FUNCTION
+END CLASS

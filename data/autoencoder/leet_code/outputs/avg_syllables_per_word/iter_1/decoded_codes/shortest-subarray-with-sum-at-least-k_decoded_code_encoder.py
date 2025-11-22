@@ -1,0 +1,18 @@
+from collections import deque
+from math import inf
+
+def shortest_subarray(nums, k):
+    prefix_sum = [0]
+    for n in nums:
+        prefix_sum.append(prefix_sum[-1] + n)
+    dq = deque()
+    min_len = inf
+
+    for i, s in enumerate(prefix_sum):
+        while dq and s - prefix_sum[dq[0]] >= k:
+            min_len = min(min_len, i - dq.popleft())
+        while dq and s <= prefix_sum[dq[-1]]:
+            dq.pop()
+        dq.append(i)
+
+    return min_len if min_len != inf else -1

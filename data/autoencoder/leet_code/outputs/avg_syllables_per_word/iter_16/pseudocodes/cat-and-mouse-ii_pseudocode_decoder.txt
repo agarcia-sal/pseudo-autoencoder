@@ -1,0 +1,110 @@
+CLASS Solution  
+    FUNCTION canMouseWin(grid, catJump, mouseJump)  
+        SET m TO the LENGTH OF grid  
+        SET n TO the LENGTH OF element at position zero of grid  
+        SET cat_start TO zero  
+        SET mouse_start TO zero  
+        SET food TO zero  
+        SET dirs TO the SEQUENCE consisting of negative one zero one zero negative one  
+        SET g_mouse TO a LIST containing m MULTIPLIED BY n EMPTY LISTS  
+        SET g_cat TO a LIST containing m MULTIPLIED BY n EMPTY LISTS  
+
+        FOR each index i AND element row IN grid  
+            FOR each index j AND element c IN row  
+                IF c EQUALS hash symbol THEN  
+                    CONTINUE to next iteration  
+                END IF  
+                SET v TO i MULTIPLIED BY n PLUS j  
+                IF c EQUALS uppercase letter C THEN  
+                    SET cat_start TO v  
+                ELSE IF c EQUALS uppercase letter M THEN  
+                    SET mouse_start TO v  
+                ELSE IF c EQUALS uppercase letter F THEN  
+                    SET food TO v  
+                END IF  
+                FOR each pair of consecutive elements a AND b IN dirs  
+                    FOR k FROM zero TO mouseJump INCLUSIVE  
+                        SET x TO i PLUS k MULTIPLIED BY a  
+                        SET y TO j PLUS k MULTIPLIED BY b  
+                        IF x IS LESS THAN zero OR x IS GREATER THAN OR EQUAL TO m OR y IS LESS THAN zero OR y IS GREATER THAN OR EQUAL TO n OR element at position x of grid AT position y EQUALS hash symbol THEN  
+                            BREAK the loop  
+                        END IF  
+                        APPEND x MULTIPLIED BY n PLUS y TO the LIST AT position v of g_mouse  
+                    END FOR  
+                    FOR k FROM zero TO catJump INCLUSIVE  
+                        SET x TO i PLUS k MULTIPLIED BY a  
+                        SET y TO j PLUS k MULTIPLIED BY b  
+                        IF x IS LESS THAN zero OR x IS GREATER THAN OR EQUAL TO m OR y IS LESS THAN zero OR y IS GREATER THAN OR EQUAL TO n OR element at position x of grid AT position y EQUALS hash symbol THEN  
+                            BREAK the loop  
+                        END IF  
+                        APPEND x MULTIPLIED BY n PLUS y TO the LIST AT position v of g_cat  
+                    END FOR  
+                END FOR  
+            END FOR  
+        END FOR  
+        RETURN the RESULT of FUNCTION named calc WITH PARAMETERS g_mouse, g_cat, mouse_start, cat_start, food EQUALS one  
+    END FUNCTION  
+
+    FUNCTION calc(g_mouse, g_cat, mouse_start, cat_start, hole)  
+        FUNCTION get_prev_states(state)  
+            DESTRUCTURE state INTO m c t  
+            SET pt TO t EXCLUSIVE OR one  
+            SET pre TO an EMPTY LIST  
+            IF pt EQUALS one THEN  
+                FOR each pc IN element at position c of g_cat  
+                    IF element at position m of ans AT position pc AT position one EQUALS zero THEN  
+                        APPEND the TRIPLE consisting of m pc pt TO pre  
+                    END IF  
+                END FOR  
+            ELSE  
+                FOR each pm IN element at position m of g_mouse  
+                    IF element at position pm of ans AT position c AT position zero EQUALS zero THEN  
+                        APPEND the TRIPLE consisting of pm c zero TO pre  
+                    END IF  
+                END FOR  
+            END IF  
+            RETURN pre  
+        END FUNCTION  
+
+        SET n TO the LENGTH OF g_mouse  
+        SET degree TO a THREE-DIMENSIONAL LIST of SIZE n BY n BY two WITH each element BEING the LIST containing zero zero  
+        FOR i FROM zero TO n MINUS one  
+            FOR j FROM zero TO n MINUS one  
+                SET element at position zero of element at position j of element at position i of degree TO the LENGTH OF element at position i of g_mouse  
+                SET element at position one of element at position j of element at position i of degree TO the LENGTH OF element at position j of g_cat  
+            END FOR  
+        END FOR  
+
+        SET ans TO a THREE-DIMENSIONAL LIST of SIZE n BY n BY two WITH each element BEING the LIST containing zero zero  
+        SET q TO an EMPTY double ended QUEUE  
+        FOR i FROM zero TO n MINUS one  
+            SET element at position one of element at position i of element at position hole of ans TO one  
+            SET element at position zero of element at position hole of element at position i of ans TO two  
+            SET element at position one of element at position i of element at position i of ans TO two  
+            SET element at position zero of element at position i of element at position i of ans TO two  
+            APPEND the TRIPLE consisting of hole i one TO q  
+            APPEND the TRIPLE consisting of i hole zero TO q  
+            APPEND the TRIPLE consisting of i i zero TO q  
+            APPEND the TRIPLE consisting of i i one TO q  
+        END FOR  
+
+        WHILE q IS NOT EMPTY  
+            REMOVE the LEFTMOST element FROM q AND ASSIGN TO state  
+            SET t TO element at position two of ans AT position one of state AT position zero of state AND AT position zero of state  
+            FOR each prev_state IN get_prev_states(state)  
+                DESTRUCTURE prev_state INTO pm pc pt  
+                IF pt EQUALS t MINUS one THEN  
+                    SET element at position pt of element at position pc of element at position pm of ans TO t  
+                    APPEND prev_state TO q  
+                ELSE  
+                    DECREMENT element at position pt of element at position pc of element at position pm of degree BY one  
+                    IF element at position pt of element at position pc of element at position pm of degree EQUALS zero THEN  
+                        SET element at position pt of element at position pc of element at position pm of ans TO t  
+                        APPEND prev_state TO q  
+                    END IF  
+                END IF  
+            END FOR  
+        END WHILE  
+        RETURN element at position zero of element at position cat_start of element at position mouse_start of ans  
+    END FUNCTION  
+END CLASS

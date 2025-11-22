@@ -1,0 +1,24 @@
+class Solution:
+    def splitLoopedString(self, strs: list[str]) -> str:
+        # Maximize each string by reversing it if reversed is lexicographically larger
+        for i in range(len(strs)):
+            rev = strs[i][::-1]
+            if rev > strs[i]:
+                strs[i] = rev
+
+        doubled_strs = strs + strs  # concatenate strs with itself to allow circular indexing
+        max_string = ""
+
+        n = len(strs)
+        for i in range(n):
+            for is_reversed in (False, True):
+                current = strs[i][::-1] if is_reversed else strs[i]
+                remaining = "".join(doubled_strs[i+1:i+n])  # the remaining strings in order
+
+                length = len(current)
+                for cut_pos in range(length):
+                    candidate = current[cut_pos:] + remaining + current[:cut_pos]
+                    if candidate > max_string:
+                        max_string = candidate
+
+        return max_string

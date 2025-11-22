@@ -1,0 +1,50 @@
+CLASS Solution  
+    FUNCTION numberOfPatterns(m, n)  
+        SET jumps TO a mapping FROM pairs of integers TO integers where pairs represent start and end dot positions AND values represent the intermediate dot required BEFORE jumping, specifically  
+            pair one and three maps TO two  
+            pair one and seven maps TO four  
+            pair one and nine maps TO five  
+            pair two and eight maps TO five  
+            pair three and one maps TO two  
+            pair three and seven maps TO five  
+            pair three and nine maps TO six  
+            pair four and six maps TO five  
+            pair five and five maps TO five  
+            pair six and four maps TO five  
+            pair seven and one maps TO four  
+            pair seven and three maps TO five  
+            pair seven and nine maps TO eight  
+            pair eight and two maps TO five  
+            pair nine and one maps TO five  
+            pair nine and three maps TO six  
+            pair nine and seven maps TO eight  
+        
+        FUNCTION countPatternsFromDot(current, visited, length)  
+            IF length EQUALS n THEN  
+                RETURN one  
+            END IF  
+            SET count TO one IF length IS GREATER THAN OR EQUAL TO m OTHERWISE zero  
+            FOR next_dot FROM one TO nine INCLUSIVE  
+                IF element at position next_dot of visited IS false THEN  
+                    SET jump TO the value FROM jumps USING key pair current AND next_dot IF EXISTS OTHERWISE null  
+                    IF jump IS null OR element at position jump of visited IS true THEN  
+                        SET element at position next_dot of visited TO true  
+                        INCREMENT count BY RESULT OF countPatternsFromDot WITH next_dot, visited, length PLUS one  
+                        SET element at position next_dot of visited TO false  
+                    END IF  
+                END IF  
+            END FOR  
+            RETURN count  
+        END FUNCTION  
+        
+        SET visited TO a list OF boolean values all set TO false WITH length ten  
+        SET result TO zero  
+        FOR i FROM one TO nine INCLUSIVE  
+            SET element at position i of visited TO true  
+            INCREMENT result BY RESULT OF countPatternsFromDot WITH i, visited, one  
+            SET element at position i of visited TO false  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

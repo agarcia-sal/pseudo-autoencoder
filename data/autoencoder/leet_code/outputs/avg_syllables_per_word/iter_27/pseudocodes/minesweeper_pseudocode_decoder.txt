@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION updateBoard(board row_lists_of_strings TO board  click row_and_column_list TO click) RETURNS row_lists_of_strings  
+        FUNCTION count_adjacent_mines(r TO row_index  c TO column_index) RETURNS integer  
+            SET count TO zero  
+            FOR i FROM r MINUS one TO r PLUS one  
+                FOR j FROM c MINUS one TO c PLUS one  
+                    IF i GREATER THAN OR EQUAL TO zero AND i LESS THAN the LENGTH OF board AND j GREATER THAN OR EQUAL TO zero AND j LESS THAN the LENGTH OF element at position zero of board AND element at position i of board AT position j EQUALS the single letter string M  
+                        INCREMENT count BY one  
+                    END IF  
+                END FOR  
+            END FOR  
+            RETURN count  
+        END FUNCTION  
+        
+        FUNCTION dfs(r TO row_index  c TO column_index)  
+            IF NOT (r GREATER THAN OR EQUAL TO zero AND r LESS THAN the LENGTH OF board AND c GREATER THAN OR EQUAL TO zero AND c LESS THAN the LENGTH OF element at position zero of board)  
+                RETURN  
+            END IF  
+            IF element at position r of board AT position c NOT EQUALS the single letter string E  
+                RETURN  
+            END IF  
+            
+            SET mine_count TO the RESULT OF count_adjacent_mines WITH PARAMETERS r AND c  
+            IF mine_count GREATER THAN zero  
+                SET element at position r of board AT position c TO the STRING REPRESENTATION OF mine_count  
+            ELSE  
+                SET element at position r of board AT position c TO the single letter string B  
+                FOR i FROM r MINUS one TO r PLUS one  
+                    FOR j FROM c MINUS one TO c PLUS one  
+                        CALL dfs WITH PARAMETERS i AND j  
+                    END FOR  
+                END FOR  
+            END IF  
+        END FUNCTION  
+        
+        SET row TO element at position zero of click  
+        SET col TO element at position one of click  
+        IF element at position row of board AT position col EQUALS the single letter string M  
+            SET element at position row of board AT position col TO the single letter string X  
+            RETURN board  
+        END IF  
+        
+        CALL dfs WITH PARAMETERS row AND col  
+        RETURN board  
+    END FUNCTION  
+END CLASS

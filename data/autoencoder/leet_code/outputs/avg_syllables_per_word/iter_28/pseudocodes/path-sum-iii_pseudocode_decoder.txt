@@ -1,0 +1,62 @@
+CLASS TreeNode  
+    FUNCTION __init__(self val left right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF the LENGTH OF values EQUALS zero THEN  
+        RETURN None  
+    END IF  
+    SET root TO a new TreeNode object with the element at position zero of values  
+    SET i TO one  
+    SET queue TO an empty double ended queue  
+    APPEND root TO queue  
+    WHILE the LENGTH OF queue GREATER THAN zero DO  
+        SET node TO the element removed from the left of queue  
+        IF i LESS THAN the LENGTH OF values AND the element at position i of values NOT EQUALS None THEN  
+            SET node.left TO a new TreeNode object with the element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN the LENGTH OF values AND the element at position i of values NOT EQUALS None THEN  
+            SET node.right TO a new TreeNode object with the element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p q)  
+    IF p EQUALS None AND q EQUALS None THEN  
+        RETURN True  
+    ELSE IF p EQUALS None OR q EQUALS None THEN  
+        RETURN False  
+    ELSE IF the val attribute of p NOT EQUALS the val attribute of q THEN  
+        RETURN False  
+    ELSE  
+        RETURN the result of is_same_tree with the left attribute of p AND the left attribute of q AND the result of is_same_tree with the right attribute of p AND the right attribute of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION pathSum(self root targetSum)  
+        FUNCTION helper(node current_sum prefix_sums)  
+            IF node EQUALS None THEN  
+                RETURN zero  
+            END IF  
+            SET current_sum TO current_sum PLUS the val attribute of node  
+            SET paths_to_here TO the value from prefix_sums at the key current_sum MINUS targetSum OR zero if the key does not exist  
+            SET the value in prefix_sums at key current_sum TO the value from prefix_sums at key current_sum OR zero IF key does not exist PLUS one  
+            SET paths_in_left TO the result of helper with the left attribute of node AND current_sum AND prefix_sums  
+            SET paths_in_right TO the result of helper with the right attribute of node AND current_sum AND prefix_sums  
+            DECREMENT the value in prefix_sums at key current_sum BY one  
+            RETURN paths_to_here PLUS paths_in_left PLUS paths_in_right  
+        END FUNCTION  
+        SET prefix_sums TO a dictionary mapping zero TO one  
+        RETURN the result of helper with root AND zero AND prefix_sums  
+    END FUNCTION  
+END CLASS

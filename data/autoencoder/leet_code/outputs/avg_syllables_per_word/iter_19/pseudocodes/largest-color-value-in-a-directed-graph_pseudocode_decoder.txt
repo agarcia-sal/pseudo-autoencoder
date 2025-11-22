@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION largestPathValue(colors, edges)  
+        SET n TO the LENGTH OF colors  
+        SET graph TO a DEFAULT DICTIONARY with LIST as default value  
+        SET in_degree TO a LIST of zero repeated n times  
+        
+        FOR each pair u and v IN edges  
+            APPEND v TO the LIST in graph AT key u  
+            INCREMENT element at position v of in_degree BY one  
+        END FOR  
+        
+        SET queue TO a double-ended QUEUE containing elements i FOR each i FROM zero TO n MINUS one WHERE element at position i of in_degree EQUALS zero  
+        SET dp TO a LIST containing n ELEMENTS each of which is a LIST containing twenty-six zeroes  
+        SET visited TO zero  
+        SET max_color_value TO zero  
+        
+        WHILE queue is not empty  
+            REMOVE the LEFTMOST element FROM queue AND ASSIGN it TO node  
+            INCREMENT element at position character code of element at position node of colors MINUS character code of a FROM the LIST at position node of dp BY one  
+            SET max_color_value TO THE GREATER OF max_color_value AND element at position character code of element at position node of colors MINUS character code of a FROM the LIST at position node of dp  
+            INCREMENT visited BY one  
+            
+            FOR each neighbor IN the LIST in graph AT key node  
+                FOR c FROM zero TO twenty-five  
+                    SET element at position c of the LIST at position neighbor of dp TO THE GREATER OF element at position c of the LIST at position neighbor of dp AND element at position c of the LIST at position node of dp  
+                END FOR  
+                DECREMENT element at position neighbor of in_degree BY one  
+                IF element at position neighbor of in_degree EQUALS zero  
+                    APPEND neighbor TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        IF visited EQUALS n  
+            RETURN max_color_value  
+        ELSE  
+            RETURN negative one  
+        END IF  
+    END FUNCTION  
+END CLASS

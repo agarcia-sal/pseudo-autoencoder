@@ -1,0 +1,56 @@
+CLASS TrieNode  
+    FUNCTION __init__(self)  
+        SET children TO an empty dictionary  
+        SET count TO zero  
+    END FUNCTION  
+END CLASS  
+
+CLASS Trie  
+    FUNCTION __init__(self, bit_length)  
+        ASSIGN reference TO a new TrieNode object TO root  
+        SET bit_length TO bit_length  
+    END FUNCTION  
+
+    FUNCTION insert(self, num)  
+        ASSIGN reference TO root TO node  
+        FOR i FROM bit_length TO zero DECREMENT BY one  
+            SET bit TO the element at position i of num DIVIDED BY power of two for i AND WITH one  
+            IF bit NOT IN keys of node.children  
+                ASSIGN reference TO a new TrieNode object TO node.children at key bit  
+            END IF  
+            ASSIGN reference TO node.children at key bit TO node  
+            INCREMENT node.count BY one  
+        END FOR  
+    END FUNCTION  
+
+    FUNCTION count_less_than(self, num, threshold)  
+        SET count TO zero  
+        ASSIGN reference TO root TO node  
+        FOR i FROM bit_length TO zero DECREMENT BY one  
+            IF node IS null  
+                BREAK the loop  
+            END IF  
+            SET bit TO the element at position i of num DIVIDED BY power of two for i AND WITH one  
+            SET threshold_bit TO the element at position i of threshold DIVIDED BY power of two for i AND WITH one  
+            IF threshold_bit EQUALS one  
+                INCREMENT count BY the count value of node.children at key bit IF it EXISTS OTHERWISE zero  
+                ASSIGN reference TO node.children at key that is bit MINUS one PLUS one TO node  
+            ELSE  
+                ASSIGN reference TO node.children at key bit TO node  
+            END IF  
+        END FOR  
+        RETURN count  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION countPairs(self, nums, low, high)  
+        ASSIGN reference TO a new Trie object TO trie  
+        SET nice_pairs TO zero  
+        FOR each num IN nums  
+            INCREMENT nice_pairs BY the result of trie.count_less_than with parameters num and high PLUS one MINUS the result of trie.count_less_than with parameters num and low  
+            CALL trie.insert with parameter num  
+        END FOR  
+        RETURN nice_pairs  
+    END FUNCTION  
+END CLASS

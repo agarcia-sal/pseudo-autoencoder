@@ -1,0 +1,43 @@
+CLASS Solution  
+    FUNCTION minimumTime(s)  
+        SET n TO LENGTH OF s  
+        INITIALIZE left_costs AS LIST OF SIZE n WITH ALL ZEROS  
+        INITIALIZE right_costs AS LIST OF SIZE n WITH ALL ZEROS  
+
+        IF CHARACTER AT s AT 0 EQUALS '1' THEN  
+            SET left_costs AT 0 TO 1  
+        ELSE  
+            SET left_costs AT 0 TO 0  
+        END IF  
+
+        FOR i FROM 1 TO n MINUS 1  
+            IF CHARACTER AT s AT i EQUALS '0' THEN  
+                SET left_costs AT i TO left_costs AT (i MINUS 1)  
+            ELSE  
+                SET left_costs AT i TO MINIMUM OF (i PLUS 1) AND (left_costs AT (i MINUS 1) PLUS 2)  
+            END IF  
+        END FOR  
+
+        IF CHARACTER AT s AT (n MINUS 1) EQUALS '1' THEN  
+            SET right_costs AT (n MINUS 1) TO 1  
+        ELSE  
+            SET right_costs AT (n MINUS 1) TO 0  
+        END IF  
+
+        FOR i FROM (n MINUS 2) DOWN TO 0  
+            IF CHARACTER AT s AT i EQUALS '0' THEN  
+                SET right_costs AT i TO right_costs AT (i PLUS 1)  
+            ELSE  
+                SET right_costs AT i TO MINIMUM OF (n MINUS i) AND (right_costs AT (i PLUS 1) PLUS 2)  
+            END IF  
+        END FOR  
+
+        SET min_time TO MINIMUM OF left_costs AT (n MINUS 1) AND right_costs AT 0  
+
+        FOR i FROM 0 TO (n MINUS 2)  
+            SET min_time TO MINIMUM OF min_time AND (left_costs AT i PLUS right_costs AT (i PLUS 1))  
+        END FOR  
+
+        RETURN min_time  
+    END FUNCTION  
+END CLASS

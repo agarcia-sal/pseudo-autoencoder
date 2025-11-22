@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION cherryPickup(grid)  
+        SET n TO LENGTH OF grid  
+        IF grid AT position 0 0 EQUALS -1 OR grid AT position n MINUS 1 n MINUS 1 EQUALS -1  
+            RETURN 0  
+        
+        INITIALIZE dp AS three-dimensional list with dimensions n BY n BY n FILLED WITH -1  
+        SET dp AT position 0 0 0 TO grid AT position 0 0  
+        
+        SET directions TO list OF pairs (0, 1) AND (1, 0)  
+        
+        FOR t FROM 1 TO (2 MULTIPLIED BY n) MINUS 2  
+            FOR i1 FROM MAXIMUM OF 0 AND (t MINUS (n MINUS 1)) TO MINIMUM OF n AND (t PLUS 1) MINUS 1  
+                FOR i2 FROM MAXIMUM OF 0 AND (t MINUS (n MINUS 1)) TO MINIMUM OF n AND (t PLUS 1) MINUS 1  
+                    SET j1 TO t MINUS i1  
+                    SET j2 TO t MINUS i2  
+                    IF grid AT position i1 j1 EQUALS -1 OR grid AT position i2 j2 EQUALS -1  
+                        CONTINUE  
+                    
+                    SET prev_max TO -1  
+                    FOR each di1 dj1 IN directions  
+                        FOR each di2 dj2 IN directions  
+                            SET pi1 TO i1 MINUS di1  
+                            SET pj1 TO j1 MINUS dj1  
+                            SET pi2 TO i2 MINUS di2  
+                            SET pj2 TO j2 MINUS dj2  
+                            IF pi1 GREATER THAN OR EQUAL TO 0 AND pi1 LESS THAN n AND pj1 GREATER THAN OR EQUAL TO 0 AND pj1 LESS THAN n  
+                                AND pi2 GREATER THAN OR EQUAL TO 0 AND pi2 LESS THAN n AND pj2 GREATER THAN OR EQUAL TO 0 AND pj2 LESS THAN n  
+                                IF dp AT position pi1 pi2 pj1 GREATER THAN prev_max  
+                                    SET prev_max TO dp AT position pi1 pi2 pj1  
+                    
+                    IF prev_max GREATER THAN OR EQUAL TO 0  
+                        IF i1 EQUALS i2  
+                            SET cherries TO grid AT position i1 j1  
+                        ELSE  
+                            SET cherries TO grid AT position i1 j1 PLUS grid AT position i2 j2  
+                        SET dp AT position i1 i2 j1 TO prev_max PLUS cherries  
+        
+        RETURN MAXIMUM OF 0 AND dp AT position n MINUS 1 n MINUS 1 n MINUS 1  
+    END FUNCTION  
+END CLASS

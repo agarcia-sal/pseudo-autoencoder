@@ -1,0 +1,53 @@
+CLASS Solution
+    FUNCTION pathsWithMaxScore(board)
+        SET MODULO_CONSTANT TO ten raised to the power of nine PLUS one
+        SET size_n TO the LENGTH OF board
+        
+        CALL initialize_dp_array WITH size_n RETURNING dp
+        
+        CALL set_starting_point WITH dp AND size_n
+        
+        FOR row_index FROM size_n MINUS one DOWN TO zero
+            FOR column_index FROM size_n MINUS one DOWN TO zero
+                IF element at position row_index OF board IS IN the collection of elements X AND S
+                    CONTINUE to next iteration
+                END IF
+                
+                SET current_value TO zero
+                IF element at position row_index OF element at position column_index OF board IS NOT EQUALS TO E
+                    SET current_value TO the INTEGER value converted from the element at position row_index OF element at position column_index OF board
+                END IF
+                
+                FOR each pair of offsets (offset_x, offset_y) IN the collection of pairs (one zero), (zero one), AND (one one)
+                    SET new_row TO row_index PLUS offset_x
+                    SET new_column TO column_index PLUS offset_y
+                    
+                    IF new_row IS GREATER THAN OR EQUAL TO zero AND new_row IS LESS THAN size_n AND new_column IS GREATER THAN OR EQUAL TO zero AND new_column IS LESS THAN size_n
+                        IF element at position zero of element at position new_row OF element at position new_column OF dp IS GREATER THAN element at position zero of element at position row_index OF element at position column_index OF dp
+                            SET element at position zero of element at position row_index OF element at position column_index OF dp TO element at position zero of element at position new_row OF element at position new_column OF dp PLUS current_value
+                            SET element at position one of element at position row_index OF element at position column_index OF dp TO element at position one of element at position new_row OF element at position new_column OF dp
+                        ELSE IF element at position zero of element at position new_row OF element at position new_column OF dp IS EQUALS TO element at position zero of element at position row_index OF element at position column_index OF dp
+                            SET element at position one of element at position row_index OF element at position column_index OF dp TO the SUM of element at position one of element at position row_index OF element at position column_index OF dp AND element at position one of element at position new_row OF element at position new_column OF dp MODULO MODULO_CONSTANT
+                        END IF
+                    END IF
+                END FOR
+            END FOR
+        END FOR
+        
+        IF element at position zero of element at position zero OF element at position zero OF dp IS EQUALS TO negative infinity
+            RETURN zero AND zero AS a list
+        END IF
+        
+        RETURN element at position zero of element at position zero OF element at position zero OF dp AND element at position one of element at position zero OF element at position zero OF dp AS a list
+    END FUNCTION
+
+    FUNCTION initialize_dp_array(size_n)
+        CREATE a list dp OF size size_n WHERE each element IS a list of size size_n WHERE each element IS a list containing negative infinity AND zero
+        RETURN dp
+    END FUNCTION
+
+    FUNCTION set_starting_point(dp, size_n)
+        SET element at position zero of element at position size_n MINUS one OF element at position size_n MINUS one OF dp TO zero
+        SET element at position one of element at position size_n MINUS one OF element at position size_n MINUS one OF dp TO one
+    END FUNCTION
+END CLASS

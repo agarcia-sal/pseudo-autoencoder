@@ -1,0 +1,49 @@
+CLASS Solution
+    FUNCTION solveEquation(equation)
+        FUNCTION parse_side(side)
+            SET tokens TO CALL replace PLUS WITH parameters side AND plus replaced by sharp plus
+            SET tokens TO CALL replace MINUS WITH parameters tokens AND minus replaced by sharp minus
+            SET tokens TO CALL split WITH parameter tokens AND sharp
+            SET x_count TO zero
+            SET num_sum TO zero
+            FOR each token IN tokens
+                IF token IS empty
+                    CONTINUE TO next iteration
+                END IF
+                IF token CONTAINS x
+                    IF token EQUALS x OR token EQUALS plus x
+                        INCREMENT x_count BY one
+                    ELSE IF token EQUALS minus x
+                        DECREMENT x_count BY one
+                    ELSE
+                        SET integer_value TO CALL replace WITH parameters token AND x replaced by empty string
+                        SET integer_value TO CALL convert_to_integer WITH parameter integer_value
+                        INCREMENT x_count BY integer_value
+                    END IF
+                ELSE
+                    SET integer_value TO CALL convert_to_integer WITH parameter token
+                    INCREMENT num_sum BY integer_value
+                END IF
+            END FOR
+            RETURN x_count, num_sum
+        END FUNCTION
+
+        SET left_side, right_side TO CALL split WITH parameters equation AND equal sign
+        SET left_x, left_num TO CALL parse_side WITH parameter left_side
+        SET right_x, right_num TO CALL parse_side WITH parameter right_side
+
+        SET total_x TO left_x MINUS right_x
+        SET total_num TO right_num MINUS left_num
+
+        IF total_x EQUALS zero
+            IF total_num EQUALS zero
+                RETURN Infinite solutions
+            ELSE
+                RETURN No solution
+            END IF
+        ELSE
+            SET division_result TO total_num DIVIDED BY total_x
+            RETURN x EQUALS division_result
+        END IF
+    END FUNCTION
+END CLASS

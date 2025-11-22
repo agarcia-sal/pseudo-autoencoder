@@ -1,0 +1,65 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val EQUAL TO zero left EQUAL TO none right EQUAL TO none  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values IS EMPTY  
+        RETURN none  
+    END IF  
+    SET root TO A NEW TreeNode WITH PARAMETER element at position zero OF values  
+    SET i TO one  
+    SET queue TO A NEW double-ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO REMOVE FIRST ELEMENT FROM queue  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i OF values IS NOT none  
+            SET node.left TO A NEW TreeNode WITH PARAMETER element at position i OF values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i OF values IS NOT none  
+            SET node.right TO A NEW TreeNode WITH PARAMETER element at position i OF values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN false  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETERS p.left q.left AND is_same_tree WITH PARAMETERS p.right q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION longestConsecutive WITH PARAMETER root  
+        IF root IS none  
+            RETURN zero  
+        END IF  
+        FUNCTION dfs WITH PARAMETERS node parent current_length  
+            IF node IS none  
+                RETURN current_length  
+            END IF  
+            IF parent IS NOT none AND node.val IS EQUAL TO parent PLUS one  
+                INCREMENT current_length BY one  
+            ELSE  
+                SET current_length TO one  
+            END IF  
+            SET left_length TO dfs WITH PARAMETERS node.left node.val current_length  
+            SET right_length TO dfs WITH PARAMETERS node.right node.val current_length  
+            RETURN THE MAXIMUM OF current_length left_length right_length  
+        END FUNCTION  
+        RETURN dfs WITH PARAMETERS root none zero  
+    END FUNCTION  
+END CLASS

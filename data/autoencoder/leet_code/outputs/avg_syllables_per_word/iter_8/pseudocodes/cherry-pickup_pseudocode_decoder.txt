@@ -1,0 +1,39 @@
+CLASS Solution  
+    FUNCTION cherryPickup(grid)  
+        SET n TO LENGTH OF grid  
+        IF grid AT 0 AT 0 EQUALS -1 OR grid AT n MINUS 1 AT n MINUS 1 EQUALS -1  
+            RETURN 0  
+        
+        SET dp TO THREE-DIMENSIONAL LIST OF SIZE n BY n BY n FILLED WITH -1  
+        SET dp AT 0 AT 0 AT 0 TO grid AT 0 AT 0  
+        
+        SET directions TO LIST OF PAIRS (0, 1) AND (1, 0)  
+        
+        FOR t FROM 1 TO 2 TIMES n MINUS 2  
+            FOR i1 FROM MAXIMUM OF 0 AND t MINUS (n MINUS 1) TO MINIMUM OF n AND t PLUS 1  
+                FOR i2 FROM MAXIMUM OF 0 AND t MINUS (n MINUS 1) TO MINIMUM OF n AND t PLUS 1  
+                    SET j1 TO t MINUS i1  
+                    SET j2 TO t MINUS i2  
+                    IF grid AT i1 AT j1 EQUALS -1 OR grid AT i2 AT j2 EQUALS -1  
+                        CONTINUE TO NEXT ITERATION  
+                    
+                    SET prev_max TO -1  
+                    FOR each pair di1, dj1 IN directions  
+                        FOR each pair di2, dj2 IN directions  
+                            SET pi1 TO i1 MINUS di1  
+                            SET pj1 TO j1 MINUS dj1  
+                            SET pi2 TO i2 MINUS di2  
+                            SET pj2 TO j2 MINUS dj2  
+                            IF pi1 GREATER THAN OR EQUAL TO 0 AND pi1 LESS THAN n AND pj1 GREATER THAN OR EQUAL TO 0 AND pj1 LESS THAN n AND pi2 GREATER THAN OR EQUAL TO 0 AND pi2 LESS THAN n AND pj2 GREATER THAN OR EQUAL TO 0 AND pj2 LESS THAN n  
+                                SET prev_max TO MAXIMUM OF prev_max AND dp AT pi1 AT pi2 AT pj1  
+                    
+                    IF prev_max GREATER THAN OR EQUAL TO 0  
+                        IF i1 EQUALS i2  
+                            SET cherries TO grid AT i1 AT j1  
+                        ELSE  
+                            SET cherries TO grid AT i1 AT j1 PLUS grid AT i2 AT j2  
+                        SET dp AT i1 AT i2 AT j1 TO prev_max PLUS cherries  
+        
+        RETURN MAXIMUM OF 0 AND dp AT n MINUS 1 AT n MINUS 1 AT n MINUS 1  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,57 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val EQUALS zero left EQUALS none right EQUALS none  
+        SET the val ATTRIBUTE OF self TO val  
+        SET the left ATTRIBUTE OF self TO left  
+        SET the right ATTRIBUTE OF self TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values AS list  
+    IF the values LIST HOLDS NO ELEMENTS  
+        RETURN none  
+    END IF  
+    SET root TO A NEW TreeNode INITIALIZED WITH the ELEMENT AT POSITION zero OF values  
+    SET i TO one  
+    SET queue TO AN EMPTY DOUBLE ENDED QUEUE  
+    APPEND root TO queue  
+    WHILE queue HOLDS ELEMENTS  
+        SET node TO THE ELEMENT REMOVED FROM THE FRONT OF queue  
+        IF i IS LESS THAN THE LENGTH OF values AND the ELEMENT AT POSITION i OF values IS NOT none  
+            SET THE left ATTRIBUTE OF node TO A NEW TreeNode INITIALIZED WITH THE ELEMENT AT POSITION i OF values  
+            APPEND THE left ATTRIBUTE OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN THE LENGTH OF values AND THE ELEMENT AT POSITION i OF values IS NOT none  
+            SET THE right ATTRIBUTE OF node TO A NEW TreeNode INITIALIZED WITH THE ELEMENT AT POSITION i OF values  
+            APPEND THE right ATTRIBUTE OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p AND q  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF THE val ATTRIBUTE OF p IS NOT EQUALS THE val ATTRIBUTE OF q  
+        RETURN false  
+    ELSE  
+        RETURN THE RESULT OF is_same_tree WITH PARAMETERS THE left ATTRIBUTE OF p AND THE left ATTRIBUTE OF q AND THE RESULT OF is_same_tree WITH PARAMETERS THE right ATTRIBUTE OF p AND THE right ATTRIBUTE OF q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION buildTree WITH PARAMETERS self preorder AS List OF integer AND inorder AS List OF integer RETURNING Optional TreeNode  
+        IF preorder HOLDS NO ELEMENTS OR inorder HOLDS NO ELEMENTS  
+            RETURN none  
+        END IF  
+        SET root_val TO THE ELEMENT AT POSITION zero OF preorder  
+        SET root TO A NEW TreeNode INITIALIZED WITH root_val  
+        SET root_index_inorder TO THE POSITION OF root_val IN inorder  
+        SET THE left ATTRIBUTE OF root TO THE RESULT OF THE buildTree FUNCTION OF self WITH PARAMETERS THE SUBLIST OF preorder FROM POSITION one TO THE POSITION root_index_inorder PLUS one AND THE SUBLIST OF inorder FROM THE START TO THE POSITION root_index_inorder  
+        SET THE right ATTRIBUTE OF root TO THE RESULT OF THE buildTree FUNCTION OF self WITH PARAMETERS THE SUBLIST OF preorder FROM THE POSITION root_index_inorder PLUS one TO THE END AND THE SUBLIST OF inorder FROM THE POSITION root_index_inorder PLUS one TO THE END  
+        RETURN root  
+    END FUNCTION  
+END CLASS

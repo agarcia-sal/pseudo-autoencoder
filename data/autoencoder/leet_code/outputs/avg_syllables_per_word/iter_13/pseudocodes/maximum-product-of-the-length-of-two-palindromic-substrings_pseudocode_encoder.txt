@@ -1,0 +1,42 @@
+CLASS Solution  
+    FUNCTION maxProduct(s)  
+        SET n TO the LENGTH OF s  
+        
+        SET max_len_end TO A LIST OF ONES WITH LENGTH n  
+        SET max_len_start TO A LIST OF ONES WITH LENGTH n  
+        
+        FUNCTION expand_around_center(left, right)  
+            WHILE left IS GREATER THAN OR EQUAL TO zero AND right IS LESS THAN n AND the CHARACTER AT POSITION left OF s EQUALS the CHARACTER AT POSITION right OF s  
+                SET length TO right MINUS left PLUS one  
+                SET max_len_end AT POSITION right TO THE GREATER VALUE BETWEEN max_len_end AT POSITION right AND length  
+                SET max_len_start AT POSITION left TO THE GREATER VALUE BETWEEN max_len_start AT POSITION left AND length  
+                DECREMENT left BY one  
+                INCREMENT right BY one  
+            END WHILE  
+        END FUNCTION  
+        
+        FOR i FROM zero TO n MINUS one  
+            CALL expand_around_center WITH ARGUMENTS i AND i  
+        END FOR  
+        
+        SET prefix_max TO A LIST OF ZEROS WITH LENGTH n  
+        SET suffix_max TO A LIST OF ZEROS WITH LENGTH n  
+        
+        SET prefix_max AT POSITION zero TO max_len_end AT POSITION zero  
+        FOR i FROM one TO n MINUS one  
+            SET prefix_max AT POSITION i TO THE GREATER VALUE BETWEEN prefix_max AT POSITION i MINUS one AND max_len_end AT POSITION i  
+        END FOR  
+        
+        SET suffix_max AT POSITION n MINUS one TO max_len_start AT POSITION n MINUS one  
+        FOR i FROM n MINUS two TO zero STEP minus one  
+            SET suffix_max AT POSITION i TO THE GREATER VALUE BETWEEN suffix_max AT POSITION i PLUS one AND max_len_start AT POSITION i  
+        END FOR  
+        
+        SET max_product TO zero  
+        FOR i FROM zero TO n MINUS two  
+            SET max_product TO THE GREATER VALUE BETWEEN max_product AND prefix_max AT POSITION i MULTIPLIED BY suffix_max AT POSITION i PLUS one  
+        END FOR  
+        
+        RETURN max_product  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION minimumIncompatibility(nums, k)  
+        SET n TO LENGTH OF nums  
+        SET subset_size TO n DIVIDED BY k  
+
+        IF any count GREATER THAN k FOR EACH count IN counts of nums  
+            RETURN -1  
+        END IF  
+
+        SET subset_incompatibility TO empty map  
+        FOR mask FROM 0 TO 2 TO THE POWER OF n MINUS 1  
+            IF count of bits set in mask EQUALS subset_size  
+                SET elements TO list of nums at positions where mask has bit set  
+                IF all elements are unique in elements  
+                    SET incompatibility TO maximum element IN elements MINUS minimum element IN elements  
+                    ASSIGN incompatibility TO subset_incompatibility AT key mask  
+                END IF  
+            END IF  
+        END FOR  
+
+        SET dp TO list of size 2 TO THE POWER OF n with all values set to infinity  
+        SET dp at position 0 TO 0  
+
+        FOR mask FROM 0 TO 2 TO THE POWER OF n MINUS 1  
+            IF count of bits set in mask MODULO subset_size IS NOT 0  
+                CONTINUE to next iteration  
+            END IF  
+            FOR each subset_mask IN keys of subset_incompatibility  
+                IF subset_mask is subset of mask  
+                    SET dp at position mask TO minimum of dp at mask and dp at mask excluding subset_mask plus subset_incompatibility at subset_mask  
+                END IF  
+            END FOR  
+        END FOR  
+
+        IF dp at position 2 TO THE POWER OF n MINUS 1 IS infinity  
+            RETURN -1  
+        ELSE  
+            RETURN dp at position 2 TO THE POWER OF n MINUS 1  
+        END IF  
+    END FUNCTION  
+END CLASS

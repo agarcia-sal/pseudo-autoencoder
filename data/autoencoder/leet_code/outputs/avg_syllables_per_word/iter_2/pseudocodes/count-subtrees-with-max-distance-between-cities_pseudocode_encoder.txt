@@ -1,0 +1,65 @@
+CLASS Solution
+    FUNCTION countSubgraphsForEachDiameter(n, edges)
+        SET graph TO dictionary mapping each integer from 1 to n TO empty list
+        
+        FOR each (u, v) IN edges
+            APPEND v TO graph[u]
+            APPEND u TO graph[v]
+        
+        FUNCTION bfs(subtree)
+            FROM collections IMPORT deque
+            SET start TO an arbitrary element from subtree
+            SET queue TO deque containing start
+            SET visited TO set containing start
+            SET distance TO 0
+            SET farthest_node TO start
+            
+            WHILE queue is not empty
+                SET node TO first element removed from queue
+                FOR each neighbor IN graph[node]
+                    IF neighbor is in subtree AND neighbor is not in visited
+                        ADD neighbor TO visited
+                        ADD neighbor TO queue
+                        SET farthest_node TO neighbor
+            
+            SET queue TO deque containing farthest_node
+            SET visited TO set containing farthest_node
+            SET max_distance TO 0
+            
+            WHILE queue is not empty
+                SET size TO length of queue
+                FOR i FROM 1 TO size
+                    SET node TO first element removed from queue
+                    FOR each neighbor IN graph[node]
+                        IF neighbor is in subtree AND neighbor is not in visited
+                            ADD neighbor TO visited
+                            ADD neighbor TO queue
+                IF queue is not empty
+                    INCREMENT max_distance BY 1
+            
+            RETURN max_distance
+        END FUNCTION
+        
+        SET result TO list of zeros with length n minus 1
+        
+        FOR size FROM 2 TO n
+            FOR each subset IN all combinations of numbers from 1 to n taken size at a time
+                SET visited TO empty set
+                SET stack TO list containing first element of subset
+                
+                WHILE stack is not empty
+                    SET node TO last element removed from stack
+                    IF node not in visited
+                        ADD node TO visited
+                        FOR each neighbor IN graph[node]
+                            IF neighbor in subset AND neighbor not in visited
+                                ADD neighbor TO stack
+                
+                IF visited equals set of elements in subset
+                    SET diameter TO bfs(set of elements in subset)
+                    IF diameter greater than 0
+                        INCREMENT result[diameter minus 1] BY 1
+        
+        RETURN result
+    END FUNCTION
+END CLASS

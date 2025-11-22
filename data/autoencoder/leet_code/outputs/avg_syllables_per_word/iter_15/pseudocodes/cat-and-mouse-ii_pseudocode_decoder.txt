@@ -1,0 +1,112 @@
+CLASS Solution  
+    FUNCTION canMouseWin(grid, catJump, mouseJump)  
+        SET m TO the LENGTH OF grid  
+        SET n TO the LENGTH OF element at position zero of grid  
+        SET cat_start TO zero  
+        SET mouse_start TO zero  
+        SET food TO zero  
+        SET dirs TO the SEQUENCE of NEGATIVE ONE zero ONE zero NEGATIVE ONE  
+        SET g_mouse TO a new LIST containing an EMPTY LIST for each number FROM zero TO m MULTIPLIED BY n MINUS one  
+        SET g_cat TO a new LIST containing an EMPTY LIST for each number FROM zero TO m MULTIPLIED BY n MINUS one  
+
+        FOR each index i and element row IN grid  
+            FOR each index j and element c IN row  
+                IF c EQUALS the HASH symbol THEN  
+                    CONTINUE to the next iteration  
+                END IF  
+                SET v TO i MULTIPLIED BY n PLUS j  
+                IF c EQUALS the character C THEN  
+                    SET cat_start TO v  
+                ELSE IF c EQUALS the character M THEN  
+                    SET mouse_start TO v  
+                ELSE IF c EQUALS the character F THEN  
+                    SET food TO v  
+                END IF  
+                FOR each pair a and b IN consecutive elements of dirs  
+                    FOR k FROM zero TO mouseJump INCLUSIVE  
+                        SET x TO i PLUS k MULTIPLIED BY a  
+                        SET y TO j PLUS k MULTIPLIED BY b  
+                        IF x IS LESS THAN zero OR x IS GREATER THAN OR EQUAL TO m OR y IS LESS THAN zero OR y IS GREATER THAN OR EQUAL TO n OR element at position x of grid IS EQUALS TO a string containing the HASH symbol at position y THEN  
+                            BREAK from this loop  
+                        END IF  
+                        APPEND x MULTIPLIED BY n PLUS y TO the element at position v of g_mouse  
+                    END FOR  
+                    FOR k FROM zero TO catJump INCLUSIVE  
+                        SET x TO i PLUS k MULTIPLIED BY a  
+                        SET y TO j PLUS k MULTIPLIED BY b  
+                        IF x IS LESS THAN zero OR x IS GREATER THAN OR EQUAL TO m OR y IS LESS THAN zero OR y IS GREATER THAN OR EQUAL TO n OR element at position x of grid IS EQUALS TO a string containing the HASH symbol at position y THEN  
+                            BREAK from this loop  
+                        END IF  
+                        APPEND x MULTIPLIED BY n PLUS y TO the element at position v of g_cat  
+                    END FOR  
+                END FOR  
+            END FOR  
+        END FOR  
+        RETURN the result of calling self.calc with g_mouse, g_cat, mouse_start, cat_start, food EQUALS one  
+    END FUNCTION  
+
+    FUNCTION calc(g_mouse, g_cat, mouse_start, cat_start, hole)  
+        FUNCTION get_prev_states(state)  
+            SET m TO element at position zero of state  
+            SET c TO element at position one of state  
+            SET t TO element at position two of state  
+            SET pt TO t XOR one  
+            SET pre TO an EMPTY LIST  
+            IF pt EQUALS one THEN  
+                FOR each pc IN the element at position c of g_cat  
+                    IF element at position m of ans at position pc at position one EQUALS zero THEN  
+                        APPEND the TRIPLE (m, pc, pt) TO pre  
+                    END IF  
+                END FOR  
+            ELSE  
+                FOR each pm IN the element at position m of g_mouse  
+                    IF element at position pm of ans at position c at position zero EQUALS zero THEN  
+                        APPEND the TRIPLE (pm, c, zero) TO pre  
+                    END IF  
+                END FOR  
+            END IF  
+            RETURN pre  
+        END FUNCTION  
+
+        SET n TO the LENGTH OF g_mouse  
+        SET degree TO a new LIST containing for each of n FROM zero TO n MINUS one a new LIST containing for each of n FROM zero TO n MINUS one a PAIR of zero zero  
+        FOR i FROM zero TO n MINUS one  
+            FOR j FROM zero TO n MINUS one  
+                SET the element at position zero of degree at position i at position j TO the LENGTH OF the element at position i of g_mouse  
+                SET the element at position one of degree at position i at position j TO the LENGTH OF the element at position j of g_cat  
+            END FOR  
+        END FOR  
+
+        SET ans TO a new LIST containing for each of n FROM zero TO n MINUS one a new LIST containing for each of n FROM zero TO n MINUS one a PAIR of zero zero  
+        SET q TO a new empty double ended queue  
+        FOR i FROM zero TO n MINUS one  
+            SET the element at position one of ans at position hole at position i TO one  
+            SET the element at position zero of ans at position i at position hole TO two  
+            SET both elements at position zero and one of ans at position i at position i TO two  
+            APPEND the TRIPLE (hole, i, one) TO q  
+            APPEND the TRIPLE (i, hole, zero) TO q  
+            APPEND the TRIPLE (i, i, zero) TO q  
+            APPEND the TRIPLE (i, i, one) TO q  
+        END FOR  
+        WHILE q IS NOT EMPTY  
+            REMOVE and STORE the element at the front of q INTO state  
+            SET t TO the element at position corresponding to element at position two of state of ans at position element at position zero of state at position element at position one of state  
+            FOR each prev_state IN the result of calling get_prev_states with state  
+                SET pm TO element at position zero of prev_state  
+                SET pc TO element at position one of prev_state  
+                SET pt TO element at position two of prev_state  
+                IF pt EQUALS t MINUS one THEN  
+                    SET the element at position pt of ans at position pm at position pc TO t  
+                    APPEND prev_state TO q  
+                ELSE  
+                    DECREMENT the element at position pt of degree at position pm at position pc BY one  
+                    IF the element at position pt of degree at position pm at position pc EQUALS zero THEN  
+                        SET the element at position pt of ans at position pm at position pc TO t  
+                        APPEND prev_state TO q  
+                    END IF  
+                END IF  
+            END FOR  
+        END WHILE  
+        RETURN element at position zero of ans at position mouse_start at position cat_start  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,42 @@
+CLASS Solution  
+    FUNCTION trapRainWater(heightMap)  
+        IF heightMap IS EMPTY OR heightMap FIRST ELEMENT IS EMPTY  
+            RETURN 0  
+          
+        SET m TO LENGTH OF heightMap  
+        SET n TO LENGTH OF FIRST ELEMENT OF heightMap  
+        SET visited TO TWO-DIMENSIONAL LIST OF SIZE m BY n WITH ALL VALUES False  
+        SET min_heap TO EMPTY LIST  
+          
+        FOR i FROM 0 TO m MINUS 1  
+            PUSH INTO min_heap A TUPLE WITH heightMap AT (i, 0), i, 0  
+            PUSH INTO min_heap A TUPLE WITH heightMap AT (i, n MINUS 1), i, n MINUS 1  
+            SET visited AT (i, 0) TO True  
+            SET visited AT (i, n MINUS 1) TO True  
+          
+        FOR j FROM 0 TO n MINUS 1  
+            PUSH INTO min_heap A TUPLE WITH heightMap AT (0, j), 0, j  
+            PUSH INTO min_heap A TUPLE WITH heightMap AT (m MINUS 1, j), m MINUS 1, j  
+            SET visited AT (0, j) TO True  
+            SET visited AT (m MINUS 1, j) TO True  
+          
+        SET directions TO LIST OF TUPLES: (-1, 0), (1, 0), (0, -1), (0, 1)  
+        SET water_trapped TO 0  
+          
+        WHILE min_heap IS NOT EMPTY  
+            REMOVE SMALLEST ELEMENT FROM min_heap INTO height, x, y  
+              
+            FOR EACH dx, dy IN directions  
+                SET nx TO x PLUS dx  
+                SET ny TO y PLUS dy  
+                
+                IF nx IS GREATER THAN OR EQUAL TO 0 AND nx LESS THAN m AND ny IS GREATER THAN OR EQUAL TO 0 AND ny LESS THAN n AND visited AT (nx, ny) IS False  
+                    SET visited AT (nx, ny) TO True  
+                    SET water_increment TO height MINUS heightMap AT (nx, ny)  
+                    IF water_increment IS GREATER THAN 0  
+                        INCREMENT water_trapped BY water_increment  
+                    PUSH INTO min_heap A TUPLE WITH THE GREATER VALUE BETWEEN height AND heightMap AT (nx, ny), nx, ny  
+          
+        RETURN water_trapped  
+    END FUNCTION  
+END CLASS

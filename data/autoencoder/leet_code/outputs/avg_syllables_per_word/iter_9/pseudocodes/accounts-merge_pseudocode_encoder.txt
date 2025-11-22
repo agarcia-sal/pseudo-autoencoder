@@ -1,0 +1,61 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.root TO list of integers from zero TO size MINUS one  
+        SET self.rank TO list of ones of length size  
+    END FUNCTION  
+
+    FUNCTION find(self, x)  
+        IF self.root at position x EQUALS x THEN  
+            RETURN x  
+        END IF  
+        SET self.root at position x TO self.find of self.root at position x  
+        RETURN self.root at position x  
+    END FUNCTION  
+
+    FUNCTION union(self, x, y)  
+        SET rootX TO self.find of x  
+        SET rootY TO self.find of y  
+        IF rootX NOT EQUALS rootY THEN  
+            IF self.rank at position rootX GREATER THAN self.rank at position rootY THEN  
+                SET self.root at position rootY TO rootX  
+            ELSE IF self.rank at position rootX LESS THAN self.rank at position rootY THEN  
+                SET self.root at position rootX TO rootY  
+            ELSE  
+                SET self.root at position rootY TO rootX  
+                INCREMENT self.rank at position rootX BY one  
+            END IF  
+        END IF  
+    END FUNCTION  
+END CLASS
+
+CLASS Solution  
+    FUNCTION accountsMerge(self, accounts)  
+        SET email_to_id TO empty map  
+        SET uf TO new UnionFind with size equal to length of accounts  
+
+        FOR i FROM zero TO length of accounts MINUS one  
+            SET current_account TO accounts at position i  
+            FOR each email in current_account from second element TO last element  
+                IF email NOT IN email_to_id THEN  
+                    SET email_to_id at key email TO i  
+                ELSE  
+                    CALL uf.union with arguments i AND email_to_id at key email  
+                END IF  
+            END FOR  
+        END FOR  
+
+        SET merged_emails TO empty map from keys to list  
+        FOR each email, account_id IN email_to_id  
+            SET root_id TO uf.find of account_id  
+            APPEND email TO merged_emails at key root_id  
+        END FOR  
+
+        SET result TO empty list  
+        FOR each account_id, emails IN merged_emails  
+            SET name TO accounts at position account_id at first element  
+            APPEND list consisting of name FOLLOWED BY emails sorted in ascending order TO result  
+        END FOR  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

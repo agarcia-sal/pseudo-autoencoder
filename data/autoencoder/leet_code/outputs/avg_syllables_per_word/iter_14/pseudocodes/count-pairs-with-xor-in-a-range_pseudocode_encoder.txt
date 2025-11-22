@@ -1,0 +1,56 @@
+CLASS TrieNode  
+    FUNCTION __init__  
+        SET children TO an empty mapping from bit TO TrieNode  
+        SET count TO zero  
+    END FUNCTION  
+END CLASS  
+
+CLASS Trie  
+    FUNCTION __init__ WITH PARAMETER bit_length EQUAL TO fifteen  
+        ASSIGN reference TO a new TrieNode TO root  
+        SET bit_length TO bit_length  
+    END FUNCTION  
+
+    FUNCTION insert WITH PARAMETER num  
+        ASSIGN reference TO root TO node  
+        FOR i FROM bit_length DOWN TO zero  
+            SET bit TO the result of SHIFT RIGHT num BY i BITS AND BITWISE AND WITH one  
+            IF bit IS NOT PRESENT IN node.children THEN  
+                ASSIGN reference TO a new TrieNode TO node.children AT bit  
+            END IF  
+            ASSIGN reference TO node.children AT bit TO node  
+            INCREMENT node.count BY one  
+        END FOR  
+    END FUNCTION  
+
+    FUNCTION count_less_than WITH PARAMETERS num AND threshold  
+        SET count TO zero  
+        ASSIGN reference TO root TO node  
+        FOR i FROM bit_length DOWN TO zero  
+            IF node IS null THEN  
+                BREAK the loop  
+            END IF  
+            SET bit TO the result of SHIFT RIGHT num BY i BITS AND BITWISE AND WITH one  
+            SET threshold_bit TO the result of SHIFT RIGHT threshold BY i BITS AND BITWISE AND WITH one  
+            IF threshold_bit IS equal to one THEN  
+                INCREMENT count BY the count value OF node.children AT bit IF it EXISTS OTHERWISE zero  
+                ASSIGN reference TO node.children AT the result of bit XOR one TO node  
+            ELSE  
+                ASSIGN reference TO node.children AT bit TO node  
+            END IF  
+        END FOR  
+        RETURN count  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION countPairs WITH PARAMETERS nums AND low AND high  
+        ASSIGN reference TO a new Trie TO trie  
+        SET nice_pairs TO zero  
+        FOR each num IN nums  
+            INCREMENT nice_pairs BY the result of trie.count_less_than WITH PARAMETERS num AND high PLUS one MINUS the result of trie.count_less_than WITH PARAMETERS num AND low  
+            CALL trie.insert WITH PARAMETER num  
+        END FOR  
+        RETURN nice_pairs  
+    END FUNCTION  
+END CLASS

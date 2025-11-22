@@ -1,0 +1,50 @@
+CLASS Solution  
+    FUNCTION getCoprimes(self, nums, edges)  
+        SET n TO length of nums  
+        CREATE tree AS a mapping with default empty lists  
+        FOR each pair u, v IN edges  
+            APPEND v TO tree at key u  
+            APPEND u TO tree at key v  
+        END FOR  
+        
+        CREATE coprime AS a two-dimensional mapping indexed from one to fifty  
+        FOR i FROM one TO fifty  
+            FOR j FROM one TO fifty  
+                SET coprime at i and j TO whether gcd of i and j EQUALS one  
+            END FOR  
+        END FOR  
+        
+        CREATE result AS a list of size n filled with negative one  
+        CREATE ancestor_stack AS a list of size fifty one filled with None  
+        
+        FUNCTION dfs(node, parent, depth)  
+            SET closest_ancestor TO negative one  
+            SET max_depth TO negative one  
+            FOR value FROM one TO fifty  
+                IF coprime at nums at node and value IS true AND ancestor_stack at value IS NOT None THEN  
+                    SET anc_node, anc_depth TO ancestor_stack at value  
+                    IF anc_depth GREATER THAN max_depth THEN  
+                        SET max_depth TO anc_depth  
+                        SET closest_ancestor TO anc_node  
+                    END IF  
+                END IF  
+            END FOR  
+            SET result at node TO closest_ancestor  
+            
+            SET original_ancestor TO ancestor_stack at nums at node  
+            SET ancestor_stack at nums at node TO tuple of node and depth  
+            
+            FOR each child IN tree at node  
+                IF child NOT EQUALS parent THEN  
+                    CALL dfs WITH child, node, depth PLUS one  
+                END IF  
+            END FOR  
+            
+            SET ancestor_stack at nums at node TO original_ancestor  
+        END FUNCTION  
+        
+        CALL dfs WITH zero, negative one, zero  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

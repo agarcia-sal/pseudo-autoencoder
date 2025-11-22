@@ -1,0 +1,76 @@
+CLASS Solution  
+    FUNCTION longestRepeating(s query_string queryCharacters query_characters queryIndices query_indices) RETURNS list_of_integers  
+        FUNCTION merge_intervals()  
+            SET i TO zero  
+            WHILE i IS LESS THAN the LENGTH OF intervals MINUS one  
+                SET current_start TO the element at position i at position zero of intervals  
+                SET current_end TO the element at position i at position one of intervals  
+                SET current_char TO the element at position i at position two of intervals  
+                SET next_start TO the element at position i plus one at position zero of intervals  
+                SET next_end TO the element at position i plus one at position one of intervals  
+                SET next_char TO the element at position i plus one at position two of intervals  
+                IF current_char EQUALS next_char  
+                    SET merged_interval_start TO current_start  
+                    SET merged_interval_end TO next_end  
+                    SET merged_interval_char TO current_char  
+                    SET the element at position i of intervals TO a tuple consisting of merged_interval_start followed by merged_interval_end followed by merged_interval_char  
+                    REMOVE the element at position i plus one FROM intervals  
+                ELSE  
+                    INCREMENT i BY one  
+                END IF  
+            END WHILE  
+        END FUNCTION  
+        
+        SET intervals TO an empty list  
+        SET n TO the LENGTH OF query_string  
+        SET start TO zero  
+        FOR i FROM one TO n MINUS one  
+            SET current_character TO the character at position i of query_string  
+            SET start_character TO the character at position start of query_string  
+            IF current_character NOT EQUALS start_character  
+                APPEND a tuple consisting of start followed by i MINUS one followed by start_character TO intervals  
+                SET start TO i  
+            END IF  
+        END FOR  
+        APPEND a tuple consisting of start followed by n MINUS one followed by the character at position start of query_string TO intervals  
+        
+        SET results TO an empty list  
+        SET longest TO the maximum of the result of subtracting start FROM end PLUS one for each start end character triple in intervals  
+        
+        FOR each character char IN query_characters AND each integer idx IN query_indices SIMULTANEOUSLY  
+            SET i TO zero  
+            WHILE i IS LESS THAN the LENGTH OF intervals  
+                SET current_start TO the element at position i at position zero of intervals  
+                SET current_end TO the element at position i at position one of intervals  
+                SET current_char TO the element at position i at position two of intervals  
+                IF current_start IS LESS THAN OR EQUAL TO idx AND idx IS LESS THAN OR EQUAL TO current_end  
+                    BREAK the loop  
+                END IF  
+                INCREMENT i BY one  
+            END WHILE  
+            
+            SET current_start TO the element at position i at position zero of intervals  
+            SET current_end TO the element at position i at position one of intervals  
+            SET current_char TO the element at position i at position two of intervals  
+            
+            IF idx IS GREATER THAN current_start  
+                INSERT at position i in intervals a tuple consisting of current_start followed by idx MINUS one followed by current_char  
+                SET the element at position i plus one of intervals TO a tuple consisting of idx followed by current_end followed by current_char  
+            END IF  
+            
+            IF idx IS LESS THAN current_end  
+                INSERT at position i plus one in intervals a tuple consisting of idx PLUS one followed by current_end followed by current_char  
+                SET the element at position i of intervals TO a tuple consisting of current_start followed by idx followed by current_char  
+            END IF  
+            
+            SET the element at position i of intervals TO a tuple consisting of the element at position i at position zero of intervals followed by the element at position i at position one of intervals followed by char  
+            
+            CALL merge_intervals()  
+            
+            SET longest TO the maximum of the result of subtracting start FROM end PLUS one for each start end character triple in intervals  
+            APPEND longest TO results  
+        END FOR  
+        
+        RETURN results  
+    END FUNCTION  
+END CLASS

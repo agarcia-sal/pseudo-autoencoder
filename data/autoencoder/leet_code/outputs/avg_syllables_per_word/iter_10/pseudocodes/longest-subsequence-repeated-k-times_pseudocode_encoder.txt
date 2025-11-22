@@ -1,0 +1,50 @@
+CLASS Solution
+    FUNCTION longestSubsequenceRepeatedK(s, k)
+        SET freq TO the frequency count of each character IN s USING Counter
+        
+        SET valid_chars TO an empty list
+        FOR each character, count IN freq items
+            IF count GREATER THAN OR EQUAL TO k
+                APPEND character TO valid_chars
+            END IF
+        END FOR
+        
+        SORT valid_chars IN descending lexicographical order
+        
+        FUNCTION is_valid_subsequence(candidate)
+            SET count TO zero
+            SET index TO zero
+            FOR each character IN s
+                IF character EQUALS element at position index OF candidate
+                    INCREMENT index BY one
+                    IF index EQUALS the length OF candidate
+                        INCREMENT count BY one
+                        SET index TO zero
+                        IF count EQUALS k
+                            RETURN True
+                        END IF
+                    END IF
+                END IF
+            END FOR
+            RETURN False
+        END FUNCTION
+        
+        SET max_length TO the integer division OF the length OF valid_chars BY k
+        SET best_candidate TO an empty string
+        
+        FUNCTION backtrack(candidate)
+            IF the length OF candidate GREATER THAN the length OF best_candidate
+                SET best_candidate TO candidate
+            END IF
+            FOR each char IN valid_chars
+                SET new_candidate TO candidate concatenated WITH char
+                IF is_valid_subsequence(new_candidate)
+                    CALL backtrack(new_candidate)
+                END IF
+            END FOR
+        END FUNCTION
+        
+        CALL backtrack with an empty string
+        RETURN best_candidate
+    END FUNCTION
+END CLASS

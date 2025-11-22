@@ -1,0 +1,51 @@
+CLASS Solution
+    FUNCTION cutOffTree(forest: List of List of Integer) RETURNS Integer
+        IF forest IS EMPTY OR forest[0] IS EMPTY THEN
+            RETURN -1
+        SET trees TO EMPTY LIST
+        FOR i FROM 0 TO LENGTH OF forest MINUS 1
+            FOR j FROM 0 TO LENGTH OF forest[0] MINUS 1
+                IF forest[i][j] GREATER THAN 1 THEN
+                    APPEND (forest[i][j], i, j) TO trees
+        SORT trees BY FIRST ELEMENT
+        
+        FUNCTION bfs(start, end) RETURNS Integer
+            IF start EQUALS end THEN
+                RETURN 0
+            SET m TO LENGTH OF forest
+            SET n TO LENGTH OF forest[0]
+            SET queue TO NEW DEQUE CONTAINING start
+            SET visited TO NEW SET CONTAINING start
+            SET steps TO 0
+            
+            WHILE queue IS NOT EMPTY
+                SET queue_length TO LENGTH OF queue
+                FOR counter FROM 1 TO queue_length
+                    SET (x, y) TO POP LEFT OF queue
+                    FOR EACH (dx, dy) IN [(-1, 0), (1, 0), (0, -1), (0, 1)]
+                        SET nx TO x PLUS dx
+                        SET ny TO y PLUS dy
+                        IF nx GREATER OR EQUAL 0 AND nx LESS THAN m AND ny GREATER OR EQUAL 0 AND ny LESS THAN n THEN
+                            IF (nx, ny) NOT IN visited AND forest[nx][ny] NOT EQUAL 0 THEN
+                                IF (nx, ny) EQUALS end THEN
+                                    RETURN steps PLUS 1
+                                ADD (nx, ny) TO visited
+                                APPEND (nx, ny) TO queue
+                INCREMENT steps BY 1
+            RETURN -1
+        
+        SET x TO 0
+        SET y TO 0
+        SET total_steps TO 0
+        
+        FOR EACH (height, tx, ty) IN trees
+            SET steps TO bfs((x, y), (tx, ty))
+            IF steps EQUALS -1 THEN
+                RETURN -1
+            INCREMENT total_steps BY steps
+            SET x TO tx
+            SET y TO ty
+        
+        RETURN total_steps
+    END FUNCTION
+END CLASS

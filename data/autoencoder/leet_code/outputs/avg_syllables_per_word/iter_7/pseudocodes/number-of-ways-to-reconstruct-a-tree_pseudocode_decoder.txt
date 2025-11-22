@@ -1,0 +1,38 @@
+CLASS Solution  
+    FUNCTION checkWays(pairs)  
+        SET graph TO empty mapping with default value as empty set  
+        FOR each x, y IN pairs  
+            ADD y TO graph[x]  
+            ADD x TO graph[y]  
+        
+        SET max_degree TO the node in graph with the maximum size of its adjacency set  
+        SET n TO size of graph  
+        
+        IF size of graph[max_degree] IS NOT EQUAL TO n MINUS 1  
+            RETURN 0  
+        
+        FUNCTION can_be_parent(u, v)  
+            FOR each neighbor IN graph[v]  
+                IF neighbor IS NOT IN graph[u] AND neighbor IS NOT EQUAL TO u  
+                    RETURN false  
+            RETURN true  
+        END FUNCTION  
+        
+        SET ways TO 1  
+        
+        FOR each u IN graph  
+            IF u IS EQUAL TO max_degree  
+                CONTINUE  
+            SET parent TO null  
+            FOR each v IN graph[u]  
+                IF v IS IN graph AND size of graph[v] IS GREATER THAN OR EQUAL TO size of graph[u] AND can_be_parent(v, u) IS true  
+                    IF parent IS null OR size of graph[v] IS LESS THAN size of graph[parent]  
+                        SET parent TO v  
+            IF parent IS null  
+                RETURN 0  
+            IF size of graph[parent] IS EQUAL TO size of graph[u]  
+                SET ways TO 2  
+        
+        RETURN ways  
+    END FUNCTION  
+END CLASS

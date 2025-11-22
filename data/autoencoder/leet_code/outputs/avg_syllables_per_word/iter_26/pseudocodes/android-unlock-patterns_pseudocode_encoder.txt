@@ -1,0 +1,59 @@
+CLASS Solution
+
+    FUNCTION numberOfPatterns(parameter m, parameter n)
+
+        SET jumps TO a mapping where pairs of dots map to the intermediate dot that must be visited before jumping over it as follows
+            pair consisting of dot one and dot three maps to dot two
+            pair consisting of dot one and dot seven maps to dot four
+            pair consisting of dot one and dot nine maps to dot five
+            pair consisting of dot two and dot eight maps to dot five
+            pair consisting of dot three and dot one maps to dot two
+            pair consisting of dot three and dot seven maps to dot five
+            pair consisting of dot three and dot nine maps to dot six
+            pair consisting of dot four and dot six maps to dot five
+            pair consisting of dot five and dot five maps to dot five
+            pair consisting of dot six and dot four maps to dot five
+            pair consisting of dot seven and dot one maps to dot four
+            pair consisting of dot seven and dot three maps to dot five
+            pair consisting of dot seven and dot nine maps to dot eight
+            pair consisting of dot eight and dot two maps to dot five
+            pair consisting of dot nine and dot one maps to dot five
+            pair consisting of dot nine and dot three maps to dot six
+            pair consisting of dot nine and dot seven maps to dot eight
+
+        FUNCTION countPatternsFromDot(parameter current, parameter visited, parameter length)
+            IF length EQUALS n THEN
+                RETURN one
+            END IF
+            
+            SET count TO one IF length GREATER THAN OR EQUAL TO m OTHERWISE zero
+
+            FOR next_dot FROM one TO nine INCLUSIVE
+                IF the element at position next_dot OF visited EQUALS FALSE THEN
+                    SET jump TO the value found in jumps for the pair consisting of current and next_dot IF present OTHERWISE null
+                    IF jump IS null OR the element at position jump OF visited EQUALS TRUE THEN
+                        SET the element at position next_dot OF visited TO TRUE
+                        INCREMENT count BY the result of calling countPatternsFromDot WITH next_dot, visited, length PLUS one
+                        SET the element at position next_dot OF visited TO FALSE
+                    END IF
+                END IF
+            END FOR
+
+            RETURN count
+        END FUNCTION
+
+        SET visited TO a list of ten FALSE values
+
+        SET result TO zero
+
+        FOR i FROM one TO nine INCLUSIVE
+            SET the element at position i OF visited TO TRUE
+            INCREMENT result BY the result of calling countPatternsFromDot WITH i, visited, one
+            SET the element at position i OF visited TO FALSE
+        END FOR
+
+        RETURN result
+
+    END FUNCTION
+
+END CLASS

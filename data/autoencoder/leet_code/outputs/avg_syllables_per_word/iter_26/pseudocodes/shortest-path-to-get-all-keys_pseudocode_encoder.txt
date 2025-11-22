@@ -1,0 +1,63 @@
+CLASS Solution
+    FUNCTION shortestPathAllKeys(grid)
+        SET directions TO the list of tuples consisting of zero and one, zero and negative one, one and zero, negative one and zero
+        
+        SET m TO the LENGTH OF grid
+        SET n TO the LENGTH OF element at position zero OF grid
+        SET start TO nothing
+        SET num_keys TO zero
+        
+        FOR i FROM zero TO m MINUS one INCLUSIVE
+            FOR j FROM zero TO n MINUS one INCLUSIVE
+                IF element at position i OF grid AT position j EQUALS the character at the position representing the at symbol
+                    SET start TO the tuple consisting of i and j
+                ELSE IF the character at element at position i OF grid AT position j IS a lowercase letter
+                    INCREMENT num_keys BY one
+                END IF
+            END FOR
+        END FOR
+        
+        SET queue TO a new double ended queue initialized with the tuple consisting of the first element of start, the second element of start, zero, zero
+        SET visited TO a new set initialized with the tuple consisting of the first element of start, the second element of start, zero
+        
+        WHILE the queue HOLDS
+            REMOVE and ASSIGN to x, y, keys, steps the element popped from the left side of queue
+            
+            FOR each dx, dy IN directions
+                SET nx TO x PLUS dx
+                SET ny TO y PLUS dy
+                
+                IF zero LESS THAN OR EQUAL TO nx AND nx LESS THAN m AND zero LESS THAN OR EQUAL TO ny AND ny LESS THAN n
+                    SET cell TO element at position nx OF grid AT position ny
+                    
+                    IF cell EQUALS the character representing the pound sign
+                        CONTINUE to the next iteration of FOR
+                    END IF
+                    
+                    IF cell IS an uppercase letter
+                        SET key_needed TO one SHIFTED LEFT BY the difference obtained by subtracting the ordinal value of the character representing lowercase a FROM the ordinal value of the lowercase equivalent of cell
+                        IF keys BITWISE AND key_needed EQUALS zero
+                            CONTINUE to the next iteration of FOR
+                        END IF
+                    END IF
+                    
+                    IF cell IS a lowercase letter
+                        SET new_keys TO keys BITWISE OR with one SHIFTED LEFT BY the difference obtained by subtracting the ordinal value of the character representing lowercase a FROM the ordinal value of cell
+                        IF new_keys EQUALS one SHIFTED LEFT BY num_keys MINUS one
+                            RETURN steps PLUS one
+                        END IF
+                    ELSE
+                        SET new_keys TO keys
+                    END IF
+                    
+                    IF the tuple consisting of nx, ny, new_keys IS NOT IN visited
+                        ADD the tuple consisting of nx, ny, new_keys TO visited
+                        APPEND the tuple consisting of nx, ny, new_keys, steps PLUS one TO queue
+                    END IF
+                END IF
+            END FOR
+        END WHILE
+        
+        RETURN negative one
+    END FUNCTION
+END CLASS

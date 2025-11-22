@@ -1,0 +1,52 @@
+CLASS Solution  
+    FUNCTION minCut(s)  
+        SET n TO the LENGTH OF s  
+        IF n LESS THAN OR EQUAL TO one  
+            RETURN zero  
+        END IF  
+        
+        CALL initialize_palindrome_table WITH n TO CREATE is_palindrome  
+        
+        FOR i FROM zero TO n MINUS one  
+            SET element at position i of element at position i of is_palindrome TO True  
+        END FOR  
+        
+        FOR length FROM two TO n  
+            FOR start FROM zero TO n MINUS length  
+                SET end TO start PLUS length MINUS one  
+                IF length EQUALS two  
+                    SET element at position start of element at position end of is_palindrome TO s at position start EQUALS s at position end  
+                ELSE  
+                    SET element at position start of element at position end of is_palindrome TO s at position start EQUALS s at position end AND element at position start PLUS one of element at position end MINUS one of is_palindrome  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        CALL initialize_min_cuts_list WITH n TO CREATE min_cuts  
+        
+        FOR i FROM zero TO n MINUS one  
+            IF element at position zero of element at position i of is_palindrome  
+                SET element at position i of min_cuts TO zero  
+            ELSE  
+                SET element at position i of min_cuts TO infinity  
+                FOR j FROM one TO i  
+                    IF element at position j of element at position i of is_palindrome AND element at position j MINUS one of min_cuts PLUS one LESS THAN element at position i of min_cuts  
+                        SET element at position i of min_cuts TO element at position j MINUS one of min_cuts PLUS one  
+                    END IF  
+                END FOR  
+            END IF  
+        END FOR  
+        
+        RETURN element at position n MINUS one of min_cuts  
+    END FUNCTION  
+    
+    FUNCTION initialize_palindrome_table(n)  
+        CREATE is_palindrome AS a two-dimensional list with n ROWS AND n COLUMNS FILLED WITH False  
+        RETURN is_palindrome  
+    END FUNCTION  
+    
+    FUNCTION initialize_min_cuts_list(n)  
+        CREATE min_cuts AS a list WITH n ELEMENTS FILLED WITH zero  
+        RETURN min_cuts  
+    END FUNCTION  
+END CLASS

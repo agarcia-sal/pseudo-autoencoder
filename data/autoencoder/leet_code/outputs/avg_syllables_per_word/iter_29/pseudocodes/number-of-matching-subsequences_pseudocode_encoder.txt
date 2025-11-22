@@ -1,0 +1,30 @@
+CLASS Solution  
+    FUNCTION numMatchingSubseq(s STRING parameter s, words LIST OF STRING parameter words)  
+        SET waiting TO an empty dictionary mapping each unique character in s TO an empty double ended queue  
+        FOR each word IN words  
+            SET iterator_of_word TO an iterator over word  
+            SET first_character_of_word TO the next character produced by iterator_of_word  
+            IF first_character_of_word IS IN waiting  
+                APPEND iterator_of_word TO the corresponding queue in waiting under key first_character_of_word  
+            END IF  
+        END FOR  
+        SET match_count TO zero  
+        FOR each character c IN s  
+            IF c IS IN waiting  
+                SET current_iterators TO the queue stored in waiting under key c  
+                REPLACE the queue stored in waiting under key c WITH a new empty double ended queue  
+                FOR each iterator it IN current_iterators  
+                    SET next_character TO the next character produced by iterator it OR TO none if no characters remain  
+                    IF next_character IS none  
+                        INCREMENT match_count BY one  
+                    ELSE  
+                        IF next_character IS IN waiting  
+                            APPEND iterator it TO the queue stored in waiting under key next_character  
+                        END IF  
+                    END IF  
+                END FOR  
+            END IF  
+        END FOR  
+        RETURN match_count  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,27 @@
+```
+CLASS Solution
+    FUNCTION exclusiveTime(n, logs)
+        SET exclusive_time TO list of zeros with length n
+        SET stack TO empty list
+
+        FOR each log IN logs
+            SPLIT log BY ':' INTO function_id, action, timestamp
+            CONVERT function_id TO integer
+            CONVERT timestamp TO integer
+
+            IF action EQUALS "start"
+                IF stack IS NOT empty
+                    SET prev_function_id, prev_timestamp TO last element of stack
+                    INCREMENT exclusive_time[prev_function_id] BY timestamp MINUS prev_timestamp
+                APPEND (function_id, timestamp) TO stack
+            ELSE
+                SET prev_function_id, prev_timestamp TO POP from stack
+                INCREMENT exclusive_time[prev_function_id] BY timestamp MINUS prev_timestamp PLUS 1
+                IF stack IS NOT empty
+                    SET top_function_id, _ TO last element of stack
+                    REPLACE last element of stack WITH (top_function_id, timestamp PLUS 1)
+
+        RETURN exclusive_time
+    END FUNCTION
+END CLASS
+```

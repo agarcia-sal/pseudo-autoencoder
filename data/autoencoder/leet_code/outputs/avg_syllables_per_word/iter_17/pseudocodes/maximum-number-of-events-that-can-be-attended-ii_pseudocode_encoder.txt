@@ -1,0 +1,22 @@
+CLASS Solution
+    FUNCTION maxValue(events AS list of list of integers, k AS integer)
+        CALL auxiliary SortEventsByEndDay WITH events
+        SET number_of_events TO the LENGTH OF events
+
+        CALL auxiliary InitializeDPTable WITH parameters number_of_events AND k ASSIGN TO dp_table
+
+        FOR index FROM one TO number_of_events
+            CALL auxiliary GetEventDetails WITH element at position index MINUS one OF events ASSIGN TO start_day, end_day, event_value
+
+            CALL auxiliary FindLatestNonOverlappingEvent WITH parameters events AND start_day ASSIGN TO previous_event_index
+
+            FOR count FROM one TO k
+                SET without_current_event TO element at position index MINUS one AND count OF dp_table
+                SET with_current_event TO element at position previous_event_index AND count MINUS one OF dp_table PLUS event_value
+                SET element at position index AND count OF dp_table TO the MAXIMUM OF without_current_event AND with_current_event
+            END FOR
+        END FOR
+
+        RETURN element at position number_of_events AND k OF dp_table
+    END FUNCTION
+END CLASS

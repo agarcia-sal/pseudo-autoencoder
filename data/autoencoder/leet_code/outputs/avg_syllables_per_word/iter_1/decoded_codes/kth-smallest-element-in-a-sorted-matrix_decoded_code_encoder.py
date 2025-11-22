@@ -1,0 +1,22 @@
+def kthSmallest(matrix, k):
+    n = len(matrix)
+    low, high = matrix[0][0], matrix[n-1][n-1]
+
+    def countLessEqual(mid):
+        count, r, c = 0, n - 1, 0
+        while r >= 0 and c < n:
+            if matrix[r][c] <= mid:
+                count += r + 1
+                c += 1
+            else:
+                r -= 1
+        return count
+
+    while low < high:
+        mid = (low + high) // 2
+        if countLessEqual(mid) < k:
+            low = mid + 1
+        else:
+            high = mid
+
+    return low

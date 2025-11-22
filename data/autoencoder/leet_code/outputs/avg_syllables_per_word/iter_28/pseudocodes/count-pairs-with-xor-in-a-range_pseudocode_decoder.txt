@@ -1,0 +1,60 @@
+CLASS TrieNode  
+    FUNCTION __init__()  
+        SET children TO empty collection of key value pairs  
+        SET count TO zero  
+    END FUNCTION  
+END CLASS  
+
+CLASS Trie  
+    FUNCTION __init__(bit_length)  
+        IF bit_length EQUALS undefined  
+            SET bit_length TO fifteen  
+        END IF  
+        ASSIGN reference TO new instance of TrieNode TO root  
+        SET bit_length TO bit_length  
+    END FUNCTION  
+
+    FUNCTION insert(num)  
+        ASSIGN reference TO root TO node  
+        FOR i FROM bit_length TO zero DECREMENTING BY one  
+            SET bit TO the result of shifting num to the right by i positions AND with one  
+            IF bit NOT IN keys of children collection of node  
+                ASSIGN reference TO new instance of TrieNode TO element at key bit in children collection of node  
+            END IF  
+            ASSIGN reference TO element at key bit in children collection of node TO node  
+            INCREMENT count property of node BY one  
+        END FOR  
+    END FUNCTION  
+
+    FUNCTION count_less_than(num, threshold)  
+        SET count TO zero  
+        ASSIGN reference TO root TO node  
+        FOR i FROM bit_length TO zero DECREMENTING BY one  
+            IF node IS null OR node IS undefined  
+                BREAK loop  
+            END IF  
+            SET bit TO the result of shifting num to the right by i positions AND with one  
+            SET threshold_bit TO the result of shifting threshold to the right by i positions AND with one  
+            IF threshold_bit EQUALS one  
+                INCREMENT count BY the count property of element at key bit in children collection of node OR zero if no such key exists  
+                ASSIGN reference TO element at key bit XOR one in children collection of node OR null if no such key exists TO node  
+            ELSE  
+                ASSIGN reference TO element at key bit in children collection of node OR null if no such key exists TO node  
+            END IF  
+        END FOR  
+        RETURN count  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION countPairs(nums, low, high)  
+        ASSIGN reference TO new instance of Trie TO trie  
+        SET nice_pairs TO zero  
+        FOR each num IN nums  
+            INCREMENT nice_pairs BY the result of calling count_less_than method of trie with arguments num and high PLUS one  
+            DECREMENT nice_pairs BY the result of calling count_less_than method of trie with arguments num and low  
+            CALL insert method of trie with argument num  
+        END FOR  
+        RETURN nice_pairs  
+    END FUNCTION  
+END CLASS

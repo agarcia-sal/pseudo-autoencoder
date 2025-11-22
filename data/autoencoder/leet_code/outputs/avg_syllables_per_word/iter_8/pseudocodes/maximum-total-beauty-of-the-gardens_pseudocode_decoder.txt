@@ -1,0 +1,48 @@
+CLASS Solution
+    FUNCTION maximumBeauty(flowers, newFlowers, target, full, partial)
+        SORT flowers INTO ascending order
+        SET n TO LENGTH OF flowers
+        SET max_beauty TO 0
+
+        SET prefix_sum TO LIST OF SIZE n PLUS 1 FILLED WITH 0
+        FOR i FROM 0 TO n MINUS 1
+            SET prefix_sum AT i PLUS 1 TO prefix_sum AT i PLUS flowers AT i
+
+        SET complete_gardens TO 0
+        FOR i FROM n MINUS 1 DOWN TO 0
+            IF flowers AT i IS GREATER THAN OR EQUAL TO target THEN
+                INCREMENT complete_gardens BY 1
+            ELSE
+                BREAK LOOP
+
+        SET remaining_flowers TO newFlowers
+        SET max_incomplete_flowers TO 0
+
+        FOR i FROM complete_gardens TO n
+            IF i IS GREATER THAN 0 THEN
+                DECREMENT remaining_flowers BY (target MINUS flowers AT n MINUS i)
+                IF remaining_flowers IS LESS THAN 0 THEN
+                    BREAK LOOP
+
+            SET left TO 0
+            SET right TO n MINUS i MINUS 1
+            WHILE left IS LESS THAN OR EQUAL TO right
+                SET mid TO (left PLUS right) DIVIDED BY 2
+                SET cost TO (flowers AT mid TIMES (mid PLUS 1)) MINUS prefix_sum AT mid PLUS 1
+                IF cost IS GREATER THAN remaining_flowers THEN
+                    SET right TO mid MINUS 1
+                ELSE
+                    SET left TO mid PLUS 1
+
+            IF right IS GREATER THAN OR EQUAL TO 0 THEN
+                SET cost_at_right TO (flowers AT right TIMES (right PLUS 1)) MINUS prefix_sum AT right PLUS 1
+                SET max_incomplete_flowers TO flowers AT right PLUS (remaining_flowers MINUS cost_at_right) DIVIDED BY (right PLUS 1)
+            ELSE
+                SET max_incomplete_flowers TO 0
+
+            SET total_beauty TO (i TIMES full) PLUS (MINIMUM OF max_incomplete_flowers AND (target MINUS 1)) TIMES partial
+            SET max_beauty TO MAXIMUM OF max_beauty AND total_beauty
+
+        RETURN max_beauty
+    END FUNCTION
+END CLASS

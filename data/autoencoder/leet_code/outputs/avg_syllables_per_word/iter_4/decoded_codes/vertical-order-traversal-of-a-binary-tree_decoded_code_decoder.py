@@ -1,0 +1,65 @@
+from collections import deque, defaultdict
+
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+def tree_node(values: list):
+    if not values:
+        return None
+    # Convert any null-like values to Python None
+    values = [None if v is None else v for v in values]
+    root = TreeNode(values[0])
+    i = 1
+    queue = deque([root])
+    while queue:
+        node = queue.popleft()
+        if i < len(values) and values[i] is not None:
+            node.left = TreeNode(values[i])
+            queue.append(node.left)
+        i += 1
+        if i < len(values) and values[i] is not None:
+            node.right = TreeNode(values[i])
+            queue.append(node.right)
+        i += 1
+    return root
+
+def is_same_tree(p, q):
+    if p is None and q is None:
+        return True
+    elif p is None or q is None:
+        return False
+    elif p.val != q.val:
+        return False
+    else:
+        return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)
+
+class Solution:
+    def verticalTraversal(self, root):
+        if root is None:
+            return []
+        node_dict = defaultdict(list)
+        min_col = 0
+        max_col = 0
+
+        def dfs(node, row, col):
+            nonlocal min_col, max_col
+            if node is None:
+                return
+            node_dict[col].append((row, node.val))
+            if col < min_col:
+                min_col = col
+            if col > max_col:
+                max_col = col
+            dfs(node.left, row + 1, col - 1)
+            dfs(node.right, row + 1, col + 1)
+
+        dfs(root, 0, 0)
+
+        result = []
+        for col in range(min_col, max_col + 1):
+            sorted_nodes = sorted(node_dict[col], key=lambda x: (x[0], x[1]))
+            result.append([val for _, val in sorted_nodes])
+        return result

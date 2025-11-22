@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION reachableNodes(edges parameter FOR list OF list OF integers maxMoves parameter OF integer n parameter OF integer) RETURNS integer  
+        SET graph TO an empty mapping FROM integers TO empty lists  
+        FOR index FROM zero TO n MINUS one  
+            SET element at position index OF graph TO an empty list  
+        END FOR  
+        FOR each element u AND element v AND element cnt IN edges  
+            APPEND the tuple consisting of element v AND element cnt TO the list at element u IN graph  
+            APPEND the tuple consisting of element u AND element cnt TO the list at element v IN graph  
+        END FOR  
+        
+        SET distances TO a list of length n FILLED WITH infinity  
+        SET the element at position zero OF distances TO zero  
+        SET priority_queue TO a list CONTAINING the tuple of zero AND zero  
+        
+        WHILE priority_queue is not empty  
+            REMOVE and ASSIGN the tuple of dist AND node FROM priority_queue USING the operation that extracts the element with the smallest first value  
+            IF dist GREATER THAN the element at position node OF distances  
+                CONTINUE TO the next iteration  
+            END IF  
+            FOR each element neighbor AND element cnt IN the list at element node IN graph  
+                SET new_dist TO dist PLUS cnt PLUS one  
+                IF new_dist LESS THAN the element at position neighbor OF distances  
+                    SET the element at position neighbor OF distances TO new_dist  
+                    INSERT the tuple of new_dist AND neighbor INTO priority_queue USING the operation that keeps the order by the first value  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        SET reachable_nodes TO zero  
+        FOR each element d IN distances  
+            IF d LESS THAN OR EQUAL TO maxMoves  
+                INCREMENT reachable_nodes BY one  
+            END IF  
+        END FOR  
+        
+        SET used_edges TO an empty mapping  
+        FOR each element u AND element v AND element cnt IN edges  
+            SET moves_u TO the maximum value BETWEEN zero AND maxMoves MINUS the element at position u OF distances  
+            SET moves_v TO the maximum value BETWEEN zero AND maxMoves MINUS the element at position v OF distances  
+            SET reachable_new_nodes TO the minimum value BETWEEN cnt AND moves_u PLUS moves_v  
+            INCREMENT reachable_nodes BY reachable_new_nodes  
+            SET the element at key of tuple u AND v OF used_edges TO reachable_new_nodes  
+        END FOR  
+        
+        RETURN reachable_nodes  
+    END FUNCTION  
+END CLASS

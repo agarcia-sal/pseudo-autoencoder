@@ -1,0 +1,75 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values AS list)  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO TreeNode with value element at position zero of values  
+    SET index_counter TO one  
+    SET node_queue TO empty double ended queue  
+    APPEND root TO node_queue  
+    WHILE node_queue IS NOT empty  
+        SET current_node TO first element removed from the left of node_queue  
+        IF index_counter IS LESS THAN the LENGTH OF values AND element at position index_counter of values IS NOT none  
+            SET current_node.left TO TreeNode with value element at position index_counter of values  
+            APPEND current_node.left TO node_queue  
+        END IF  
+        INCREMENT index_counter BY one  
+        IF index_counter IS LESS THAN the LENGTH OF values AND element at position index_counter of values IS NOT none  
+            SET current_node.right TO TreeNode with value element at position index_counter of values  
+            APPEND current_node.right TO node_queue  
+        END IF  
+        INCREMENT index_counter BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF value of p IS NOT EQUAL TO value of q  
+        RETURN false  
+    ELSE  
+        RETURN logical AND of is_same_tree(left child of p, left child of q) AND is_same_tree(right child of p, right child of q)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION zigzagLevelOrder(self, root)  
+        IF root IS none  
+            RETURN empty list  
+        END IF  
+        SET result TO empty list  
+        SET node_queue TO double ended queue containing root  
+        SET left_to_right TO true  
+        WHILE node_queue IS NOT empty  
+            SET level_size TO the LENGTH OF node_queue  
+            SET current_level TO empty double ended queue  
+            FOR each iteration FROM one TO level_size  
+                SET current_node TO first element removed from the left of node_queue  
+                IF left_to_right IS true  
+                    APPEND value of current_node TO current_level at the end  
+                ELSE  
+                    APPEND value of current_node TO current_level at the beginning  
+                END IF  
+                IF left child of current_node IS NOT none  
+                    APPEND left child of current_node TO node_queue  
+                END IF  
+                IF right child of current_node IS NOT none  
+                    APPEND right child of current_node TO node_queue  
+                END IF  
+            END FOR  
+            APPEND the list converted from current_level TO result  
+            SET left_to_right TO logical NOT of left_to_right  
+        END WHILE  
+        RETURN result  
+    END FUNCTION  
+END CLASS

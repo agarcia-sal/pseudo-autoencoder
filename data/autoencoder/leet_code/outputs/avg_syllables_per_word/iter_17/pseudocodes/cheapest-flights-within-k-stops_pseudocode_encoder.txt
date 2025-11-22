@@ -1,0 +1,64 @@
+CLASS Solution
+    FUNCTION findCheapestPrice(n, flights, src, dst, k)
+        CALL build_adjacency_list WITH n AND flights ASSIGN TO graph
+        CALL initialize_min_heap WITH src ASSIGN TO min_heap
+        CALL initialize_min_cost WITH src ASSIGN TO min_cost
+        
+        WHILE min_heap IS NOT EMPTY
+            CALL extract_min_element FROM min_heap ASSIGN TO cost, stops, city
+            
+            IF city EQUALS dst
+                RETURN cost
+            END IF
+            
+            IF stops GREATER THAN OR EQUAL TO k
+                CONTINUE TO NEXT ITERATION
+            END IF
+            
+            FOR each neighbor, price IN element at position city OF graph
+                SET next_cost TO cost PLUS price
+                SET next_stops TO stops PLUS one
+                
+                IF neighbor NOT IN min_cost OR next_stops LESS THAN element at position neighbor OF min_cost OR next_cost LESS THAN element at position zero OF element at position zero OF min_heap
+                    SET element at position neighbor OF min_cost TO next_stops
+                    CALL push_to_min_heap WITH min_heap AND next_cost, next_stops, neighbor
+                END IF
+            END FOR
+        END WHILE
+        
+        RETURN negative one
+    END FUNCTION
+
+    FUNCTION build_adjacency_list(n, flights)
+        DECLARE graph AS dictionary WITH KEYS from zero TO n MINUS one EACH MAPPING TO empty list
+        FOR each u, v, w IN flights
+            APPEND tuple of v, w TO element at position u OF graph
+        END FOR
+        RETURN graph
+    END FUNCTION
+
+    FUNCTION initialize_min_heap(src)
+        RETURN list CONTAINING tuple of zero, negative one, src
+    END FUNCTION
+
+    FUNCTION initialize_min_cost(src)
+        RETURN dictionary WITH KEY src MAPPING TO negative one
+    END FUNCTION
+
+    FUNCTION extract_min_element(min_heap)
+        CALL pop_min_from_heap WITH min_heap RETURNING cost, stops, city
+        RETURN cost, stops, city
+    END FUNCTION
+
+    FUNCTION push_to_min_heap(min_heap, cost, stops, city)
+        CALL push_element_to_heap WITH min_heap AND tuple of cost, stops, city
+    END FUNCTION
+
+    FUNCTION pop_min_from_heap(min_heap)
+        IMPLEMENTED AS auxiliary FUNCTION FOR heap POP OPERATION
+    END FUNCTION
+
+    FUNCTION push_element_to_heap(min_heap, element)
+        IMPLEMENTED AS auxiliary FUNCTION FOR heap PUSH OPERATION
+    END FUNCTION
+END CLASS

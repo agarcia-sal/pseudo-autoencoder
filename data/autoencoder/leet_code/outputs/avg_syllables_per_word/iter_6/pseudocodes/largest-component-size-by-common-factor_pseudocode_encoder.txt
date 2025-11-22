@@ -1,0 +1,70 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.parent TO list of integers from 0 TO size MINUS 1  
+        SET self.rank TO list of ones of length size  
+        SET self.size TO list of ones of length size  
+    END FUNCTION  
+  
+    FUNCTION find(self, u)  
+        IF self.parent AT u NOT EQUALS u  
+            SET self.parent AT u TO CALL self.find WITH self.parent AT u  
+        RETURN self.parent AT u  
+    END FUNCTION  
+  
+    FUNCTION union(self, u, v)  
+        SET rootU TO CALL self.find WITH u  
+        SET rootV TO CALL self.find WITH v  
+        IF rootU NOT EQUALS rootV  
+            IF self.rank AT rootU GREATER THAN self.rank AT rootV  
+                SET self.parent AT rootV TO rootU  
+                INCREMENT self.size AT rootU BY self.size AT rootV  
+            ELSE IF self.rank AT rootU LESS THAN self.rank AT rootV  
+                SET self.parent AT rootU TO rootV  
+                INCREMENT self.size AT rootV BY self.size AT rootU  
+            ELSE  
+                SET self.parent AT rootV TO rootU  
+                INCREMENT self.rank AT rootU BY 1  
+                INCREMENT self.size AT rootU BY self.size AT rootV  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION largestComponentSize(self, nums)  
+        SET max_num TO maximum value IN nums  
+        SET uf TO NEW UnionFind WITH max_num PLUS 1  
+        SET prime_to_index TO empty map  
+  
+        FOR each num IN nums  
+            FOR each prime IN CALL self.prime_factors WITH num  
+                IF prime EXISTS IN prime_to_index  
+                    CALL uf.union WITH prime_to_index AT prime, num  
+                ELSE  
+                    SET prime_to_index AT prime TO num  
+  
+        SET max_component_size TO 0  
+        FOR each num IN nums  
+            SET root TO CALL uf.find WITH num  
+            IF uf.size AT root GREATER THAN max_component_size  
+                SET max_component_size TO uf.size AT root  
+  
+        RETURN max_component_size  
+    END FUNCTION  
+  
+    FUNCTION prime_factors(self, n)  
+        SET factors TO empty set  
+  
+        WHILE n MODULO 2 EQUALS 0  
+            ADD 2 TO factors  
+            SET n TO n DIVIDED BY 2  
+  
+        FOR i FROM 3 TO FLOOR OF square root of n PLUS 1 STEP 2  
+            WHILE n MODULO i EQUALS 0  
+                ADD i TO factors  
+                SET n TO n DIVIDED BY i  
+  
+        IF n GREATER THAN 2  
+            ADD n TO factors  
+  
+        RETURN factors  
+    END FUNCTION  
+END CLASS

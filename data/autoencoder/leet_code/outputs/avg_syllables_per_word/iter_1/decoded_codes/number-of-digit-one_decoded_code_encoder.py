@@ -1,0 +1,16 @@
+def countDigitOne(n):
+    if n <= 0:
+        return 0
+    count, factor = 0, 1
+    while factor <= n:
+        lower = n - (n // factor) * factor
+        cur = (n // factor) % 10
+        higher = n // (factor * 10)
+        if cur == 0:
+            count += higher * factor
+        elif cur == 1:
+            count += higher * factor + lower + 1
+        else:
+            count += (higher + 1) * factor
+        factor *= 10
+    return count

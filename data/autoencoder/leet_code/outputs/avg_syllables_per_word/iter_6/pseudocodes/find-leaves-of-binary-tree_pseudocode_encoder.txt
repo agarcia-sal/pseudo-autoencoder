@@ -1,0 +1,57 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS 0, left EQUALS None, right EQUALS None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET root TO NEW TreeNode WITH values AT INDEX 0  
+    SET i TO 1  
+    SET queue TO NEW empty deque  
+    CALL queue APPEND WITH root  
+    WHILE queue IS NOT EMPTY  
+        SET node TO CALL queue POP LEFT  
+        IF i LESS THAN LENGTH OF values AND values AT INDEX i IS NOT None  
+            SET node.left TO NEW TreeNode WITH values AT INDEX i  
+            CALL queue APPEND WITH node.left  
+        INCREMENT i BY 1  
+        IF i LESS THAN LENGTH OF values AND values AT INDEX i IS NOT None  
+            SET node.right TO NEW TreeNode WITH values AT INDEX i  
+            CALL queue APPEND WITH node.right  
+        INCREMENT i BY 1  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN CALL is_same_tree WITH p.left AND q.left AND CALL is_same_tree WITH p.right AND q.right  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION findLeaves(self, root)  
+        FUNCTION collectLeaves(node)  
+            IF node IS None  
+                RETURN MINUS 1  
+            SET left_height TO CALL collectLeaves WITH node.left  
+            SET right_height TO CALL collectLeaves WITH node.right  
+            SET current_height TO MAXIMUM OF left_height AND right_height PLUS 1  
+            IF current_height GREATER THAN OR EQUAL TO LENGTH OF result  
+                CALL result APPEND WITH empty list  
+            CALL result AT INDEX current_height APPEND WITH node.val  
+            RETURN current_height  
+        END FUNCTION  
+        SET result TO empty list  
+        CALL collectLeaves WITH root  
+        RETURN result  
+    END FUNCTION  
+END CLASS

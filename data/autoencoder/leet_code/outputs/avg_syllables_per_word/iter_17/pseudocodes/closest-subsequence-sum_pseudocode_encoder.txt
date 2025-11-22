@@ -1,0 +1,43 @@
+CLASS Solution
+    FUNCTION minAbsDifference(nums, goal)
+        SET n TO the LENGTH OF nums
+        SET mid TO n DIVIDED BY two
+
+        SET left_sums TO a list containing zero
+        FOR each number IN the SUBLIST of nums from position zero TO the position before mid
+            SET new_sums TO an empty list
+            FOR each sum_value IN left_sums
+                APPEND sum_value PLUS number TO new_sums
+            END FOR
+            EXTEND left_sums BY elements of new_sums
+        END FOR
+
+        SET right_sums TO a list containing zero
+        FOR each number IN the SUBLIST of nums from position mid TO the END
+            SET new_sums TO an empty list
+            FOR each sum_value IN right_sums
+                APPEND sum_value PLUS number TO new_sums
+            END FOR
+            EXTEND right_sums BY elements of new_sums
+        END FOR
+
+        CALL sort ON right_sums
+
+        SET min_diff TO positive infinity
+
+        FOR each left_sum IN left_sums
+            SET target TO goal MINUS left_sum
+            SET pos TO the RESULT OF bisect_left CALLED WITH right_sums AND target
+
+            IF pos IS LESS THAN the LENGTH OF right_sums
+                SET min_diff TO THE MINIMUM OF min_diff AND THE ABSOLUTE VALUE OF left_sum PLUS the ELEMENT AT position pos OF right_sums MINUS goal
+            END IF
+
+            IF pos IS GREATER THAN zero
+                SET min_diff TO THE MINIMUM OF min_diff AND THE ABSOLUTE VALUE OF left_sum PLUS the ELEMENT AT position pos MINUS one OF right_sums MINUS goal
+            END IF
+        END FOR
+
+        RETURN min_diff
+    END FUNCTION
+END CLASS

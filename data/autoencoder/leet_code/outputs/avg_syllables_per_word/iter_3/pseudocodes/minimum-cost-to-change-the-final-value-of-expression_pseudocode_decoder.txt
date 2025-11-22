@@ -1,0 +1,47 @@
+CLASS Solution
+    FUNCTION minOperationsToFlip(expression)
+        SET stack TO empty list
+
+        FOR each character e IN expression
+            IF e IS '(' OR e IS '&' OR e IS '|'
+                APPEND tuple (e, 0) TO stack
+                CONTINUE to next iteration
+            END IF
+
+            IF e IS ')'
+                SET lastPair TO POP from stack
+                POP from stack  // Pop '('
+            ELSE  // e IS '0' OR '1'
+                SET lastPair TO (e, 1)
+            END IF
+
+            IF stack IS NOT empty AND stack last element's first value IS '&' OR '|'
+                SET op TO POP first value from stack last element
+                SET a, costA TO POP from stack
+                SET b, costB TO lastPair
+
+                IF op IS '&'
+                    IF a IS '0' AND b IS '0'
+                        SET lastPair TO ('0', 1 + MINIMUM of costA and costB)
+                    ELSE IF (a IS '0' AND b IS '1') OR (a IS '1' AND b IS '0')
+                        SET lastPair TO ('0', 1)
+                    ELSE  // a IS '1' AND b IS '1'
+                        SET lastPair TO ('1', MINIMUM of costA and costB)
+                    END IF
+                ELSE  // op IS '|'
+                    IF a IS '0' AND b IS '0'
+                        SET lastPair TO ('0', MINIMUM of costA and costB)
+                    ELSE IF (a IS '0' AND b IS '1') OR (a IS '1' AND b IS '0')
+                        SET lastPair TO ('1', 1)
+                    ELSE  // a IS '1' AND b IS '1'
+                        SET lastPair TO ('1', 1 + MINIMUM of costA and costB)
+                    END IF
+                END IF
+            END IF
+
+            APPEND lastPair TO stack
+        END FOR
+
+        RETURN second value of stack last element
+    END FUNCTION
+END CLASS

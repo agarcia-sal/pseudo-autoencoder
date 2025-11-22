@@ -1,0 +1,35 @@
+CLASS Solution
+    FUNCTION validUtf8(data: List of Integer) RETURNS Boolean
+        FUNCTION get_byte_count(byte)
+            IF byte SHIFTED RIGHT BY 7 EQUALS 0b0 THEN
+                RETURN 1
+            ELSE IF byte SHIFTED RIGHT BY 5 EQUALS 0b110 THEN
+                RETURN 2
+            ELSE IF byte SHIFTED RIGHT BY 4 EQUALS 0b1110 THEN
+                RETURN 3
+            ELSE IF byte SHIFTED RIGHT BY 3 EQUALS 0b11110 THEN
+                RETURN 4
+            ELSE
+                RETURN -1
+            END IF
+        END FUNCTION
+
+        SET i TO 0
+        WHILE i LESS THAN LENGTH OF data
+            SET byte_count TO get_byte_count(data AT INDEX i)
+            IF byte_count EQUALS -1 THEN
+                RETURN False
+            END IF
+            IF i PLUS byte_count GREATER THAN LENGTH OF data THEN
+                RETURN False
+            END IF
+            FOR j FROM i PLUS 1 TO i PLUS byte_count MINUS 1
+                IF data AT INDEX j SHIFTED RIGHT BY 6 NOT EQUAL TO 0b10 THEN
+                    RETURN False
+                END IF
+            END FOR
+            INCREMENT i BY byte_count
+        END WHILE
+        RETURN True
+    END FUNCTION
+END CLASS

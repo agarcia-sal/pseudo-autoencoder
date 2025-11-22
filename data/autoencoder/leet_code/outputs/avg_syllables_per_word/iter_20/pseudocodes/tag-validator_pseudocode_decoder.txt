@@ -1,0 +1,51 @@
+CLASS Solution  
+    FUNCTION isValid(code)  
+        IMPORT regular expression module as re  
+        
+        SET cdata pattern TO the string representing the pattern for CDATA sections starting with left angle bracket exclamation mark left square bracket CDATA left square bracket any characters in non-greedy manner right square bracket right square bracket greater than sign  
+        
+        SET code TO the result of replacing all substrings matching cdata pattern in code with empty string using regular expression substitution  
+        
+        SET stack TO an empty list  
+        
+        SET position i TO zero  
+        WHILE position i IS LESS THAN the LENGTH OF code  
+            SET current character TO element at position i of code  
+            IF current character EQUALS left angle bracket  
+                SET position j TO the position of the next greater than sign in code starting from position i plus one  
+                IF position j EQUALS minus one  
+                    RETURN false because there is no matching greater than sign for an opening angle bracket  
+                END IF  
+                
+                SET tag content TO substring from position i plus one TO position j minus one of code  
+                
+                IF tag content IS EMPTY  
+                    RETURN false because tag content should not be empty  
+                END IF  
+                
+                SET first character of tag content TO the element at position zero of tag content  
+                
+                IF first character of tag content EQUALS forward slash  
+                    SET tag name TO substring from position one TO end of tag content  
+                    IF stack IS EMPTY OR element at the last position of stack IS NOT EQUAL TO tag name  
+                        RETURN false because closing tag does not match the last opened tag  
+                    END IF  
+                    REMOVE the element at the last position FROM stack  
+                ELSE IF first character of tag content EQUALS exclamation mark  
+                    RETURN false because CDATA section should have been removed already  
+                ELSE  
+                    IF length of tag content IS LESS THAN one OR length of tag content IS GREATER THAN nine OR tag content IS NOT composed entirely of uppercase letters  
+                        RETURN false because tag name is invalid  
+                    END IF  
+                    APPEND tag content TO stack  
+                END IF  
+                
+                SET position i TO position j plus one  
+            ELSE  
+                INCREMENT position i BY one  
+            END IF  
+        END WHILE  
+        
+        RETURN the result of the logical expression that stack IS EMPTY AND the number of matches found by searching the code with the regular expression for open angle bracket uppercase letters one or more times greater than sign followed by any characters followed by less than sign forward slash uppercase letters one or more times greater than sign IS GREATER THAN zero  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,37 @@
+CLASS Solution  
+    FUNCTION areConnected(n, threshold, queries)  
+        IF threshold EQUALS zero  
+            RETURN list of True repeated the LENGTH OF queries  
+        END IF  
+        
+        CALL list_range WITH PARAMETERS zero TO n ASSIGN TO parent  
+        
+        FUNCTION find(x)  
+            IF element at position x OF parent NOT EQUALS x  
+                SET element at position x OF parent TO CALL find WITH PARAMETER element at position x OF parent  
+            END IF  
+            RETURN element at position x OF parent  
+        END FUNCTION  
+        
+        FUNCTION union(x, y)  
+            SET rootX TO CALL find WITH PARAMETER x  
+            SET rootY TO CALL find WITH PARAMETER y  
+            IF rootX NOT EQUALS rootY  
+                SET element at position rootY OF parent TO rootX  
+            END IF  
+        END FUNCTION  
+        
+        FOR i FROM threshold PLUS one TO n  
+            FOR j FROM i MULTIPLIED BY two TO n STEP i  
+                CALL union WITH PARAMETERS i, j  
+            END FOR  
+        END FOR  
+        
+        SET result TO empty list  
+        FOR each pair a, b IN queries  
+            APPEND result WITH the EXPRESSION whether CALL find WITH PARAMETER a EQUALS CALL find WITH PARAMETER b  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

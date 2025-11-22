@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION outerTrees(trees)  
+        FUNCTION dist_sq(p1, p2)  
+            RETURN THE SQUARE OF THE DIFFERENCE BETWEEN element at position zero of p1 AND element at position zero of p2 PLUS THE SQUARE OF THE DIFFERENCE BETWEEN element at position one of p1 AND element at position one of p2  
+        END FUNCTION  
+
+        FUNCTION circumcenter(p1, p2, p3)  
+            SET ax TO element at position zero of p1  
+            SET ay TO element at position one of p1  
+            SET bx TO element at position zero of p2  
+            SET by TO element at position one of p2  
+            SET cx TO element at position zero of p3  
+            SET cy TO element at position one of p3  
+            SET d TO two MULTIPLIED BY the SUM OF ax MULTIPLIED BY the DIFFERENCE BETWEEN by AND cy PLUS bx MULTIPLIED BY the DIFFERENCE BETWEEN cy AND ay PLUS cx MULTIPLIED BY the DIFFERENCE BETWEEN ay AND by  
+            SET ux TO THE SUM OF THE PRODUCT OF THE SUM OF ax MULTIPLIED BY ax PLUS ay MULTIPLIED BY ay AND THE DIFFERENCE BETWEEN by AND cy WITH THE PRODUCT OF THE SUM OF bx MULTIPLIED BY bx PLUS by MULTIPLIED BY by AND THE DIFFERENCE BETWEEN cy AND ay PLUS THE PRODUCT OF THE SUM OF cx MULTIPLIED BY cx PLUS cy MULTIPLIED BY cy AND THE DIFFERENCE BETWEEN ay AND by DIVIDED BY d  
+            SET uy TO THE SUM OF THE PRODUCT OF THE SUM OF ax MULTIPLIED BY ax PLUS ay MULTIPLIED BY ay AND THE DIFFERENCE BETWEEN cx AND bx WITH THE PRODUCT OF THE SUM OF bx MULTIPLIED BY bx PLUS by MULTIPLIED BY by AND THE DIFFERENCE BETWEEN ax AND cx PLUS THE PRODUCT OF THE SUM OF cx MULTIPLIED BY cx PLUS cy MULTIPLIED BY cy AND THE DIFFERENCE BETWEEN bx AND ax DIVIDED BY d  
+            RETURN A LIST CONTAINING ux AND uy AND THE SQUARE ROOT OF THE SUM OF THE SQUARE OF THE DIFFERENCE BETWEEN ux AND ax AND THE SQUARE OF THE DIFFERENCE BETWEEN uy AND ay  
+        END FUNCTION  
+
+        FUNCTION welzl(points, boundary, n)  
+            IF n EQUALS zero OR THE LENGTH OF boundary EQUALS three THEN  
+                IF THE LENGTH OF boundary EQUALS zero THEN  
+                    RETURN A LIST CONTAINING zero AND zero AND zero  
+                ELSE IF THE LENGTH OF boundary EQUALS one THEN  
+                    RETURN THE ELEMENT AT POSITION zero OF boundary AND zero  
+                ELSE IF THE LENGTH OF boundary EQUALS two THEN  
+                    SET center TO A LIST CONTAINING THE SUM OF element at position zero of element at position zero of boundary AND element at position zero of element at position one of boundary DIVIDED BY two AND THE SUM OF element at position one of element at position zero of boundary AND element at position one of element at position one of boundary DIVIDED BY two  
+                    SET radius TO THE SQUARE ROOT OF dist_sq BETWEEN element at position zero of boundary AND element at position one of boundary DIVIDED BY two  
+                    RETURN center AND radius  
+                ELSE  
+                    RETURN circumcenter WITH UNPACKED boundary  
+                END IF  
+            END IF  
+            
+            SET p TO element at position n MINUS one of points  
+            SET center, radius TO welzl WITH points, boundary, AND n MINUS one  
+            IF dist_sq BETWEEN center AND p LESS THAN OR EQUAL TO radius MULTIPLIED BY radius THEN  
+                RETURN center AND radius  
+            END IF  
+            
+            RETURN welzl WITH points, boundary PLUS A LIST CONTAINING p, AND n MINUS one  
+        END FUNCTION  
+
+        EXECUTE random.shuffle WITH trees  
+        SET center, radius TO welzl WITH trees, AN EMPTY LIST, AND THE LENGTH OF trees  
+        RETURN A LIST CONTAINING element at position zero of center, element at position one of center, AND radius  
+    END FUNCTION  
+END CLASS

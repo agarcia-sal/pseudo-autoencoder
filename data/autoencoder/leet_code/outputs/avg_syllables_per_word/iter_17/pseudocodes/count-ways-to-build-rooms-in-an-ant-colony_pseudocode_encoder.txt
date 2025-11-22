@@ -1,0 +1,38 @@
+CLASS Solution
+    FUNCTION waysToBuildRooms(prevRoom)
+        ASSIGN n TO the LENGTH OF prevRoom
+        ASSIGN graph TO CALL create_defaultdict_of_list WITH no parameters
+        
+        FOR room FROM one TO n MINUS one
+            APPEND room TO the LIST at key element at position room of prevRoom OF graph
+        END FOR
+        
+        FUNCTION dp(node)
+            IF the LIST at key node OF graph IS empty
+                RETURN one, one
+            END IF
+            
+            SET total_ways TO one
+            SET total_size TO one
+            
+            ASSIGN child_results TO CALL create_empty_list WITH no parameters
+            FOR each child IN the LIST at key node OF graph
+                ASSIGN ways, size TO CALL dp WITH child
+                APPEND the PAIR ways, size TO child_results
+                INCREMENT total_size BY size
+            END FOR
+            
+            SET current_size TO one
+            FOR each ways, size IN child_results
+                SET total_ways TO total_ways MULTIPLIED BY CALL comb WITH current_size PLUS size MINUS one AND size
+                SET total_ways TO total_ways MULTIPLIED BY ways
+                SET total_ways TO total_ways MODULO the integer one billion PLUS seven
+                INCREMENT current_size BY size
+            END FOR
+            
+            RETURN total_ways, total_size
+        END FUNCTION
+        
+        RETURN the FIRST element of CALL dp WITH zero
+    END FUNCTION
+END CLASS

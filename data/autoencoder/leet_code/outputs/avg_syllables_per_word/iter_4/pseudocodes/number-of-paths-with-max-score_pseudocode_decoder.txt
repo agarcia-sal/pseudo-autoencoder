@@ -1,0 +1,34 @@
+CLASS Solution
+    FUNCTION pathsWithMaxScore(board)
+        SET MOD TO 10 TO THE POWER OF 9 PLUS 7
+        SET n TO LENGTH OF board
+        
+        INITIALIZE dp AS 3D LIST WITH DIMENSIONS n BY n WHERE EACH ELEMENT IS [-INFINITY, 0]
+        
+        SET dp[n MINUS 1][n MINUS 1] TO [0, 1]
+        
+        FOR i FROM n MINUS 1 DOWNTO 0
+            FOR j FROM n MINUS 1 DOWNTO 0
+                IF board[i][j] IS 'X' OR 'S'
+                    CONTINUE TO NEXT j
+                
+                IF board[i][j] IS 'E'
+                    SET value TO 0
+                ELSE
+                    SET value TO INTEGER VALUE OF board[i][j]
+                
+                FOR EACH (x, y) IN [(1, 0), (0, 1), (1, 1)]
+                    SET ni TO i PLUS x
+                    SET nj TO j PLUS y
+                    IF ni IS BETWEEN 0 AND n MINUS 1 AND nj IS BETWEEN 0 AND n MINUS 1
+                        IF dp[ni][nj][0] GREATER THAN dp[i][j][0]
+                            SET dp[i][j] TO [dp[ni][nj][0] PLUS value, dp[ni][nj][1]]
+                        ELSE IF dp[ni][nj][0] EQUALS dp[i][j][0]
+                            SET dp[i][j][1] TO (dp[i][j][1] PLUS dp[ni][nj][1]) MODULO MOD
+        
+        IF dp[0][0][0] EQUALS -INFINITY
+            RETURN [0, 0]
+        
+        RETURN [dp[0][0][0], dp[0][0][1]]
+    END FUNCTION
+END CLASS

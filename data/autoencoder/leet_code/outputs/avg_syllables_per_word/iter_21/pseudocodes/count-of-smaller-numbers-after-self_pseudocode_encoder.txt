@@ -1,0 +1,49 @@
+CLASS Solution  
+    FUNCTION countSmaller(nums)  
+        SET sorted_nums TO CALL convert_set_to_sorted_list WITH PARAMETER nums  
+        SET rank TO CALL create_rank_dictionary WITH PARAMETER sorted_nums  
+        SET bit TO CALL initialize_bit WITH PARAMETER the LENGTH OF sorted_nums PLUS one  
+        
+        FUNCTION get_sum(idx)  
+            SET res TO zero  
+            WHILE idx IS GREATER THAN zero  
+                INCREMENT res BY element at position idx OF bit  
+                SET idx TO idx MINUS THE VALUE OF idx BITWISE AND THE NEGATION OF idx  
+            END WHILE  
+            RETURN res  
+        END FUNCTION  
+        
+        FUNCTION update(idx, delta)  
+            WHILE idx IS LESS THAN the LENGTH OF bit  
+                INCREMENT element at position idx OF bit BY delta  
+                SET idx TO idx PLUS THE VALUE OF idx BITWISE AND THE NEGATION OF idx  
+            END WHILE  
+        END FUNCTION  
+        
+        SET counts TO an empty list  
+        FOR each num IN the REVERSE OF nums  
+            SET r TO element at key num OF rank  
+            CALL append TO add the RESULT OF get_sum WITH PARAMETER r MINUS one TO counts  
+            CALL update WITH PARAMETERS r AND one  
+        END FOR  
+        
+        SET result TO the REVERSE OF counts  
+        RETURN result  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION convert_set_to_sorted_list(collection)  
+    RETURN the sorted list of unique elements FROM collection  
+END FUNCTION  
+
+FUNCTION create_rank_dictionary(sorted_list)  
+    SET dictionary TO an empty dictionary  
+    FOR each idx AND val IN the enumeration of sorted_list  
+        SET element at key val OF dictionary TO idx PLUS one  
+    END FOR  
+    RETURN dictionary  
+END FUNCTION  
+
+FUNCTION initialize_bit(size)  
+    RETURN a list OF zeroes WITH length size  
+END FUNCTION

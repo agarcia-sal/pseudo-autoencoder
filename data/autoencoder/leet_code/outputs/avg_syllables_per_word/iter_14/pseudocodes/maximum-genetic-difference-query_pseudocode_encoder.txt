@@ -1,0 +1,89 @@
+CLASS TrieNode  
+    FUNCTION __init__  
+        SET children TO a DEFAULT DICTIONARY that RETURNS a new TrieNode WHEN ACCESSED WITH A KEY  
+        SET count TO zero  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION maxGeneticDifference WITH PARAMETERS parents AND queries  
+        SET tree TO a DEFAULT DICTIONARY THAT MAPS TO AN EMPTY LIST  
+        SET index TO zero  
+        FOR each parent_element IN parents  
+            IF parent_element IS NOT EQUAL TO negative one  
+                APPEND index TO the LIST ASSOCIATED WITH parent_element IN tree  
+            END IF  
+            INCREMENT index BY one  
+        END FOR  
+
+        SET node_queries TO a DEFAULT DICTIONARY THAT MAPS TO AN EMPTY LIST  
+        FOR each pair OF node AND val IN queries  
+            APPEND val TO the LIST ASSOCIATED WITH node IN node_queries  
+        END FOR  
+
+        CREATE root AS A NEW TrieNode  
+
+        SET result TO a LIST OF zeroes WITH THE LENGTH OF queries  
+
+        FUNCTION dfs WITH PARAMETER node  
+            CALL insert WITH trie_root SET TO root AND value SET TO node  
+
+            FOR each val IN the LIST ASSOCIATED WITH node IN node_queries  
+                SET result AT the POSITION ASSOCIATED WITH THE PAIR node AND val IN query_idx TO THE RETURN VALUE OF max_xor WITH trie_root SET TO root AND value SET TO val  
+            END FOR  
+
+            FOR each child IN the LIST ASSOCIATED WITH node IN tree  
+                CALL dfs WITH child AS ARGUMENT  
+            END FOR  
+
+            CALL erase WITH trie_root SET TO root AND value SET TO node  
+        END FUNCTION  
+
+        FUNCTION insert WITH PARAMETERS trie_root AND value  
+            SET current_node TO trie_root  
+            FOR bit_position FROM seventeen DOWN TO zero  
+                SET bit TO THE BIT AT bit_position IN value AS A ZERO OR ONE  
+                ASSIGN current_node TO the CHILD OF current_node ASSOCIATED WITH bit  
+                INCREMENT current_node's count BY one  
+            END FOR  
+        END FUNCTION  
+
+        FUNCTION erase WITH PARAMETERS trie_root AND value  
+            SET current_node TO trie_root  
+            FOR bit_position FROM seventeen DOWN TO zero  
+                SET bit TO THE BIT AT bit_position IN value AS A ZERO OR ONE  
+                ASSIGN current_node TO the CHILD OF current_node ASSOCIATED WITH bit  
+                DECREMENT current_node's count BY one  
+            END FOR  
+        END FUNCTION  
+
+        FUNCTION max_xor WITH PARAMETERS trie_root AND value  
+            SET current_node TO trie_root  
+            SET max_xor_val TO zero  
+            FOR bit_position FROM seventeen DOWN TO zero  
+                SET bit TO THE BIT AT bit_position IN value AS A ZERO OR ONE  
+                SET toggled_bit TO one MINUS bit  
+                IF toggled_bit IS A KEY IN current_node's children AND current_node's child ASSOCIATED WITH toggled_bit HAS count GREATER THAN zero  
+                    INCREMENT max_xor_val BY one SHIFTED LEFT BY bit_position  
+                    ASSIGN current_node TO the CHILD OF current_node ASSOCIATED WITH toggled_bit  
+                ELSE  
+                    ASSIGN current_node TO the CHILD OF current_node ASSOCIATED WITH bit  
+                END IF  
+            END FOR  
+            RETURN max_xor_val  
+        END FUNCTION  
+
+        SET query_idx TO AN ASSOCIATION OF EACH PAIR node AND val FROM queries TO ITS INDEX POSITION  
+
+        SET index TO zero  
+        FOR each parent_element IN parents  
+            IF parent_element EQUALS negative one  
+                CALL dfs WITH index  
+                BREAK  
+            END IF  
+            INCREMENT index BY one  
+        END FOR  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

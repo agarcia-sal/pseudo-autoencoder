@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION checkWays(pairs)  
+        SET graph TO a new default mapping from elements to collections of connected elements  
+        FOR each element x and element y IN pairs  
+            APPEND element y TO the collection at position x of graph  
+            APPEND element x TO the collection at position y of graph  
+        END FOR  
+
+        SET max_degree TO the element in graph whose collection has the maximum number of elements  
+        SET n TO the number of keys in graph  
+
+        IF the number of elements in the collection at position max_degree of graph IS NOT EQUAL TO n MINUS one THEN  
+            RETURN zero  
+        END IF  
+
+        FUNCTION can_be_parent(u, v)  
+            RETURN whether for every element neighbor IN the collection at position v of graph it is true that either the collection at position u of graph CONTAINS neighbor OR neighbor EQUALS u  
+        END FUNCTION  
+
+        SET ways TO one  
+
+        FOR each element u IN graph  
+            IF u EQUALS max_degree THEN  
+                CONTINUE to next iteration  
+            END IF  
+
+            SET parent TO nothing  
+
+            FOR each element v IN the collection at position u of graph  
+                IF the key v EXISTS IN graph AND the number of elements in the collection at position v of graph IS GREATER THAN OR EQUAL TO the number of elements in the collection at position u of graph AND can_be_parent with parameters v and u RETURNS true THEN  
+                    IF parent IS nothing OR the number of elements in the collection at position v of graph IS LESS THAN the number of elements in the collection at position parent of graph THEN  
+                        SET parent TO v  
+                    END IF  
+                END IF  
+            END FOR  
+
+            IF parent IS nothing THEN  
+                RETURN zero  
+            END IF  
+
+            IF the number of elements in the collection at position parent of graph EQUALS the number of elements in the collection at position u of graph THEN  
+                SET ways TO two  
+            END IF  
+        END FOR  
+
+        RETURN ways  
+    END FUNCTION  
+END CLASS

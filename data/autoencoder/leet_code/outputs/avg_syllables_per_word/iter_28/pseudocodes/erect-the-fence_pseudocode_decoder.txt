@@ -1,0 +1,53 @@
+CLASS Solution  
+    FUNCTION outerTrees(trees)  
+        FUNCTION cross(i, j, k)  
+            SET pointA TO element at position i of trees  
+            SET pointB TO element at position j of trees  
+            SET pointC TO element at position k of trees  
+            SET horizontalDifferenceOne TO horizontal coordinate of pointB MINUS horizontal coordinate of pointA  
+            SET verticalDifferenceOne TO vertical coordinate of pointB MINUS vertical coordinate of pointA  
+            SET horizontalDifferenceTwo TO horizontal coordinate of pointC MINUS horizontal coordinate of pointB  
+            SET verticalDifferenceTwo TO vertical coordinate of pointC MINUS vertical coordinate of pointB  
+            SET crossProduct TO horizontalDifferenceOne MULTIPLIED BY verticalDifferenceTwo MINUS verticalDifferenceOne MULTIPLIED BY horizontalDifferenceTwo  
+            RETURN crossProduct  
+        END FUNCTION  
+
+        SET numberOfTrees TO the LENGTH OF trees  
+        IF numberOfTrees LESS THAN four  
+            RETURN trees  
+        END IF  
+
+        SORT trees IN ASCENDING ORDER  
+        SET visitedList TO list of Boolean FALSE values of length numberOfTrees  
+        SET stack TO list containing element zero  
+
+        FOR index FROM one TO numberOfTrees MINUS one  
+            WHILE LENGTH OF stack GREATER THAN one AND cross(element at position LENGTH OF stack MINUS two of stack, element at position LENGTH OF stack MINUS one of stack, index) LESS THAN zero  
+                SET poppedIndex TO the last element popped FROM stack  
+                SET element at position poppedIndex of visitedList TO FALSE  
+            END WHILE  
+            SET element at position index of visitedList TO TRUE  
+            APPEND index TO stack  
+        END FOR  
+
+        SET m TO LENGTH OF stack  
+
+        FOR index FROM numberOfTrees MINUS two TO zero STEP negative one  
+            IF element at position index of visitedList IS TRUE  
+                CONTINUE TO next iteration  
+            END IF  
+            WHILE LENGTH OF stack GREATER THAN m AND cross(element at position LENGTH OF stack MINUS two of stack, element at position LENGTH OF stack MINUS one of stack, index) LESS THAN zero  
+                REMOVE the last element FROM stack  
+            END WHILE  
+            APPEND index TO stack  
+        END FOR  
+
+        REMOVE the last element FROM stack  
+        SET resultList TO empty list  
+        FOR each element index IN stack  
+            APPEND element at position index of trees TO resultList  
+        END FOR  
+
+        RETURN resultList  
+    END FUNCTION  
+END CLASS

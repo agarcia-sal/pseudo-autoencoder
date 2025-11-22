@@ -1,0 +1,49 @@
+CLASS Solution
+    FUNCTION minFlips(mat)
+        FUNCTION flip(matrix, x, y)
+            SET directions TO [(-1, 0), (1, 0), (0, -1), (0, 1), (0, 0)]
+            FOR each (dx, dy) IN directions
+                SET nx TO x + dx
+                SET ny TO y + dy
+                IF nx >= 0 AND nx < m AND ny >= 0 AND ny < n THEN
+                    SET matrix[nx][ny] TO 1 MINUS matrix[nx][ny]
+                END IF
+            END FOR
+        END FUNCTION
+
+        FUNCTION matrix_to_tuple(matrix)
+            RETURN tuple OF tuples of each row in matrix
+        END FUNCTION
+
+        SET m TO LENGTH OF mat
+        SET n TO LENGTH OF mat[0]
+        SET target TO tuple OF tuples filled with 0 of size m by n
+        SET initial_state TO matrix_to_tuple(mat)
+        SET queue TO LIST containing (initial_state, 0)
+        SET visited TO EMPTY SET
+        ADD initial_state TO visited
+
+        WHILE queue IS NOT EMPTY
+            SET current_state, steps TO queue REMOVE FIRST ELEMENT
+            IF current_state IS EQUAL TO target THEN
+                RETURN steps
+            END IF
+
+            SET current_matrix TO LIST OF lists converted from current_state
+
+            FOR i FROM 0 TO m MINUS 1
+                FOR j FROM 0 TO n MINUS 1
+                    SET next_matrix TO DEEP COPY OF current_matrix
+                    CALL flip(next_matrix, i, j)
+                    SET next_state TO matrix_to_tuple(next_matrix)
+                    IF next_state NOT IN visited THEN
+                        ADD next_state TO visited
+                        APPEND (next_state, steps PLUS 1) TO queue
+                    END IF
+                END FOR
+            END FOR
+        END WHILE
+
+        RETURN -1
+    END FUNCTION
+END CLASS

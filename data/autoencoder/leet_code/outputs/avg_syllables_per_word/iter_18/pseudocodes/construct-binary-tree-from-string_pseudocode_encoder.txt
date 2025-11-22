@@ -1,0 +1,101 @@
+CLASS ListNode  
+    FUNCTION __init__ WITH parameter val EQUALS zero AND parameter next EQUALS none  
+        SET the attribute val OF self TO val  
+        SET the attribute next OF self TO next  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION list_node WITH parameter values AS list  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET head TO a new instance of ListNode WITH the element at position zero of values  
+    SET p TO head  
+    FOR each val IN elements from position one TO the end of values  
+        SET node TO a new instance of ListNode WITH val  
+        SET the next attribute of p TO node  
+        SET p TO node  
+    END FOR  
+    RETURN head  
+END FUNCTION  
+
+FUNCTION is_same_list WITH parameters p1 AND p2  
+    IF p1 IS none AND p2 IS none  
+        RETURN true  
+    END IF  
+    IF p1 IS none OR p2 IS none  
+        RETURN false  
+    END IF  
+    RETURN the attribute val of p1 EQUALS the attribute val of p2 AND is_same_list WITH arguments the attribute next of p1 AND the attribute next of p2  
+END FUNCTION  
+
+CLASS TreeNode  
+    FUNCTION __init__ WITH parameter val EQUALS zero AND parameter left EQUALS none AND parameter right EQUALS none  
+        SET the attribute val OF self TO val  
+        SET the attribute left OF self TO left  
+        SET the attribute right OF self TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH parameter values AS list  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO a new instance of TreeNode WITH the element at position zero of values  
+    SET i TO one  
+    SET queue TO an empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO the element removed from the front of queue  
+        IF i IS less than the LENGTH OF values AND the element at position i of values IS NOT none  
+            SET the left attribute of node TO a new instance of TreeNode WITH the element at position i of values  
+            APPEND the left attribute of node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS less than the LENGTH OF values AND the element at position i of values IS NOT none  
+            SET the right attribute of node TO a new instance of TreeNode WITH the element at position i of values  
+            APPEND the right attribute of node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH parameters p AND q  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF the attribute val of p IS NOT EQUALS the attribute val of q  
+        RETURN false  
+    ELSE  
+        RETURN is_same_tree WITH arguments the attribute left of p AND the attribute left of q AND is_same_tree WITH arguments the attribute right of p AND the attribute right of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION str2tree WITH parameter s AS str RETURNING OPTIONAL TreeNode  
+        FUNCTION parse_tree WITH parameter index  
+            IF index IS greater THAN OR EQUAL TO the LENGTH OF s  
+                RETURN none AND index  
+            END IF  
+            SET start TO index  
+            WHILE index IS less THAN the LENGTH OF s AND the character at position index of s IS a digit OR the character at position index of s IS a hyphen  
+                INCREMENT index BY one  
+            END WHILE  
+            SET node TO a new instance of TreeNode WITH integer conversion of the substring of s from position start TO position index  
+            IF index IS less THAN the LENGTH OF s AND the character at position index of s IS an opening parenthesis  
+                SET the left attribute of node AND index TO the result of parse_tree CALLED WITH index incremented by one  
+            END IF  
+            IF index IS less THAN the LENGTH OF s AND the character at position index of s IS an opening parenthesis  
+                SET the right attribute of node AND index TO the result of parse_tree CALLED WITH index incremented by one  
+            END IF  
+            IF index IS less THAN the LENGTH OF s AND the character at position index of s IS a closing parenthesis  
+                INCREMENT index BY one  
+            END IF  
+            RETURN node AND index  
+        END FUNCTION  
+        SET root AND discard second returned value TO parse_tree CALLED WITH zero  
+        RETURN root  
+    END FUNCTION  
+END CLASS

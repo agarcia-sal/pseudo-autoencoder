@@ -1,0 +1,67 @@
+CLASS Solution  
+    FUNCTION updateMatrix(mat)  
+        IF mat EQUALS nothing OR element at position zero OF mat EQUALS nothing  
+            RETURN mat  
+        END IF  
+
+        SET rows TO the LENGTH OF mat  
+        SET cols TO the LENGTH OF element at position zero OF mat  
+        SET dist TO the RESULT OF CALLING the FUNCTION createMatrixInfinity WITH PARAMETERS rows AND cols  
+        SET queue TO the RESULT OF CALLING the FUNCTION createEmptyQueue WITHOUT PARAMETERS  
+
+        FOR r FROM zero TO rows MINUS one  
+            FOR c FROM zero TO cols MINUS one  
+                IF element at position r OF mat AT position c EQUALS zero  
+                    SET element at position r OF dist AT position c TO zero  
+                    CALL function appendToQueue WITH PARAMETERS queue AND tuple COMPOSED OF r AND c  
+                END IF  
+            END FOR  
+        END FOR  
+
+        SET directions TO the RESULT OF CALLING the FUNCTION createDirectionList WITHOUT PARAMETERS  
+
+        WHILE queue IS NOT empty  
+            SET r, c TO the RESULT OF CALLING the FUNCTION popFromQueue WITH PARAMETER queue  
+
+            FOR each dr, dc IN directions  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+
+                IF nr GREATER THAN OR EQUAL TO zero AND nr LESS THAN rows AND nc GREATER THAN OR EQUAL TO zero AND nc LESS THAN cols AND element at position nr OF dist AT position nc GREATER THAN element at position r OF dist AT position c PLUS one  
+                    SET element at position nr OF dist AT position nc TO element at position r OF dist AT position c PLUS one  
+                    CALL function appendToQueue WITH PARAMETERS queue AND tuple COMPOSED OF nr AND nc  
+                END IF  
+            END FOR  
+        END WHILE  
+
+        RETURN dist  
+    END FUNCTION  
+
+    FUNCTION createMatrixInfinity(rows, cols)  
+        CREATE a two-dimensional matrix WITH dimensions rows BY cols  
+        SET each element OF the matrix TO positive infinity  
+        RETURN the matrix  
+    END FUNCTION  
+
+    FUNCTION createEmptyQueue()  
+        CREATE an empty queue structure  
+        RETURN the empty queue  
+    END FUNCTION  
+
+    FUNCTION appendToQueue(queue, element)  
+        ADD the element TO the end OF the queue  
+    END FUNCTION  
+
+    FUNCTION popFromQueue(queue)  
+        REMOVE and RETURN the element at the front OF the queue  
+    END FUNCTION  
+
+    FUNCTION createDirectionList()  
+        CREATE a list OF four tuples representing up, down, left, and right movements AS  
+            tuple MINUS one AND zero  
+            tuple one AND zero  
+            tuple zero AND MINUS one  
+            tuple zero AND one  
+        RETURN the list  
+    END FUNCTION  
+END CLASS

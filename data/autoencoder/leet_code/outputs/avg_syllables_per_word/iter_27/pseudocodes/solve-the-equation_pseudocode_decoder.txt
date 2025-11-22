@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION solveEquation(equation)  
+        FUNCTION parse_side(side)  
+            SET modified_side TO side WITH all occurrences of plus REPLACED BY pound followed by plus WITH all occurrences of minus REPLACED BY pound followed by minus  
+            SET tokens TO the RESULT OF SPLITTING modified_side BY pound  
+            SET x_count TO zero  
+            SET num_sum TO zero  
+            FOR each token IN tokens  
+                IF token EQUALS empty string THEN  
+                    CONTINUE to next iteration  
+                END IF  
+                IF token CONTAINS the character x THEN  
+                    IF token EQUALS the character x OR token EQUALS plus followed by the character x THEN  
+                        INCREMENT x_count BY one  
+                    ELSE IF token EQUALS minus followed by the character x THEN  
+                        DECREMENT x_count BY one  
+                    ELSE  
+                        SET coefficient_string TO token WITH the character x REMOVED  
+                        INCREMENT x_count BY the INTEGER VALUE OF coefficient_string  
+                    END IF  
+                ELSE  
+                    INCREMENT num_sum BY the INTEGER VALUE OF token  
+                END IF  
+            END FOR  
+            RETURN x_count AND num_sum  
+        END FUNCTION  
+        
+        SET left_side AND right_side TO the RESULT OF SPLITTING equation BY equals sign  
+        SET left_x AND left_num TO THE RESULT OF CALLING parse_side WITH left_side  
+        SET right_x AND right_num TO THE RESULT OF CALLING parse_side WITH right_side  
+        
+        SET total_x TO left_x MINUS right_x  
+        SET total_num TO right_num MINUS left_num  
+        
+        IF total_x EQUALS zero THEN  
+            IF total_num EQUALS zero THEN  
+                RETURN the string Infinite solutions  
+            ELSE  
+                RETURN the string No solution  
+            END IF  
+        ELSE  
+            SET result TO total_num DIVIDED BY total_x USING integer division  
+            RETURN the string formed by concatenating the character x equals sign AND the STRING REPRESENTATION OF result  
+        END IF  
+    END FUNCTION  
+END CLASS

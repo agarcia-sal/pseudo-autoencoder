@@ -1,0 +1,85 @@
+CLASS Solution  
+    FUNCTION containVirus WITH PARAMETER isInfected  
+        FUNCTION neighbors WITH PARAMETERS r AND c  
+            RETURN the LIST OF PAIRS OF r PLUS one AND c  
+            FOLLOWED BY r MINUS one AND c  
+            FOLLOWED BY r AND c PLUS one  
+            FOLLOWED BY r AND c MINUS one  
+        END FUNCTION  
+
+        FUNCTION bfs WITH PARAMETERS r AND c  
+            SET infected TO an empty SET  
+            SET threatened TO an empty SET  
+            SET queue TO a double ended queue CONTAINING the PAIR r AND c  
+            SET visited TO a SET CONTAINING the PAIR r AND c  
+            WHILE queue IS NOT EMPTY  
+                REMOVE the FIRST ELEMENT FROM queue AND ASSIGN THE TWO VALUES TO x AND y  
+                ADD the PAIR x AND y TO infected  
+                FOR each PAIR nx AND ny IN neighbors WITH PARAMETER x AND y  
+                    IF nx IS GREATER THAN OR EQUAL TO zero AND nx IS LESS THAN m AND ny IS GREATER THAN OR EQUAL TO zero AND ny IS LESS THAN n AND THE PAIR nx AND ny IS NOT IN visited  
+                        ADD the PAIR nx AND ny TO visited  
+                        IF the ELEMENT at POSITION nx OF THE ELEMENT at POSITION ny OF isInfected IS EQUAL TO one  
+                            APPEND the PAIR nx AND ny TO queue  
+                        ELSE IF the ELEMENT at POSITION nx OF THE ELEMENT at POSITION ny OF isInfected IS EQUAL TO zero  
+                            ADD the PAIR nx AND ny TO threatened  
+                        END IF  
+                    END IF  
+                END FOR  
+            END WHILE  
+            RETURN infected AND threatened  
+        END FUNCTION  
+
+        FUNCTION build_walls WITH PARAMETER infected  
+            SET walls TO zero  
+            FOR each PAIR x AND y IN infected  
+                FOR each PAIR nx AND ny IN neighbors WITH PARAMETERS x AND y  
+                    IF nx IS GREATER THAN OR EQUAL TO zero AND nx IS LESS THAN m AND ny IS GREATER THAN OR EQUAL TO zero AND ny IS LESS THAN n AND the ELEMENT at POSITION nx OF THE ELEMENT at POSITION ny OF isInfected IS EQUAL TO zero  
+                        INCREMENT walls BY one  
+                    END IF  
+                END FOR  
+            END FOR  
+            RETURN walls  
+        END FUNCTION  
+
+        FUNCTION spread_virus WITH PARAMETER threatened  
+            FOR each PAIR x AND y IN threatened  
+                SET the ELEMENT at POSITION x OF THE ELEMENT at POSITION y OF isInfected TO one  
+            END FOR  
+        END FUNCTION  
+
+        SET m TO the LENGTH OF isInfected  
+        SET n TO the LENGTH OF the ELEMENT at POSITION zero OF isInfected  
+        SET total_walls TO zero  
+
+        WHILE TRUE  
+            SET regions TO an empty LIST  
+            SET visited TO an empty SET  
+            FOR r FROM zero TO m MINUS one  
+                FOR c FROM zero TO n MINUS one  
+                    IF the ELEMENT at POSITION r OF THE ELEMENT at POSITION c OF isInfected IS EQUAL TO one AND the PAIR r AND c IS NOT IN visited  
+                        CALL bfs WITH PARAMETERS r AND c AND ASSIGN THE TWO RETURNED SETS TO infected AND threatened  
+                        APPEND the PAIR infected AND threatened TO regions  
+                        SET visited TO visited UNION infected  
+                    END IF  
+                END FOR  
+            END FOR  
+
+            IF regions IS EMPTY  
+                BREAK  
+            END IF  
+
+            SORT regions BY THE NEGATIVE OF THE SIZE OF THE SECOND ELEMENT OF EACH PAIR IN THE LIST regions  
+
+            INCREMENT total_walls BY THE RESULT OF build_walls CALLED WITH THE FIRST ELEMENT OF THE FIRST PAIR IN regions  
+            FOR each PAIR x AND y IN THE FIRST ELEMENT OF THE FIRST PAIR IN regions  
+                SET the ELEMENT at POSITION x OF THE ELEMENT at POSITION y OF isInfected TO MINUS one  
+            END FOR  
+
+            FOR i FROM one TO THE LENGTH OF regions MINUS one  
+                CALL spread_virus WITH THE SECOND ELEMENT OF THE PAIR AT POSITION i OF regions  
+            END FOR  
+        END WHILE  
+
+        RETURN total_walls  
+    END FUNCTION  
+END CLASS

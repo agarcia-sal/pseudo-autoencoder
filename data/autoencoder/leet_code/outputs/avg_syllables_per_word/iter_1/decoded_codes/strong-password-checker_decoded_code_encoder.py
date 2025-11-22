@@ -1,0 +1,33 @@
+def strong_password_checker(pwd: str) -> int:
+    n = len(pwd)
+    has_lower = any(c.islower() for c in pwd)
+    has_upper = any(c.isupper() for c in pwd)
+    has_digit = any(c.isdigit() for c in pwd)
+    miss = 3 - sum([has_lower, has_upper, has_digit])
+
+    rep = one = two = 0
+    i = 2
+    while i < n:
+        if pwd[i] == pwd[i-1] == pwd[i-2]:
+            length = 2
+            while i < n and pwd[i] == pwd[i-1]:
+                length += 1
+                i += 1
+            rep += length // 3
+            if length % 3 == 0:
+                one += 1
+            elif length % 3 == 1:
+                two += 1
+        else:
+            i += 1
+
+    if n < 6:
+        return max(miss, 6 - n)
+    elif n <= 20:
+        return max(miss, rep)
+    else:
+        delete = n - 20
+        rep -= min(delete, one)
+        rep -= min(max(delete - one, 0), two * 2) // 2
+        rep -= max(delete - one - 2 * two, 0) // 3
+        return delete + max(miss, rep)

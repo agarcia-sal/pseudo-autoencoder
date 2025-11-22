@@ -1,0 +1,77 @@
+CLASS ListNode  
+    FUNCTION __init__ WITH PARAMETERS self val defaulted TO zero next defaulted TO none  
+        SET self val TO val  
+        SET self next TO next  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION list_node WITH PARAMETER values  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET head TO A NEW INSTANCE OF ListNode WITH value as element at position zero of values  
+    SET p TO head  
+    FOR each val IN elements of values starting from position one to the end  
+        SET node TO A NEW INSTANCE OF ListNode WITH value val  
+        SET next property of p TO node  
+        SET p TO node  
+    END FOR  
+    RETURN head  
+END FUNCTION  
+
+FUNCTION is_same_list WITH PARAMETERS p1 p2  
+    IF p1 IS none AND p2 IS none  
+        RETURN true  
+    END IF  
+    IF p1 IS none OR p2 IS none  
+        RETURN false  
+    END IF  
+    RETURN the value property of p1 EQUALS the value property of p2 AND CALL is_same_list WITH PARAMETERS the next property of p1 AND the next property of p2  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION sortList WITH PARAMETERS self head  
+        IF head IS none OR the next property of head IS none  
+            RETURN head  
+        END IF  
+
+        FUNCTION split WITH PARAMETER head  
+            SET slow TO head  
+            SET fast TO the next property of head  
+            WHILE fast IS NOT none AND the next property of fast IS NOT none  
+                SET slow TO the next property of slow  
+                SET fast TO the next property of the next property of fast  
+            END WHILE  
+            SET mid TO the next property of slow  
+            SET next property of slow TO none  
+            RETURN head AND mid  
+        END FUNCTION  
+
+        FUNCTION merge WITH PARAMETERS l1 l2  
+            SET dummy TO A NEW INSTANCE OF ListNode  
+            SET current TO dummy  
+            WHILE l1 IS NOT none AND l2 IS NOT none  
+                IF the value property of l1 IS LESS THAN the value property of l2  
+                    SET next property of current TO l1  
+                    SET l1 TO the next property of l1  
+                ELSE  
+                    SET next property of current TO l2  
+                    SET l2 TO the next property of l2  
+                END IF  
+                SET current TO the next property of current  
+            END WHILE  
+            IF l1 IS NOT none  
+                SET next property of current TO l1  
+            ELSE  
+                SET next property of current TO l2  
+            END IF  
+            RETURN the next property of dummy  
+        END FUNCTION  
+
+        SET left AND right TO CALL split WITH PARAMETER head  
+        SET left TO CALL sortList ON self WITH PARAMETER left  
+        SET right TO CALL sortList ON self WITH PARAMETER right  
+
+        RETURN CALL merge WITH PARAMETERS left right  
+    END FUNCTION  
+END CLASS

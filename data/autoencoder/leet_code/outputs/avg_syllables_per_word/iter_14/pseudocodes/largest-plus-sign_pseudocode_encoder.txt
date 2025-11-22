@@ -1,0 +1,47 @@
+CLASS Solution  
+    FUNCTION orderOfLargestPlusSign WITH PARAMETERS n AND mines  
+        SET mines_set TO a NEW empty collection of unique coordinate pairs  
+        FOR each mine_element IN mines  
+            CONVERT mine_element TO a coordinate pair  
+            ADD the coordinate pair TO mines_set  
+        END FOR  
+
+        SET dp TO a NEW two-dimensional collection of size n BY n WHERE each element IS a list of four zeros representing counts in four directions  
+
+        SET directions TO a COLLECTION of coordinate offset pairs representing right zero one, down one zero, left zero negative one, and up negative one zero  
+
+        FOR i FROM zero TO n MINUS one  
+            FOR j FROM zero TO n MINUS one  
+                IF coordinate pair i j IS NOT IN mines_set THEN  
+                    IF j IS GREATER THAN zero THEN  
+                        SET dp element at row i column j position zero TO dp element at row i column j MINUS one position zero PLUS one  
+                    END IF  
+                    IF i IS GREATER THAN zero THEN  
+                        SET dp element at row i column j position one TO dp element at row i MINUS one column j position one PLUS one  
+                    END IF  
+                END IF  
+            END FOR  
+        END FOR  
+
+        SET result TO zero  
+
+        FOR i FROM n MINUS one DOWN TO zero  
+            FOR j FROM n MINUS one DOWN TO zero  
+                IF coordinate pair i j IS NOT IN mines_set THEN  
+                    IF j IS LESS THAN n MINUS one THEN  
+                        SET dp element at row i column j position two TO dp element at row i column j PLUS one position two PLUS one  
+                    END IF  
+                    IF i IS LESS THAN n MINUS one THEN  
+                        SET dp element at row i column j position three TO dp element at row i PLUS one column j position three PLUS one  
+                    END IF  
+                    SET plus_sign_order TO the MINIMUM value AMONG the four elements of dp element at row i column j  
+                    IF plus_sign_order IS GREATER THAN result THEN  
+                        SET result TO plus_sign_order  
+                    END IF  
+                END IF  
+            END FOR  
+        END FOR  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

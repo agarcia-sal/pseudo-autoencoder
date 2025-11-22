@@ -1,0 +1,77 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val zero left None right None  
+        SET self dot val TO val  
+        SET self dot left TO left  
+        SET self dot right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETERS values  
+    IF the LENGTH OF values IS EQUAL TO zero  
+        RETURN None  
+    END IF  
+    SET root TO A NEW instance OF TreeNode WITH the element at position zero OF values  
+    SET i TO one  
+    SET queue TO AN EMPTY deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO THE FIRST ELEMENT OF queue REMOVED  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i OF values IS NOT None  
+            SET node dot left TO A NEW instance OF TreeNode WITH the element at position i OF values  
+            APPEND node dot left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i OF values IS NOT None  
+            SET node dot right TO A NEW instance OF TreeNode WITH the element at position i OF values  
+            APPEND node dot right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p dot val IS NOT EQUAL TO q dot val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETERS p dot left q dot left AND is_same_tree WITH PARAMETERS p dot right q dot right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION verticalOrder WITH PARAMETERS self root  
+        IF root IS None  
+            RETURN AN EMPTY LIST  
+        END IF  
+        SET column_table TO A NEW default dictionary MAPPING TO LIST  
+        SET queue TO AN EMPTY deque  
+        APPEND THE PAIR OF root AND zero TO queue  
+        SET min_column TO zero  
+        SET max_column TO zero  
+        WHILE queue IS NOT EMPTY  
+            SET pair TO THE FIRST ELEMENT OF queue REMOVED  
+            SET node TO THE FIRST ELEMENT OF pair  
+            SET column_index TO THE SECOND ELEMENT OF pair  
+            IF node IS NOT None  
+                APPEND node dot val TO THE LIST MAPPED BY column_index IN column_table  
+                IF column_index IS LESS THAN min_column  
+                    SET min_column TO column_index  
+                END IF  
+                IF column_index IS GREATER THAN max_column  
+                    SET max_column TO column_index  
+                END IF  
+                APPEND THE PAIR OF node dot left AND column_index MINUS one TO queue  
+                APPEND THE PAIR OF node dot right AND column_index PLUS one TO queue  
+            END IF  
+        END WHILE  
+        SET result TO AN EMPTY LIST  
+        FOR index FROM min_column TO max_column  
+            APPEND THE LIST MAPPED BY index IN column_table TO result  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+END CLASS

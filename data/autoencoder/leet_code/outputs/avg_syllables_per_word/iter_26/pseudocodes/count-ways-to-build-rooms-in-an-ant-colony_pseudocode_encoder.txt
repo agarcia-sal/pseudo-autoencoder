@@ -1,0 +1,38 @@
+CLASS Solution
+    FUNCTION waysToBuildRooms(previousRoom LIST OF INTEGER) RETURNS INTEGER
+        IMPORT the default dictionary data structure FROM collections
+        
+        SET number_of_rooms TO the LENGTH OF previousRoom
+        ASSIGN graph TO a new default dictionary mapping to lists
+        
+        FOR each room_index FROM one TO number_of_rooms MINUS one INCLUSIVE
+            APPEND room_index TO the list at element AT position room_index OF previousRoom IN graph
+        END FOR
+        
+        FUNCTION dp(node INTEGER) RETURNS a TUPLE OF integers
+            IF the list AT element AT position node OF graph IS empty
+                RETURN one AND one as the number of ways AND the size of the subtree
+            END IF
+            
+            SET total_number_of_ways TO one
+            SET total_subtree_size TO one to count the node itself
+            
+            ASSIGN child_results TO an empty list
+            FOR each child_node IN the list AT element AT position node OF graph
+                CALL dp WITH child_node AND ASSIGN its returned number_of_ways AND subtree_size TO ways AND size
+                APPEND the tuple ways AND size TO child_results
+                INCREMENT total_subtree_size BY size
+            END FOR
+            
+            SET current_size TO one
+            FOR each ways AND size IN child_results
+                SET total_number_of_ways TO total_number_of_ways MULTIPLIED BY the mathematical combination of current_size PLUS size MINUS one CHOOSE size MULTIPLIED BY ways MODULO the fixed MOD value
+                INCREMENT current_size BY size
+            END FOR
+            
+            RETURN total_number_of_ways AND total_subtree_size
+        END FUNCTION
+        
+        RETURN the first element OF the result of dp called WITH zero
+    END FUNCTION
+END CLASS

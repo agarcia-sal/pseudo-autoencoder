@@ -1,0 +1,39 @@
+CLASS Solution  
+    FUNCTION kthSmallest WITH PARAMETERS mat OF TYPE list of list of integers AND k OF TYPE integer RETURNS integer  
+        SET m TO the LENGTH OF mat  
+        SET n TO the LENGTH OF element at position zero of mat  
+        SET initial_sum TO the SUM OF element at position zero of each row IN mat  
+        SET initial_indices TO a tuple consisting of zero repeated m times  
+        SET min_heap TO a list containing a tuple of initial_sum and initial_indices  
+        CREATE a set called visited  
+        ADD initial_indices TO visited  
+        
+        WHILE k GREATER THAN zero HOLDS  
+            EXTRACT current_sum AND indices BY REMOVING the SMALLEST ELEMENT FROM min_heap  
+            DECREMENT k BY one  
+            
+            IF k EQUALS zero THEN  
+                RETURN current_sum  
+            END IF  
+            
+            FOR each integer i FROM zero TO m MINUS one  
+                SET current_index TO element at position i of indices  
+                IF current_index PLUS one LESS THAN n THEN  
+                    SET new_indices_list TO a copy of indices CONVERTED TO a LIST  
+                    INCREMENT element at position i of new_indices_list BY one  
+                    SET new_indices_tuple TO new_indices_list CONVERTED TO a TUPLE  
+                    SET old_value TO element at position current_index of element at position i of mat  
+                    SET new_value TO element at position current_index PLUS one of element at position i of mat  
+                    SET new_sum TO current_sum MINUS old_value PLUS new_value  
+                    
+                    IF new_indices_tuple NOT IN visited THEN  
+                        ADD new_indices_tuple TO visited  
+                        INSERT tuple of new_sum and new_indices_tuple INTO min_heap MAINTAINING min_heap PROPERTY  
+                    END IF  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

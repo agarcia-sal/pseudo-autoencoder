@@ -1,0 +1,66 @@
+CLASS Solution
+    FUNCTION minAbbreviation(target, dictionary)
+        FUNCTION is_valid_abbr(string_s, abbreviation_abbr)
+            SET index_i TO zero
+            SET index_j TO zero
+            WHILE index_i LESS THAN the LENGTH OF string_s AND index_j LESS THAN the LENGTH OF abbreviation_abbr holds
+                IF the element at position index_j of abbreviation_abbr IS A DIGIT
+                    IF the element at position index_j of abbreviation_abbr EQUALS zero
+                        RETURN false
+                    END IF
+                    SET shift TO zero
+                    WHILE index_j LESS THAN the LENGTH OF abbreviation_abbr AND the element at position index_j of abbreviation_abbr IS A DIGIT holds
+                        SET shift TO shift MULTIPLIED BY ten PLUS the INTEGER VALUE OF the element at position index_j of abbreviation_abbr
+                        INCREMENT index_j BY one
+                    END WHILE
+                    INCREMENT index_i BY shift
+                ELSE
+                    IF the element at position index_i of string_s NOT EQUALS the element at position index_j of abbreviation_abbr
+                        RETURN false
+                    END IF
+                    INCREMENT index_i BY one
+                    INCREMENT index_j BY one
+                END IF
+            END WHILE
+            RETURN index_i EQUALS the LENGTH OF string_s AND index_j EQUALS the LENGTH OF abbreviation_abbr
+        END FUNCTION
+
+        FUNCTION generate_abbrs(word, word_length, abbreviation_string, current_index, skipped_count)
+            IF current_index EQUALS word_length
+                IF skipped_count GREATER THAN zero
+                    SET abbreviation_string TO abbreviation_string CONCATENATED WITH the STRING REPRESENTATION OF skipped_count
+                END IF
+                APPEND abbreviation_string TO abbrs
+                RETURN
+            END IF
+            CALL generate_abbrs WITH word WITH word_length WITH abbreviation_string WITH current_index PLUS one WITH skipped_count PLUS one
+            IF skipped_count GREATER THAN zero
+                SET abbreviation_string TO abbreviation_string CONCATENATED WITH the STRING REPRESENTATION OF skipped_count
+            END IF
+            CALL generate_abbrs WITH word WITH word_length WITH abbreviation_string CONCATENATED WITH the element at position current_index of word WITH current_index PLUS one WITH zero
+        END FUNCTION
+
+        FUNCTION find_unique_abbr()
+            FOR abbreviation_length FROM one TO the LENGTH OF target
+                CALL generate_abbrs WITH target WITH the LENGTH OF target WITH empty string WITH zero WITH zero
+                SET minimum_abbreviation TO None
+                SET minimum_length TO infinite
+                FOR each abbreviation IN abbrs
+                    IF FOR ALL each word IN filtered_dict the RESULT OF is_valid_abbr WITH word WITH abbreviation IS false
+                        IF the LENGTH OF abbreviation LESS THAN minimum_length
+                            SET minimum_length TO the LENGTH OF abbreviation
+                            SET minimum_abbreviation TO abbreviation
+                        END IF
+                    END IF
+                END FOR
+                IF minimum_abbreviation IS NOT None
+                    RETURN minimum_abbreviation
+                END IF
+            END FOR
+        END FUNCTION
+
+        SET filtered_dict TO auxiliary FUNCTION FilterWordsByLength WITH dictionary WITH the LENGTH OF target
+        SET abbrs TO an empty list
+        RETURN CALL find_unique_abbr
+    END FUNCTION
+END CLASS

@@ -1,0 +1,56 @@
+CLASS Solution
+    FUNCTION maximalPathQuality(values, edges, maxTime)
+        SET graph TO CALL initializeGraph FROM edges
+        
+        SET visited_nodes TO CALL initializeEmptySet
+        SET maximum_quality TO zero
+        
+        FUNCTION dfs(node, remaining_time, current_quality)
+            IF node EQUALS zero
+                SET maximum_quality TO the GREATER OF maximum_quality AND current_quality
+            END IF
+            
+            FOR each neighbor, travel_time IN element at position node OF graph
+                IF travel_time LESS THAN OR EQUAL TO remaining_time
+                    IF neighbor IS NOT IN visited_nodes
+                        CALL addElement TO visited_nodes WITH neighbor
+                        CALL dfs WITH neighbor, remaining_time MINUS travel_time, current_quality PLUS element at position neighbor OF values
+                        CALL removeElement FROM visited_nodes WITH neighbor
+                    ELSE
+                        CALL dfs WITH neighbor, remaining_time MINUS travel_time, current_quality
+                    END IF
+                END IF
+            END FOR
+        END FUNCTION
+        
+        CALL addElement TO visited_nodes WITH zero
+        CALL dfs WITH zero, maxTime, element at position zero OF values
+        
+        RETURN maximum_quality
+    END FUNCTION
+END CLASS
+
+FUNCTION initializeGraph FROM list_of_edges
+    SET graph_structure TO CALL initializeDefaultList
+    FOR each start_node, end_node, travel_time IN list_of_edges
+        CALL append TO element at position start_node OF graph_structure WITH tuple of end_node AND travel_time
+        CALL append TO element at position end_node OF graph_structure WITH tuple of start_node AND travel_time
+    END FOR
+    RETURN graph_structure
+END FUNCTION
+
+FUNCTION initializeDefaultList
+    RETURN an empty mapping from integers TO empty lists
+END FUNCTION
+
+FUNCTION initializeEmptySet
+    RETURN an empty set
+END FUNCTION
+
+FUNCTION addElement TO set_structure WITH element
+    ADD element TO set_structure
+END FUNCTION
+
+FUNCTION removeElement FROM set_structure WITH element
+    REMOVE element FROM set_structure
+END FUNCTION

@@ -1,0 +1,45 @@
+CLASS Solution
+    FUNCTION numPoints(darts, r)
+        FUNCTION distance(p1, p2)
+            SET diff_x TO p1[0] MINUS p2[0]
+            SET diff_y TO p1[1] MINUS p2[1]
+            RETURN square root of (diff_x squared PLUS diff_y squared)
+        END FUNCTION
+
+        FUNCTION circle_center(p1, p2, r)
+            SET d TO distance between p1 and p2
+            IF d GREATER THAN 2 TIMES r
+                RETURN None
+            SET a TO square root of (r squared MINUS (d DIVIDED BY 2) squared)
+            SET h_x TO (p1[0] PLUS p2[0]) DIVIDED BY 2
+            SET h_y TO (p1[1] PLUS p2[1]) DIVIDED BY 2
+            SET dx TO (p2[1] MINUS p1[1]) TIMES a DIVIDED BY d
+            SET dy TO (p2[0] MINUS p1[0]) TIMES a DIVIDED BY d
+            RETURN list containing (h_x MINUS dx, h_y PLUS dy) AND (h_x PLUS dx, h_y MINUS dy)
+        END FUNCTION
+
+        FUNCTION is_inside(circle, point, r)
+            RETURN distance between circle and point LESS THAN OR EQUAL TO r
+        END FUNCTION
+
+        SET n TO LENGTH OF darts
+        IF n EQUALS 1
+            RETURN 1
+
+        SET max_count TO 1
+
+        FOR i FROM 0 TO n MINUS 1
+            FOR j FROM i PLUS 1 TO n MINUS 1
+                SET centers TO circle_center(darts[i], darts[j], r)
+                IF centers IS NOT None
+                    FOR EACH center IN centers
+                        SET count TO 0
+                        FOR EACH dart IN darts
+                            IF is_inside(center, dart, r)
+                                INCREMENT count BY 1
+                        IF count GREATER THAN max_count
+                            SET max_count TO count
+
+        RETURN max_count
+    END FUNCTION
+END CLASS

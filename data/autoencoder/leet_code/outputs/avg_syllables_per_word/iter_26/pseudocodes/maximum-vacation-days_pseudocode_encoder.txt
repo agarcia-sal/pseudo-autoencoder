@@ -1,0 +1,34 @@
+CLASS Solution
+    FUNCTION maxVacationDays(flights AS list of lists of integers, days AS list of lists of integers)
+        SET number_of_cities TO the LENGTH OF flights
+        SET number_of_weeks TO the LENGTH OF the element at position zero OF days
+
+        INITIALIZE dp_list TO a list of negative one values with the LENGTH OF number_of_cities
+        SET the element at position zero OF dp_list TO zero
+
+        INITIALIZE graph_dictionary TO a dictionary mapping each integer from zero TO number_of_cities MINUS one inclusive TO an empty list
+        FOR city_index FROM zero TO number_of_cities MINUS one INCLUSIVE
+            FOR destination_index FROM zero TO number_of_cities MINUS one INCLUSIVE
+                IF the element at position destination_index OF the element at position city_index OF flights EQUALS one THEN
+                    APPEND destination_index TO the list at key city_index OF graph_dictionary
+                END IF
+            END FOR
+        END FOR
+
+        FOR week_index FROM zero TO number_of_weeks MINUS one INCLUSIVE
+            INITIALIZE new_dp_list TO a list of negative one values with the LENGTH OF number_of_cities
+            FOR city_index FROM zero TO number_of_cities MINUS one INCLUSIVE
+                IF the element at position city_index OF dp_list EQUALS negative one THEN
+                    CONTINUE TO the next iteration
+                END IF
+                SET the element at position city_index OF new_dp_list TO the GREATER VALUE BETWEEN the element at position city_index OF new_dp_list AND the SUM OF the element at position city_index OF dp_list AND the element at position week_index OF the element at position city_index OF days
+                FOR reachable_city IN the list at key city_index OF graph_dictionary
+                    SET the element at position reachable_city OF new_dp_list TO the GREATER VALUE BETWEEN the element at position reachable_city OF new_dp_list AND the SUM OF the element at position city_index OF dp_list AND the element at position week_index OF the element at position reachable_city OF days
+                END FOR
+            END FOR
+            ASSIGN dp_list TO new_dp_list
+        END FOR
+
+        RETURN the MAXIMUM VALUE IN dp_list
+    END FUNCTION
+END CLASS

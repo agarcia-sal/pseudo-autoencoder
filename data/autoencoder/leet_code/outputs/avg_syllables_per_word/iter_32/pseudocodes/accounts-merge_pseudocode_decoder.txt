@@ -1,0 +1,60 @@
+CLASS UnionFind  
+    FUNCTION __init__ with parameter size  
+        SET self root TO list containing each number from zero TO size MINUS one  
+        SET self rank TO list containing one repeated size times  
+    END FUNCTION  
+
+    FUNCTION find with parameter x  
+        IF element at position x of self root EQUALS x  
+            RETURN x  
+        END IF  
+        SET element at position x of self root TO the result of calling find with argument element at position x of self root  
+        RETURN element at position x of self root  
+    END FUNCTION  
+
+    FUNCTION union with parameters x y  
+        SET rootX TO the result of calling find with argument x  
+        SET rootY TO the result of calling find with argument y  
+        IF rootX NOT EQUALS rootY  
+            IF element at position rootX of self rank GREATER THAN element at position rootY of self rank  
+                SET element at position rootY of self root TO rootX  
+            ELSE IF element at position rootX of self rank LESS THAN element at position rootY of self rank  
+                SET element at position rootX of self root TO rootY  
+            ELSE  
+                SET element at position rootY of self root TO rootX  
+                INCREMENT element at position rootX of self rank BY one  
+            END IF  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION accountsMerge with parameter accounts  
+        SET email_to_id TO an empty dictionary  
+        SET uf TO a new instance of UnionFind with argument the length of accounts  
+
+        FOR each index i and elements ignoring first element and emails in enumeration of accounts  
+            FOR each email IN emails  
+                IF email NOT IN email_to_id  
+                    SET the value at key email in email_to_id TO i  
+                ELSE  
+                    CALL union method of uf with arguments i and the value at key email in email_to_id  
+                END IF  
+            END FOR  
+        END FOR  
+
+        SET merged_emails TO a new dictionary defaulting to lists  
+        FOR each email and account_id IN items of email_to_id  
+            SET root_id TO the result of calling find method of uf with argument account_id  
+            APPEND email TO the list at key root_id in merged_emails  
+        END FOR  
+
+        SET result TO an empty list  
+        FOR each account_id and emails IN items of merged_emails  
+            SET name TO element at position zero of element at position account_id of accounts  
+            APPEND a new list consisting of name followed by emails sorted in ascending order TO result  
+        END FOR  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

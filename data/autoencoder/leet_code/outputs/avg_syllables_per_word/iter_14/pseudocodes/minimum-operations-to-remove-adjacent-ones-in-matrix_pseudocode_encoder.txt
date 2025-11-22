@@ -1,0 +1,79 @@
+CLASS Solution  
+    FUNCTION minimumOperations(grid)  
+        FUNCTION bfs()  
+            SET queue TO a new empty double-ended queue  
+            FOR u FROM zero TO n MINUS one  
+                IF match element at position u IS EQUAL TO minus one  
+                    SET dist element at position u TO zero  
+                    APPEND u TO queue  
+                ELSE  
+                    SET dist element at position u TO infinity  
+                END IF  
+            END FOR  
+            SET dist element at position minus one TO infinity  
+            WHILE the LENGTH OF queue IS GREATER THAN zero  
+                REMOVE element from the front of queue and ASSIGN it TO u  
+                IF dist element at position u IS LESS THAN dist element at position minus one  
+                    FOR each v IN the set element at position u OF graph  
+                        IF dist element at position match element at position v IS EQUAL TO infinity  
+                            SET dist element at position match element at position v TO dist element at position u PLUS one  
+                            APPEND match element at position v TO queue  
+                        END IF  
+                    END FOR  
+                END IF  
+            END WHILE  
+            RETURN TRUE if dist element at position minus one IS LESS THAN infinity OTHERWISE RETURN FALSE  
+        END FUNCTION  
+        
+        FUNCTION dfs(u)  
+            IF u IS NOT EQUAL TO minus one  
+                FOR each v IN the set element at position u OF graph  
+                    IF dist element at position match element at position v IS EQUAL TO dist element at position u PLUS one  
+                        IF dfs with argument match element at position v RETURNS TRUE  
+                            SET match element at position v TO u  
+                            SET match element at position u TO v  
+                            RETURN TRUE  
+                        END IF  
+                    END IF  
+                END FOR  
+                SET dist element at position u TO infinity  
+                RETURN FALSE  
+            END IF  
+            RETURN TRUE  
+        END FUNCTION  
+        
+        SET rows TO the LENGTH OF grid  
+        SET cols TO the LENGTH OF element at position zero OF grid  
+        SET n TO rows MULTIPLIED BY cols  
+        SET graph TO a list of sets of size n PLUS one where each element is an empty set  
+        SET match TO a list of size n PLUS one where each element IS EQUAL TO minus one  
+        SET dist TO a list of size n PLUS one where each element IS EQUAL TO zero  
+        
+        FOR r FROM zero TO rows MINUS one  
+            FOR c FROM zero TO cols MINUS one  
+                IF element at position r OF grid element at position c IS EQUAL TO one  
+                    SET u TO r MULTIPLIED BY cols PLUS c  
+                    FOR each pair dr and dc in the set consisting of minus one and zero then one and zero then zero and minus one then zero and one  
+                        SET nr TO r PLUS dr  
+                        SET nc TO c PLUS dc  
+                        IF nr IS GREATER THAN OR EQUAL TO zero AND nr IS LESS THAN rows AND nc IS GREATER THAN OR EQUAL TO zero AND nc IS LESS THAN cols AND element at position nr OF grid element at position nc IS EQUAL TO one  
+                            SET v TO nr MULTIPLIED BY cols PLUS nc  
+                            ADD v TO the set element at position u OF graph  
+                        END IF  
+                    END FOR  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET matching TO zero  
+        WHILE bfs() RETURNS TRUE  
+            FOR u FROM zero TO n MINUS one  
+                IF match element at position u IS EQUAL TO minus one AND dfs(u) RETURNS TRUE  
+                    INCREMENT matching BY one  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN matching  
+    END FUNCTION  
+END CLASS

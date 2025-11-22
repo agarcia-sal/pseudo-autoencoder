@@ -1,0 +1,57 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS None, right EQUALS None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(list_of_values)
+    IF the list_of_values IS EMPTY
+        RETURN None
+    END IF
+    SET root TO A NEW TreeNode WITH element at position zero OF list_of_values AS val
+    SET i TO one
+    SET queue TO AN EMPTY double ended queue
+    APPEND root TO queue
+    WHILE queue HOLDS ELEMENTS
+        SET node TO THE FIRST ELEMENT REMOVED FROM queue
+        IF i IS LESS THAN THE LENGTH OF list_of_values AND element at position i OF list_of_values IS NOT None
+            SET node.left TO A NEW TreeNode WITH element at position i OF list_of_values AS val
+            APPEND node.left TO queue
+        END IF
+        INCREMENT i BY one
+        IF i IS LESS THAN THE LENGTH OF list_of_values AND element at position i OF list_of_values IS NOT None
+            SET node.right TO A NEW TreeNode WITH element at position i OF list_of_values AS val
+            APPEND node.right TO queue
+        END IF
+        INCREMENT i BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val NOT EQUALS q.val
+        RETURN False
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION upsideDownBinaryTree(self, root)
+        IF root IS None OR root.left IS None
+            RETURN root
+        END IF
+        SET new_root TO self.upsideDownBinaryTree(root.left)
+        SET root.left.left TO root.right
+        SET root.left.right TO root
+        SET root.left TO None
+        SET root.right TO None
+        RETURN new_root
+    END FUNCTION
+END CLASS

@@ -1,0 +1,63 @@
+CLASS Solution  
+    FUNCTION isValid(code)  
+        IMPORT regular expression module  
+        
+        SET pattern for CDATA sections TO the text matching the start of CDATA marker FOLLOWED BY any characters non-greedily FOLLOWED BY the end of CDATA marker  
+        
+        SET code TO the result of replacing all substrings matching the CDATA pattern IN code WITH empty text  
+        
+        SET stack TO empty list  
+        
+        SET index i TO zero  
+        
+        WHILE index i LESS THAN the length of code  
+            IF the element at position i of code EQUALS the less than character  
+                
+                SET index j TO the result of finding the position of the greater than character in code STARTING FROM position i PLUS one  
+                
+                IF index j EQUALS negative one  
+                    RETURN false  
+                END IF  
+                
+                SET tag_content TO the substring of code FROM the position one more than index i TO position j EXCLUSIVE  
+                
+                IF tag_content IS empty  
+                    RETURN false  
+                END IF  
+                
+                IF the element at position zero of tag_content EQUALS the forward slash character  
+                    
+                    SET tag_name TO the substring of tag_content FROM position one TO the end  
+                    
+                    IF stack IS empty OR the element at the last position of stack DOES NOT EQUAL tag_name  
+                        RETURN false  
+                    END IF  
+                    
+                    REMOVE the last element FROM stack  
+                
+                ELSE IF the element at position zero of tag_content EQUALS the exclamation mark character  
+                    RETURN false  
+                
+                ELSE  
+                    IF the length of tag_content IS LESS THAN one OR GREATER THAN nine OR tag_content IS NOT composed entirely of uppercase letters  
+                        RETURN false  
+                    END IF  
+                    
+                    APPEND tag_content TO stack  
+                
+                END IF  
+                
+                SET index i TO index j PLUS one  
+            
+            ELSE  
+                INCREMENT index i BY one  
+            
+            END IF  
+        
+        END WHILE  
+        
+        SET valid_tag_pattern TO the text matching an opening tag with uppercase letters FOLLOWED BY any characters FOLLOWED BY a corresponding closing tag with uppercase letters  
+        
+        RETURN the logical condition that stack IS empty AND the count of substrings matching valid_tag_pattern IN code IS GREATER THAN zero  
+    END FUNCTION  
+END CLASS

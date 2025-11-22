@@ -1,0 +1,74 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val EQUALS zero left EQUALS none right EQUALS none  
+        SET self dot val TO val  
+        SET self dot left TO left  
+        SET self dot right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO NEW TreeNode WITH PARAMETER element at position zero of values  
+    SET index TO one  
+    SET queue TO NEW deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO element popped from the left side of queue  
+        IF index IS LESS THAN the LENGTH OF values AND element at position index of values IS NOT none  
+            SET node dot left TO NEW TreeNode WITH PARAMETER element at position index of values  
+            APPEND node dot left TO queue  
+        END IF  
+        INCREMENT index BY one  
+        IF index IS LESS THAN the LENGTH OF values AND element at position index of values IS NOT none  
+            SET node dot right TO NEW TreeNode WITH PARAMETER element at position index of values  
+            APPEND node dot right TO queue  
+        END IF  
+        INCREMENT index BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF p dot val IS NOT EQUAL TO q dot val  
+        RETURN false  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETERS p dot left q dot left AND is_same_tree WITH PARAMETERS p dot right q dot right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION verticalTraversal WITH PARAMETERS self root  
+        IF root IS none  
+            RETURN an empty list  
+        END IF  
+        SET node_dict TO an empty mapping from keys TO empty list  
+        SET min_col TO zero  
+        SET max_col TO zero  
+
+        FUNCTION dfs WITH PARAMETERS node row col  
+            IF node IS none  
+                RETURN  
+            END IF  
+            APPEND the tuple of row AND node dot val TO the list in node_dict at key col  
+            SET min_col TO the lesser VALUE BETWEEN min_col AND col  
+            SET max_col TO the greater VALUE BETWEEN max_col AND col  
+            CALL dfs WITH PARAMETERS node dot left row PLUS one col MINUS one  
+            CALL dfs WITH PARAMETERS node dot right row PLUS one col PLUS one  
+        END FUNCTION  
+
+        CALL dfs WITH PARAMETERS root zero zero  
+
+        SET result TO an empty list  
+        FOR each column FROM min_col TO max_col inclusive  
+            SET sorted_list TO the list in node_dict at key column sorted first by the first element of the tuple then by the second element of the tuple  
+            APPEND the list of the second elements from sorted_list TO result  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+END CLASS

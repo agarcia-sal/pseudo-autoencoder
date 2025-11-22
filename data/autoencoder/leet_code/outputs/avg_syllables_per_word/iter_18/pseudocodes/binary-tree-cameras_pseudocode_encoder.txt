@@ -1,0 +1,61 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val defaulted to zero left defaulted to none right defaulted to none  
+        SET the property val OF self TO val  
+        SET the property left OF self TO left  
+        SET the property right OF self TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETERS values list  
+    IF the condition values is empty holds  
+        RETURN none  
+    END IF  
+    SET root TO a new instance of TreeNode initialized WITH the element at position zero of values  
+    SET i TO one  
+    SET queue TO a new empty double ended queue  
+    APPEND root TO queue  
+    WHILE the condition the queue is not empty holds  
+        SET node TO the element removed from the front of queue  
+        IF the condition i is less than the length of values AND the element at position i of values is not none holds  
+            SET the property left OF node TO a new instance of TreeNode initialized WITH the element at position i of values  
+            APPEND the property left OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF the condition i is less than the length of values AND the element at position i of values is not none holds  
+            SET the property right OF node TO a new instance of TreeNode initialized WITH the element at position i of values  
+            APPEND the property right OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF the condition p is none AND q is none holds  
+        RETURN true  
+    ELSE IF the condition p is none OR q is none holds  
+        RETURN false  
+    ELSE IF the condition the property val of p is NOT EQUALS to the property val of q holds  
+        RETURN false  
+    ELSE  
+        RETURN is_same_tree WITH ARGUMENTS the property left of p and the property left of q AND is_same_tree WITH ARGUMENTS the property right of p and the property right of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION minCameraCover WITH PARAMETERS root optional of type TreeNode  
+        FUNCTION dfs WITH PARAMETERS node  
+            IF the condition node is none holds  
+                RETURN zero comma zero comma positive infinity  
+            END IF  
+            SET left_no_camera COMMA left_monitored COMMA left_camera TO dfs WITH ARGUMENT the property left of node  
+            SET right_no_camera COMMA right_monitored COMMA right_camera TO dfs WITH ARGUMENT the property right of node  
+            SET no_camera TO left_monitored PLUS right_monitored  
+            SET monitored TO the minimum of left_camera PLUS the minimum of right_monitored and right_camera AND right_camera PLUS the minimum of left_monitored and left_camera AND left_camera PLUS right_camera  
+            SET camera TO one PLUS the minimum of left_no_camera comma left_monitored comma left_camera PLUS the minimum of right_no_camera comma right_monitored comma right_camera  
+            RETURN no_camera comma monitored comma camera  
+        END FUNCTION  
+        SET root_no_camera COMMA root_monitored COMMA root_camera TO dfs WITH ARGUMENT root  
+        RETURN the minimum of root_monitored and root_camera  
+    END FUNCTION  
+END CLASS

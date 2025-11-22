@@ -1,0 +1,59 @@
+CLASS Solution  
+    FUNCTION maxScoreWords(words letters score)  
+        FUNCTION word_score(word score_map)  
+            SET total_score TO zero  
+            FOR each character IN word  
+                INCREMENT total_score BY the value in score_map associated with character  
+            END FOR  
+            RETURN total_score  
+        END FUNCTION  
+        
+        FUNCTION can_form(word letter_count)  
+            SET word_count TO a count of each character in word  
+            FOR each character count_pair IN word_count  
+                IF the count of character in letter_count LESS THAN the count in word_count for that character THEN  
+                    RETURN False  
+                END IF  
+            END FOR  
+            RETURN True  
+        END FUNCTION  
+        
+        FUNCTION update_letter_count(letter_count word add)  
+            FOR each character IN word  
+                IF add EQUALS True THEN  
+                    INCREMENT the count of character in letter_count BY one  
+                ELSE  
+                    DECREMENT the count of character in letter_count BY one  
+                END IF  
+            END FOR  
+        END FUNCTION  
+        
+        FUNCTION backtrack(index current_score letter_count)  
+            IF index EQUALS the length of words THEN  
+                RETURN current_score  
+            END IF  
+            
+            SET max_score TO current_score  
+            FOR i FROM index TO the length of words MINUS one  
+                IF can_form(element at position i of words letter_count) EQUALS True THEN  
+                    CALL update_letter_count(letter_count element at position i of words add EQUALS False)  
+                    SET possible_score TO backtrack(i PLUS one current_score PLUS word_score(element at position i of words score_map) letter_count)  
+                    IF possible_score GREATER THAN max_score THEN  
+                        SET max_score TO possible_score  
+                    END IF  
+                    CALL update_letter_count(letter_count element at position i of words add EQUALS True)  
+                END IF  
+            END FOR  
+            
+            RETURN max_score  
+        END FUNCTION  
+        
+        SET score_map TO an empty mapping  
+        FOR i FROM zero TO twenty five  
+            ASSIGN the mapping at the character corresponding to the letter 'a' PLUS i TO element at position i of score  
+        END FOR  
+        SET letter_count TO a count of each character in letters  
+        
+        RETURN backtrack(zero zero letter_count)  
+    END FUNCTION  
+END CLASS

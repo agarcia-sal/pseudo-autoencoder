@@ -1,0 +1,67 @@
+CLASS Solution  
+    FUNCTION smallestMissingValueSubtree(parents WITH TYPE List OF integer, nums WITH TYPE List OF integer) RETURNS List OF integer  
+        SET n TO the LENGTH OF parents  
+        ASSIGN reference TO a new default dictionary named tree that creates an empty list for new keys  
+        
+        FOR each index i FROM one TO n MINUS one  
+            APPEND element i TO the list at key element at position i of parents in tree  
+        END FOR  
+        
+        SET node_with_one TO negative one  
+        FOR each index i FROM zero TO n MINUS one  
+            IF element at position i of nums EQUALS one  
+                SET node_with_one TO i  
+                BREAK THE LOOP  
+            END IF  
+        END FOR  
+        
+        IF node_with_one EQUALS negative one  
+            SET answer_list TO an empty list  
+            FOR count FROM zero TO n MINUS one  
+                APPEND one TO answer_list  
+            END FOR  
+            RETURN answer_list  
+        END IF  
+        
+        SET result TO an empty list  
+        FOR count FROM zero TO n MINUS one  
+            APPEND one TO result  
+        END FOR  
+        
+        FUNCTION dfs(node)  
+            ADD node TO the visited set  
+            ASSIGN genetic_values TO a new set containing element at position node of nums  
+            FOR each child IN the list at key node of tree  
+                IF child NOT IN visited  
+                    CALL dfs WITH child AND ASSIGN returned set TO child_values  
+                    UPDATE genetic_values BY THE UNION WITH child_values  
+                END IF  
+            END FOR  
+            SET smallest_missing TO one  
+            WHILE smallest_missing IS AN ELEMENT OF genetic_values  
+                INCREMENT smallest_missing BY one  
+            END WHILE  
+            SET element at position node of result TO smallest_missing  
+            RETURN genetic_values  
+        END FUNCTION  
+        
+        ASSIGN visited TO an empty set  
+        
+        ASSIGN path TO an empty list  
+        SET current TO node_with_one  
+        WHILE current IS NOT EQUAL TO negative one  
+            APPEND current TO path  
+            SET current TO element at position current of parents  
+        END WHILE  
+        
+        ASSIGN path_set TO a set containing elements of path  
+        FOR each node IN path IN REVERSE ORDER  
+            IF node IS AN ELEMENT OF visited  
+                CONTINUE TO NEXT iteration  
+            END IF  
+            CALL dfs WITH node  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,38 @@
+CLASS Solution
+    FUNCTION smallestSufficientTeam(required_skills, list_of_people)
+        SET skill_index_map TO CALL create_skill_index_map WITH required_skills
+        SET total_skills TO the LENGTH OF required_skills
+        SET total_people TO the LENGTH OF list_of_people
+        SET people_skill_bitmask_list TO a list of zeroes OF LENGTH total_people
+        FOR index FROM zero TO total_people MINUS one
+            FOR each skill IN element at position index of list_of_people
+                SET people_skill_bitmask_list at position index TO people_skill_bitmask_list at position index OR one SHIFTED LEFT BY skill_index_map AT skill
+            END FOR
+        END FOR
+        SET max_state TO one SHIFTED LEFT BY total_skills
+        SET minimum_team_size_list TO a list with value infinity OF LENGTH max_state
+        SET last_person_added_list TO a list of zeroes OF LENGTH max_state
+        SET previous_state_list TO a list of zeroes OF LENGTH max_state
+        SET minimum_team_size_list at position zero TO zero
+        FOR current_state FROM one TO max_state MINUS one
+            IF minimum_team_size_list at position current_state EQUALS infinity
+                CONTINUE to next iteration
+            END IF
+            FOR person_index FROM zero TO total_people MINUS one
+                SET new_state TO current_state OR people_skill_bitmask_list at position person_index
+                IF minimum_team_size_list at position current_state PLUS one LESS THAN minimum_team_size_list at position new_state
+                    SET minimum_team_size_list at position new_state TO minimum_team_size_list at position current_state PLUS one
+                    SET last_person_added_list at position new_state TO person_index
+                    SET previous_state_list at position new_state TO current_state
+                END IF
+            END FOR
+        END FOR
+        SET final_state TO max_state MINUS one
+        SET answer_list TO an empty list
+        WHILE final_state IS NOT zero
+            CALL APPEND element at position final_state of last_person_added_list TO answer_list
+            SET final_state TO element at position final_state of previous_state_list
+        END WHILE
+        RETURN answer_list
+    END FUNCTION
+END CLASS

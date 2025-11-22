@@ -1,0 +1,61 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS 0, left EQUALS None, right EQUALS None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET root TO TreeNode(values AT INDEX 0)  
+    SET i TO 1  
+    SET queue TO EMPTY QUEUE  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO REMOVE FIRST ELEMENT FROM queue  
+        IF i IS LESS THAN LENGTH OF values AND values AT INDEX i IS NOT None  
+            SET node.left TO TreeNode(values AT INDEX i)  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i IS LESS THAN LENGTH OF values AND values AT INDEX i IS NOT None  
+            SET node.right TO TreeNode(values AT INDEX i)  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION closestKValues(self, root, target, k)  
+        FUNCTION inorder_traversal(node)  
+            IF node IS None  
+                RETURN  
+            CALL inorder_traversal(node.left)  
+            IF LENGTH OF result IS LESS THAN k  
+                APPEND node.val TO result  
+            ELSE  
+                IF ABSOLUTE VALUE OF node.val MINUS target IS LESS THAN ABSOLUTE VALUE OF FIRST ELEMENT IN result MINUS target  
+                    REMOVE FIRST ELEMENT FROM result  
+                    APPEND node.val TO result  
+                ELSE  
+                    RETURN  
+            CALL inorder_traversal(node.right)  
+        END FUNCTION  
+
+        SET result TO EMPTY QUEUE  
+        CALL inorder_traversal(root)  
+        RETURN LIST CONSTRUCTED FROM result  
+    END FUNCTION  
+END CLASS

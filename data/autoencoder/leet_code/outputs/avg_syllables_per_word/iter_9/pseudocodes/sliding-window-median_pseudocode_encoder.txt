@@ -1,0 +1,59 @@
+CLASS Solution  
+    FUNCTION medianSlidingWindow(self, nums, k)  
+        SET lo TO empty list  
+        SET hi TO empty list  
+
+        FUNCTION balance_heaps()  
+            IF length of lo GREATER THAN length of hi PLUS one THEN  
+                INSERT into hi the negation of REMOVED from lo the smallest element  
+            ELSE IF length of hi GREATER THAN length of lo THEN  
+                INSERT into lo the negation of REMOVED from hi the smallest element  
+            END IF  
+        END FUNCTION  
+
+        FUNCTION add_num(num)  
+            IF lo is empty OR num LESS THAN OR EQUAL TO negation of first element in lo THEN  
+                INSERT into lo the negation of num  
+            ELSE  
+                INSERT into hi the num  
+            END IF  
+            CALL balance_heaps()  
+        END FUNCTION  
+
+        FUNCTION remove_num(num)  
+            IF num LESS THAN OR EQUAL TO negation of first element in lo THEN  
+                REMOVE from lo the negation of num  
+                IF lo is not empty THEN  
+                    REORGANIZE lo into a valid heap  
+                END IF  
+            ELSE  
+                REMOVE from hi the num  
+                IF hi is not empty THEN  
+                    REORGANIZE hi into a valid heap  
+                END IF  
+            END IF  
+            CALL balance_heaps()  
+        END FUNCTION  
+
+        FUNCTION get_median()  
+            IF length of lo GREATER THAN length of hi THEN  
+                RETURN negation of first element in lo  
+            END IF  
+            RETURN average of negation of first element in lo AND first element in hi  
+        END FUNCTION  
+
+        FOR i FROM zero TO k MINUS one DO  
+            CALL add_num WITH nums at index i  
+        END FOR  
+
+        SET medians TO list containing result of get_median()  
+
+        FOR i FROM k TO length of nums MINUS one DO  
+            CALL add_num WITH nums at index i  
+            CALL remove_num WITH nums at index i MINUS k  
+            APPEND result of get_median() TO medians  
+        END FOR  
+
+        RETURN medians  
+    END FUNCTION  
+END CLASS

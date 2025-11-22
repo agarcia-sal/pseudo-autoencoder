@@ -1,0 +1,65 @@
+CLASS Solution
+    FUNCTION minimumTime(s)
+        SET n TO the LENGTH OF s
+        SET left_costs TO a LIST OF zero WITH the LENGTH OF n
+        SET right_costs TO a LIST OF zero WITH the LENGTH OF n
+
+        # Calculate left costs
+        IF the ELEMENT AT POSITION zero OF s EQUALS the character one
+            SET the ELEMENT AT POSITION zero OF left_costs TO one
+        ELSE
+            SET the ELEMENT AT POSITION zero OF left_costs TO zero
+        END IF
+
+        FOR i FROM one TO n MINUS one INCLUSIVE
+            IF the ELEMENT AT POSITION i OF s EQUALS the character zero
+                SET the ELEMENT AT POSITION i OF left_costs TO the ELEMENT AT POSITION i MINUS one OF left_costs
+            ELSE
+                SET left_costs_i_candidate_one TO i PLUS one
+                SET left_costs_i_candidate_two TO the ELEMENT AT POSITION i MINUS one OF left_costs PLUS two
+                IF left_costs_i_candidate_one LESS THAN left_costs_i_candidate_two
+                    SET the ELEMENT AT POSITION i OF left_costs TO left_costs_i_candidate_one
+                ELSE
+                    SET the ELEMENT AT POSITION i OF left_costs TO left_costs_i_candidate_two
+                END IF
+            END IF
+        END FOR
+
+        # Calculate right costs
+        IF the ELEMENT AT POSITION n MINUS one OF s EQUALS the character one
+            SET the ELEMENT AT POSITION n MINUS one OF right_costs TO one
+        ELSE
+            SET the ELEMENT AT POSITION n MINUS one OF right_costs TO zero
+        END IF
+
+        FOR i FROM n MINUS two DOWN TO zero INCLUSIVE DECREMENTING BY one
+            IF the ELEMENT AT POSITION i OF s EQUALS the character zero
+                SET the ELEMENT AT POSITION i OF right_costs TO the ELEMENT AT POSITION i PLUS one OF right_costs
+            ELSE
+                SET right_costs_i_candidate_one TO n MINUS i
+                SET right_costs_i_candidate_two TO the ELEMENT AT POSITION i PLUS one OF right_costs PLUS two
+                IF right_costs_i_candidate_one LESS THAN right_costs_i_candidate_two
+                    SET the ELEMENT AT POSITION i OF right_costs TO right_costs_i_candidate_one
+                ELSE
+                    SET the ELEMENT AT POSITION i OF right_costs TO right_costs_i_candidate_two
+                END IF
+            END IF
+        END FOR
+
+        # Calculate minimum time by combining left and right costs
+        IF the ELEMENT AT POSITION n MINUS one OF left_costs LESS THAN the ELEMENT AT POSITION zero OF right_costs
+            SET min_time TO the ELEMENT AT POSITION n MINUS one OF left_costs
+        ELSE
+            SET min_time TO the ELEMENT AT POSITION zero OF right_costs
+        END IF
+
+        FOR i FROM zero TO n MINUS two INCLUSIVE
+            SET candidate_time TO the ELEMENT AT POSITION i OF left_costs PLUS the ELEMENT AT POSITION i PLUS one OF right_costs
+            IF candidate_time LESS THAN min_time
+                SET min_time TO candidate_time
+            END IF
+        END FOR
+
+        RETURN min_time
+    END FUNCTION
+END CLASS

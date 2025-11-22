@@ -1,0 +1,71 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val SET TO zero left SET TO none right SET TO none  
+        SET self dot val TO val  
+        SET self dot left TO left  
+        SET self dot right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values IS empty OR values IS null  
+        RETURN none  
+    END IF  
+    SET root TO A NEW TreeNode WITH PARAMETER element at position zero OF values  
+    SET i TO one  
+    SET queue TO A NEW empty double-ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO THE element REMOVED FROM THE FRONT OF queue  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i OF values IS NOT none  
+            SET node dot left TO A NEW TreeNode WITH PARAMETER element at position i OF values  
+            APPEND node dot left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i OF values IS NOT none  
+            SET node dot right TO A NEW TreeNode WITH PARAMETER element at position i OF values  
+            APPEND node dot right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF p dot val IS NOT EQUAL TO q dot val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETERS p dot left q dot left AND is_same_tree WITH PARAMETERS p dot right q dot right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION maxSumBST WITH PARAMETERS self root  
+        SET self dot max_sum TO zero  
+        
+        FUNCTION helper WITH PARAMETER node  
+            IF node IS none  
+                RETURN True AND zero AND positive infinity AND negative infinity  
+            END IF  
+            
+            SET left_is_bst AND left_sum AND left_min AND left_max TO helper WITH PARAMETER node dot left  
+            SET right_is_bst AND right_sum AND right_min AND right_max TO helper WITH PARAMETER node dot right  
+            
+            IF left_is_bst IS True AND right_is_bst IS True AND left_max IS LESS THAN node dot val AND node dot val IS LESS THAN right_min  
+                SET current_sum TO left_sum PLUS right_sum PLUS node dot val  
+                SET current_min TO THE MINIMUM BETWEEN node dot val AND left_min  
+                SET current_max TO THE MAXIMUM BETWEEN node dot val AND right_max  
+                SET self dot max_sum TO THE MAXIMUM BETWEEN self dot max_sum AND current_sum  
+                RETURN True AND current_sum AND current_min AND current_max  
+            END IF  
+            
+            RETURN False AND zero AND positive infinity AND negative infinity  
+        END FUNCTION  
+        
+        CALL helper WITH PARAMETER root  
+        RETURN self dot max_sum  
+    END FUNCTION  
+END CLASS

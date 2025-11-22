@@ -1,0 +1,41 @@
+CLASS UnionFind
+    FUNCTION __init__(size)
+        SET parent TO list of integers from 0 to size minus 1
+        SET rank TO list of 1 repeated size times
+    END FUNCTION
+
+    FUNCTION find(p)
+        IF parent at index p is not equal to p THEN
+            SET parent at index p TO find(parent at index p)  # Path compression
+        END IF
+        RETURN parent at index p
+    END FUNCTION
+
+    FUNCTION union(p, q)
+        SET rootP TO find(p)
+        SET rootQ TO find(q)
+        IF rootP equals rootQ THEN
+            RETURN False
+        END IF
+        IF rank at rootP greater than rank at rootQ THEN
+            SET parent at rootQ TO rootP
+        ELSE IF rank at rootP less than rank at rootQ THEN
+            SET parent at rootP TO rootQ
+        ELSE
+            SET parent at rootQ TO rootP
+            INCREMENT rank at rootP BY 1
+        END IF
+        RETURN True
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION findRedundantConnection(edges)
+        SET uf TO new UnionFind with size equal to length of edges plus 1
+        FOR each pair u, v IN edges DO
+            IF union of u and v in uf returns False THEN
+                RETURN list containing u and v
+            END IF
+        END FOR
+    END FUNCTION
+END CLASS

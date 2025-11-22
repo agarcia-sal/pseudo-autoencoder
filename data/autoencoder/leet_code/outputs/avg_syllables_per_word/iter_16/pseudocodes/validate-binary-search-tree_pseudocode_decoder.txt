@@ -1,0 +1,60 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val EQUALS zero left EQUALS none right EQUALS none  
+        SET val ATTRIBUTE OF self TO val  
+        SET left ATTRIBUTE OF self TO left  
+        SET right ATTRIBUTE OF self TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO NEW TreeNode WITH PARAMETER element at position zero of values  
+    SET i TO one  
+    SET queue TO NEW deque COLLECTION  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO REMOVE first element FROM queue  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT none  
+            SET left ATTRIBUTE OF node TO NEW TreeNode WITH PARAMETER element at position i of values  
+            APPEND left ATTRIBUTE OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT none  
+            SET right ATTRIBUTE OF node TO NEW TreeNode WITH PARAMETER element at position i of values  
+            APPEND right ATTRIBUTE OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF val ATTRIBUTE OF p IS NOT EQUALS TO val ATTRIBUTE OF q  
+        RETURN False  
+    ELSE  
+        RETURN the RESULT OF is_same_tree WITH PARAMETERS left ATTRIBUTE OF p AND left ATTRIBUTE OF q  
+        AND the RESULT OF is_same_tree WITH PARAMETERS right ATTRIBUTE OF p AND right ATTRIBUTE OF q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION isValidBST WITH PARAMETERS root  
+        FUNCTION validate WITH PARAMETERS node low EQUALS negative infinity high EQUALS positive infinity  
+            IF node IS none  
+                RETURN True  
+            END IF  
+            IF val ATTRIBUTE OF node IS LESS THAN OR EQUAL TO low OR val ATTRIBUTE OF node IS GREATER THAN OR EQUAL TO high  
+                RETURN False  
+            END IF  
+            RETURN the RESULT OF validate WITH PARAMETERS left ATTRIBUTE OF node low AND val ATTRIBUTE OF node  
+            AND the RESULT OF validate WITH PARAMETERS right ATTRIBUTE OF node val ATTRIBUTE OF node AND high  
+        END FUNCTION  
+        RETURN RESULT OF validate WITH PARAMETER root  
+    END FUNCTION  
+END CLASS

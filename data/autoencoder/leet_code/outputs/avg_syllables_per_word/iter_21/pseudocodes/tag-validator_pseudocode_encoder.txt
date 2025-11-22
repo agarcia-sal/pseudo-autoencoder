@@ -1,0 +1,57 @@
+CLASS Solution  
+    FUNCTION isValid(code)  
+        IMPORT regular expression module AS re  
+        
+        SET cdata_pattern TO the string representing a regular expression for CDATA sections STARTING WITH opening bracket followed by exclamation mark followed by open square bracket followed by CDATA followed by open square bracket then any characters in minimal quantity FOLLOWED BY close square bracket close square bracket greater than sign  
+        
+        SET code TO the result of CALLING the substitution FUNCTION OF regular expression module WITH PARAMETERS cdata_pattern TO empty string ON code  
+        
+        SET stack TO an empty list  
+        
+        SET i TO zero  
+        
+        WHILE i LESS THAN the LENGTH OF code HOLDS  
+            IF the character at position i OF code EQUALS less than sign THEN  
+                SET j TO the result of FINDING the character greater than sign IN code STARTING FROM position i PLUS one  
+                
+                IF j EQUALS negative one THEN  
+                    RETURN boolean false  
+                END IF  
+                
+                SET tag_content TO the substring FROM position i PLUS one TO position j MINUS one OF code  
+                
+                IF tag_content IS empty THEN  
+                    RETURN boolean false  
+                END IF  
+                
+                IF the character at position zero OF tag_content EQUALS forward slash THEN  
+                    SET tag_name TO the substring FROM position one TO the end OF tag_content  
+                    
+                    IF stack IS empty OR the last element OF stack NOT EQUALS tag_name THEN  
+                        RETURN boolean false  
+                    END IF  
+                    
+                    REMOVE the last element FROM stack  
+                ELSE IF the character at position zero OF tag_content EQUALS exclamation mark THEN  
+                    RETURN boolean false  
+                ELSE  
+                    IF the LENGTH OF tag_content LESS THAN one OR GREATER THAN nine OR tag_content IS NOT composed entirely OF uppercase letters THEN  
+                        RETURN boolean false  
+                    END IF  
+                    
+                    APPEND tag_content TO stack  
+                END IF  
+                
+                SET i TO j PLUS one  
+            ELSE  
+                INCREMENT i BY one  
+            END IF  
+        END WHILE  
+        
+        SET valid_tag_pattern TO the string representing a regular expression MATCHING opening tag WITH uppercase letters FOLLOWED BY any characters FOLLOWED BY matching closing tag WITH uppercase letters  
+        
+        SET count_of_valid_tags TO the result of FINDING ALL occurrences OF valid_tag_pattern IN code USING regular expression module  
+        
+        RETURN boolean true IF stack IS empty AND the LENGTH OF count_of_valid_tags GREATER THAN zero OTHERWISE RETURN boolean false  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,52 @@
+CLASS Solution  
+    FUNCTION slidingPuzzle(board)  
+        SET start TO tuple OF tuple OF row FOR EACH row IN board  
+        SET target TO tuple OF tuple (one, two, three), (four, five, zero) WITH VALUES (1, 2, 3), (4, 5, 0)  
+        
+        SET neighbors TO dictionary WITH  
+            key zero ASSIGNED set containing one and three,  
+            key one ASSIGNED set containing zero, two, and four,  
+            key two ASSIGNED set containing one and five,  
+            key three ASSIGNED set containing zero and four,  
+            key four ASSIGNED set containing one, three, and five,  
+            key five ASSIGNED set containing two and four  
+        
+        FOR i FROM zero TO one  
+            FOR j FROM zero TO two  
+                IF element at position j of element at position i of start EQUALS zero  
+                    SET zero_pos TO i MULTIPLIED BY three PLUS j  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET queue TO double-ended queue containing tuple consisting of start, zero_pos, and zero  
+        SET visited TO set containing start  
+        
+        WHILE queue IS NOT empty  
+            REMOVE first element FROM queue AND SET TO state, zero_pos, moves  
+            
+            IF state EQUALS target  
+                RETURN moves  
+            END IF  
+            
+            FOR neighbor IN element at key zero_pos of neighbors  
+                SET new_state TO list created by converting each row of state to list  
+                SET i TO zero_pos DIVIDED BY three USING integer division  
+                SET j TO remainder of zero_pos DIVIDED BY three  
+                SET ni TO neighbor DIVIDED BY three USING integer division  
+                SET nj TO remainder of neighbor DIVIDED BY three  
+                
+                SWAP element at position j of element at position i of new_state WITH element at position nj of element at position ni of new_state  
+                
+                SET new_tuple_state TO tuple OF tuple OF row FOR EACH row IN new_state  
+                
+                IF new_tuple_state NOT IN visited  
+                    ADD new_tuple_state TO visited  
+                    APPEND tuple consisting of new_tuple_state, neighbor, and moves PLUS one TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

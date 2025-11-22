@@ -1,0 +1,57 @@
+```
+CLASS UnionFind
+    FUNCTION __init__(self, size)
+        SET self.parent TO list of integers from 0 TO size minus 1
+        SET self.rank TO list of 1 repeated size times
+    END FUNCTION
+
+    FUNCTION find(self, p)
+        IF self.parent[p] IS NOT p
+            SET self.parent[p] TO self.find(self.parent[p])
+        END IF
+        RETURN self.parent[p]
+    END FUNCTION
+
+    FUNCTION union(self, p, q)
+        SET rootP TO self.find(p)
+        SET rootQ TO self.find(q)
+        IF rootP EQUALS rootQ
+            RETURN False
+        END IF
+        IF self.rank[rootP] GREATER THAN self.rank[rootQ]
+            SET self.parent[rootQ] TO rootP
+        ELSE IF self.rank[rootP] LESS THAN self.rank[rootQ]
+            SET self.parent[rootP] TO rootQ
+        ELSE
+            SET self.parent[rootQ] TO rootP
+            INCREMENT self.rank[rootP] BY 1
+        END IF
+        RETURN True
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION gcdSort(self, nums)
+        SET sorted_nums TO nums sorted in ascending order
+        SET max_val TO maximum value in nums
+        CREATE uf AS new UnionFind with size max_val plus 1
+
+        FOR each num IN nums
+            FOR factor FROM 2 TO integer square root of num plus 1
+                IF num MODULO factor EQUALS 0
+                    CALL uf.union(num, factor)
+                    CALL uf.union(num, num DIVIDED BY factor)
+                END IF
+            END FOR
+        END FOR
+
+        FOR i FROM 0 TO length of nums minus 1
+            IF uf.find(nums[i]) IS NOT EQUAL TO uf.find(sorted_nums[i])
+                RETURN False
+            END IF
+        END FOR
+
+        RETURN True
+    END FUNCTION
+END CLASS
+```

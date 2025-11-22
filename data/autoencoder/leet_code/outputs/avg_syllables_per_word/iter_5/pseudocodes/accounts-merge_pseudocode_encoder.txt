@@ -1,0 +1,52 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.root TO list of integers from zero TO size MINUS one  
+        SET self.rank TO list of ones with length size  
+    END FUNCTION  
+
+    FUNCTION find(self, x)  
+        IF self.root at position x EQUALS x THEN  
+            RETURN x  
+        SET self.root at position x TO self.find(self.root at position x)  
+        RETURN self.root at position x  
+    END FUNCTION  
+
+    FUNCTION union(self, x, y)  
+        SET rootX TO self.find(x)  
+        SET rootY TO self.find(y)  
+        IF rootX NOT EQUAL TO rootY THEN  
+            IF self.rank at position rootX GREATER THAN self.rank at position rootY THEN  
+                SET self.root at position rootY TO rootX  
+            ELSE IF self.rank at position rootX LESS THAN self.rank at position rootY THEN  
+                SET self.root at position rootX TO rootY  
+            ELSE  
+                SET self.root at position rootY TO rootX  
+                INCREMENT self.rank at position rootX BY one  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION accountsMerge(self, accounts)  
+        SET email_to_id TO empty dictionary  
+        SET uf TO new UnionFind initialized WITH length of accounts  
+
+        FOR each index i and tuple of name and list of emails EXTRACTED FROM accounts  
+            FOR each email IN emails  
+                IF email NOT IN email_to_id THEN  
+                    SET email_to_id at email TO i  
+                ELSE  
+                    CALL uf.union WITH parameters i AND email_to_id at email  
+        
+        SET merged_emails TO empty dictionary with default value as empty list  
+        FOR each email and account_id IN email_to_id items  
+            SET root_id TO uf.find(account_id)  
+            APPEND email TO merged_emails at position root_id  
+        
+        SET result TO empty list  
+        FOR each account_id and emails IN merged_emails items  
+            SET name TO accounts at position account_id at index zero  
+            APPEND list consisting of name FOLLOWED BY sorted emails TO result  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

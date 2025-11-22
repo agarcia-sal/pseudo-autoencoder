@@ -1,0 +1,61 @@
+CLASS UnionFind
+    FUNCTION __init__(self, size)
+        SET self.parent TO a list representing consecutive integers FROM zero TO size MINUS one
+    END FUNCTION
+
+    FUNCTION find(self, u)
+        IF the element at position u OF self.parent NOT EQUALS u THEN
+            SET the element at position u OF self.parent TO the result OF invoking find WITH the element at position u OF self.parent
+        END IF
+        RETURN the element at position u OF self.parent
+    END FUNCTION
+
+    FUNCTION union(self, u, v)
+        SET root_u TO the result OF invoking find WITH u
+        SET root_v TO the result OF invoking find WITH v
+        IF root_u NOT EQUALS root_v THEN
+            SET the element at position root_u OF self.parent TO root_v
+        END IF
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION matrixRankTransform(self, matrix)
+        SET m TO the LENGTH OF matrix
+        SET n TO the LENGTH OF the element at position zero OF matrix
+        SET value_to_indices TO a mapping that returns an empty list WHEN a new key is accessed
+        
+        FOR r FROM zero TO m MINUS one INCLUSIVE
+            FOR c FROM zero TO n MINUS one INCLUSIVE
+                APPEND the tuple of r and c TO the list at key equal TO the element at position r OF matrix and position c OF that row IN value_to_indices
+            END FOR
+        END FOR
+
+        SET row_rank TO a list OF zeroes WITH length m
+        SET col_rank TO a list OF zeroes WITH length n
+        SET result TO a two dimensional list FILLED WITH zeroes WITH m rows AND n columns
+
+        FOR each value IN the keys of value_to_indices SORTED in ASCENDING order
+            ASSIGN reference TO a new UnionFind object initialized WITH size equal TO m PLUS n
+            ASSIGN reference TO a mapping that RETURNS zero WHEN a new key is accessed NAMED rank
+
+            FOR each pair of r and c IN the list at key value IN value_to_indices
+                INVOKE union ON the UnionFind object WITH r AND c PLUS m
+            END FOR
+
+            FOR each pair of r and c IN the list at key value IN value_to_indices
+                SET root TO the result OF invoking find ON the UnionFind object WITH r
+                SET the value at key root IN rank TO the maximum OF the current value at key root IN rank AND the maximum OF the element at position r IN row_rank AND the element at position c IN col_rank PLUS one
+            END FOR
+
+            FOR each pair of r and c IN the list at key value IN value_to_indices
+                SET root TO the result OF invoking find ON the UnionFind object WITH r
+                SET the element at position r OF result and position c TO the value at key root IN rank
+                SET the element at position r IN row_rank TO the value at key root IN rank
+                SET the element at position c IN col_rank TO the value at key root IN rank
+            END FOR
+        END FOR
+
+        RETURN result
+    END FUNCTION
+END CLASS

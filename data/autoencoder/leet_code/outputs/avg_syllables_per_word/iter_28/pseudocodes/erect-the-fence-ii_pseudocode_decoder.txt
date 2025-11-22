@@ -1,0 +1,64 @@
+CLASS Solution  
+    FUNCTION outerTrees(trees)  
+        FUNCTION dist_sq(p1, p2)  
+            SET difference of element at position zero of p1 MINUS element at position zero of p2 TO first_difference  
+            SET difference of element at position one of p1 MINUS element at position one of p2 TO second_difference  
+            SET square of first_difference TO first_square  
+            SET square of second_difference TO second_square  
+            SET sum_of_squares TO first_square PLUS second_square  
+            RETURN sum_of_squares  
+        END FUNCTION  
+
+        FUNCTION circumcenter(p1, p2, p3)  
+            SET element at position zero of p1 TO ax  
+            SET element at position one of p1 TO ay  
+            SET element at position zero of p2 TO bx  
+            SET element at position one of p2 TO by  
+            SET element at position zero of p3 TO cx  
+            SET element at position one of p3 TO cy  
+            SET product of two TIMES (ax MULTIPLIED BY (by MINUS cy) PLUS bx MULTIPLIED BY (cy MINUS ay) PLUS cx MULTIPLIED BY (ay MINUS by)) TO d  
+            SET (ax MULTIPLIED BY ax PLUS ay MULTIPLIED BY ay) MULTIPLIED BY (by MINUS cy) PLUS (bx MULTIPLIED BY bx PLUS by MULTIPLIED BY by) MULTIPLIED BY (cy MINUS ay) PLUS (cx MULTIPLIED BY cx PLUS cy MULTIPLIED BY cy) MULTIPLIED BY (ay MINUS by) TO numerator_ux  
+            SET numerator_ux DIVIDED BY d TO ux  
+            SET (ax MULTIPLIED BY ax PLUS ay MULTIPLIED BY ay) MULTIPLIED BY (cx MINUS bx) PLUS (bx MULTIPLIED BY bx PLUS by MULTIPLIED BY by) MULTIPLIED BY (ax MINUS cx) PLUS (cx MULTIPLIED BY cx PLUS cy MULTIPLIED BY cy) MULTIPLIED BY (bx MINUS ax) TO numerator_uy  
+            SET numerator_uy DIVIDED BY d TO uy  
+            SET difference of ux MINUS ax TO diff_x  
+            SET difference of uy MINUS ay TO diff_y  
+            SET square of diff_x PLUS square of diff_y TO radius_squared  
+            SET square root of radius_squared TO radius  
+            RETURN list containing ux AND uy, radius  
+        END FUNCTION  
+
+        FUNCTION welzl(points, boundary, n)  
+            IF n EQUALS zero OR LENGTH OF boundary EQUALS three THEN  
+                IF LENGTH OF boundary EQUALS zero THEN  
+                    RETURN list containing zero AND zero, zero  
+                ELSE IF LENGTH OF boundary EQUALS one THEN  
+                    RETURN element at position zero of boundary, zero  
+                ELSE IF LENGTH OF boundary EQUALS two THEN  
+                    SET average of element at position zero of element at position zero of boundary PLUS element at position zero of element at position one of boundary DIVIDED BY two TO center_x  
+                    SET average of element at position one of element at position zero of boundary PLUS element at position one of element at position one of boundary DIVIDED BY two TO center_y  
+                    SET list containing center_x AND center_y TO center  
+                    SET dist_sq of element at position zero of boundary AND element at position one of boundary TO dist_between_points  
+                    SET square root of dist_between_points DIVIDED BY two TO radius  
+                    RETURN center, radius  
+                ELSE  
+                    RETURN circumcenter with arguments unpacked from boundary  
+                END IF  
+            END IF  
+
+            SET element at position n MINUS one of points TO p  
+            SET welzl with arguments points, boundary, n MINUS one TO center, radius  
+            SET dist_sq with arguments center, p TO dist_center_p  
+            SET product of radius MULTIPLIED BY radius TO radius_squared  
+            IF dist_center_p LESS THAN OR EQUAL TO radius_squared THEN  
+                RETURN center, radius  
+            END IF  
+            SET welzl with arguments points, boundary PLUS list containing p, n MINUS one TO returned_center, returned_radius  
+            RETURN returned_center, returned_radius  
+        END FUNCTION  
+
+        CALL random shuffle on trees  
+        SET welzl with arguments trees, empty list, LENGTH OF trees TO center, radius  
+        RETURN list containing element at position zero of center, element at position one of center, radius  
+    END FUNCTION  
+END CLASS

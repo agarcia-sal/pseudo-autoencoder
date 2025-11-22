@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION openLock(deadends, target)  
+        SET deadends_set TO the SET of elements in deadends  
+        IF the string consisting of four zeros IS IN deadends_set  
+            RETURN negative one  
+        END IF  
+        IF target EQUALS the string consisting of four zeros  
+            RETURN zero  
+        END IF  
+        SET queue TO a double ended queue containing the tuple of the string consisting of four zeros and zero  
+        SET visited TO the SET containing the string consisting of four zeros  
+        
+        FUNCTION neighbors(state)  
+            SET result TO an empty list  
+            FOR index FROM zero TO three  
+                SET digit TO the integer CONVERSION OF the character at position index OF state  
+                FOR move IN the list containing negative one and one  
+                    SET new_digit TO the remainder of the sum of digit and move DIVIDED BY ten  
+                    SET new_state TO the substring from position zero TO position index MINUS one OF state CONCATENATED WITH the string CONVERSION OF new_digit CONCATENATED WITH the substring from position index PLUS one TO the end OF state  
+                    APPEND new_state TO result  
+                END FOR  
+            END FOR  
+            RETURN result  
+        END FUNCTION  
+        
+        WHILE the LENGTH OF queue IS GREATER THAN zero  
+            REMOVE the leftmost element FROM queue INTO current_state AND steps  
+            FOR each neighbor IN neighbors(current_state)  
+                IF neighbor IS NOT IN visited AND neighbor IS NOT IN deadends_set  
+                    IF neighbor EQUALS target  
+                        RETURN steps PLUS one  
+                    END IF  
+                    ADD neighbor TO visited  
+                    APPEND the tuple of neighbor and steps PLUS one TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,46 @@
+CLASS Solution
+    FUNCTION numberOfPatterns(m, n)
+        SET jumps TO mapping of pairs TO intermediate dots:
+            (1, 3) TO 2, (1, 7) TO 4, (1, 9) TO 5, (2, 8) TO 5, (3, 1) TO 2,
+            (3, 7) TO 5, (3, 9) TO 6, (4, 6) TO 5, (5, 5) TO 5, (6, 4) TO 5,
+            (7, 1) TO 4, (7, 3) TO 5, (7, 9) TO 8, (8, 2) TO 5, (9, 1) TO 5,
+            (9, 3) TO 6, (9, 7) TO 8
+
+        FUNCTION countPatternsFromDot(current, visited, length)
+            IF length EQUALS n THEN
+                RETURN 1
+            END IF
+            SET count TO 1 IF length >= m ELSE 0
+            FOR next_dot FROM 1 TO 9
+                IF visited[next_dot] IS FALSE THEN
+                    SET jump TO jumps VALUE FOR (current, next_dot) IF EXISTS
+                    IF jump DOES NOT EXIST OR visited[jump] IS TRUE THEN
+                        SET visited[next_dot] TO TRUE
+                        INCREMENT count BY countPatternsFromDot(next_dot, visited, length + 1)
+                        SET visited[next_dot] TO FALSE
+                    END IF
+                END IF
+            END FOR
+            RETURN count
+        END FUNCTION
+
+        SET visited TO list OF 10 FALSE VALUES
+        SET result TO 0
+
+        SET visited[1] TO TRUE
+        SET corner_count TO countPatternsFromDot(1, visited, 1)
+        SET visited[1] TO FALSE
+
+        SET visited[2] TO TRUE
+        SET edge_count TO countPatternsFromDot(2, visited, 1)
+        SET visited[2] TO FALSE
+
+        SET visited[5] TO TRUE
+        SET center_count TO countPatternsFromDot(5, visited, 1)
+        SET visited[5] TO FALSE
+
+        SET result TO corner_count MULTIPLIED BY 4 PLUS edge_count MULTIPLIED BY 4 PLUS center_count
+
+        RETURN result
+    END FUNCTION
+END CLASS

@@ -1,0 +1,63 @@
+CLASS Solution  
+    FUNCTION sortItems(n, m, group, beforeItems)  
+        FOR index FROM 0 TO n MINUS 1  
+            IF group AT index EQUALS -1  
+                SET group AT index TO m  
+                INCREMENT m BY 1  
+        
+        INITIALIZE group_items AS new default dictionary of list  
+        INITIALIZE group_graph AS new default dictionary of list  
+        INITIALIZE item_graph AS new default dictionary of list  
+        INITIALIZE item_in_degree AS list of zeros with length n  
+        INITIALIZE group_in_degree AS list of zeros with length m  
+        
+        FOR index FROM 0 TO n MINUS 1  
+            APPEND index TO group_items AT group AT index  
+        
+        FOR index FROM 0 TO n MINUS 1  
+            FOR each before IN beforeItems AT index  
+                IF group AT before EQUALS group AT index  
+                    APPEND index TO item_graph AT before  
+                    INCREMENT item_in_degree AT index BY 1  
+                ELSE  
+                    APPEND group AT index TO group_graph AT group AT before  
+                    INCREMENT group_in_degree AT group AT index BY 1  
+        
+        FUNCTION topological_sort(graph, in_degree, items)  
+            INITIALIZE q AS new deque with items FROM items WHERE in_degree AT item EQUALS 0  
+            INITIALIZE result AS empty list  
+            WHILE q IS NOT empty  
+                SET u TO element removed from front of q  
+                APPEND u TO result  
+                FOR each v IN graph AT u  
+                    DECREMENT in_degree AT v BY 1  
+                    IF in_degree AT v EQUALS 0  
+                        APPEND v TO q  
+            IF LENGTH OF result EQUALS LENGTH OF items  
+                RETURN result  
+            ELSE  
+                RETURN empty list  
+        END FUNCTION  
+        
+        INITIALIZE sorted_within_groups AS empty list  
+        FOR each items IN values of group_items  
+            SET sorted_items TO CALL topological_sort WITH item_graph, item_in_degree, items  
+            IF sorted_items IS empty  
+                RETURN empty list  
+            APPEND all elements of sorted_items TO sorted_within_groups  
+        
+        SET sorted_groups TO CALL topological_sort WITH group_graph, group_in_degree, list of integers FROM 0 TO m MINUS 1  
+        IF sorted_groups IS empty  
+            RETURN empty list  
+        
+        INITIALIZE group_to_items_map AS new default dictionary of list  
+        FOR each item IN sorted_within_groups  
+            APPEND item TO group_to_items_map AT group AT item  
+        
+        INITIALIZE result AS empty list  
+        FOR each group_id IN sorted_groups  
+            APPEND all elements of group_to_items_map AT group_id TO result  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

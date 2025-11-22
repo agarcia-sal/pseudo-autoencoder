@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION largestPathValue(colors parameters colors IN string, edges parameters edges IN list of lists of integers) RETURNS integer  
+        SET n TO the LENGTH OF colors  
+        SET graph TO a new mapping of lists with default empty lists  
+        SET in_degree TO a list of zeros with the LENGTH OF n  
+        
+        FOR each pair u and v IN edges  
+            APPEND v TO the list associated with u IN graph  
+            INCREMENT the element at position v of in_degree BY one  
+        END FOR  
+        
+        SET queue TO a new double-ended queue initialized with all indices i FROM zero TO n MINUS one WHERE the element at position i of in_degree EQUALS zero  
+        SET dp TO a list containing n lists each containing twenty-six zeros  
+        SET visited TO zero  
+        SET max_color_value TO zero  
+        
+        WHILE queue is not empty  
+            REMOVE the first element FROM queue AND ASSIGN it TO node  
+            INCREMENT the element at position corresponding to the alphabetical index of the element at position node of colors IN the list at position node of dp BY one  
+            SET max_color_value TO the greater of max_color_value AND the element at position corresponding to the alphabetical index of the element at position node of colors IN the list at position node of dp  
+            INCREMENT visited BY one  
+            
+            FOR each neighbor IN the list associated with node IN graph  
+                FOR index c FROM zero TO twenty-five  
+                    SET the element at position c of the list at position neighbor of dp TO the greater of the element at position c of the list at position neighbor of dp AND the element at position c of the list at position node of dp  
+                END FOR  
+                DECREMENT the element at position neighbor of in_degree BY one  
+                IF the element at position neighbor of in_degree EQUALS zero  
+                    APPEND neighbor TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        IF visited EQUALS n  
+            RETURN max_color_value  
+        ELSE  
+            RETURN the additive inverse of one  
+        END IF  
+    END FUNCTION  
+END CLASS

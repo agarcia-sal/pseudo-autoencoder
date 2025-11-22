@@ -1,0 +1,62 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, n)  
+        SET self.parent TO list of integers from 0 to n minus 1  
+        SET self.size TO list of 1 repeated n times  
+    END FUNCTION  
+  
+    FUNCTION find(self, u)  
+        IF self.parent at u IS NOT u THEN  
+            SET self.parent at u TO self.find(self.parent at u)  
+        RETURN self.parent at u  
+    END FUNCTION  
+  
+    FUNCTION union(self, u, v)  
+        SET root_u TO self.find(u)  
+        SET root_v TO self.find(v)  
+        IF root_u IS NOT root_v THEN  
+            IF self.size at root_u GREATER THAN self.size at root_v THEN  
+                SET self.parent at root_v TO root_u  
+                INCREMENT self.size at root_u BY self.size at root_v  
+            ELSE  
+                SET self.parent at root_u TO root_v  
+                INCREMENT self.size at root_v BY self.size at root_u  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION friendRequests(self, n, restrictions, requests)  
+        SET uf TO new UnionFind with n  
+        SET result TO empty list  
+        SET restriction_map TO empty map  
+  
+        FOR each pair x, y IN restrictions DO  
+            IF x NOT IN restriction_map THEN  
+                SET restriction_map at x TO empty set  
+            IF y NOT IN restriction_map THEN  
+                SET restriction_map at y TO empty set  
+            ADD y TO restriction_map at x  
+            ADD x TO restriction_map at y  
+  
+        FUNCTION can_union(u, v)  
+            SET root_u TO uf.find(u)  
+            SET root_v TO uf.find(v)  
+            FOR each person IN restriction_map value at root_u or empty set DO  
+                IF uf.find(person) EQUALS root_v THEN  
+                    RETURN False  
+            FOR each person IN restriction_map value at root_v or empty set DO  
+                IF uf.find(person) EQUALS root_u THEN  
+                    RETURN False  
+            RETURN True  
+  
+        FOR each pair u, v IN requests DO  
+            IF uf.find(u) EQUALS uf.find(v) THEN  
+                APPEND True TO result  
+            ELSE IF can_union(u, v) THEN  
+                uf.union(u, v)  
+                APPEND True TO result  
+            ELSE  
+                APPEND False TO result  
+  
+        RETURN result  
+    END FUNCTION  
+END CLASS

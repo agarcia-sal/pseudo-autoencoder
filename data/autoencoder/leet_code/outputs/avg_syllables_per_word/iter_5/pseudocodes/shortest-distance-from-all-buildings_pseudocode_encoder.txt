@@ -1,0 +1,54 @@
+CLASS Solution  
+    FUNCTION shortestDistance(grid)  
+        IF grid IS empty OR grid AT 0 IS empty  
+            RETURN -1  
+        
+        SET m TO LENGTH OF grid  
+        SET n TO LENGTH OF grid AT 0  
+        INITIALIZE total_distance AS m BY n MATRIX WITH ALL ZEROS  
+        INITIALIZE reach_count AS m BY n MATRIX WITH ALL ZEROS  
+        SET building_count TO 0  
+        
+        SET directions TO LIST OF (1, 0), (-1, 0), (0, 1), (0, -1)  
+        
+        FUNCTION bfs(start_x, start_y)  
+            INITIALIZE queue WITH start_x AND start_y  
+            INITIALIZE visited AS m BY n MATRIX WITH ALL FALSE  
+            SET distance TO 0  
+            SET reachable TO 0  
+            
+            WHILE queue IS NOT empty  
+                SET size TO LENGTH OF queue  
+                INCREMENT distance BY 1  
+                FOR counter FROM 1 TO size  
+                    SET x, y TO FIRST ELEMENT OF queue AND REMOVE IT  
+                    FOR dx, dy IN directions  
+                        SET nx TO x PLUS dx  
+                        SET ny TO y PLUS dy  
+                        IF nx IS GREATER THAN OR EQUAL TO 0 AND nx IS LESS THAN m AND ny IS GREATER THAN OR EQUAL TO 0 AND ny IS LESS THAN n AND visited AT nx AND ny IS FALSE AND grid AT nx AND ny IS 0  
+                            SET visited AT nx AND ny TO TRUE  
+                            APPEND nx AND ny TO queue  
+                            INCREMENT total_distance AT nx AND ny BY distance  
+                            INCREMENT reach_count AT nx AND ny BY 1  
+                            INCREMENT reachable BY 1  
+            RETURN reachable  
+        
+        FOR i FROM 0 TO m MINUS 1  
+            FOR j FROM 0 TO n MINUS 1  
+                IF grid AT i AND j IS 1  
+                    INCREMENT building_count BY 1  
+                    IF bfs(i, j) IS LESS THAN building_count MINUS 1  
+                        RETURN -1  
+        
+        SET min_distance TO infinity  
+        FOR i FROM 0 TO m MINUS 1  
+            FOR j FROM 0 TO n MINUS 1  
+                IF grid AT i AND j IS 0 AND reach_count AT i AND j IS EQUAL TO building_count  
+                    SET min_distance TO THE MINIMUM OF min_distance AND total_distance AT i AND j  
+        
+        IF min_distance IS EQUAL TO infinity  
+            RETURN -1  
+        ELSE  
+            RETURN min_distance  
+    END FUNCTION  
+END CLASS

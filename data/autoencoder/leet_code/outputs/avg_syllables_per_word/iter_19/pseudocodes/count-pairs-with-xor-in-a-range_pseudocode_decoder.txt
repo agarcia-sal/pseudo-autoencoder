@@ -1,0 +1,56 @@
+CLASS TrieNode  
+    FUNCTION __init__  
+        SET children TO empty collection mapping keys TO values  
+        SET count TO zero  
+    END FUNCTION  
+END CLASS  
+
+CLASS Trie  
+    FUNCTION __init__ WITH parameter bit_length EQUAL TO fifteen  
+        ASSIGN pointer TO object root OF TYPE TrieNode  
+        SET bit_length TO bit_length  
+    END FUNCTION  
+
+    FUNCTION insert WITH parameter num  
+        ASSIGN pointer TO object node EQUALS root  
+        FOR index FROM bit_length DOWN TO zero  
+            SET bit TO result of SHIFTING num TO THE RIGHT BY index TIMES AND WITH BITWISE AND ONE  
+            IF bit IS NOT PRESENT AS KEY IN node children  
+                ASSIGN pointer TO object AT key bit OF node children EQUALS new TrieNode  
+            END IF  
+            ASSIGN pointer TO object node EQUALS element AT key bit OF node children  
+            INCREMENT node count BY one  
+        END FOR  
+    END FUNCTION  
+
+    FUNCTION count_less_than WITH parameters num AND threshold  
+        SET count TO zero  
+        ASSIGN pointer TO object node EQUALS root  
+        FOR index FROM bit_length DOWN TO zero  
+            IF node IS NOT DEFINED OR IS NULL  
+                BREAK THE LOOP  
+            END IF  
+            SET bit TO result of SHIFTING num TO THE RIGHT BY index TIMES AND WITH BITWISE AND ONE  
+            SET threshold_bit TO result of SHIFTING threshold TO THE RIGHT BY index TIMES AND WITH BITWISE AND ONE  
+            IF threshold_bit EQUALS one  
+                INCREMENT count BY count OF element AT key bit OF node children OR zero IF NOT PRESENT  
+                ASSIGN pointer TO object node EQUALS element AT key bit XOR one OF node children OR null IF NOT PRESENT  
+            ELSE  
+                ASSIGN pointer TO object node EQUALS element AT key bit OF node children OR null IF NOT PRESENT  
+            END IF  
+        END FOR  
+        RETURN count  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION countPairs WITH parameters nums low high  
+        ASSIGN pointer TO object trie EQUALS new Trie  
+        SET nice_pairs TO zero  
+        FOR each num IN nums  
+            INCREMENT nice_pairs BY result of trie count_less_than WITH num AND high PLUS one MINUS result of trie count_less_than WITH num AND low  
+            CALL insert OF trie WITH num  
+        END FOR  
+        RETURN nice_pairs  
+    END FUNCTION  
+END CLASS

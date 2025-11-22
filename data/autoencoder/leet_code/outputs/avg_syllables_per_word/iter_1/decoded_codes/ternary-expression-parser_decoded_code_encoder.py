@@ -1,0 +1,9 @@
+def parseTernary(expr):
+    def eval(i):
+        if i == len(expr) - 1 or expr[i + 1] == ':':
+            return expr[i], i + 2
+        t, ni = eval(i + 2)
+        f, fi = eval(ni)
+        return (t if expr[i] == 'T' else f), fi
+    res, _ = eval(0)
+    return res

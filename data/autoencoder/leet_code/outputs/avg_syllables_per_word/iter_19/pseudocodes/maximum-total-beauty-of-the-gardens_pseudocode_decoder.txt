@@ -1,0 +1,58 @@
+CLASS Solution  
+    FUNCTION maximumBeauty(flowers AS List of integers, newFlowers AS integer, target AS integer, full AS integer, partial AS integer) RETURNS integer  
+        SORT the collection flowers IN ascending order  
+        SET n TO the LENGTH OF flowers  
+        SET max_beauty TO zero  
+        
+        INITIALIZE prefix_sum AS a list of zeros with LENGTH n PLUS one  
+        FOR each index i FROM zero TO n MINUS one  
+            SET the element at position i PLUS one of prefix_sum TO the element at position i of prefix_sum PLUS the element at position i of flowers  
+        END FOR  
+        
+        SET complete_gardens TO zero  
+        FOR each index i FROM n MINUS one DOWN TO zero  
+            IF the element at position i of flowers IS GREATER THAN OR EQUAL TO target THEN  
+                INCREMENT complete_gardens BY one  
+            ELSE  
+                BREAK the loop  
+            END IF  
+        END FOR  
+        
+        SET remaining_flowers TO newFlowers  
+        SET max_incomplete_flowers TO zero  
+        
+        FOR each integer i FROM complete_gardens TO n  
+            IF i IS GREATER THAN zero THEN  
+                DECREMENT remaining_flowers BY the difference of target MINUS the element at position n MINUS i of flowers  
+                IF remaining_flowers IS LESS THAN zero THEN  
+                    BREAK the loop  
+                END IF  
+            END IF  
+            
+            SET left TO zero  
+            SET right TO n MINUS i MINUS one  
+            WHILE left IS LESS THAN OR EQUAL TO right  
+                SET mid TO the integer division of left PLUS right BY two  
+                SET cost TO the product of the element at position mid of flowers MULTIPLIED BY mid PLUS one MINUS the element at position mid PLUS one of prefix_sum  
+                IF cost IS GREATER THAN remaining_flowers THEN  
+                    SET right TO right MINUS one  
+                ELSE  
+                    SET left TO left PLUS one  
+                END IF  
+            END WHILE  
+            
+            IF right IS GREATER THAN OR EQUAL TO zero THEN  
+                SET max_incomplete_flowers TO the sum of the element at position right of flowers PLUS the integer division of the difference of remaining_flowers MINUS the difference of the product of the element at position right of flowers MULTIPLIED BY right PLUS one MINUS the element at position right PLUS one of prefix_sum BY right PLUS one  
+            ELSE  
+                SET max_incomplete_flowers TO zero  
+            END IF  
+            
+            SET total_beauty TO the sum of the product of i MULTIPLIED BY full PLUS the product of the lesser value between max_incomplete_flowers AND target MINUS one MULTIPLIED BY partial  
+            IF total_beauty IS GREATER THAN max_beauty THEN  
+                SET max_beauty TO total_beauty  
+            END IF  
+        END FOR  
+        
+        RETURN max_beauty  
+    END FUNCTION  
+END CLASS

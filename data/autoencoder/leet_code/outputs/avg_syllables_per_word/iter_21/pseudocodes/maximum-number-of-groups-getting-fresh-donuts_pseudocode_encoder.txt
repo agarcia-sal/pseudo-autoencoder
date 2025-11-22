@@ -1,0 +1,43 @@
+CLASS Solution  
+    FUNCTION maxHappyGroups(batchSize, groups)  
+        IF batchSize EQUALS one  
+            RETURN the LENGTH OF groups  
+        END IF  
+        
+        CALL remainder_count TO A NEW LIST OF batchSize ZEROES  
+        
+        FOR each group IN groups  
+            INCREMENT the element at position group MODULO batchSize OF remainder_count BY one  
+        END FOR  
+        
+        FUNCTION dp(remainder, all_remainders)  
+            SET remainder_count TO a NEW LIST CREATED FROM all_remainders  
+            SET max_happy TO zero  
+            
+            FOR i FROM zero TO batchSize MINUS one  
+                IF the element at position i OF remainder_count EQUALS zero  
+                    CONTINUE TO next iteration  
+                END IF  
+                
+                DECREMENT the element at position i OF remainder_count BY one  
+                SET new_remainder TO the value of remainder MINUS i MODULO batchSize  
+                
+                IF remainder EQUALS zero  
+                    SET happy_groups TO one PLUS CALL dp WITH PARAMETERS new_remainder AND unpacked remainder_count  
+                ELSE  
+                    SET happy_groups TO CALL dp WITH PARAMETERS new_remainder AND unpacked remainder_count  
+                END IF  
+                
+                IF happy_groups GREATER THAN max_happy  
+                    SET max_happy TO happy_groups  
+                END IF  
+                
+                INCREMENT the element at position i OF remainder_count BY one  
+            END FOR  
+            
+            RETURN max_happy  
+        END FUNCTION  
+        
+        RETURN CALL dp WITH PARAMETERS zero AND unpacked remainder_count  
+    END FUNCTION  
+END CLASS

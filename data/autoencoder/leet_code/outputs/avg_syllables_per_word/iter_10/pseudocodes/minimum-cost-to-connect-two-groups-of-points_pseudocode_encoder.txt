@@ -1,0 +1,36 @@
+CLASS Solution  
+    FUNCTION connectTwoGroups(cost)  
+        SET size1 TO the LENGTH OF cost  
+        SET size2 TO the LENGTH OF element at position zero of cost  
+        CALL aUXILIARY FUNCTION initialize_dp_table WITH parameters size1, size2 AND SET RESULT TO dp  
+
+        SET element at position zero of dp AT position zero TO zero  
+
+        FOR index i FROM zero TO size1 MINUS one  
+            FOR variable mask FROM zero TO two RAISED TO THE POWER OF size2 MINUS one  
+                FOR index j FROM zero TO size2 MINUS one  
+                    SET new_mask TO the result of bitwise OR between mask AND two RAISED TO THE POWER OF j  
+                    SET element at position i PLUS one of dp AT position new_mask TO the MINIMUM OF element at position i PLUS one of dp AT position new_mask AND element at position i of dp AT position mask PLUS element at position i of cost AT position j  
+                END FOR  
+                
+                FOR index j FROM zero TO size2 MINUS one  
+                    IF the bitwise AND between mask AND two RAISED TO THE POWER OF j IS NOT EQUAL TO zero  
+                        SET toggled_mask TO the result of bitwise XOR between mask AND two RAISED TO THE POWER OF j  
+                        SET element at position i PLUS one of dp AT position mask TO the MINIMUM OF element at position i PLUS one of dp AT position mask AND element at position i PLUS one of dp AT position toggled_mask PLUS element at position i of cost AT position j  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+
+        RETURN element at position size1 of dp AT position two RAISED TO THE POWER OF size2 MINUS one  
+    END FUNCTION  
+
+    FUNCTION initialize_dp_table(size1, size2)  
+        SET table TO an empty list  
+        FOR index FROM zero TO size1  
+            CREATE a list of length two RAISED TO THE POWER OF size2 FILLED WITH positive infinity  
+            APPEND the list TO table  
+        END FOR  
+        RETURN table  
+    END FUNCTION  
+END CLASS

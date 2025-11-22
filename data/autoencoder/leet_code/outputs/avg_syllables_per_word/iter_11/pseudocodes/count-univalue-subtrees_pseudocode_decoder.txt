@@ -1,0 +1,63 @@
+CLASS TreeNode  
+    FUNCTION __init__ with parameters val, left, right  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node with parameter values  
+    IF values IS empty  
+        RETURN None  
+    END IF  
+    SET root TO new TreeNode with value element at position zero of values  
+    SET i TO one  
+    SET queue TO deque initialized empty  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO element popped from the left of queue  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT None  
+            SET node.left TO new TreeNode with value element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT None  
+            SET node.right TO new TreeNode with value element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree with parameters p, q  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF value of p.val IS NOT EQUAL TO value of q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree with parameters p.left, q.left AND is_same_tree with parameters p.right, q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION countUnivalSubtrees with parameter root  
+        FUNCTION helper with parameter node  
+            IF node IS None  
+                RETURN True, zero  
+            END IF  
+            SET is_left_unival, left_count TO helper with parameter node.left  
+            SET is_right_unival, right_count TO helper with parameter node.right  
+            IF is_left_unival AND is_right_unival  
+                IF (node.left IS None OR value of node.left.val EQUALS value of node.val) AND (node.right IS None OR value of node.right.val EQUALS value of node.val)  
+                    RETURN True, left_count PLUS right_count PLUS one  
+                END IF  
+            END IF  
+            RETURN False, left_count PLUS right_count  
+        END FUNCTION  
+        SET _, count TO helper with parameter root  
+        RETURN count  
+    END FUNCTION  
+END CLASS

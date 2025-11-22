@@ -1,0 +1,65 @@
+CLASS Solution  
+    FUNCTION shortestCommonSupersequence(str1, str2)  
+        SET m TO the LENGTH OF str1  
+        SET n TO the LENGTH OF str2  
+        
+        CALL create_dp_table WITH m PLUS one AND n PLUS one RETURNING dp  
+        
+        FOR i FROM one TO m  
+            FOR j FROM one TO n  
+                IF the element at position i MINUS one of str1 EQUALS the element at position j MINUS one of str2  
+                    SET the element at position i and j of dp TO the element at position i MINUS one and j MINUS one of dp PLUS one  
+                ELSE  
+                    SET the element at position i and j of dp TO the GREATER OF the element at position i MINUS one and j of dp AND the element at position i and j MINUS one of dp  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET i TO m  
+        SET j TO n  
+        SET scs TO an empty list  
+        
+        WHILE i IS GREATER THAN zero AND j IS GREATER THAN zero  
+            IF the element at position i MINUS one of str1 EQUALS the element at position j MINUS one of str2  
+                APPEND the element at position i MINUS one of str1 TO scs  
+                DECREMENT i BY one  
+                DECREMENT j BY one  
+            ELSE IF the element at position i MINUS one and j of dp IS GREATER THAN the element at position i and j MINUS one of dp  
+                APPEND the element at position i MINUS one of str1 TO scs  
+                DECREMENT i BY one  
+            ELSE  
+                APPEND the element at position j MINUS one of str2 TO scs  
+                DECREMENT j BY one  
+            END IF  
+        END WHILE  
+        
+        WHILE i IS GREATER THAN zero  
+            APPEND the element at position i MINUS one of str1 TO scs  
+            DECREMENT i BY one  
+        END WHILE  
+        
+        WHILE j IS GREATER THAN zero  
+            APPEND the element at position j MINUS one of str2 TO scs  
+            DECREMENT j BY one  
+        END WHILE  
+        
+        CALL reverse_list WITH scs RETURNING scs_reversed  
+        
+        CALL join_characters_in_list WITH scs_reversed RETURNING result_string  
+        
+        RETURN result_string  
+    END FUNCTION  
+    
+    FUNCTION create_dp_table(rows, columns)  
+        CREATE a two dimensional list with rows number of lists each containing columns number of zeros  
+        RETURN this two dimensional list  
+    END FUNCTION  
+    
+    FUNCTION reverse_list(input_list)  
+        RETURN the list with elements in reverse order relative to input_list  
+    END FUNCTION  
+    
+    FUNCTION join_characters_in_list(character_list)  
+        RETURN a concatenated string formed by joining all elements of character_list in their order  
+    END FUNCTION  
+END CLASS

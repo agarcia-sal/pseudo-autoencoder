@@ -1,0 +1,69 @@
+CLASS ListNode  
+    FUNCTION __init__(self, val, next)  
+        SET self.val TO val  
+        SET self.next TO next  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION list_node(values)  
+    IF values IS EMPTY  
+        RETURN NONE  
+    END IF  
+    SET head TO A NEW ListNode WITH val AS element at position zero OF values AND next AS NONE  
+    SET p TO head  
+    FOR each val IN elements OF values FROM position one TO the END  
+        SET node TO A NEW ListNode WITH val AS val AND next AS NONE  
+        SET p.next TO node  
+        SET p TO node  
+    END FOR  
+    RETURN head  
+END FUNCTION  
+
+FUNCTION is_same_list(p1, p2)  
+    IF p1 IS NONE AND p2 IS NONE  
+        RETURN TRUE  
+    END IF  
+    IF p1 IS NONE OR p2 IS NONE  
+        RETURN FALSE  
+    END IF  
+    RETURN THE RESULT OF p1.val EQUAL TO p2.val AND is_same_list WITH ARGUMENTS p1.next AND p2.next  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION reverseKGroup(self, head, k)  
+        FUNCTION reverseLinkedList(start, end)  
+            SET prev TO NONE  
+            SET curr TO start  
+            WHILE curr IS NOT EQUAL TO end  
+                SET next_node TO curr.next  
+                SET curr.next TO prev  
+                SET prev TO curr  
+                SET curr TO next_node  
+            END WHILE  
+            SET curr.next TO prev  
+            RETURN end AND start  
+        END FUNCTION  
+
+        SET dummy TO A NEW ListNode WITH val AS zero AND next AS NONE  
+        SET dummy.next TO head  
+        SET prev_group_end TO dummy  
+
+        WHILE TRUE  
+            SET kth_node TO prev_group_end  
+            FOR counter FROM one TO k  
+                SET kth_node TO kth_node.next  
+                IF kth_node IS NONE  
+                    RETURN dummy.next  
+                END IF  
+            END FOR  
+            SET next_group_start TO kth_node.next  
+            SET kth_node.next TO NONE  
+            SET new_group_start AND new_group_end TO THE RESULT OF reverseLinkedList WITH ARGUMENTS prev_group_end.next AND kth_node  
+            SET prev_group_end.next TO new_group_start  
+            SET new_group_end.next TO next_group_start  
+            SET prev_group_end TO new_group_end  
+        END WHILE  
+
+        RETURN dummy.next  
+    END FUNCTION  
+END CLASS

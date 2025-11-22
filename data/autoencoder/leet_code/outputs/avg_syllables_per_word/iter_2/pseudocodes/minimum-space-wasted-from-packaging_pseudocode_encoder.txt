@@ -1,0 +1,38 @@
+CLASS Solution
+    FUNCTION minWastedSpace(packages: List of Integer, boxes: List of List of Integer)
+        SET MOD TO 10^9 + 7
+        SORT packages
+        SET n TO LENGTH OF packages
+
+        SET prefix_sum TO ARRAY OF SIZE (n + 1) FILLED WITH 0
+        FOR i FROM 0 TO n - 1
+            SET prefix_sum[i + 1] TO prefix_sum[i] + packages[i]
+
+        SET min_wasted_space TO infinity
+
+        FOR each box IN boxes
+            SORT box
+            IF last element of box < last element of packages THEN
+                CONTINUE to next box
+
+            SET total_wasted TO 0
+            SET last_index TO 0
+
+            FOR each box_size IN box
+                SET index TO last_index
+                WHILE index < n AND packages[index] <= box_size
+                    INCREMENT index BY 1
+
+                IF index > last_index THEN
+                    INCREMENT total_wasted BY (index - last_index) * box_size - (prefix_sum[index] - prefix_sum[last_index])
+                    SET last_index TO index
+
+            IF last_index == n THEN
+                SET min_wasted_space TO MINIMUM OF min_wasted_space AND total_wasted
+
+        IF min_wasted_space IS NOT infinity THEN
+            RETURN min_wasted_space MODULO MOD
+        ELSE
+            RETURN -1
+    END FUNCTION
+END CLASS

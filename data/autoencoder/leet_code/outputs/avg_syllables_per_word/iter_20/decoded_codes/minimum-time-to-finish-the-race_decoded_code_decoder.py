@@ -1,0 +1,27 @@
+import math
+from typing import List
+
+class Solution:
+    def minimumFinishTime(self, tires: List[List[int]], changeTime: int, numLaps: int) -> int:
+        min_times = [math.inf] * 15
+
+        for f, r in tires:
+            total_time = 0
+            for i in range(15):
+                lap_time = f * (r ** i)
+                if lap_time > changeTime + f:
+                    break
+                total_time += lap_time
+                if total_time < min_times[i]:
+                    min_times[i] = total_time
+
+        dp = [math.inf] * (numLaps + 1)
+        dp[0] = 0
+        for i in range(1, numLaps + 1):
+            max_j = min(i - 1, 14)
+            for j in range(max_j + 1):
+                candidate = dp[i - j - 1] + min_times[j] + changeTime
+                if candidate < dp[i]:
+                    dp[i] = candidate
+
+        return dp[numLaps] - changeTime

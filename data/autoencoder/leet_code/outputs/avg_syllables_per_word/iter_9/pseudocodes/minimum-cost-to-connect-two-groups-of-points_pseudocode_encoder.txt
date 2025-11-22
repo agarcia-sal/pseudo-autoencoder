@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION connectTwoGroups(self, cost)  
+        SET size1 TO length of cost  
+        SET size2 TO length of first element in cost  
+        
+        FUNCTION initialize_dp_table(rows, columns)  
+            SET table TO empty list  
+            FOR index FROM zero TO rows MINUS one  
+                SET row TO empty list  
+                FOR subindex FROM zero TO columns MINUS one  
+                    APPEND infinity TO row  
+                END FOR  
+                APPEND row TO table  
+            END FOR  
+            RETURN table  
+        END FUNCTION  
+        
+        SET dp TO initialize_dp_table(size1 PLUS one, two RAISED TO size2)  
+        SET dp at zero and zero TO zero  
+        
+        FOR i FROM zero TO size1 MINUS one  
+            FOR mask FROM zero TO two RAISED TO size2 MINUS one  
+                FOR j FROM zero TO size2 MINUS one  
+                    SET new_mask TO mask OR two RAISED TO j  
+                    SET option_cost TO dp at i and mask PLUS cost at i and j  
+                    SET dp at i plus one and new_mask TO minimum of dp at i plus one and new_mask AND option_cost  
+                END FOR  
+                
+                FOR j FROM zero TO size2 MINUS one  
+                    IF bitwise AND of mask AND two RAISED TO j IS NOT zero THEN  
+                        SET alternative_cost TO dp at i plus one and bitwise XOR of mask AND two RAISED TO j PLUS cost at i and j  
+                        SET dp at i plus one and mask TO minimum of dp at i plus one and mask AND alternative_cost  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+        
+        RETURN dp at size1 and (two RAISED TO size2 MINUS one)  
+    END FUNCTION  
+END CLASS

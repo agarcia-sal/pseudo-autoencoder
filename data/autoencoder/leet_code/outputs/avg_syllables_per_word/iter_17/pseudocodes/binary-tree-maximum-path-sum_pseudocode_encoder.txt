@@ -1,0 +1,62 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values list_of_values)
+    IF values IS empty
+        RETURN none
+    END IF
+    SET root TO CALL TreeNode WITH element at position zero of list_of_values
+    SET i TO one
+    SET queue TO CALL deque WITH no parameters
+    CALL APPEND root TO queue
+    WHILE queue IS NOT empty
+        SET node TO CALL popleft ON queue
+        IF i IS LESS THAN the LENGTH OF list_of_values AND element at position i of list_of_values IS NOT none
+            SET node.left TO CALL TreeNode WITH element at position i of list_of_values
+            CALL APPEND node.left TO queue
+        END IF
+        INCREMENT i BY one
+        IF i IS LESS THAN the LENGTH OF list_of_values AND element at position i of list_of_values IS NOT none
+            SET node.right TO CALL TreeNode WITH element at position i of list_of_values
+            CALL APPEND node.right TO queue
+        END IF
+        INCREMENT i BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p node_one, q node_two)
+    IF p IS none AND q IS none
+        RETURN true
+    ELSE IF p IS none OR q IS none
+        RETURN false
+    ELSE IF p.val IS NOT EQUALS q.val
+        RETURN false
+    ELSE
+        RETURN CALL is_same_tree WITH p.left AND q.left AND CALL is_same_tree WITH p.right AND q.right
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION maxPathSum(self, root optional_tree_node)
+        FUNCTION helper(node)
+            IF node IS none
+                RETURN negative infinity, negative infinity
+            END IF
+            SET left_max, left_gain TO CALL helper WITH node.left
+            SET right_max, right_gain TO CALL helper WITH node.right
+
+            SET current_max TO node.val PLUS the GREATER OF left_gain AND zero PLUS the GREATER OF right_gain AND zero
+            SET current_gain TO node.val PLUS the GREATER OF left_gain, right_gain, AND zero
+            SET global_max TO the GREATER OF left_max, right_max, AND current_max
+
+            RETURN global_max, current_gain
+        END FUNCTION
+        RETURN the FIRST element of CALL helper WITH root
+    END FUNCTION
+END CLASS

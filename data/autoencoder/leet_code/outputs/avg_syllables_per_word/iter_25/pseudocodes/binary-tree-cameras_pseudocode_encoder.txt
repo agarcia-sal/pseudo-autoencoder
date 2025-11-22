@@ -1,0 +1,64 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val EQUALS zero left EQUALS none right EQUALS none  
+        SET self val TO val  
+        SET self left TO left  
+        SET self right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO A NEW TreeNode WITH val EQUALS element at position zero of values  
+    SET i TO one  
+    CREATE an empty double ended queue named queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO removing the leftmost element from queue  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT none  
+            SET node left TO A NEW TreeNode WITH val EQUALS element at position i of values  
+            APPEND node left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT none  
+            SET node right TO A NEW TreeNode WITH val EQUALS element at position i of values  
+            APPEND node right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF val of p IS NOT EQUALS TO val of q  
+        RETURN false  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETERS left child of p AND left child of q AND is_same_tree WITH PARAMETERS right child of p AND right child of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION minCameraCover WITH PARAMETERS self root  
+        FUNCTION dfs WITH PARAMETER node  
+            IF node IS none  
+                RETURN zero zero and infinity  
+            END IF  
+            SET left_no_camera left_monitored left_camera TO dfs WITH PARAMETER left child of node  
+            SET right_no_camera right_monitored right_camera TO dfs WITH PARAMETER right child of node  
+            SET no_camera TO left_monitored PLUS right_monitored  
+            SET monitored TO THE MINIMUM OF  
+                left_camera PLUS THE MINIMUM OF right_monitored AND right_camera  
+                right_camera PLUS THE MINIMUM OF left_monitored AND left_camera  
+                left_camera PLUS right_camera  
+            SET camera TO one PLUS THE MINIMUM OF left_no_camera left_monitored left_camera PLUS THE MINIMUM OF right_no_camera right_monitored right_camera  
+            RETURN no_camera monitored camera  
+        END FUNCTION  
+        SET root_no_camera root_monitored root_camera TO dfs WITH PARAMETER root  
+        RETURN THE MINIMUM OF root_monitored AND root_camera  
+    END FUNCTION  
+END CLASS

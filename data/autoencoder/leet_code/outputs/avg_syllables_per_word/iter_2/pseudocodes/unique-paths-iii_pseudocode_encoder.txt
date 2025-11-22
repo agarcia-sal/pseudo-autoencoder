@@ -1,0 +1,43 @@
+CLASS Solution
+    FUNCTION uniquePathsIII(grid)
+        FUNCTION dfs(x, y, steps)
+            IF grid[x][y] == 2 THEN
+                RETURN steps == 0
+            END IF
+
+            SET original TO grid[x][y]
+            SET grid[x][y] TO -2
+            SET count TO 0
+
+            FOR each (dx, dy) IN [(-1, 0), (1, 0), (0, -1), (0, 1)]
+                SET nx TO x + dx
+                SET ny TO y + dy
+                IF nx >= 0 AND nx < m AND ny >= 0 AND ny < n AND grid[nx][ny] >= 0 THEN
+                    INCREMENT count BY dfs(nx, ny, steps - 1)
+                END IF
+            END FOR
+
+            SET grid[x][y] TO original
+            RETURN count
+        END FUNCTION
+
+        SET m TO LENGTH OF grid
+        SET n TO LENGTH OF grid[0]
+        SET start_x TO 0
+        SET start_y TO 0
+        SET empty_squares TO 1
+
+        FOR i FROM 0 TO m - 1
+            FOR j FROM 0 TO n - 1
+                IF grid[i][j] == 1 THEN
+                    SET start_x TO i
+                    SET start_y TO j
+                ELSE IF grid[i][j] == 0 THEN
+                    INCREMENT empty_squares BY 1
+                END IF
+            END FOR
+        END FOR
+
+        RETURN dfs(start_x, start_y, empty_squares)
+    END FUNCTION
+END CLASS

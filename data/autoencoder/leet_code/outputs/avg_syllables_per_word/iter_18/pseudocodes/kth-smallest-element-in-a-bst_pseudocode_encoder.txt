@@ -1,0 +1,63 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val DEFAULT zero left DEFAULT none right DEFAULT none  
+        SET attribute val OF self TO val  
+        SET attribute left OF self TO left  
+        SET attribute right OF self TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETERS values  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO new TreeNode WITH PARAMETER element at position zero of values  
+    SET i TO one  
+    SET queue TO new double ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO element removed from the left of queue  
+        IF i IS LESS THAN length of values AND element at position i of values IS NOT none  
+            SET attribute left OF node TO new TreeNode WITH PARAMETER element at position i of values  
+            APPEND attribute left OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN length of values AND element at position i of values IS NOT none  
+            SET attribute right OF node TO new TreeNode WITH PARAMETER element at position i of values  
+            APPEND attribute right OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF attribute val OF p IS NOT EQUAL TO attribute val OF q  
+        RETURN false  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETERS attribute left OF p attribute left OF q AND is_same_tree WITH PARAMETERS attribute right OF p attribute right OF q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION kthSmallest WITH PARAMETERS self root k  
+        SET stack TO empty list  
+        SET current TO root  
+        SET count TO zero  
+        WHILE stack IS NOT empty OR current IS NOT none  
+            WHILE current IS NOT none  
+                APPEND current TO stack  
+                SET current TO attribute left OF current  
+            END WHILE  
+            SET current TO element removed from the end of stack  
+            INCREMENT count BY one  
+            IF count EQUALS k  
+                RETURN attribute val OF current  
+            END IF  
+            SET current TO attribute right OF current  
+        END WHILE  
+    END FUNCTION  
+END CLASS

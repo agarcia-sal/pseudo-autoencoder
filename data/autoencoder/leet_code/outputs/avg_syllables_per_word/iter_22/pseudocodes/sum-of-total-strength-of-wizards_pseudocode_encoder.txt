@@ -1,0 +1,55 @@
+CLASS Solution  
+    FUNCTION totalStrength(strength)  
+        SET MOD TO one billion PLUS seven  
+        SET n TO the LENGTH OF strength  
+        
+        SET prefix TO a list of zeros with size n PLUS one  
+        FOR i FROM zero TO n MINUS one  
+            SET element at position i PLUS one of prefix TO the remainder of the sum of element at position i of prefix AND element at position i of strength WHEN DIVIDED BY MOD  
+        END FOR  
+        
+        SET prefix_prefix TO a list of zeros with size n PLUS two  
+        FOR i FROM zero TO n  
+            SET element at position i PLUS one of prefix_prefix TO the remainder of the sum of element at position i of prefix_prefix AND element at position i of prefix WHEN DIVIDED BY MOD  
+        END FOR  
+        
+        SET prev_smaller TO a list of minus one repeated n times  
+        SET next_smaller_or_equal TO a list of n repeated n times  
+        
+        SET stack TO an empty list  
+        FOR i FROM zero TO n MINUS one  
+            WHILE stack is not empty AND element at position element at position length of stack MINUS one of stack of strength GREATER THAN OR EQUAL TO element at position i of strength  
+                REMOVE the last element FROM stack  
+            END WHILE  
+            IF stack is not empty  
+                SET element at position i of prev_smaller TO element at position length of stack MINUS one of stack  
+            END IF  
+            APPEND i TO stack  
+        END FOR  
+        
+        CLEAR stack  
+        FOR i FROM n MINUS one DOWN TO zero  
+            WHILE stack is not empty AND element at position element at position length of stack MINUS one of stack of strength GREATER THAN element at position i of strength  
+                REMOVE the last element FROM stack  
+            END WHILE  
+            IF stack is not empty  
+                SET element at position i of next_smaller_or_equal TO element at position length of stack MINUS one of stack  
+            END IF  
+            APPEND i TO stack  
+        END FOR  
+        
+        SET total_strength TO zero  
+        FOR i FROM zero TO n MINUS one  
+            SET left TO element at position i of prev_smaller PLUS one  
+            SET right TO element at position i of next_smaller_or_equal  
+            
+            SET sum_left TO the remainder of the product of the difference between i AND left PLUS one AND the difference between element at position right PLUS one of prefix_prefix AND element at position i PLUS one of prefix_prefix WHEN DIVIDED BY MOD  
+            SET sum_right TO the remainder of the product of the difference between right AND i AND the difference between element at position i PLUS one of prefix_prefix AND element at position left of prefix_prefix WHEN DIVIDED BY MOD  
+            
+            SET contribution TO the remainder of the product of element at position i of strength AND the difference between sum_left AND sum_right WHEN DIVIDED BY MOD  
+            SET total_strength TO the remainder of the sum of total_strength AND contribution WHEN DIVIDED BY MOD  
+        END FOR  
+        
+        RETURN total_strength  
+    END FUNCTION  
+END CLASS

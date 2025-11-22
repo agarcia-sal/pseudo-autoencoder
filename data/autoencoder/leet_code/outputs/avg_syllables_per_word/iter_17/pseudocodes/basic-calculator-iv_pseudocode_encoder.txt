@@ -1,0 +1,151 @@
+CLASS Term
+    FUNCTION __init__(self, coefficient, variables)
+        SET self.coefficient TO coefficient
+        SET self.variables TO variables
+    END FUNCTION
+
+    FUNCTION __lt__(self, other)
+        IF the LENGTH OF self.variables NOT EQUALS the LENGTH OF other.variables
+            RETURN the LENGTH OF self.variables GREATER THAN the LENGTH OF other.variables
+        END IF
+        RETURN the STRING CONCATENATION OF self.variables JOINED BY the ASTERISK LESS THAN the STRING CONCATENATION OF other.variables JOINED BY the ASTERISK
+    END FUNCTION
+
+    FUNCTION __repr__(self)
+        IF self.variables IS EMPTY
+            RETURN the STRING REPRESENTATION OF self.coefficient
+        END IF
+        RETURN the STRING CONCATENATION OF self.coefficient, ASTERISK, AND the STRING CONCATENATION OF self.variables JOINED BY the ASTERISK
+    END FUNCTION
+END CLASS
+
+CLASS Expression
+    FUNCTION __init__(self)
+        SET self.terms TO CALL defaultdict WITH argument integer
+    END FUNCTION
+
+    FUNCTION add_term(self, term)
+        SET key TO the TUPLE OF the SORTED term.variables
+        INCREMENT the VALUE AT key OF self.terms BY term.coefficient
+    END FUNCTION
+
+    FUNCTION multiply(self, other)
+        SET result TO CALL Expression WITH no parameters
+        FOR each vars1, coeff1 IN the ITEMS OF self.terms
+            FOR each vars2, coeff2 IN the ITEMS OF other.terms
+                SET combined_vars TO the SORTED LIST OF the CONCATENATION OF vars1 AND vars2
+                CALL result.add_term WITH THE NEW Term CREATED WITH coefficient EQUAL TO coeff1 MULTIPLIED BY coeff2 AND variables EQUAL TO combined_vars
+            END FOR
+        END FOR
+        RETURN result
+    END FUNCTION
+
+    FUNCTION add(self, other)
+        FOR each vars, coeff IN the ITEMS OF other.terms
+            CALL self.add_term WITH THE NEW Term CREATED WITH coefficient EQUAL TO coeff AND variables EQUAL TO the LIST OF vars
+        END FOR
+        RETURN self
+    END FUNCTION
+
+    FUNCTION subtract(self, other)
+        FOR each vars, coeff IN the ITEMS OF other.terms
+            CALL self.add_term WITH THE NEW Term CREATED WITH coefficient EQUAL TO NEGATIVE coeff AND variables EQUAL TO the LIST OF vars
+        END FOR
+        RETURN self
+    END FUNCTION
+
+    FUNCTION evaluate(self, var_map)
+        SET result TO CALL Expression WITH no parameters
+        FOR each vars, coeff IN the ITEMS OF self.terms
+            SET new_vars TO EMPTY LIST
+            FOR each var IN vars
+                IF var IS IN var_map
+                    APPEND the STRING REPRESENTATION OF the VALUE AT var IN var_map TO new_vars
+                ELSE
+                    APPEND var TO new_vars
+                END IF
+            END FOR
+            IF new_vars IS EMPTY
+                SET new_coeff TO one
+            ELSE
+                SET new_coeff TO CALL eval WITH the CONCATENATION OF ELEMENTS OF new_vars
+            END IF
+            CALL result.add_term WITH THE NEW Term CREATED WITH coefficient EQUAL TO coeff MULTIPLIED BY new_coeff AND variables EQUAL TO EMPTY LIST
+        END FOR
+        RETURN result
+    END FUNCTION
+
+    FUNCTION simplify(self)
+        SET simplified_terms TO the LIST OF Terms CREATED FROM coeff, LIST OF vars FOR EACH vars, coeff IN the ITEMS OF self.terms WHERE coeff NOT EQUALS zero
+        SORT simplified_terms
+        RETURN simplified_terms
+    END FUNCTION
+
+    FUNCTION __repr__(self)
+        RETURN the STRING JOINED BY plus OF THE MAP OF __repr__ APPLIED TO self.simplify()
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION basicCalculatorIV(self, expression, evalvars, evalints)
+        SET var_map TO the DICTIONARY CREATED BY ZIPPING evalvars TO evalints
+        SET tokens TO CALL re.findall WITH PATTERN matching parentheses, plus, minus, multiply, digits, or words ON expression
+        SET output TO EMPTY LIST
+        SET operators TO EMPTY LIST
+
+        FUNCTION apply_operator()
+            SET right TO THE LAST ELEMENT OF output REMOVED
+            SET left TO THE LAST ELEMENT OF output REMOVED
+            SET op TO THE LAST ELEMENT OF operators REMOVED
+            IF op EQUALS plus
+                APPEND left.add(right) TO output
+            ELSE IF op EQUALS minus
+                APPEND left.subtract(right) TO output
+            ELSE IF op EQUALS multiply
+                APPEND left.multiply(right) TO output
+            END IF
+        END FUNCTION
+
+        SET i TO zero
+        WHILE i LESS THAN THE LENGTH OF tokens
+            SET token TO ELEMENT AT POSITION i OF tokens
+            IF token CONSISTS OF ONLY DIGITS
+                APPEND CALL Expression WITH no parameters TO output
+                CALL the LAST ELEMENT OF output.add_term WITH THE NEW Term WITH coefficient EQUAL TO the INTEGER VALUE OF token AND variables EQUAL TO EMPTY LIST
+            ELSE IF token CONSISTS OF ONLY LETTERS
+                APPEND CALL Expression WITH no parameters TO output
+                SET coef TO THE VALUE AT token IN var_map IF PRESENT OR one OTHERWISE
+                IF coef EQUALS one
+                    IF token NOT IN var_map
+                        CALL the LAST ELEMENT OF output.add_term WITH THE NEW Term WITH coefficient one AND variables LIST CONTAINING token
+                    ELSE
+                        CALL the LAST ELEMENT OF output.add_term WITH THE NEW Term WITH coefficient one AND variables EMPTY LIST
+                    END IF
+                ELSE
+                    CALL the LAST ELEMENT OF output.add_term WITH THE NEW Term WITH coefficient coef AND variables EMPTY LIST
+                END IF
+            ELSE IF token EQUALS left parenthesis
+                APPEND token TO operators
+            ELSE IF token EQUALS right parenthesis
+                WHILE operators IS NOT EMPTY AND THE LAST ELEMENT OF operators NOT EQUAL TO left parenthesis
+                    CALL apply_operator
+                END WHILE
+                REMOVE THE LAST ELEMENT OF operators
+            ELSE IF token IN plus, minus, multiply
+                WHILE operators IS NOT EMPTY AND THE LAST ELEMENT OF operators NOT EQUAL TO left parenthesis AND
+                      (token IN plus OR minus OR THE LAST ELEMENT OF operators EQUALS multiply)
+                    CALL apply_operator
+                END WHILE
+                APPEND token TO operators
+            END IF
+            INCREMENT i BY one
+        END WHILE
+
+        WHILE operators IS NOT EMPTY
+            CALL apply_operator
+        END WHILE
+
+        SET simplified_terms TO CALL simplify ON THE FIRST ELEMENT OF output
+        RETURN A LIST OF THE STRING CONCATENATIONS OF term.coefficient, ASTERISK, and the STRING CONCATENATION OF term.variables JOINED BY ASTERISK IF term.variables IS NOT EMPTY ELSE THE STRING REPRESENTATION OF term.coefficient FOR EACH term IN simplified_terms
+    END FUNCTION
+END CLASS

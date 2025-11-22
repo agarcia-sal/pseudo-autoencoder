@@ -1,0 +1,75 @@
+CLASS Solution  
+    FUNCTION outerTrees(trees)  
+        FUNCTION dist_sq(p1, p2)  
+            SET difference_in_first_component TO element at position zero OF p1 MINUS element at position zero OF p2  
+            SET difference_in_second_component TO element at position one OF p1 MINUS element at position one OF p2  
+            SET square_of_difference_first TO difference_in_first_component MULTIPLIED BY difference_in_first_component  
+            SET square_of_difference_second TO difference_in_second_component MULTIPLIED BY difference_in_second_component  
+            SET sum_of_squares TO square_of_difference_first PLUS square_of_difference_second  
+            RETURN sum_of_squares  
+        END FUNCTION  
+
+        FUNCTION circumcenter(p1, p2, p3)  
+            SET ax TO element at position zero OF p1  
+            SET ay TO element at position one OF p1  
+            SET bx TO element at position zero OF p2  
+            SET by TO element at position one OF p2  
+            SET cx TO element at position zero OF p3  
+            SET cy TO element at position one OF p3  
+
+            SET term_one TO ax MULTIPLIED BY (by MINUS cy)  
+            SET term_two TO bx MULTIPLIED BY (cy MINUS ay)  
+            SET term_three TO cx MULTIPLIED BY (ay MINUS by)  
+            SET d TO two MULTIPLIED BY (term_one PLUS term_two PLUS term_three)  
+
+            SET sum_squares_ax_ay TO ax MULTIPLIED BY ax PLUS ay MULTIPLIED BY ay  
+            SET sum_squares_bx_by TO bx MULTIPLIED BY bx PLUS by MULTIPLIED BY by  
+            SET sum_squares_cx_cy TO cx MULTIPLIED BY cx PLUS cy MULTIPLIED BY cy  
+
+            SET ux_numerator TO sum_squares_ax_ay MULTIPLIED BY (by MINUS cy) PLUS sum_squares_bx_by MULTIPLIED BY (cy MINUS ay) PLUS sum_squares_cx_cy MULTIPLIED BY (ay MINUS by)  
+            SET ux TO ux_numerator DIVIDED BY d  
+
+            SET uy_numerator TO sum_squares_ax_ay MULTIPLIED BY (cx MINUS bx) PLUS sum_squares_bx_by MULTIPLIED BY (ax MINUS cx) PLUS sum_squares_cx_cy MULTIPLIED BY (bx MINUS ax)  
+            SET uy TO uy_numerator DIVIDED BY d  
+
+            SET radius_square_component_one TO ux MINUS ax  
+            SET radius_square_component_two TO uy MINUS ay  
+            SET radius_square TO radius_square_component_one MULTIPLIED BY radius_square_component_one PLUS radius_square_component_two MULTIPLIED BY radius_square_component_two  
+            SET radius TO radius_square RAISED TO THE POWER OF one divided by two  
+
+            RETURN list containing ux AND uy, radius  
+        END FUNCTION  
+
+        FUNCTION welzl(points, boundary, n)  
+            IF n EQUALS zero OR the LENGTH OF boundary EQUALS three  
+                IF the LENGTH OF boundary EQUALS zero  
+                    RETURN list containing zero AND zero, zero  
+                ELSE IF the LENGTH OF boundary EQUALS one  
+                    RETURN element at position zero OF boundary, zero  
+                ELSE IF the LENGTH OF boundary EQUALS two  
+                    SET midpoint_first_component TO element at position zero of the element at position zero OF boundary PLUS element at position zero of the element at position one OF boundary DIVIDED BY two  
+                    SET midpoint_second_component TO element at position one of the element at position zero OF boundary PLUS element at position one of the element at position one OF boundary DIVIDED BY two  
+                    SET center TO list containing midpoint_first_component AND midpoint_second_component  
+                    SET distance_square TO CALL dist_sq WITH arguments element at position zero OF boundary AND element at position one OF boundary  
+                    SET radius TO distance_square RAISED TO THE POWER OF one divided by two DIVIDED BY two  
+                    RETURN center, radius  
+                ELSE  
+                    RETURN CALL circumcenter WITH elements unpacked from boundary  
+                END IF  
+            END IF  
+
+            SET p TO element at position n MINUS one OF points  
+            SET center, radius TO CALL welzl WITH arguments points, boundary, n MINUS one  
+            SET distance_to_p TO CALL dist_sq WITH arguments center AND p  
+            IF distance_to_p LESS THAN OR EQUAL TO radius MULTIPLIED BY radius  
+                RETURN center, radius  
+            END IF  
+
+            RETURN CALL welzl WITH arguments points, boundary PLUS list containing p, n MINUS one  
+        END FUNCTION  
+
+        CALL random shuffle ON trees  
+        SET center, radius TO CALL welzl WITH arguments trees, empty list, LENGTH OF trees  
+        RETURN list containing element at position zero OF center, element at position one OF center, radius  
+    END FUNCTION  
+END CLASS

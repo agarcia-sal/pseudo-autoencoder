@@ -1,0 +1,39 @@
+CLASS Solution
+    FUNCTION maxTaskAssign(tasks: List[int], workers: List[int], pills: int, strength: int) RETURNS int
+        SORT tasks
+        SORT workers
+
+        FUNCTION canAssignTasks(k) RETURNS bool
+            SET available_workers TO last k elements of workers
+            SET pills_used TO 0
+
+            FOR i FROM k - 1 DOWNTO 0
+                SET task TO tasks[i]
+
+                SET worker_idx TO position of smallest worker in available_workers with value >= task
+                IF worker_idx is less than LENGTH OF available_workers THEN
+                    REMOVE element at worker_idx from available_workers
+                ELSE IF pills_used < pills THEN
+                    SET worker_idx TO position of smallest worker in available_workers with value >= (task - strength)
+                    IF worker_idx is less than LENGTH OF available_workers THEN
+                        REMOVE element at worker_idx from available_workers
+                        INCREMENT pills_used BY 1
+                    ELSE
+                        RETURN False
+                ELSE
+                    RETURN False
+            RETURN True
+        END FUNCTION
+
+        SET left TO 0
+        SET right TO minimum of LENGTH OF tasks and LENGTH OF workers PLUS 1
+
+        WHILE left < right
+            SET mid TO (left + right) DIVIDED BY 2
+            IF canAssignTasks(mid) THEN
+                SET left TO mid + 1
+            ELSE
+                SET right TO mid
+        RETURN left - 1
+    END FUNCTION
+END CLASS

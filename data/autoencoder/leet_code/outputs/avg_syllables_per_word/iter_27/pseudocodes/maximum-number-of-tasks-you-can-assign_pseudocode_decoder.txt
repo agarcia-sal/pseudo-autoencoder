@@ -1,0 +1,45 @@
+CLASS Solution  
+    FUNCTION maxTaskAssign(tasks, workers, pills, strength)  
+        CALL tasks TO SORT IN ASCENDING ORDER  
+        CALL workers TO SORT IN ASCENDING ORDER  
+        
+        FUNCTION canAssignTasks(k)  
+            SET available_workers TO the LAST k ELEMENTS OF workers  
+            SET pills_used TO zero  
+            
+            FOR i FROM k MINUS one DOWN TO zero  
+                SET task TO the ELEMENT at position i of tasks  
+                
+                SET worker_idx TO the LOWEST POSITION IN available_workers WHERE task CAN BE INSERTED TO MAINTAIN ORDER  
+                IF worker_idx IS LESS THAN the LENGTH OF available_workers THEN  
+                    REMOVE the ELEMENT at position worker_idx FROM available_workers  
+                ELSE IF pills_used IS LESS THAN pills THEN  
+                    SET worker_idx TO the LOWEST POSITION IN available_workers WHERE task MINUS strength CAN BE INSERTED TO MAINTAIN ORDER  
+                    IF worker_idx IS LESS THAN the LENGTH OF available_workers THEN  
+                        REMOVE the ELEMENT at position worker_idx FROM available_workers  
+                        INCREMENT pills_used BY one  
+                    ELSE  
+                        RETURN False  
+                    END IF  
+                ELSE  
+                    RETURN False  
+                END IF  
+            END FOR  
+            RETURN True  
+        END FUNCTION  
+        
+        SET left TO zero  
+        SET right TO the MINIMUM OF the LENGTH OF tasks AND the LENGTH OF workers PLUS one  
+        
+        WHILE left IS LESS THAN right  
+            SET mid TO the INTEGER DIVISION OF left PLUS right BY two  
+            IF canAssignTasks(mid) IS True THEN  
+                SET left TO mid PLUS one  
+            ELSE  
+                SET right TO mid  
+            END IF  
+        END WHILE  
+        
+        RETURN left MINUS one  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,11 @@
+from math import gcd
+
+def mirrorReflection(p, q):
+    lcm = (p * q) // gcd(p, q)
+    v = lcm // p
+    h = lcm // q
+    if v % 2 == 0:
+        return 0
+    if h % 2 == 1:
+        return 1
+    return 2

@@ -1,0 +1,34 @@
+CLASS Solution  
+    FUNCTION minChanges(list_of_numbers WITH ELEMENT TYPE integer, k)  
+        CREATE a collection named groups that returns an empty list for any new key  
+        FOR each index FROM zero TO the LENGTH OF list_of_numbers MINUS one  
+            APPEND element at position index of list_of_numbers TO the list in groups at the remainder of index DIVIDED BY k  
+        END FOR  
+  
+        CREATE a list named freq containing k elements EACH BEING a collection that returns zero for any new key  
+        CREATE a list named min_size containing k elements EACH BEING infinity  
+        FOR each index FROM zero TO k MINUS one  
+            FOR each number IN the list associated to index in groups  
+                INCREMENT the count of number in freq at position index BY one  
+            END FOR  
+            SET element at position index of min_size TO the LENGTH OF the list associated to index in groups  
+        END FOR  
+  
+        CREATE a list named dp containing two TO THE POWER OF ten elements EACH BEING infinity  
+        SET element at position zero of dp TO zero  
+  
+        FOR each index FROM zero TO k MINUS one  
+            CREATE a list named new_dp containing two TO THE POWER OF ten elements EACH BEING infinity  
+            SET variable min_dp TO the minimum value contained in dp  
+            FOR each integer j FROM zero TO two TO THE POWER OF ten MINUS one  
+                SET element at position j of new_dp TO min_dp PLUS element at position index of min_size  
+                FOR each number AND its count IN the collection freq at position index  
+                    SET element at position j of new_dp TO the minimum BETWEEN the current element at position j of new_dp AND the sum of element at position of the result of bitwise XOR of j AND number in dp PLUS element at position index of min_size MINUS count  
+                END FOR  
+            END FOR  
+            ASSIGN reference of new_dp TO dp  
+        END FOR  
+  
+        RETURN element at position zero of dp  
+    END FUNCTION  
+END CLASS

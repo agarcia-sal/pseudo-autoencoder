@@ -1,0 +1,22 @@
+class Solution:
+    def maxPoints(self, points):
+        def slope(p1, p2):
+            if p1[0] == p2[0]:
+                return float('inf')
+            return (p1[1] - p2[1]) / (p1[0] - p2[0])
+
+        max_points = 0
+
+        for i in range(len(points)):
+            slopes = {}
+            for j in range(len(points)):
+                if i != j:
+                    s = slope(points[i], points[j])
+                    slopes[s] = slopes.get(s, 0) + 1
+                    if slopes[s] > max_points:
+                        max_points = slopes[s]
+
+        if points:
+            return max_points + 1
+        else:
+            return 0

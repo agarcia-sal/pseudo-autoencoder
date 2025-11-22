@@ -1,0 +1,61 @@
+CLASS Solution  
+    FUNCTION smallestMissingValueSubtree(parents LIST OF INTEGER nums LIST OF INTEGER) RETURNS LIST OF INTEGER  
+        SET n TO the LENGTH OF parents  
+        CREATE a default dictionary named tree with list as default value type  
+        
+        FOR index FROM one TO n MINUS one  
+            APPEND index TO the list at key element at position index of parents in tree  
+        END FOR  
+        
+        SET node_with_one TO negative one  
+        FOR index FROM zero TO n MINUS one  
+            IF element at position index of nums EQUALS one  
+                SET node_with_one TO index  
+                BREAK the loop  
+            END IF  
+        END FOR  
+        
+        IF node_with_one EQUALS negative one  
+            CREATE a list containing one repeated n times  
+            RETURN this list  
+        END IF  
+        
+        CREATE a list named result containing one repeated n times  
+        
+        FUNCTION dfs(node INTEGER) RETURNS a set  
+            ADD node TO the set named visited  
+            CREATE a set named genetic_values containing element at position node of nums  
+            FOR each child IN the list at key node in tree  
+                IF child NOT IN visited  
+                    UPDATE genetic_values WITH the set returned by dfs called with child  
+                END IF  
+            END FOR  
+            
+            SET smallest_missing TO one  
+            WHILE smallest_missing IS IN genetic_values  
+                INCREMENT smallest_missing BY one  
+            END WHILE  
+            
+            SET element at position node of result TO smallest_missing  
+            RETURN genetic_values  
+        END FUNCTION  
+        
+        CREATE an empty set named visited  
+        CREATE an empty list named path  
+        SET current TO node_with_one  
+        WHILE current NOT EQUALS negative one  
+            APPEND current TO path  
+            SET current TO element at position current of parents  
+        END WHILE  
+        
+        CREATE a set named path_set FROM path  
+        FOR each node IN path in reverse order  
+            IF node IS IN visited  
+                CONTINUE to next iteration  
+            END IF  
+            CALL dfs with node  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,68 @@
+CLASS TreeNode  
+    FUNCTION __init__ with parameters val left right  
+        SET val OF self TO val  
+        SET left OF self TO left  
+        SET right OF self TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node with parameter values  
+    IF values EQUALS empty  
+        RETURN none  
+    END IF  
+    SET root TO new TreeNode with element at position one of values  
+    SET i TO one  
+    CREATE empty double ended queue queue  
+    APPEND root TO queue  
+    WHILE queue is not empty  
+        SET node TO the element removed from the left of queue  
+        IF i LESS THAN the length OF values AND the element at position i of values is not none  
+            SET left OF node TO new TreeNode with element at position i of values  
+            APPEND left OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN the length OF values AND the element at position i of values is not none  
+            SET right OF node TO new TreeNode with element at position i of values  
+            APPEND right OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree with parameters p q  
+    IF p EQUALS none AND q EQUALS none  
+        RETURN True  
+    ELSE IF p EQUALS none OR q EQUALS none  
+        RETURN False  
+    ELSE IF val OF p NOT EQUALS val OF q  
+        RETURN False  
+    ELSE  
+        RETURN the result OF is_same_tree with parameters left OF p left OF q AND the result OF is_same_tree with parameters right OF p right OF q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION longestUnivaluePath with parameter root  
+        FUNCTION dfs with parameter node  
+            IF node EQUALS none  
+                RETURN zero AND zero  
+            END IF  
+            SET left_length AND left_value TO the result OF dfs with parameter left OF node  
+            SET right_length AND right_value TO the result OF dfs with parameter right OF node  
+            SET left_arrow TO zero  
+            SET right_arrow TO zero  
+            IF left OF node NOT EQUALS none AND val OF left OF node EQUALS val OF node  
+                SET left_arrow TO left_length PLUS one  
+            END IF  
+            IF right OF node NOT EQUALS none AND val OF right OF node EQUALS val OF node  
+                SET right_arrow TO right_length PLUS one  
+            END IF  
+            SET max_length OF self TO the maximum OF max_length OF self AND left_arrow PLUS right_arrow  
+            RETURN the maximum OF left_arrow AND right_arrow AND val OF node  
+        END FUNCTION  
+        SET max_length OF self TO zero  
+        CALL dfs with parameter root  
+        RETURN max_length OF self  
+    END FUNCTION  
+END CLASS

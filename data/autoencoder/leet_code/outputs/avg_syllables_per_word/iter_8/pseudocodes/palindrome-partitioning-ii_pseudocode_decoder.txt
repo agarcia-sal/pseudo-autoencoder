@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION minCut(s)  
+        SET n TO LENGTH OF s  
+        IF n LESS THAN OR EQUAL TO 1  
+            RETURN 0  
+        END IF  
+        
+        SET is_palindrome TO 2D LIST of size n BY n WITH False  
+        
+        FOR i FROM 0 TO n MINUS 1  
+            SET is_palindrome[i][i] TO True  
+        END FOR  
+        
+        FOR length FROM 2 TO n  
+            FOR start FROM 0 TO n MINUS length  
+                SET end TO start PLUS length MINUS 1  
+                IF length EQUALS 2  
+                    SET is_palindrome[start][end] TO WHETHER s[start] EQUALS s[end]  
+                ELSE  
+                    SET is_palindrome[start][end] TO WHETHER s[start] EQUALS s[end] AND is_palindrome[start PLUS 1][end MINUS 1] IS True  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET min_cuts TO LIST of size n FILLED WITH 0  
+        FOR i FROM 0 TO n MINUS 1  
+            IF is_palindrome[0][i] IS True  
+                SET min_cuts[i] TO 0  
+            ELSE  
+                SET min_cuts[i] TO infinity  
+                FOR j FROM 1 TO i  
+                    IF is_palindrome[j][i] IS True AND min_cuts[j MINUS 1] PLUS 1 LESS THAN min_cuts[i]  
+                        SET min_cuts[i] TO min_cuts[j MINUS 1] PLUS 1  
+                    END IF  
+                END FOR  
+            END IF  
+        END FOR  
+        
+        RETURN min_cuts[n MINUS 1]  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,48 @@
+CLASS Solution
+    FUNCTION minimumWeight(n, edges, src1, src2, dest)
+        FUNCTION dijkstra(graph, start)
+            SET distances TO list of size n with all values as infinity
+            SET distances[start] TO 0
+            SET heap TO list containing tuple (0, start)
+            
+            WHILE heap is not empty
+                SET current_distance, current_node TO heappop from heap
+                
+                IF current_distance greater than distances[current_node]
+                    CONTINUE
+                
+                FOR each neighbor, weight IN graph[current_node]
+                    SET distance TO current_distance plus weight
+                    
+                    IF distance less than distances[neighbor]
+                        SET distances[neighbor] TO distance
+                        heappush tuple (distance, neighbor) TO heap
+            
+            RETURN distances
+        END FUNCTION
+        
+        SET graph TO list of n empty lists
+        SET reverse_graph TO list of n empty lists
+        
+        FOR each u, v, w IN edges
+            APPEND tuple (v, w) TO graph[u]
+            APPEND tuple (u, w) TO reverse_graph[v]
+        
+        SET dist_from_src1 TO dijkstra(graph, src1)
+        SET dist_from_src2 TO dijkstra(graph, src2)
+        SET dist_to_dest TO dijkstra(reverse_graph, dest)
+        
+        SET min_weight TO infinity
+        
+        FOR i FROM 0 TO n MINUS 1
+            IF dist_from_src1[i] is not infinity AND dist_from_src2[i] is not infinity AND dist_to_dest[i] is not infinity
+                SET combined_weight TO dist_from_src1[i] plus dist_from_src2[i] plus dist_to_dest[i]
+                IF combined_weight less than min_weight
+                    SET min_weight TO combined_weight
+        
+        IF min_weight equals infinity
+            RETURN -1
+        ELSE
+            RETURN min_weight
+    END FUNCTION
+END CLASS

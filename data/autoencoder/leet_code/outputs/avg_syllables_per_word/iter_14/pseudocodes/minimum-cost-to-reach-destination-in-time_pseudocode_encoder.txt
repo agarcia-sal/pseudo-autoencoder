@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION minCost(maxTime, edges, passingFees)  
+        SET n TO the LENGTH OF passingFees  
+        SET graph TO a new list of empty lists REPEATED n times  
+        FOR each element edge IN edges  
+            SET x TO the element at position zero OF edge  
+            SET y TO the element at position one OF edge  
+            SET time TO the element at position two OF edge  
+            APPEND tuple containing y AND time TO the element at position x OF graph  
+            APPEND tuple containing x AND time TO the element at position y OF graph  
+        END FOR  
+        
+        SET pq TO a list containing a tuple of the element at position zero OF passingFees, zero, AND zero  
+        SET visited_time TO a list containing positive infinity REPEATED n times  
+        SET the element at position zero OF visited_time TO zero  
+        
+        WHILE the LENGTH OF pq IS GREATER THAN zero  
+            REMOVE and ASSIGN the smallest tuple FROM pq TO current_cost, current_city, current_time  
+            
+            IF current_city EQUAL TO n MINUS one  
+                RETURN current_cost  
+            END IF  
+            
+            FOR each element neighbor_trip IN the element at position current_city OF graph  
+                SET neighbor TO the element at position zero OF neighbor_trip  
+                SET travel_time TO the element at position one OF neighbor_trip  
+                
+                SET new_time TO current_time PLUS travel_time  
+                SET new_cost TO current_cost PLUS the element at position neighbor OF passingFees  
+                
+                IF new_time IS LESS THAN OR EQUAL TO maxTime AND (new_time IS LESS THAN the element at position neighbor OF visited_time OR new_cost IS LESS THAN current_cost)  
+                    SET the element at position neighbor OF visited_time TO new_time  
+                    ADD the tuple containing new_cost, neighbor, new_time TO pq  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

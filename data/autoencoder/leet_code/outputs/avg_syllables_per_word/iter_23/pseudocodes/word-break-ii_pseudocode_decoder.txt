@@ -1,0 +1,38 @@
+CLASS Solution  
+    FUNCTION wordBreak(s parameter OF type string, wordDict parameter OF type list OF string) RETURNS list OF string  
+        SET wordSet TO an empty set  
+        FOR each word IN wordDict  
+            ADD word TO wordSet  
+        END FOR  
+        SET memo TO an empty dictionary  
+        
+        FUNCTION backtrack(start parameter OF type integer) RETURNS list OF string  
+            IF start EXISTS AS a key IN memo  
+                RETURN the value CORRESPONDING TO start IN memo  
+            END IF  
+            IF start EQUALS the length OF s  
+                RETURN a list CONTAINING the empty string  
+            END IF  
+            
+            SET res TO an empty list  
+            FOR end FROM start PLUS one TO the length OF s PLUS one  
+                SET word TO the substring OF s FROM position start TO position end MINUS one  
+                IF word EXISTS IN wordSet  
+                    SET sentences TO the result OF backtrack WITH argument end  
+                    FOR each sentence IN sentences  
+                        IF sentence EQUALS the empty string  
+                            APPEND word TO res  
+                        ELSE  
+                            APPEND the concatenation OF word PLUS a space PLUS sentence TO res  
+                        END IF  
+                    END FOR  
+                END IF  
+            END FOR  
+            
+            SET memo AT key start TO res  
+            RETURN res  
+        END FUNCTION  
+        
+        RETURN backtrack WITH argument zero  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,61 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val EQUALS zero left EQUALS None right EQUALS None  
+        SET self dot val TO val  
+        SET self dot left TO left  
+        SET self dot right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values IS EMPTY  
+        RETURN None  
+    END IF  
+    SET root TO NEW TreeNode WITH PARAMETER element at position zero of values  
+    SET i TO one  
+    SET queue TO a new double ended queue structure  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO the first element removed from the left of queue  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT None  
+            SET node dot left TO NEW TreeNode WITH PARAMETER element at position i of values  
+            APPEND node dot left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT None  
+            SET node dot right TO NEW TreeNode WITH PARAMETER element at position i of values  
+            APPEND node dot right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p dot val IS NOT EQUAL TO q dot val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETERS p dot left q dot left AND is_same_tree WITH PARAMETERS p dot right q dot right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION sumNumbers WITH PARAMETERS root  
+        FUNCTION dfs WITH PARAMETERS node current_number  
+            IF node IS None  
+                RETURN zero  
+            END IF  
+            SET current_number TO current_number MULTIPLIED BY ten PLUS node dot val  
+            IF node dot left IS None AND node dot right IS None  
+                RETURN current_number  
+            END IF  
+            SET left_sum TO dfs WITH PARAMETERS node dot left current_number  
+            SET right_sum TO dfs WITH PARAMETERS node dot right current_number  
+            RETURN left_sum PLUS right_sum  
+        END FUNCTION  
+        RETURN dfs WITH PARAMETERS root zero  
+    END FUNCTION  
+END CLASS

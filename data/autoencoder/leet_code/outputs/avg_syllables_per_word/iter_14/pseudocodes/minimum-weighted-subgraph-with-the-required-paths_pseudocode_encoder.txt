@@ -1,0 +1,59 @@
+CLASS Solution  
+    FUNCTION minimumWeight(n, edges, src1, src2, dest)  
+        FUNCTION dijkstra(graph, start)  
+            SET distances TO a list of size n FILLED WITH positive infinity  
+            SET the element at position start OF distances TO zero  
+            SET heap TO a list CONTAINING a pair of zero AND start  
+            
+            WHILE the LENGTH OF heap IS GREATER THAN zero  
+                SET current_distance AND current_node TO the pair REMOVED FROM heap USING the heap pop operation  
+                
+                IF current_distance IS GREATER THAN the element at position current_node OF distances  
+                    CONTINUE to the next iteration  
+                END IF  
+                
+                FOR each pair neighbor AND weight IN the element at position current_node OF graph  
+                    SET distance TO current_distance PLUS weight  
+                    
+                    IF distance IS LESS THAN the element at position neighbor OF distances  
+                        SET the element at position neighbor OF distances TO distance  
+                        ADD the pair distance AND neighbor TO heap USING the heap push operation  
+                    END IF  
+                END FOR  
+            END WHILE  
+            
+            RETURN distances  
+        END FUNCTION  
+        
+        SET graph TO a list OF size n WHERE each element IS an empty list  
+        SET reverse_graph TO a list OF size n WHERE each element IS an empty list  
+        
+        FOR each triple u v w IN edges  
+            APPEND the pair v AND w TO the element at position u OF graph  
+            APPEND the pair u AND w TO the element at position v OF reverse_graph  
+        END FOR  
+        
+        SET dist_from_src1 TO the result of CALLING dijkstra WITH graph AND src1  
+        SET dist_from_src2 TO the result of CALLING dijkstra WITH graph AND src2  
+        SET dist_to_dest TO the result of CALLING dijkstra WITH reverse_graph AND dest  
+        
+        SET min_weight TO positive infinity  
+        
+        FOR index FROM zero TO n MINUS one  
+            IF the element at position index OF dist_from_src1 IS NOT positive infinity  
+            AND the element at position index OF dist_from_src2 IS NOT positive infinity  
+            AND the element at position index OF dist_to_dest IS NOT positive infinity  
+                SET total_distance TO the element at position index OF dist_from_src1 PLUS the element at position index OF dist_from_src2 PLUS the element at position index OF dist_to_dest  
+                IF total_distance IS LESS THAN min_weight  
+                    SET min_weight TO total_distance  
+                END IF  
+            END IF  
+        END FOR  
+        
+        IF min_weight IS EQUAL TO positive infinity  
+            RETURN negative one  
+        ELSE  
+            RETURN min_weight  
+        END IF  
+    END FUNCTION  
+END CLASS

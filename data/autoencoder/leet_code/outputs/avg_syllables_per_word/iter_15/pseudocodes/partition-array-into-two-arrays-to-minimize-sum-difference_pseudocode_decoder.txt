@@ -1,0 +1,58 @@
+CLASS Solution  
+    FUNCTION minimumDifference(nums)  
+        SET n TO the LENGTH OF nums DIVIDED BY two  
+        SET total_sum TO the SUM OF nums  
+        SET target TO total_sum DIVIDED BY two  
+        SET min_diff TO infinity  
+        
+        SET left_half TO the SUBLIST OF nums FROM position zero TO position n MINUS one  
+        SET right_half TO the SUBLIST OF nums FROM position n TO the END OF nums  
+        
+        SET left_sums TO a LIST OF dictionaries with LENGTH n PLUS one  
+        SET right_sums TO a LIST OF dictionaries with LENGTH n PLUS one  
+        
+        FOR each i FROM zero TO n  
+            FOR each combination OF left_half TAKING i elements  
+                SET subset_sum TO the SUM OF combination  
+                IF subset_sum NOT IN left_sums AT position i THEN  
+                    SET left_sums AT position i AT key subset_sum TO zero  
+                END IF  
+                INCREMENT left_sums AT position i AT key subset_sum BY one  
+            END FOR  
+            
+            FOR each combination OF right_half TAKING i elements  
+                SET subset_sum TO the SUM OF combination  
+                IF subset_sum NOT IN right_sums AT position i THEN  
+                    SET right_sums AT position i AT key subset_sum TO zero  
+                END IF  
+                INCREMENT right_sums AT position i AT key subset_sum BY one  
+            END FOR  
+        END FOR  
+        
+        FOR each i FROM zero TO n  
+            SET left_values TO the sorted LIST OF keys IN left_sums AT position i  
+            SET right_values TO the sorted LIST OF keys IN right_sums AT position n MINUS i  
+            
+            SET j TO zero  
+            SET k TO the LENGTH OF right_values MINUS one  
+            
+            WHILE j LESS THAN the LENGTH OF left_values AND k GREATER THAN OR EQUAL TO zero  
+                SET current_sum TO left_values AT position j PLUS right_values AT position k  
+                SET candidate_diff TO the ABSOLUTE VALUE OF total_sum MINUS two MULTIPLIED BY current_sum  
+                IF candidate_diff LESS THAN min_diff THEN  
+                    SET min_diff TO candidate_diff  
+                END IF  
+                
+                IF current_sum LESS THAN target THEN  
+                    INCREMENT j BY one  
+                ELSE IF current_sum GREATER THAN target THEN  
+                    DECREMENT k BY one  
+                ELSE  
+                    RETURN zero  
+                END IF  
+            END WHILE  
+        END FOR  
+        
+        RETURN min_diff  
+    END FUNCTION  
+END CLASS

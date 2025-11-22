@@ -1,0 +1,67 @@
+CLASS Solution
+    FUNCTION containVirus(isInfected)
+        FUNCTION neighbors(r, c)
+            RETURN list of coordinates: (r+1, c), (r-1, c), (r, c+1), (r, c-1)
+        END FUNCTION
+
+        FUNCTION bfs(r, c)
+            SET infected TO empty set
+            SET threatened TO empty set
+            SET queue TO deque with element (r, c)
+            SET visited TO set with element (r, c)
+            WHILE queue is not empty
+                SET x, y TO dequeue from queue
+                ADD (x, y) TO infected
+                FOR each (nx, ny) IN neighbors(x, y)
+                    IF nx is within 0 and m-1 AND ny is within 0 and n-1 AND (nx, ny) not in visited
+                        ADD (nx, ny) TO visited
+                        IF isInfected[nx][ny] EQUALS 1
+                            APPEND (nx, ny) TO queue
+                        ELSE IF isInfected[nx][ny] EQUALS 0
+                            ADD (nx, ny) TO threatened
+            RETURN infected, threatened
+        END FUNCTION
+
+        FUNCTION build_walls(infected)
+            SET walls TO 0
+            FOR each (x, y) IN infected
+                FOR each (nx, ny) IN neighbors(x, y)
+                    IF nx is within 0 and m-1 AND ny is within 0 and n-1 AND isInfected[nx][ny] EQUALS 0
+                        INCREMENT walls BY 1
+            RETURN walls
+        END FUNCTION
+
+        FUNCTION spread_virus(threatened)
+            FOR each (x, y) IN threatened
+                SET isInfected[x][y] TO 1
+        END FUNCTION
+
+        SET m TO number of rows in isInfected
+        SET n TO number of columns in isInfected
+        SET total_walls TO 0
+
+        WHILE True
+            SET regions TO empty list
+            SET visited TO empty set
+            FOR r FROM 0 TO m-1
+                FOR c FROM 0 TO n-1
+                    IF isInfected[r][c] EQUALS 1 AND (r, c) not in visited
+                        SET infected, threatened TO bfs(r, c)
+                        APPEND (infected, threatened) TO regions
+                        ADD all elements of infected TO visited
+
+            IF regions is empty
+                BREAK
+
+            SORT regions descending by size of threatened set
+
+            INCREMENT total_walls BY build_walls(regions[0][0])
+            FOR each (x, y) IN regions[0][0]
+                SET isInfected[x][y] TO -1
+
+            FOR i FROM 1 TO length of regions minus 1
+                spread_virus(regions[i][1])
+
+        RETURN total_walls
+    END FUNCTION
+END CLASS

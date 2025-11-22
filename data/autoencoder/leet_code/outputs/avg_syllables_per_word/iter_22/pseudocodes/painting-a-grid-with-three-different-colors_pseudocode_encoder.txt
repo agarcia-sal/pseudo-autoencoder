@@ -1,0 +1,68 @@
+CLASS Solution  
+    FUNCTION colorTheGrid(m, n)  
+        SET MOD TO ten RAISED TO the power of nine PLUS seven  
+        
+        FUNCTION generate_valid_columns(prev_col)  
+            SET colors TO list containing one PLUS two PLUS three  
+            SET valid_cols TO empty list  
+            
+            FUNCTION backtrack(col, row)  
+                IF row EQUALS m THEN  
+                    APPEND tuple conversion of col TO valid_cols  
+                    RETURN  
+                END IF  
+                FOR each color IN colors  
+                    IF col IS empty OR element at last position of col NOT EQUALS color THEN  
+                        IF prev_col IS NOT None AND element at position row of prev_col EQUALS color THEN  
+                            CONTINUE to next iteration  
+                        END IF  
+                        APPEND color TO col  
+                        CALL backtrack WITH col AND row PLUS one  
+                        REMOVE element at last position FROM col  
+                    END IF  
+                END FOR  
+            END FUNCTION  
+            
+            CALL backtrack WITH empty list AND zero  
+            RETURN valid_cols  
+        END FUNCTION  
+        
+        SET all_valid_cols TO generate_valid_columns WITH None  
+        SET num_valid_cols TO the LENGTH OF all_valid_cols  
+        
+        CREATE compatible_cols AS a mapping FROM zero UP TO num_valid_cols MINUS one TO empty list  
+        FOR i FROM zero TO num_valid_cols MINUS one  
+            FOR j FROM zero TO num_valid_cols MINUS one  
+                SET all_positions_different TO true  
+                FOR k FROM zero TO m MINUS one  
+                    IF element at position k of element at position i of all_valid_cols EQUALS element at position k of element at position j of all_valid_cols THEN  
+                        SET all_positions_different TO false  
+                        BREAK the loop  
+                    END IF  
+                END FOR  
+                IF all_positions_different IS true THEN  
+                    APPEND j TO the list at key i IN compatible_cols  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET dp TO list of ones REPEATED num_valid_cols times  
+        
+        FOR each integer FROM one TO n MINUS one  
+            SET next_dp TO list of zeros REPEATED num_valid_cols times  
+            FOR i FROM zero TO num_valid_cols MINUS one  
+                FOR each j IN the list at key i IN compatible_cols  
+                    SET next_dp at position j TO next_dp at position j PLUS dp at position i  
+                    SET next_dp at position j TO next_dp at position j MODULO MOD  
+                END FOR  
+            END FOR  
+            SET dp TO next_dp  
+        END FOR  
+        
+        SET total_sum TO zero  
+        FOR each value IN dp  
+            INCREMENT total_sum BY value  
+        END FOR  
+        RETURN total_sum MODULO MOD  
+    END FUNCTION  
+END CLASS

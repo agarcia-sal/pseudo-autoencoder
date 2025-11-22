@@ -1,0 +1,46 @@
+CLASS Solution
+    FUNCTION connectTwoGroups(cost)
+        SET size1 TO the LENGTH OF cost
+        SET size2 TO the LENGTH OF element at position zero of cost
+        SET dp TO CALL initializeDPTable WITH parameters size1 AND size2
+        SET element at position zero of element at position zero of dp TO zero
+        
+        FOR i FROM zero TO size1 MINUS one
+            FOR mask FROM zero TO CALL powerOfTwo WITH parameter size2 MINUS one
+                FOR j FROM zero TO size2 MINUS one
+                    SET new_mask TO mask OR CALL powerOfTwo WITH parameter j
+                    SET current_value TO element at position i PLUS one of element at position new_mask of dp
+                    SET candidate_value TO the MINIMUM OF current_value AND element at position i of element at position mask of dp PLUS element at position i of element at position j of cost
+                    SET element at position i PLUS one of element at position new_mask of dp TO candidate_value
+                END FOR
+                
+                FOR j FROM zero TO size2 MINUS one
+                    IF mask AND CALL powerOfTwo WITH parameter j IS GREATER THAN zero THEN
+                        SET without_j_mask TO mask XOR CALL powerOfTwo WITH parameter j
+                        SET current_value TO element at position i PLUS one of element at position mask of dp
+                        SET candidate_value TO the MINIMUM OF current_value AND element at position i PLUS one of element at position without_j_mask of dp PLUS element at position i of element at position j of cost
+                        SET element at position i PLUS one of element at position mask of dp TO candidate_value
+                    END IF
+                END FOR
+            END FOR
+        END FOR
+        
+        RETURN element at position size1 of element at position CALL powerOfTwo WITH parameter size2 MINUS one of dp
+    END FUNCTION
+
+    FUNCTION initializeDPTable(size1, size2)
+        CREATE table AS a LIST
+        FOR index FROM zero TO size1
+            APPEND a LIST containing CALL infinity REPEATED CALL powerOfTwo WITH parameter size2 TIMES TO table
+        END FOR
+        RETURN table
+    END FUNCTION
+
+    FUNCTION powerOfTwo(exponent)
+        RETURN one SHIFTED LEFT BY exponent POSITIONS
+    END FUNCTION
+
+    FUNCTION infinity()
+        RETURN positive infinity constant
+    END FUNCTION
+END CLASS

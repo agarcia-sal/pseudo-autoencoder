@@ -1,0 +1,67 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val SET TO zero left SET TO None right SET TO None  
+        SET attribute val OF self TO val  
+        SET attribute left OF self TO left  
+        SET attribute right OF self TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values IS empty  
+        RETURN None  
+    END IF  
+    SET root TO new instance of TreeNode WITH argument element at position zero of values  
+    SET i TO one  
+    SET queue TO new deque collection  
+    APPEND root TO queue  
+    WHILE the LENGTH OF queue IS greater than zero  
+        SET node TO the first element REMOVED from queue  
+        IF i IS less than the LENGTH OF values AND element at position i of values IS NOT None  
+            SET attribute left OF node TO new instance of TreeNode WITH argument element at position i of values  
+            APPEND attribute left OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS less than the LENGTH OF values AND element at position i of values IS NOT None  
+            SET attribute right OF node TO new instance of TreeNode WITH argument element at position i of values  
+            APPEND attribute right OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF attribute val OF p IS NOT EQUAL TO attribute val OF q  
+        RETURN False  
+    ELSE  
+        RETURN the logical AND of the result of calling is_same_tree WITH arguments attribute left OF p AND attribute left OF q AND the result of calling is_same_tree WITH arguments attribute right OF p AND attribute right OF q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION flatten WITH PARAMETERS self root  
+        IF root IS None  
+            RETURN  
+        END IF  
+        SET stack TO a new list containing root  
+        WHILE the LENGTH OF stack IS greater than zero  
+            SET node TO the last element REMOVED from stack  
+            IF attribute right OF node IS NOT None  
+                APPEND attribute right OF node TO stack  
+            END IF  
+            IF attribute left OF node IS NOT None  
+                APPEND attribute left OF node TO stack  
+            END IF  
+            SET attribute left OF node TO None  
+            IF the LENGTH OF stack IS greater than zero  
+                SET attribute right OF node TO the last element of stack  
+            ELSE  
+                SET attribute right OF node TO None  
+            END IF  
+        END WHILE  
+    END FUNCTION  
+END CLASS

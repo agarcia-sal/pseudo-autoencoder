@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION updateBoard(board click)  
+        FUNCTION count_adjacent_mines(row column)  
+            SET mine_count TO zero  
+            FOR each index_i FROM row MINUS one TO row PLUS one  
+                FOR each index_j FROM column MINUS one TO column PLUS one  
+                    IF index_i IS GREATER THAN OR EQUAL TO zero AND index_i IS LESS THAN the LENGTH OF board AND index_j IS GREATER THAN OR EQUAL TO zero AND index_j IS LESS THAN the LENGTH OF element at position zero OF board AND element at position index_i of board at position index_j EQUALS the character REPRESENTING a mine  
+                        INCREMENT mine_count BY one  
+                    END IF  
+                END FOR  
+            END FOR  
+            RETURN mine_count  
+        END FUNCTION  
+        
+        FUNCTION dfs(row column)  
+            IF row IS LESS THAN zero OR row IS GREATER THAN OR EQUAL TO the LENGTH OF board OR column IS LESS THAN zero OR column IS GREATER THAN OR EQUAL TO the LENGTH OF element at position zero OF board  
+                RETURN  
+            END IF  
+            IF element at position row of board at position column IS NOT the character REPRESENTING an unrevealed empty cell  
+                RETURN  
+            END IF  
+            
+            SET adjacent_mine_count TO count_adjacent_mines(row column)  
+            IF adjacent_mine_count IS GREATER THAN zero  
+                SET element at position row of board at position column TO the string REPRESENTING the adjacent_mine_count  
+            ELSE  
+                SET element at position row of board at position column TO the character REPRESENTING a blank revealed cell  
+                FOR each index_i FROM row MINUS one TO row PLUS one  
+                    FOR each index_j FROM column MINUS one TO column PLUS one  
+                        CALL dfs WITH index_i AND index_j  
+                    END FOR  
+                END FOR  
+            END IF  
+        END FUNCTION  
+        
+        SET row TO element at position zero of click  
+        SET column TO element at position one of click  
+        IF element at position row of board at position column IS the character REPRESENTING a mine  
+            SET element at position row of board at position column TO the character REPRESENTING a revealed mine hit  
+            RETURN board  
+        END IF  
+        
+        CALL dfs WITH row AND column  
+        RETURN board  
+    END FUNCTION  
+END CLASS

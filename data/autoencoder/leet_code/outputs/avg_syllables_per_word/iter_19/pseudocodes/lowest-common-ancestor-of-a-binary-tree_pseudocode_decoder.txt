@@ -1,0 +1,61 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val EQUALS zero, left EQUALS none, right EQUALS none  
+        SET self dot val TO val  
+        SET self dot left TO left  
+        SET self dot right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETERS values AS list  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO A NEW INSTANCE OF TreeNode WITH PARAMETER element at position zero of values  
+    SET i TO one  
+    SET queue TO A NEW DEQUE COLLECTION  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO THE FIRST ELEMENT REMOVED FROM queue  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i of values IS NOT none  
+            SET node dot left TO A NEW INSTANCE OF TreeNode WITH PARAMETER element at position i of values  
+            APPEND node dot left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i of values IS NOT none  
+            SET node dot right TO A NEW INSTANCE OF TreeNode WITH PARAMETER element at position i of values  
+            APPEND node dot right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p, q  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF p dot val IS NOT EQUALS TO q dot val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree WITH ARGUMENTS p dot left, q dot left AND is_same_tree WITH ARGUMENTS p dot right, q dot right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION lowestCommonAncestor WITH PARAMETERS self, root AS TreeNode, p AS TreeNode, q AS TreeNode  
+        IF root IS none OR root IS EQUALS TO p OR root IS EQUALS TO q  
+            RETURN root  
+        END IF  
+        SET left TO self dot lowestCommonAncestor WITH ARGUMENTS root dot left, p, q  
+        SET right TO self dot lowestCommonAncestor WITH ARGUMENTS root dot right, p, q  
+        IF left IS NOT none AND right IS NOT none  
+            RETURN root  
+        END IF  
+        IF left IS NOT none  
+            RETURN left  
+        ELSE  
+            RETURN right  
+        END IF  
+    END FUNCTION  
+END CLASS

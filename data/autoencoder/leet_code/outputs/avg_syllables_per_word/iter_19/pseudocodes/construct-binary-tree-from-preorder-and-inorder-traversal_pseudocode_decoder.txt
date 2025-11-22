@@ -1,0 +1,57 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS None, right EQUALS None)  
+        SET self DOT val TO val  
+        SET self DOT left TO left  
+        SET self DOT right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values EQUALS None OR the LENGTH OF values EQUALS zero THEN  
+        RETURN None  
+    END IF  
+    SET root TO A new TreeNode CREATED WITH the element at position zero of values  
+    SET i TO one  
+    SET queue TO A new deque  
+    APPEND root TO queue  
+    WHILE the LENGTH OF queue IS GREATER THAN zero  
+        SET node TO the FIRST element REMOVED FROM queue  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT None THEN  
+            SET node DOT left TO A new TreeNode CREATED WITH the element at position i of values  
+            APPEND node DOT left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT None THEN  
+            SET node DOT right TO A new TreeNode CREATED WITH the element at position i of values  
+            APPEND node DOT right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p EQUALS None AND q EQUALS None THEN  
+        RETURN True  
+    ELSE IF p EQUALS None OR q EQUALS None THEN  
+        RETURN False  
+    ELSE IF p DOT val IS NOT EQUALS TO q DOT val THEN  
+        RETURN False  
+    ELSE  
+        RETURN the RESULT OF is_same_tree WITH p DOT left AND q DOT left AND the RESULT OF is_same_tree WITH p DOT right AND q DOT right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION buildTree(self, preorder, inorder)  
+        IF preorder EQUALS None OR the LENGTH OF preorder EQUALS zero OR inorder EQUALS None OR the LENGTH OF inorder EQUALS zero THEN  
+            RETURN None  
+        END IF  
+        SET root_val TO the element at position zero of preorder  
+        SET root TO A new TreeNode CREATED WITH root_val  
+        SET root_index_inorder TO the POSITION OF root_val IN inorder  
+        SET root DOT left TO self DOT buildTree WITH the SUBLIST of preorder FROM position one TO root_index_inorder INCLUSIVE AND the SUBLIST of inorder FROM position zero TO root_index_inorder MINUS one  
+        SET root DOT right TO self DOT buildTree WITH the SUBLIST of preorder FROM position root_index_inorder PLUS one TO THE END AND the SUBLIST of inorder FROM position root_index_inorder PLUS one TO THE END  
+        RETURN root  
+    END FUNCTION  
+END CLASS

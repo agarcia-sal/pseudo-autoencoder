@@ -1,0 +1,63 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val EQUALS zero left EQUALS none right EQUALS none  
+        SET self dot val TO val  
+        SET self dot left TO left  
+        SET self dot right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values AS list  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO NEW TreeNode WITH PARAMETER element at position zero of values  
+    SET i TO one  
+    SET queue TO NEW deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO REMOVE first element FROM queue  
+        IF i IS LESS THAN LENGTH OF values AND element at position i of values IS NOT none  
+            SET node dot left TO NEW TreeNode WITH PARAMETER element at position i of values  
+            APPEND node dot left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN LENGTH OF values AND element at position i of values IS NOT none  
+            SET node dot right TO NEW TreeNode WITH PARAMETER element at position i of values  
+            APPEND node dot right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p AND q  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF value of p IS NOT EQUALS value of q  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETERS p dot left AND q dot left AND is_same_tree WITH PARAMETERS p dot right AND q dot right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION countUnivalSubtrees WITH PARAMETERS root AS Optional OF TreeNode  
+        FUNCTION helper WITH PARAMETER node  
+            IF node IS none  
+                RETURN True AND zero  
+            END IF  
+            SET is_left_unival AND left_count TO helper WITH PARAMETER node dot left  
+            SET is_right_unival AND right_count TO helper WITH PARAMETER node dot right  
+            IF is_left_unival AND is_right_unival  
+                IF (node dot left IS none OR value of node dot left EQUALS value of node) AND (node dot right IS none OR value of node dot right EQUALS value of node)  
+                    RETURN True AND left_count PLUS right_count PLUS one  
+                END IF  
+            END IF  
+            RETURN False AND left_count PLUS right_count  
+        END FUNCTION  
+        SET underscore AND count TO helper WITH PARAMETER root  
+        RETURN count  
+    END FUNCTION  
+END CLASS

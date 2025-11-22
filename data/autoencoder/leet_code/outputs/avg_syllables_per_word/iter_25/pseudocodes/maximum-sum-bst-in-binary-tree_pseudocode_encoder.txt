@@ -1,0 +1,68 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val SET TO zero, left SET TO none, right SET TO none  
+        SET the attribute val OF self TO val  
+        SET the attribute left OF self TO left  
+        SET the attribute right OF self TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values IS EMPTY  
+        RETURN none  
+    END IF  
+    SET root TO A NEW INSTANCE OF TreeNode INITIALIZED WITH the first element of values  
+    SET i TO one  
+    SET queue TO AN EMPTY DOUBLE ENDED QUEUE  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO THE FIRST ELEMENT REMOVED FROM queue  
+        IF i IS LESS THAN THE LENGTH OF values AND the element at position i of values IS NOT none  
+            SET the attribute left OF node TO A NEW INSTANCE OF TreeNode INITIALIZED WITH the element at position i of values  
+            APPEND the attribute left OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN THE LENGTH OF values AND the element at position i of values IS NOT none  
+            SET the attribute right OF node TO A NEW INSTANCE OF TreeNode INITIALIZED WITH the element at position i of values  
+            APPEND the attribute right OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p AND q  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF the attribute val OF p NOT EQUALS the attribute val OF q  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETERS the attribute left OF p AND the attribute left OF q AND is_same_tree WITH PARAMETERS the attribute right OF p AND the attribute right OF q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION maxSumBST WITH PARAMETER root  
+        SET self.max_sum TO zero  
+
+        FUNCTION helper WITH PARAMETER node  
+            IF node IS none  
+                RETURN True AND zero AND positive infinity AND negative infinity  
+            END IF  
+            SET left_is_bst AND left_sum AND left_min AND left_max TO THE RESULT OF CALLING helper WITH THE ATTRIBUTE left OF node  
+            SET right_is_bst AND right_sum AND right_min AND right_max TO THE RESULT OF CALLING helper WITH THE ATTRIBUTE right OF node  
+            IF left_is_bst IS True AND right_is_bst IS True AND left_max LESS THAN the attribute val OF node AND the attribute val OF node LESS THAN right_min  
+                SET current_sum TO left_sum PLUS right_sum PLUS the attribute val OF node  
+                SET current_min TO THE MINIMUM OF the attribute val OF node AND left_min  
+                SET current_max TO THE MAXIMUM OF the attribute val OF node AND right_max  
+                SET self.max_sum TO THE MAXIMUM OF self.max_sum AND current_sum  
+                RETURN True AND current_sum AND current_min AND current_max  
+            END IF  
+            RETURN False AND zero AND positive infinity AND negative infinity  
+        END FUNCTION  
+
+        CALL helper WITH root  
+        RETURN self.max_sum  
+    END FUNCTION  
+END CLASS

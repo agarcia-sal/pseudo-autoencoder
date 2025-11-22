@@ -1,0 +1,44 @@
+CLASS Solution
+    FUNCTION minTransfers(transactions: List of List of Integer) RETURNS Integer
+        SET balance TO empty dictionary
+        FOR each (frm, to, amount) IN transactions
+            SET balance[frm] TO balance.get(frm, 0) MINUS amount
+            SET balance[to] TO balance.get(to, 0) PLUS amount
+        END FOR
+
+        SET balances TO empty list
+        FOR each net IN balance values
+            IF net NOT EQUAL TO 0
+                APPEND net TO balances
+            END IF
+        END FOR
+
+        IF balances IS empty
+            RETURN 0
+        END IF
+
+        FUNCTION settle(start: Integer, cnt: Integer) RETURNS Integer
+            WHILE start LESS THAN LENGTH OF balances AND balances[start] EQUALS 0
+                INCREMENT start BY 1
+            END WHILE
+
+            IF start EQUALS LENGTH OF balances
+                RETURN cnt
+            END IF
+
+            SET min_cnt TO infinity
+
+            FOR i FROM start + 1 TO LENGTH OF balances MINUS 1
+                IF balances[start] MULTIPLIED BY balances[i] LESS THAN 0
+                    SET balances[i] TO balances[i] PLUS balances[start]
+                    SET min_cnt TO MINIMUM OF min_cnt AND settle(start + 1, cnt + 1)
+                    SET balances[i] TO balances[i] MINUS balances[start]
+                END IF
+            END FOR
+
+            RETURN min_cnt
+        END FUNCTION
+
+        RETURN settle(0, 0)
+    END FUNCTION
+END CLASS

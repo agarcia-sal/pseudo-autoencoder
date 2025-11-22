@@ -1,0 +1,8 @@
+def max_satisfaction(s):
+    s.sort(reverse=True)
+    max_sat = cur_sat = tot_sat = 0
+    for x in s:
+        cur_sat += x
+        tot_sat += cur_sat
+        max_sat = max(max_sat, tot_sat)
+    return max_sat

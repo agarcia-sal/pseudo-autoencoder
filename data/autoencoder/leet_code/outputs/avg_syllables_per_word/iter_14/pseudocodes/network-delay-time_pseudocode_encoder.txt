@@ -1,0 +1,50 @@
+CLASS Solution  
+    FUNCTION networkDelayTime(times AS list OF list OF integer, n AS integer, k AS integer) RETURNS integer  
+        SET graph TO an empty mapping FROM integer TO list OF pairs OF integer AND integer  
+        FOR each integer i FROM one TO n  
+            ASSIGN an empty list TO element at key i OF graph  
+        END FOR  
+        
+        FOR each element IN times  
+            SET u TO element at position zero OF element  
+            SET v TO element at position one OF element  
+            SET w TO element at position two OF element  
+            APPEND the pair of v AND w TO element at key u OF graph  
+        END FOR  
+        
+        SET dist TO an empty mapping FROM integer TO a very large number representing infinity  
+        FOR each integer i FROM one TO n  
+            ASSIGN the very large number representing infinity TO element at key i OF dist  
+        END FOR  
+        SET element at key k OF dist TO zero  
+        
+        SET min_heap TO a list containing the pair of zero AND k  
+        
+        WHILE the LENGTH OF min_heap IS GREATER THAN zero  
+            EXTRACT the smallest pair FROM min_heap AND ASSIGN the first element TO current_dist AND the second element TO node  
+            
+            IF current_dist IS GREATER THAN element at key node OF dist  
+                CONTINUE to the next iteration of the WHILE loop  
+            END IF  
+            
+            FOR each pair IN element at key node OF graph  
+                SET neighbor TO the first element OF pair  
+                SET weight TO the second element OF pair  
+                SET distance TO current_dist PLUS weight  
+                
+                IF distance IS LESS THAN element at key neighbor OF dist  
+                    SET element at key neighbor OF dist TO distance  
+                    INSERT the pair of distance AND neighbor INTO min_heap maintaining min-heap property  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        SET max_time TO the greatest value among all values OF dist  
+        
+        IF max_time IS EQUAL TO the very large number representing infinity  
+            RETURN negative one  
+        ELSE  
+            RETURN max_time  
+        END IF  
+    END FUNCTION  
+END CLASS

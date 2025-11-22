@@ -1,0 +1,60 @@
+CLASS Solution  
+    FUNCTION countCombinations(pieces, positions)  
+        SET directions TO dictionary mapping piece types TO their movement directions  
+            "rook" TO list of four directions along rows and columns  
+            "queen" TO list of eight directions including diagonals  
+            "bishop" TO list of four diagonal directions  
+        
+        SET positions TO list of pairs where each original position is converted TO zero-based indexing by subtracting one from row and column  
+        
+        FUNCTION get_destinations(start, piece_type)  
+            SET r, c TO start  
+            SET dests TO list containing start position  
+            FOR each dr, dc IN directions of piece_type  
+                SET nr, nc TO r plus dr, c plus dc  
+                WHILE nr is greater than or equal to zero AND nr is less than eight AND nc is greater than or equal to zero AND nc is less than eight  
+                    APPEND (nr, nc) TO dests  
+                    INCREMENT nr BY dr  
+                    INCREMENT nc BY dc  
+            RETURN dests  
+        END FUNCTION  
+        
+        SET all_destinations TO list of get_destinations called for each piece and its corresponding position  
+        
+        FUNCTION is_valid_combination(combination)  
+            SET pos TO a copy of positions  
+            SET n TO length of pos  
+            WHILE true  
+                IF length of set of pos is less than n  
+                    RETURN false  
+                SET all_reached TO true  
+                FOR i FROM 0 TO n minus one  
+                    IF pos at i equals combination at i  
+                        CONTINUE to next iteration  
+                    SET all_reached TO false  
+                    SET r, c TO pos at i  
+                    IF combination at i row is greater than r  
+                        SET dr TO 1  
+                    ELSE IF combination at i row is less than r  
+                        SET dr TO negative one  
+                    ELSE  
+                        SET dr TO zero  
+                    IF combination at i column is greater than c  
+                        SET dc TO 1  
+                    ELSE IF combination at i column is less than c  
+                        SET dc TO negative one  
+                    ELSE  
+                        SET dc TO zero  
+                    SET pos at i TO (r plus dr, c plus dc)  
+                IF all_reached  
+                    RETURN true  
+        END FUNCTION  
+        
+        SET valid_count TO zero  
+        FOR each combination IN product of all_destinations  
+            IF is_valid_combination(combination)  
+                INCREMENT valid_count BY one  
+        
+        RETURN valid_count  
+    END FUNCTION  
+END CLASS

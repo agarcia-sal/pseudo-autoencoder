@@ -1,0 +1,73 @@
+CLASS Solution  
+    FUNCTION minCost(maxTime, edges, passingFees)  
+        SET n TO the LENGTH OF passingFees  
+        
+        CALL FUNCTION create_empty_graph WITH n AND ASSIGN RESULT TO graph  
+        
+        FOR each x, y, time IN edges  
+            CALL FUNCTION append_to_graph WITH graph, x, y, time  
+        END FOR  
+        
+        CALL FUNCTION create_priority_queue WITH passingFees AND ASSIGN RESULT TO pq  
+        
+        CALL FUNCTION create_visited_time_list WITH n AND ASSIGN RESULT TO visited_time  
+        
+        SET element at position zero OF visited_time TO zero  
+        
+        WHILE pq HOLDS ELEMENTS  
+            CALL FUNCTION pop_from_priority_queue WITH pq AND ASSIGN RESULT TO current_cost, current_city, current_time  
+            
+            IF current_city EQUALS n MINUS one  
+                RETURN current_cost  
+            END IF  
+            
+            FOR each neighbor, travel_time IN element at position current_city OF graph  
+                SET new_time TO current_time PLUS travel_time  
+                SET new_cost TO current_cost PLUS element at position neighbor OF passingFees  
+                
+                IF new_time LESS THAN OR EQUAL TO maxTime AND (new_time LESS THAN element at position neighbor OF visited_time OR new_cost LESS THAN current_cost)  
+                    SET element at position neighbor OF visited_time TO new_time  
+                    CALL FUNCTION push_to_priority_queue WITH pq, new_cost, neighbor, new_time  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN negative one  
+    END FUNCTION  
+    
+    FUNCTION create_empty_graph(size)  
+        SET empty_graph TO empty list  
+        FOR index FROM zero TO size MINUS one  
+            APPEND empty list TO empty_graph  
+        END FOR  
+        RETURN empty_graph  
+    END FUNCTION  
+    
+    FUNCTION append_to_graph(graph, x, y, time)  
+        APPEND tuple of y AND time TO element at position x OF graph  
+        APPEND tuple of x AND time TO element at position y OF graph  
+    END FUNCTION  
+    
+    FUNCTION create_priority_queue(passingFees)  
+        SET initial_cost TO element at position zero OF passingFees  
+        RETURN list containing tuple of initial_cost, zero, zero  
+    END FUNCTION  
+    
+    FUNCTION create_visited_time_list(size)  
+        SET visited TO empty list  
+        FOR index FROM zero TO size MINUS one  
+            APPEND infinity TO visited  
+        END FOR  
+        RETURN visited  
+    END FUNCTION  
+    
+    FUNCTION pop_from_priority_queue(pq)  
+        SORT pq TO MAINTAIN MINIMUM ELEMENT AT FRONT BASED ON FIRST ELEMENT OF TUPLE  
+        REMOVE AND RETURN first element OF pq  
+    END FUNCTION  
+    
+    FUNCTION push_to_priority_queue(pq, cost, city, time)  
+        APPEND tuple of cost, city, time TO pq  
+        SORT pq TO MAINTAIN MINIMUM ELEMENT AT FRONT BASED ON FIRST ELEMENT OF TUPLE  
+    END FUNCTION  
+END CLASS

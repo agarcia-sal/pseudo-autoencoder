@@ -1,0 +1,101 @@
+CLASS ListNode  
+    FUNCTION __init__(val, next)  
+        SET self.val TO val  
+        SET self.next TO next  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION list_node(values)  
+    IF values EQUALS empty  
+        RETURN None  
+    END IF  
+    SET head TO ListNode with val as element at position zero of values  
+    SET p TO head  
+    FOR each val IN elements of values starting from position one  
+        SET node TO ListNode with val as val  
+        SET p.next TO node  
+        SET p TO node  
+    END FOR  
+    RETURN head  
+END FUNCTION  
+
+FUNCTION is_same_list(p1, p2)  
+    IF p1 EQUALS None AND p2 EQUALS None  
+        RETURN True  
+    END IF  
+    IF p1 EQUALS None OR p2 EQUALS None  
+        RETURN False  
+    END IF  
+    RETURN p1.val EQUALS p2.val AND is_same_list(p1.next, p2.next)  
+END FUNCTION  
+
+CLASS TreeNode  
+    FUNCTION __init__(val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values EQUALS empty  
+        RETURN None  
+    END IF  
+    SET root TO TreeNode with val as element at position zero of values  
+    SET i TO one  
+    SET queue TO empty deque  
+    APPEND root TO queue  
+    WHILE queue NOT empty  
+        SET node TO first element REMOVED FROM queue  
+        IF i LESS THAN LENGTH OF values AND element at position i of values NOT EQUALS None  
+            SET node.left TO TreeNode with val as element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN LENGTH OF values AND element at position i of values NOT EQUALS None  
+            SET node.right TO TreeNode with val as element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p EQUALS None AND q EQUALS None  
+        RETURN True  
+    ELSE IF p EQUALS None OR q EQUALS None  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION str2tree(s)  
+        FUNCTION parse_tree(index)  
+            IF index GREATER THAN OR EQUAL TO LENGTH OF s  
+                RETURN None, index  
+            END IF  
+            SET start TO index  
+            WHILE index LESS THAN LENGTH OF s AND (element at position index of s IS a digit OR element at position index of s EQUALS the character '-')  
+                INCREMENT index BY one  
+            END WHILE  
+            SET node TO TreeNode with val as integer parsed from substring of s starting at start and ending before index  
+            IF index LESS THAN LENGTH OF s AND element at position index of s EQUALS '('  
+                SET node.left, index TO parse_tree(index PLUS one)  
+            END IF  
+            IF index LESS THAN LENGTH OF s AND element at position index of s EQUALS '('  
+                SET node.right, index TO parse_tree(index PLUS one)  
+            END IF  
+            IF index LESS THAN LENGTH OF s AND element at position index of s EQUALS ')'  
+                INCREMENT index BY one  
+            END IF  
+            RETURN node, index  
+        END FUNCTION  
+        SET root, dummy_index TO parse_tree(zero)  
+        RETURN root  
+    END FUNCTION  
+END CLASS

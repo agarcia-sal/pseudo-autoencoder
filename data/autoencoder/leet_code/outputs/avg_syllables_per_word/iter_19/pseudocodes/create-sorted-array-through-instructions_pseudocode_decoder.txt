@@ -1,0 +1,37 @@
+CLASS Solution  
+    FUNCTION createSortedArray WITH PARAMETER instructions  
+        SET MOD TO one billion PLUS seven  
+        SET MAX TO the maximum element IN instructions PLUS one  
+        SET bit TO a list of zero repeated MAX times  
+
+        FUNCTION update WITH PARAMETERS idx AND val  
+            WHILE idx IS LESS THAN MAX  
+                INCREMENT element at position idx of bit BY val  
+                INCREMENT idx BY bitwise AND of idx AND negative idx  
+            END WHILE  
+        END FUNCTION  
+
+        FUNCTION query WITH PARAMETER idx  
+            SET total TO zero  
+            WHILE idx IS GREATER THAN zero  
+                INCREMENT total BY element at position idx of bit  
+                DECREMENT idx BY bitwise AND of idx AND negative idx  
+            END WHILE  
+            RETURN total  
+        END FUNCTION  
+
+        SET total_cost TO zero  
+        FOR each pair of index i AND element num IN instructions WITH their indices  
+            SET less_than TO query WITH argument num MINUS one  
+            SET greater_than TO i MINUS query WITH argument num  
+            IF less_than IS LESS THAN OR EQUAL TO greater_than  
+                SET cost TO less_than  
+            ELSE  
+                SET cost TO greater_than  
+            END IF  
+            SET total_cost TO the remainder when total_cost PLUS cost IS DIVIDED BY MOD  
+            CALL update WITH arguments num AND one  
+        END FOR  
+
+        RETURN total_cost  
+END CLASS

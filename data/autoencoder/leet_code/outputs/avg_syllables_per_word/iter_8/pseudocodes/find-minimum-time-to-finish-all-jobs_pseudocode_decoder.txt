@@ -1,0 +1,24 @@
+CLASS Solution  
+    FUNCTION minimumTimeRequired(jobs, k)  
+        SET n TO LENGTH OF jobs  
+        SET subset_sums TO LIST OF ZEROS WITH SIZE 2 RAISED TO POWER n  
+        
+        FOR i FROM 0 TO n MINUS 1  
+            FOR mask FROM 0 TO 2 RAISED TO POWER i MINUS 1  
+                SET subset_sums AT POSITION (mask OR 2 RAISED TO POWER i) TO subset_sums AT POSITION mask PLUS jobs AT POSITION i  
+        
+        FUNCTION dp(k, mask)  
+            IF k EQUALS 1 THEN  
+                RETURN subset_sums AT POSITION mask  
+            END IF  
+            SET res TO INFINITY  
+            SET submask TO mask  
+            WHILE submask IS NOT ZERO  
+                SET res TO MINIMUM OF res AND MAXIMUM OF dp(k MINUS 1, mask XOR submask) AND subset_sums AT POSITION submask  
+                SET submask TO submask MINUS 1 AND mask  
+            END WHILE  
+            RETURN res  
+        END FUNCTION  
+        
+        RETURN dp(k, 2 RAISED TO POWER n MINUS 1)  
+END CLASS

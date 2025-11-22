@@ -1,0 +1,56 @@
+CLASS TrieNode  
+    FUNCTION __init__()  
+        SET children TO empty dictionary  
+        SET count TO zero  
+    END FUNCTION  
+END CLASS  
+
+CLASS Trie  
+    FUNCTION __init__(bit_length)  
+        SET root TO new TrieNode  
+        SET bit_length TO bit_length  
+    END FUNCTION  
+
+    FUNCTION insert(num)  
+        SET node TO root  
+        FOR i FROM bit_length DOWN TO zero  
+            SET bit TO the bit at position i of num  
+            IF bit NOT IN children of node THEN  
+                SET node.children at bit TO new TrieNode  
+            END IF  
+            SET node TO node.children at bit  
+            INCREMENT node.count BY one  
+        END FOR  
+    END FUNCTION  
+
+    FUNCTION count_less_than(num, threshold)  
+        SET count TO zero  
+        SET node TO root  
+        FOR i FROM bit_length DOWN TO zero  
+            IF node IS null THEN  
+                BREAK  
+            END IF  
+            SET bit TO the bit at position i of num  
+            SET threshold_bit TO the bit at position i of threshold  
+            IF threshold_bit EQUALS one THEN  
+                INCREMENT count BY count of child node at bit if exists otherwise zero  
+                SET node TO child node at bit XOR one  
+            ELSE  
+                SET node TO child node at bit  
+            END IF  
+        END FOR  
+        RETURN count  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION countPairs(nums, low, high)  
+        SET trie TO new Trie WITH bit_length FIFTEEN  
+        SET nice_pairs TO zero  
+        FOR each num IN nums  
+            INCREMENT nice_pairs BY trie.count_less_than(num, high PLUS one) MINUS trie.count_less_than(num, low)  
+            CALL trie.insert WITH num  
+        END FOR  
+        RETURN nice_pairs  
+    END FUNCTION  
+END CLASS

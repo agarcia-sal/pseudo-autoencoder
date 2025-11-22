@@ -1,0 +1,58 @@
+CLASS Solution  
+    FUNCTION cutOffTree(forest)  
+        IF forest EQUALS empty OR element at position zero of forest EQUALS empty  
+            RETURN negative one  
+        END IF  
+        
+        SET trees TO list of tuples each containing element at position i and j of forest followed by i followed by j for each i from zero TO length of forest MINUS one for each j from zero TO length of element at position zero of forest MINUS one where element at position i and j of forest IS GREATER THAN one  
+        SORT trees IN ascending order  
+        
+        FUNCTION bfs(start, end)  
+            IF start EQUALS end  
+                RETURN zero  
+            END IF  
+            SET m TO length of forest  
+            SET n TO length of element at position zero of forest  
+            SET queue TO deque containing start  
+            SET visited TO set containing start  
+            SET steps TO zero  
+            
+            WHILE queue IS NOT empty  
+                FOR each element IN queue at current length of queue  
+                    SET x TO element at position zero of dequeued item from queue  
+                    SET y TO element at position one of dequeued item from queue  
+                    FOR each pair dx and dy IN list of pairs negative one and zero, one and zero, zero and negative one, zero and one  
+                        SET nx TO x PLUS dx  
+                        SET ny TO y PLUS dy  
+                        IF nx IS GREATER THAN OR EQUAL TO zero AND nx IS LESS THAN m AND ny IS GREATER THAN OR EQUAL TO zero AND ny IS LESS THAN n AND tuple of nx and ny IS NOT IN visited AND element at position nx and ny of forest IS NOT EQUAL TO zero  
+                            IF tuple of nx and ny EQUALS end  
+                                RETURN steps PLUS one  
+                            END IF  
+                            ADD tuple of nx and ny TO visited  
+                            APPEND tuple of nx and ny TO queue  
+                        END IF  
+                    END FOR  
+                END FOR  
+                INCREMENT steps BY one  
+            END WHILE  
+            
+            RETURN negative one  
+        END FUNCTION  
+        
+        SET x TO zero  
+        SET y TO zero  
+        SET total_steps TO zero  
+        
+        FOR each height followed by tx followed by ty IN trees  
+            SET steps TO bfs with start as tuple of x and y and end as tuple of tx and ty  
+            IF steps EQUALS negative one  
+                RETURN negative one  
+            END IF  
+            INCREMENT total_steps BY steps  
+            SET x TO tx  
+            SET y TO ty  
+        END FOR  
+        
+        RETURN total_steps  
+    END FUNCTION  
+END CLASS

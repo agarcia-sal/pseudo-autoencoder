@@ -1,0 +1,66 @@
+CLASS Solution  
+    FUNCTION rectangleArea(rectangles)  
+        SET MOD TO ten TO THE POWER OF nine PLUS one  
+        
+        SET y_coords TO an empty SET  
+        FOR each rectangle COORDINATED AS x1, y1, x2, y2 IN rectangles  
+            ADD y1 TO y_coords  
+            ADD y2 TO y_coords  
+        END FOR  
+        
+        SET y_coords TO the LIST OF y_coords SORTED IN ascending ORDER  
+        
+        FUNCTION create_y_index_map(y_coords)  
+            SET y_index_map TO an empty DICTIONARY  
+            FOR each index FROM zero TO the LENGTH OF y_coords MINUS one  
+                MAP element at position index OF y_coords TO index IN y_index_map  
+            END FOR  
+            RETURN y_index_map  
+        END FUNCTION  
+        
+        SET y_index TO create_y_index_map(y_coords)  
+        
+        FUNCTION create_count_list(length)  
+            RETURN a LIST OF zero VALUES OF size length  
+        END FUNCTION  
+        
+        SET count TO create_count_list(the LENGTH OF y_coords MINUS one)  
+        
+        SET events TO an empty LIST  
+        FOR each rectangle COORDINATED AS x1, y1, x2, y2 IN rectangles  
+            APPEND the LIST OF x1, one, y1, y2 TO events  
+            APPEND the LIST OF x2, negative one, y1, y2 TO events  
+        END FOR  
+        
+        SET events TO the LIST OF events SORTED BY element at position zero OF each event  
+        
+        SET prev_x TO zero  
+        SET area TO zero  
+        
+        FOR each event ELEMENTS x, eventType, y1, y2 IN events  
+            SET current_length TO zero  
+            FOR each index FROM one TO the LENGTH OF count  
+                IF element at position index MINUS one OF count IS GREATER THAN zero THEN  
+                    INCREMENT current_length BY element at position index OF y_coords MINUS element at position index MINUS one OF y_coords  
+                END IF  
+            END FOR  
+            
+            INCREMENT area BY current_length MULTIPLIED BY x MINUS prev_x  
+            SET area TO area MODULO MOD  
+            
+            IF eventType EQUAL TO one THEN  
+                FOR each index FROM y_index[y1] TO y_index[y2] MINUS one  
+                    INCREMENT element at position index OF count BY one  
+                END FOR  
+            ELSE  
+                FOR each index FROM y_index[y1] TO y_index[y2] MINUS one  
+                    DECREMENT element at position index OF count BY one  
+                END FOR  
+            END IF  
+            
+            SET prev_x TO x  
+        END FOR  
+        
+        RETURN area  
+    END FUNCTION  
+END CLASS

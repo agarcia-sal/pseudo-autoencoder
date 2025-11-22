@@ -1,0 +1,36 @@
+CLASS Solution  
+    FUNCTION pyramidTransition(bottom, allowed)  
+        CREATE allowed_map AS mapping from pair of blocks TO list of possible top blocks  
+        FOR each rule IN allowed  
+            SET left TO first element of rule  
+            SET right TO second element of rule  
+            SET top TO third element of rule  
+            APPEND top TO allowed_map AT left AND right  
+        END FOR  
+
+        FUNCTION can_build_pyramid(current_bottom, current_top)  
+            IF LENGTH OF current_bottom EQUALS 1  
+                RETURN True  
+            END IF  
+
+            IF LENGTH OF current_top EQUALS LENGTH OF current_bottom MINUS 1  
+                RETURN CALL can_build_pyramid WITH current_top AND empty list  
+            END IF  
+
+            SET left TO element in current_bottom AT position LENGTH OF current_top  
+            SET right TO element in current_bottom AT position LENGTH OF current_top PLUS 1  
+
+            IF allowed_map CONTAINS left AND allowed_map AT left CONTAINS right  
+                FOR each top IN allowed_map AT left AND right  
+                    IF CALL can_build_pyramid WITH current_bottom AND current_top CONCATENATED WITH top RETURNS True  
+                        RETURN True  
+                    END IF  
+                END FOR  
+            END IF  
+
+            RETURN False  
+        END FUNCTION  
+
+        RETURN CALL can_build_pyramid WITH bottom AND empty list  
+    END FUNCTION  
+END CLASS

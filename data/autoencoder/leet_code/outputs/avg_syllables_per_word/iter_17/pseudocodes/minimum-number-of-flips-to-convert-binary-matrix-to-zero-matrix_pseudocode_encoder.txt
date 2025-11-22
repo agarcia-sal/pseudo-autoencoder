@@ -1,0 +1,57 @@
+CLASS Solution
+    FUNCTION minFlips(matrix_of_integers)
+        FUNCTION flip(matrix, x, y)
+            SET directions TO list of tuples containing negative one zero one zero zero zero negative one zero zero one zero zero zero zero zero
+            FOR each dx_dy_tuple IN directions
+                ASSIGN dx TO element at position zero of dx_dy_tuple
+                ASSIGN dy TO element at position one of dx_dy_tuple
+                SET nx TO x PLUS dx
+                SET ny TO y PLUS dy
+                IF zero LESS THAN OR EQUAL TO nx AND nx LESS THAN m AND zero LESS THAN OR EQUAL TO ny AND ny LESS THAN n
+                    SET element at position nx of matrix element at position ny TO one MINUS element at position nx of matrix element at position ny
+                END IF
+            END FOR
+        END FUNCTION
+
+        FUNCTION matrix_to_tuple(matrix)
+            CALL auxiliary_function_to_convert_matrix_rows_to_tuples WITH matrix
+            RETURN result_of_auxiliary_function
+        END FUNCTION
+
+        SET m TO the LENGTH OF matrix_of_integers
+        SET n TO the LENGTH OF element at position zero of matrix_of_integers
+        CALL auxiliary_function_to_generate_target_matrix_with_zeros WITH m n
+        SET target TO result_of_auxiliary_function
+        CALL matrix_to_tuple WITH matrix_of_integers
+        SET initial_state TO result_of_matrix_to_tuple
+        SET queue TO list containing tuple of initial_state and zero
+        SET visited TO empty set
+        ADD initial_state TO visited
+
+        WHILE the LENGTH OF queue greater than zero holds
+            REMOVE element at position zero from queue and ASSIGN TO current_state steps
+            IF current_state EQUALS target
+                RETURN steps
+            END IF
+
+            CALL auxiliary_function_to_convert_tuple_to_list_of_lists WITH current_state
+            SET current_matrix TO result_of_auxiliary_function
+
+            FOR i FROM zero TO m MINUS one
+                FOR j FROM zero TO n MINUS one
+                    CALL auxiliary_function_to_deep_copy_matrix WITH current_matrix
+                    SET next_matrix TO result_of_auxiliary_function
+                    CALL flip WITH next_matrix i j
+                    CALL matrix_to_tuple WITH next_matrix
+                    SET next_state TO result_of_matrix_to_tuple
+                    IF next_state NOT IN visited
+                        ADD next_state TO visited
+                        APPEND tuple of next_state and steps PLUS one TO queue
+                    END IF
+                END FOR
+            END FOR
+        END WHILE
+
+        RETURN negative one
+    END FUNCTION
+END CLASS

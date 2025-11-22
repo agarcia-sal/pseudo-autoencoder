@@ -1,0 +1,44 @@
+CLASS Solution  
+    FUNCTION solveEquation(equation)  
+        FUNCTION parse_side(side)  
+            SET tokens TO the result of replacing each plus sign in side with the string consisting of a hash sign followed by a plus sign and then replacing each minus sign in side with the string consisting of a hash sign followed by a minus sign and then splitting the resulting string by the hash sign  
+            SET x_count TO zero  
+            SET num_sum TO zero  
+            FOR each token IN tokens  
+                IF token EQUALS an empty string THEN  
+                    CONTINUE to the next token  
+                END IF  
+                IF token CONTAINS the character x THEN  
+                    IF token EQUALS the character x OR token EQUALS the character plus followed by the character x THEN  
+                        INCREMENT x_count BY one  
+                    ELSE IF token EQUALS the character minus followed by the character x THEN  
+                        DECREMENT x_count BY one  
+                    ELSE  
+                        SET x_count TO x_count PLUS the integer value represented by the string resulting from replacing the character x in token with an empty string  
+                    END IF  
+                ELSE  
+                    INCREMENT num_sum BY the integer value represented by token  
+                END IF  
+            END FOR  
+            RETURN x_count AND num_sum  
+        END FUNCTION  
+
+        SPLIT equation by the character equals into left_side and right_side  
+        CALL parse_side with left_side and ASSIGN the first returned value to left_x and the second returned value to left_num  
+        CALL parse_side with right_side and ASSIGN the first returned value to right_x and the second returned value to right_num  
+
+        SET total_x TO left_x MINUS right_x  
+        SET total_num TO right_num MINUS left_num  
+
+        IF total_x EQUALS zero THEN  
+            IF total_num EQUALS zero THEN  
+                RETURN the phrase Infinite solutions  
+            ELSE  
+                RETURN the phrase No solution  
+            END IF  
+        ELSE  
+            SET quotient TO total_num DIVIDED BY total_x using integer division  
+            RETURN the string formed by concatenating the character x equals and the string representation of quotient  
+        END IF  
+    END FUNCTION  
+END CLASS

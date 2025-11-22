@@ -1,0 +1,41 @@
+CLASS UnionFind  
+    FUNCTION __init__(size)  
+        SET parent TO list of integers from 0 TO size MINUS 1  
+        SET rank TO list of size elements each SET TO 1  
+    END FUNCTION  
+
+    FUNCTION find(p)  
+        IF parent at index p NOT EQUALS p THEN  
+            SET parent at index p TO CALL find WITH parent at index p  
+        END IF  
+        RETURN parent at index p  
+    END FUNCTION  
+
+    FUNCTION union(p, q)  
+        SET rootP TO CALL find WITH p  
+        SET rootQ TO CALL find WITH q  
+        IF rootP EQUALS rootQ THEN  
+            RETURN False  
+        END IF  
+        IF rank at index rootP GREATER THAN rank at index rootQ THEN  
+            SET parent at index rootQ TO rootP  
+        ELSE IF rank at index rootP LESS THAN rank at index rootQ THEN  
+            SET parent at index rootP TO rootQ  
+        ELSE  
+            SET parent at index rootQ TO rootP  
+            INCREMENT rank at index rootP BY 1  
+        END IF  
+        RETURN True  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION findRedundantConnection(edges)  
+        SET uf TO new instance of UnionFind WITH length of edges PLUS 1  
+        FOR each pair u, v IN edges  
+            IF CALL union ON uf WITH u AND v RETURNS False THEN  
+                RETURN list containing u AND v  
+            END IF  
+        END FOR  
+    END FUNCTION  
+END CLASS

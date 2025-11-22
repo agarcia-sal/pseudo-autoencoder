@@ -1,0 +1,52 @@
+from collections import deque
+from typing import List, Tuple
+
+class Solution:
+    def cutOffTree(self, forest: List[List[int]]) -> int:
+        if not forest or not forest[0]:
+            return -1
+
+        trees = []
+        for i in range(len(forest)):
+            for j in range(len(forest[i])):
+                if forest[i][j] > 1:
+                    trees.append((forest[i][j], i, j))
+        trees.sort(key=lambda x: x[0])
+
+        def bfs(start: Tuple[int, int], end: Tuple[int, int]) -> int:
+            if start == end:
+                return 0
+            m = len(forest)
+            n = len(forest[0])
+            queue = deque([start])
+            visited = set([start])
+            steps = 0
+
+            directions = [(-1,0),(1,0),(0,-1),(0,1)]
+
+            while queue:
+                current_length = len(queue)
+                for _ in range(current_length):
+                    x, y = queue.popleft()
+                    for dx, dy in directions:
+                        nx, ny = x + dx, y + dy
+                        if 0 <= nx < m and 0 <= ny < n and (nx, ny) not in visited and forest[nx][ny] != 0:
+                            if (nx, ny) == end:
+                                return steps + 1
+                            visited.add((nx, ny))
+                            queue.append((nx, ny))
+                steps += 1
+            return -1
+
+        x = 0
+        y = 0
+        total_steps = 0
+
+        for _, tx, ty in trees:
+            steps = bfs((x, y), (tx, ty))
+            if steps == -1:
+                return -1
+            total_steps += steps
+            x, y = tx, ty
+
+        return total_steps

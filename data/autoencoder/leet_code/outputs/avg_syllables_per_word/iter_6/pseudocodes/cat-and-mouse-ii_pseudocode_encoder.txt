@@ -1,0 +1,91 @@
+CLASS Solution  
+    FUNCTION canMouseWin(grid, catJump, mouseJump)  
+        SET m TO LENGTH OF grid  
+        SET n TO LENGTH OF first element IN grid  
+        SET cat_start TO 0  
+        SET mouse_start TO 0  
+        SET food TO 0  
+        SET dirs TO the sequence of values minus one, zero, one, zero, minus one  
+        INITIALIZE g_mouse AS list of empty lists for each position in grid (m MULTIPLIED BY n)  
+        INITIALIZE g_cat AS list of empty lists for each position in grid (m MULTIPLIED BY n)  
+
+        FOR each index i AND row IN grid  
+            FOR each index j AND character c IN row  
+                IF c EQUALS "#"  
+                    CONTINUE  
+                SET v TO i MULTIPLIED BY n PLUS j  
+                IF c EQUALS "C"  
+                    SET cat_start TO v  
+                ELSE IF c EQUALS "M"  
+                    SET mouse_start TO v  
+                ELSE IF c EQUALS "F"  
+                    SET food TO v  
+                FOR each pair (a, b) FROM consecutive elements in dirs  
+                    FOR k FROM 0 TO mouseJump INCLUSIVE  
+                        SET x TO i PLUS k MULTIPLIED BY a  
+                        SET y TO j PLUS k MULTIPLIED BY b  
+                        IF x LESS THAN 0 OR x GREATER THAN OR EQUAL TO m OR y LESS THAN 0 OR y GREATER THAN OR EQUAL TO n OR grid at position x, y EQUALS "#"  
+                            BREAK  
+                        APPEND x MULTIPLIED BY n PLUS y TO g_mouse at index v  
+                    FOR k FROM 0 TO catJump INCLUSIVE  
+                        SET x TO i PLUS k MULTIPLIED BY a  
+                        SET y TO j PLUS k MULTIPLIED BY b  
+                        IF x LESS THAN 0 OR x GREATER THAN OR EQUAL TO m OR y LESS THAN 0 OR y GREATER THAN OR EQUAL TO n OR grid at position x, y EQUALS "#"  
+                            BREAK  
+                        APPEND x MULTIPLIED BY n PLUS y TO g_cat at index v  
+
+        RETURN CALL calc WITH arguments g_mouse, g_cat, mouse_start, cat_start, food EQUALS 1  
+    END FUNCTION  
+
+    FUNCTION calc(g_mouse, g_cat, mouse_start, cat_start, hole)  
+        FUNCTION get_prev_states(state)  
+            UNPACK state INTO m, c, t  
+            SET pt TO t XOR 1  
+            INITIALIZE pre AS empty list  
+            IF pt EQUALS 1  
+                FOR each pc IN g_cat at index c  
+                    IF ans at coordinates m, pc, 1 EQUALS 0  
+                        APPEND tuple (m, pc, pt) TO pre  
+            ELSE  
+                FOR each pm IN g_mouse at index m  
+                    IF ans at coordinates pm, c, 0 EQUALS 0  
+                        APPEND tuple (pm, c, 0) TO pre  
+            RETURN pre  
+        END FUNCTION  
+
+        SET n TO LENGTH OF g_mouse  
+        INITIALIZE degree AS three-dimensional list size n by n by 2 with zeroes  
+        FOR i FROM 0 TO n MINUS 1  
+            FOR j FROM 0 TO n MINUS 1  
+                SET degree at index i, j, 0 TO LENGTH OF g_mouse at index i  
+                SET degree at index i, j, 1 TO LENGTH OF g_cat at index j  
+
+        INITIALIZE ans AS three-dimensional list size n by n by 2 with zeroes  
+        INITIALIZE q AS empty double-ended queue  
+
+        FOR i FROM 0 TO n MINUS 1  
+            SET ans at hole, i, 1 TO 1  
+            SET ans at i, hole, 0 TO 2  
+            SET ans at i, i, 1 TO 2  
+            SET ans at i, i, 0 TO 2  
+            APPEND tuple (hole, i, 1) TO q  
+            APPEND tuple (i, hole, 0) TO q  
+            APPEND tuple (i, i, 0) TO q  
+            APPEND tuple (i, i, 1) TO q  
+
+        WHILE q IS NOT EMPTY  
+            SET state TO q POP left  
+            SET t TO ans at state[0], state[1], state[2]  
+            FOR each prev_state IN CALL get_prev_states WITH argument state  
+                UNPACK prev_state INTO pm, pc, pt  
+                IF pt EQUALS t MINUS 1  
+                    SET ans at pm, pc, pt TO t  
+                    APPEND prev_state TO q  
+                ELSE  
+                    DECREMENT degree at pm, pc, pt BY 1  
+                    IF degree at pm, pc, pt EQUALS 0  
+                        SET ans at pm, pc, pt TO t  
+                        APPEND prev_state TO q  
+        RETURN ans at mouse_start, cat_start, 0  
+    END FUNCTION  
+END CLASS

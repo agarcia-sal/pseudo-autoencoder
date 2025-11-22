@@ -1,0 +1,86 @@
+CLASS Solution
+    FUNCTION isSolvable(words AS list_of_strings, result AS string) RETURNS boolean
+        SET unique_chars TO the SET OF all CHARACTERS in the CONCATENATION OF all words AND the result string
+        IF the LENGTH OF unique_chars IS GREATER THAN ten
+            RETURN False
+        END IF
+
+        SET non_zero_chars TO the SET OF the FIRST CHARACTER OF each word IN words WHERE the LENGTH OF word IS GREATER THAN one
+        IF the LENGTH OF result IS GREATER THAN one
+            ADD the FIRST CHARACTER OF result TO non_zero_chars
+        END IF
+
+        SET char_to_digit TO an EMPTY DICTIONARY
+        SET digit_to_char TO an EMPTY DICTIONARY
+
+        FUNCTION can_assign(char AS character, digit AS number) RETURNS boolean
+            RETURN char IS NOT IN char_to_digit AND (digit IS NOT IN digit_to_char OR digit_to_char AT digit EQUALS char)
+        END FUNCTION
+
+        FUNCTION assign(char AS character, digit AS number)
+            SET char_to_digit AT char TO digit
+            SET digit_to_char AT digit TO char
+        END FUNCTION
+
+        FUNCTION unassign(char AS character, digit AS number)
+            REMOVE char FROM char_to_digit
+            REMOVE digit FROM digit_to_char
+        END FUNCTION
+
+        FUNCTION word_value(word AS string) RETURNS number
+            RETURN THE SUM FOR each position i AND character char IN ENUMERATE THE REVERSED word OF char_to_digit AT char MULTIPLIED BY ten RAISED TO THE POWER OF i
+        END FUNCTION
+
+        FUNCTION backtrack(index AS number, col AS number, sum_col AS number) RETURNS boolean
+            IF col IS GREATER THAN OR EQUAL TO THE MAXIMUM LENGTH OF all words IN words AND col IS GREATER THAN OR EQUAL TO THE LENGTH OF result
+                RETURN sum_col EQUALS zero
+            END IF
+
+            IF index EQUALS THE LENGTH OF words
+                IF col IS LESS THAN THE LENGTH OF result
+                    SET digit TO THE CHARACTER AT POSITION THE LENGTH OF result MINUS one MINUS col OF result
+                    IF digit IS IN char_to_digit
+                        IF char_to_digit AT digit EQUALS sum_col MODULO ten
+                            RETURN CALL backtrack WITH PARAMETERS zero, col PLUS one, sum_col DIVIDED BY ten WITHOUT REMAINDER
+                        ELSE
+                            RETURN False
+                        END IF
+                    ELSE IF can_assign WITH digit AND sum_col MODULO ten AND sum_col MODULO ten NOT EQUAL TO zero OR digit NOT IN non_zero_chars
+                        CALL assign WITH digit AND sum_col MODULO ten
+                        IF CALL backtrack WITH PARAMETERS zero, col PLUS one, sum_col DIVIDED BY ten WITHOUT REMAINDER RETURNS True
+                            RETURN True
+                        END IF
+                        CALL unassign WITH digit AND sum_col MODULO ten
+                    END IF
+                ELSE
+                    RETURN sum_col EQUALS zero
+                END IF
+                RETURN False
+            END IF
+
+            SET word TO element at position index of words
+            IF col IS GREATER THAN OR EQUAL TO THE LENGTH OF word
+                RETURN CALL backtrack WITH index PLUS one, col, sum_col
+            END IF
+
+            SET char TO element at position THE LENGTH OF word MINUS one MINUS col OF word
+            IF char IS IN char_to_digit
+                RETURN CALL backtrack WITH index PLUS one, col, sum_col PLUS char_to_digit AT char
+            END IF
+
+            FOR digit FROM zero TO nine
+                IF can_assign WITH char AND digit AND (digit NOT EQUAL TO zero OR char NOT IN non_zero_chars)
+                    CALL assign WITH char AND digit
+                    IF CALL backtrack WITH index PLUS one, col, sum_col PLUS digit RETURNS True
+                        RETURN True
+                    END IF
+                    CALL unassign WITH char AND digit
+                END IF
+            END FOR
+
+            RETURN False
+        END FUNCTION
+
+        RETURN CALL backtrack WITH zero, zero, zero
+    END FUNCTION
+END CLASS

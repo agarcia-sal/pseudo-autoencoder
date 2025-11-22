@@ -1,0 +1,56 @@
+CLASS Trie  
+    FUNCTION __init__()  
+        SET children TO a list of twenty six elements each SET TO None  
+        SET is_end TO False  
+    END FUNCTION  
+
+    FUNCTION insert(w)  
+        SET node TO this Trie instance  
+        FOR each character c IN w  
+            SET idx TO the Unicode ordinal value of character c MINUS the Unicode ordinal value of character a  
+            IF the element at position idx OF node's children IS None  
+                CALL the Trie constructor TO CREATE a new Trie instance  
+                SET the element at position idx OF node's children TO this new Trie instance  
+            END IF  
+            SET node TO the element at position idx OF node's children  
+        END FOR  
+        SET node's is_end TO True  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION findAllConcatenatedWordsInADict(words)  
+        FUNCTION dfs(w, start)  
+            IF start EQUALS the LENGTH OF w  
+                RETURN True  
+            END IF  
+            SET node TO trie  
+            FOR index i FROM start TO the LENGTH OF w MINUS one  
+                SET idx TO the Unicode ordinal value of the element at position i OF w MINUS the Unicode ordinal value of character a  
+                IF the element at position idx OF node's children IS None  
+                    RETURN False  
+                END IF  
+                SET node TO the element at position idx OF node's children  
+                IF node's is_end IS True AND CALL dfs WITH PARAMETERS w AND i PLUS one RETURNS True  
+                    RETURN True  
+                END IF  
+            END FOR  
+            RETURN False  
+        END FUNCTION  
+
+        CALL the Trie constructor TO CREATE a new Trie instance  
+        SET trie TO this new Trie instance  
+        SET ans TO an empty list  
+        SORT words BY the LENGTH OF each element in ascending order  
+        FOR each word w IN words  
+            IF w IS NOT empty  
+                IF CALL dfs WITH PARAMETERS w AND zero RETURNS True  
+                    APPEND w TO ans  
+                ELSE  
+                    CALL trie's insert FUNCTION WITH PARAMETER w  
+                END IF  
+            END IF  
+        END FOR  
+        RETURN ans  
+    END FUNCTION  
+END CLASS

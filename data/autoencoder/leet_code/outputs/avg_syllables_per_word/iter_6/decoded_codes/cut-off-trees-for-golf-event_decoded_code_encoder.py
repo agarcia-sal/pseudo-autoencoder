@@ -1,0 +1,40 @@
+from collections import deque
+
+class Solution:
+    def cutOffTree(self, forest):
+        if not forest or not forest[0]:
+            return -1
+
+        trees = [(h, i, j) for i, row in enumerate(forest) for j, h in enumerate(row) if h > 1]
+        trees.sort()
+
+        def bfs(start, end):
+            if start == end:
+                return 0
+            m, n = len(forest), len(forest[0])
+            queue = deque([start])
+            visited = {start}
+            steps = 0
+
+            while queue:
+                for _ in range(len(queue)):
+                    x, y = queue.popleft()
+                    for dx, dy in [(-1,0), (1,0), (0,-1), (0,1)]:
+                        nx, ny = x + dx, y + dy
+                        if 0 <= nx < m and 0 <= ny < n and (nx, ny) not in visited and forest[nx][ny] != 0:
+                            if (nx, ny) == end:
+                                return steps + 1
+                            visited.add((nx, ny))
+                            queue.append((nx, ny))
+                steps += 1
+            return -1
+
+        x = y = total_steps = 0
+        for _, tx, ty in trees:
+            steps = bfs((x, y), (tx, ty))
+            if steps == -1:
+                return -1
+            total_steps += steps
+            x, y = tx, ty
+
+        return total_steps

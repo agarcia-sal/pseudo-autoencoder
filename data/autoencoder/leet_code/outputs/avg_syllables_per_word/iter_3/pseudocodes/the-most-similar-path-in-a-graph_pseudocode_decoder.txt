@@ -1,0 +1,43 @@
+CLASS Solution
+    FUNCTION mostSimilar(n, roads, names, targetPath)
+        SET graph TO a mapping from city to list of connected cities with default empty list
+        FOR each (u, v) IN roads
+            APPEND v TO graph[u]
+            APPEND u TO graph[v]
+
+        SET m TO LENGTH OF targetPath
+
+        FUNCTION dp(i, j)
+            IF i EQUALS 0 THEN
+                IF names[j] NOT EQUALS targetPath[i] THEN
+                    SET cost TO 1
+                ELSE
+                    SET cost TO 0
+                SET path TO list containing j
+                RETURN (cost, path)
+
+            SET min_cost TO infinity
+            SET min_path TO empty list
+            FOR each k IN graph[j]
+                (cost, path) = CALL dp(i - 1, k)
+                IF cost LESS THAN min_cost THEN
+                    SET min_cost TO cost
+                    SET min_path TO path
+
+            IF names[j] NOT EQUALS targetPath[i] THEN
+                SET current_cost TO min_cost PLUS 1
+            ELSE
+                SET current_cost TO min_cost
+            RETURN (current_cost, min_path with j appended at end)
+
+        SET min_cost TO infinity
+        SET min_path TO empty list
+        FOR j FROM 0 TO n - 1
+            (cost, path) = CALL dp(m - 1, j)
+            IF cost LESS THAN min_cost THEN
+                SET min_cost TO cost
+                SET min_path TO path
+
+        RETURN min_path
+    END FUNCTION
+END CLASS

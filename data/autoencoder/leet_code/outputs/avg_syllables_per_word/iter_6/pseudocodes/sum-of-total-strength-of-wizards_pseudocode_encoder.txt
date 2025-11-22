@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION totalStrength(strength)  
+        SET MOD TO one billion plus seven  
+        SET n TO length of strength  
+        
+        INITIALIZE prefix AS list of zeros with length n plus one  
+        FOR i FROM zero TO n MINUS one  
+            SET prefix at i plus one TO prefix at i PLUS strength at i MODULO MOD  
+        
+        INITIALIZE prefix_prefix AS list of zeros with length n plus two  
+        FOR i FROM zero TO n  
+            SET prefix_prefix at i plus one TO prefix_prefix at i PLUS prefix at i MODULO MOD  
+        
+        INITIALIZE prev_smaller AS list of minus one repeated n times  
+        INITIALIZE next_smaller_or_equal AS list of n repeated n times  
+        
+        INITIALIZE empty stack  
+        FOR i FROM zero TO n MINUS one  
+            WHILE stack IS NOT empty AND strength at top of stack GREATER THAN OR EQUAL TO strength at i  
+                REMOVE top from stack  
+            IF stack IS NOT empty  
+                SET prev_smaller at i TO top of stack  
+            APPEND i TO stack  
+        
+        CLEAR stack  
+        FOR i FROM n MINUS one DOWN TO zero  
+            WHILE stack IS NOT empty AND strength at top of stack GREATER THAN strength at i  
+                REMOVE top from stack  
+            IF stack IS NOT empty  
+                SET next_smaller_or_equal at i TO top of stack  
+            APPEND i TO stack  
+        
+        SET total_strength TO zero  
+        FOR i FROM zero TO n MINUS one  
+            SET left TO prev_smaller at i PLUS one  
+            SET right TO next_smaller_or_equal at i  
+            
+            SET sum_left TO (i MINUS left PLUS one) MULTIPLIED BY (prefix_prefix at right plus one MINUS prefix_prefix at i plus one) MODULO MOD  
+            SET sum_right TO (right MINUS i) MULTIPLIED BY (prefix_prefix at i plus one MINUS prefix_prefix at left) MODULO MOD  
+            
+            SET contribution TO strength at i MULTIPLIED BY (sum_left MINUS sum_right) MODULO MOD  
+            SET total_strength TO total_strength PLUS contribution MODULO MOD  
+        
+        RETURN total_strength  
+    END FUNCTION  
+END CLASS

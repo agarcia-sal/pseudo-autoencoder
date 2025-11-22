@@ -1,0 +1,50 @@
+CLASS Solution
+    FUNCTION areSentencesSimilarTwo(sentence1, sentence2, similarPairs)
+        IF LENGTH OF sentence1 IS NOT EQUAL TO LENGTH OF sentence2 THEN
+            RETURN False
+        END IF
+
+        SET parent TO empty mapping
+
+        FUNCTION find(x)
+            IF parent AT x IS NOT EQUAL TO x THEN
+                SET parent AT x TO find(parent AT x)
+            END IF
+            RETURN parent AT x
+        END FUNCTION
+
+        FUNCTION union(x, y)
+            SET rootX TO find(x)
+            SET rootY TO find(y)
+            IF rootX IS NOT EQUAL TO rootY THEN
+                SET parent AT rootY TO rootX
+            END IF
+        END FUNCTION
+
+        FOR each pair IN similarPairs
+            FOR each word IN pair
+                IF word IS NOT IN parent THEN
+                    SET parent AT word TO word
+                END IF
+            END FOR
+        END FOR
+
+        FOR each x, y IN similarPairs
+            CALL union(x, y)
+        END FOR
+
+        FOR each w1, w2 IN sentence1 AND sentence2 CORRESPONDINGLY
+            IF w1 IS NOT IN parent THEN
+                SET parent AT w1 TO w1
+            END IF
+            IF w2 IS NOT IN parent THEN
+                SET parent AT w2 TO w2
+            END IF
+            IF find(w1) IS NOT EQUAL TO find(w2) THEN
+                RETURN False
+            END IF
+        END FOR
+
+        RETURN True
+    END FUNCTION
+END CLASS

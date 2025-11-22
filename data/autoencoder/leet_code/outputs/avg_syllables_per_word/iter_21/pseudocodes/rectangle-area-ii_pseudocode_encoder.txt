@@ -1,0 +1,88 @@
+CLASS Solution  
+    FUNCTION rectangleArea(rectangles)  
+        SET MOD TO one billion PLUS seven  
+        
+        SET y_coords TO a new empty set  
+        FOR each element rectangle IN rectangles  
+            SET x1 TO element at position zero OF rectangle  
+            SET y1 TO element at position one OF rectangle  
+            SET x2 TO element at position two OF rectangle  
+            SET y2 TO element at position three OF rectangle  
+            ADD y1 TO y_coords  
+            ADD y2 TO y_coords  
+        END FOR  
+        
+        SET y_coords TO the sorted list converted from y_coords  
+        
+        FUNCTION create_y_index(y_coords)  
+            SET y_index TO an empty dictionary  
+            FOR each element y WITH index i IN y_coords  
+                SET the value at key y OF y_index TO i  
+            END FOR  
+            RETURN y_index  
+        END FUNCTION  
+        
+        SET y_index TO CALL create_y_index WITH PARAMETERS y_coords  
+        
+        FUNCTION create_count_list(length)  
+            SET count TO an empty list  
+            FOR index FROM zero TO length MINUS one  
+                APPEND zero TO count  
+            END FOR  
+            RETURN count  
+        END FUNCTION  
+        
+        SET count TO CALL create_count_list WITH PARAMETERS the length of y_coords  
+        
+        SET events TO an empty list  
+        FOR each element rectangle IN rectangles  
+            SET x1 TO element at position zero OF rectangle  
+            SET y1 TO element at position one OF rectangle  
+            SET x2 TO element at position two OF rectangle  
+            SET y2 TO element at position three OF rectangle  
+            APPEND a tuple of x1 one y1 y2 TO events  
+            APPEND a tuple of x2 minus one y1 y2 TO events  
+        END FOR  
+        
+        FUNCTION sort_events(events)  
+            SORT events BY the first element of each tuple in ascending order  
+            RETURN events  
+        END FUNCTION  
+        
+        SET events TO CALL sort_events WITH PARAMETERS events  
+        
+        SET prev_x TO zero  
+        SET area TO zero  
+        
+        FOR each element event IN events  
+            SET x TO element at position zero OF event  
+            SET eventType TO element at position one OF event  
+            SET y1 TO element at position two OF event  
+            SET y2 TO element at position three OF event  
+            
+            SET current_length TO zero  
+            FOR i FROM one TO the length of count MINUS one  
+                IF the element at position i MINUS one OF count GREATER THAN zero THEN  
+                    INCREMENT current_length BY the element at position i OF y_coords MINUS the element at position i MINUS one OF y_coords  
+                END IF  
+            END FOR  
+            
+            INCREMENT area BY current_length MULTIPLIED BY x MINUS prev_x  
+            SET area TO the remainder after dividing area BY MOD  
+            
+            IF eventType EQUALS one THEN  
+                FOR i FROM the value at key y1 OF y_index TO the value at key y2 OF y_index MINUS one  
+                    INCREMENT the element at position i OF count BY one  
+                END FOR  
+            ELSE  
+                FOR i FROM the value at key y1 OF y_index TO the value at key y2 OF y_index MINUS one  
+                    DECREMENT the element at position i OF count BY one  
+                END FOR  
+            END IF  
+            
+            SET prev_x TO x  
+        END FOR  
+        
+        RETURN area  
+    END FUNCTION  
+END CLASS

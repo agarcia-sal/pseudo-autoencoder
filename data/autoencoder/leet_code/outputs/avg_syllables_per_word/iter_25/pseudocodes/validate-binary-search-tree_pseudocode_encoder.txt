@@ -1,0 +1,58 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val WITH DEFAULT zero left WITH DEFAULT none right WITH DEFAULT none  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values IS EMPTY  
+        RETURN none  
+    END IF  
+    SET root TO new TreeNode initialized WITH element at position zero of values  
+    SET i TO one  
+    SET queue TO empty deque collection  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO the first element REMOVED FROM queue  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT none  
+            SET node.left TO new TreeNode initialized WITH element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT none  
+            SET node.right TO new TreeNode initialized WITH element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF the val property of p IS NOT EQUALS TO the val property of q  
+        RETURN false  
+    ELSE  
+        RETURN the logical AND of the result of calling is_same_tree WITH PARAMETERS the left property of p AND the left property of q AND the result of calling is_same_tree WITH PARAMETERS the right property of p AND the right property of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION isValidBST WITH PARAMETERS self root  
+        FUNCTION validate WITH PARAMETERS node low WITH DEFAULT negative infinity high WITH DEFAULT positive infinity  
+            IF node IS none  
+                RETURN true  
+            END IF  
+            IF the val property of node IS LESS THAN OR EQUAL TO low OR the val property of node IS GREATER THAN OR EQUAL TO high  
+                RETURN false  
+            END IF  
+            RETURN the logical AND of calling validate WITH PARAMETERS the left property of node low AND the val property of node AND calling validate WITH PARAMETERS the right property of node the val property of node AND high  
+        END FUNCTION  
+        RETURN validate CALLED WITH root  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,64 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val PLUS left PLUS right  
+        SET the value attribute TO val  
+        SET the left attribute TO left  
+        SET the right attribute TO right  
+    END FUNCTION  
+END CLASS
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values DOES NOT CONTAIN ANY ELEMENTS  
+        RETURN nothing  
+    END IF  
+    SET root TO a new TreeNode CREATED WITH the first element of values  
+    SET i TO one  
+    CREATE an empty double ended queue named queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        REMOVE the element from the front of queue AND ASSIGN it TO node  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT nothing  
+            SET the left attribute of node TO a new TreeNode CREATED WITH the element at position i of values  
+            APPEND the left attribute of node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT nothing  
+            SET the right attribute of node TO a new TreeNode CREATED WITH the element at position i of values  
+            APPEND the right attribute of node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION
+
+FUNCTION is_same_tree WITH PARAMETERS p PLUS q  
+    IF p IS nothing AND q IS nothing  
+        RETURN true  
+    ELSE IF p IS nothing OR q IS nothing  
+        RETURN false  
+    ELSE IF the value attribute of p IS NOT EQUALS TO the value attribute of q  
+        RETURN false  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETERS the left attribute of p PLUS the left attribute of q AND AND is_same_tree WITH PARAMETERS the right attribute of p PLUS the right attribute of q  
+    END IF  
+END FUNCTION
+
+CLASS Solution  
+    FUNCTION minCameraCover WITH PARAMETERS root  
+        FUNCTION dfs WITH PARAMETER node  
+            IF node IS nothing  
+                RETURN a tuple with zero PLUS zero PLUS infinite value  
+            END IF  
+            SET left_no_camera PLUS left_monitored PLUS left_camera TO dfs WITH the left attribute of node  
+            SET right_no_camera PLUS right_monitored PLUS right_camera TO dfs WITH the right attribute of node  
+            SET no_camera TO left_monitored PLUS right_monitored  
+            SET monitored TO the minimum OF  
+                left_camera PLUS the minimum OF right_monitored PLUS right_camera  
+                right_camera PLUS the minimum OF left_monitored PLUS left_camera  
+                left_camera PLUS right_camera  
+            SET camera TO one PLUS the minimum OF left_no_camera PLUS left_monitored PLUS left_camera PLUS the minimum OF right_no_camera PLUS right_monitored PLUS right_camera  
+            RETURN a tuple with no_camera PLUS monitored PLUS camera  
+        END FUNCTION  
+        SET root_no_camera PLUS root_monitored PLUS root_camera TO dfs WITH root  
+        RETURN the minimum OF root_monitored PLUS root_camera  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION openLock(deadends deadends LIST OF STRING target target STRING) RETURNS INTEGER  
+        SET deadends_set TO a set containing all elements of deadends  
+        IF the string representing four zeros IS IN deadends_set THEN  
+            RETURN the integer negative one  
+        END IF  
+        IF target EQUALS the string representing four zeros THEN  
+            RETURN the integer zero  
+        END IF  
+        SET queue TO a double ended queue containing the pair of the string representing four zeros and the integer zero  
+        SET visited TO a set containing the string representing four zeros  
+        
+        FUNCTION neighbors(state state STRING) RETURNS LIST OF STRING  
+            SET result TO an empty list  
+            FOR position i FROM zero TO the integer three  
+                SET digit TO the integer value of the character at position i of state  
+                FOR each move IN the list containing the integer negative one and the integer one  
+                    SET new_digit TO digit PLUS move  
+                    IF new_digit LESS THAN zero THEN  
+                        SET new_digit TO new_digit PLUS ten  
+                    ELSE IF new_digit GREATER THAN OR EQUAL TO ten THEN  
+                        SET new_digit TO new_digit MINUS ten  
+                    END IF  
+                    SET new_state TO the concatenation of the substring of state from position zero TO the position before i, concatenated with the string representation of new_digit concatenated with the substring of state from the position after i TO the end of state  
+                    APPEND new_state TO result  
+                END FOR  
+            END FOR  
+            RETURN result  
+        END FUNCTION  
+        
+        WHILE the queue is not empty DO  
+            REMOVE the first element of queue and ASSIGN the first element of this pair TO current_state and the second element TO steps  
+            FOR each neighbor IN the result of calling neighbors with current_state as argument  
+                IF neighbor IS NOT IN visited AND neighbor IS NOT IN deadends_set THEN  
+                    IF neighbor EQUALS target THEN  
+                        RETURN steps PLUS one  
+                    END IF  
+                    ADD neighbor TO visited  
+                    ADD the pair of neighbor and steps PLUS one TO the end of queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN the integer negative one  
+    END FUNCTION  
+END CLASS

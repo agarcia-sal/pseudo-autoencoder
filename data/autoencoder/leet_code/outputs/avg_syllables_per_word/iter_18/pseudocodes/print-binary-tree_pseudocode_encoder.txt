@@ -1,0 +1,68 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val SET TO zero left SET TO None right SET TO None  
+        SET the attribute val OF self TO val  
+        SET the attribute left OF self TO left  
+        SET the attribute right OF self TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETERS values OF TYPE list  
+    IF the collection values IS empty  
+        RETURN None  
+    END IF  
+    SET root TO new instance OF TreeNode WITH the element at position zero of values  
+    SET iterator_index TO one  
+    SET queue TO new deque collection  
+    APPEND root TO queue  
+    WHILE the collection queue IS not empty  
+        SET node TO the first element REMOVED FROM queue  
+        IF iterator_index IS LESS THAN the LENGTH OF values AND the element at position iterator_index of values IS NOT None  
+            SET the attribute left OF node TO new instance OF TreeNode WITH the element at position iterator_index of values  
+            APPEND the attribute left OF node TO queue  
+        END IF  
+        INCREMENT iterator_index BY one  
+        IF iterator_index IS LESS THAN the LENGTH OF values AND the element at position iterator_index of values IS NOT None  
+            SET the attribute right OF node TO new instance OF TreeNode WITH the element at position iterator_index of values  
+            APPEND the attribute right OF node TO queue  
+        END IF  
+        INCREMENT iterator_index BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF the object p IS None AND the object q IS None  
+        RETURN True  
+    ELSE IF the object p IS None OR the object q IS None  
+        RETURN False  
+    ELSE IF the attribute val OF p IS NOT EQUAL TO the attribute val OF q  
+        RETURN False  
+    ELSE  
+        RETURN the logical AND of the result of calling is_same_tree WITH the attribute left OF p AND the attribute left OF q AND the result of calling is_same_tree WITH the attribute right OF p AND the attribute right OF q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION printTree WITH PARAMETERS self root OF OPTIONAL TreeNode TYPE  
+        FUNCTION getHeight WITH PARAMETERS node  
+            IF the object node IS None  
+                RETURN zero  
+            END IF  
+            RETURN one PLUS the maximum of the results of calling getHeight WITH the attribute left OF node AND calling getHeight WITH the attribute right OF node  
+        END FUNCTION  
+        SET height TO the result of calling getHeight WITH root  
+        SET width TO two RAISED TO THE power OF height MINUS one  
+        SET res TO new list of lists WHERE EACH inner list CONTAINS the empty string REPEATED width TIMES AND THE outer list REPEATS THAT inner list height TIMES  
+        FUNCTION placeNode WITH PARAMETERS node row left right  
+            IF the object node IS None  
+                RETURN  
+            END IF  
+            SET middle_position TO the integer division of the sum of left AND right BY two  
+            SET the element at position middle_position of the list at position row of res TO the string representation OF the attribute val OF node  
+            CALL placeNode WITH the attribute left OF node AND row INCREMENTED BY one AND left AND middle_position  
+            CALL placeNode WITH the attribute right OF node AND row INCREMENTED BY one AND middle_position AND right  
+        END FUNCTION  
+        CALL placeNode WITH root AND zero AND zero AND width  
+        RETURN res  
+    END FUNCTION  
+END CLASS

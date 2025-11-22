@@ -1,0 +1,43 @@
+CLASS Solution
+    FUNCTION expressiveWords(s: string, words: list of string) RETURNS integer
+        
+        FUNCTION compress(word: string) RETURNS list of (character, integer)
+            IF word IS empty
+                RETURN empty list
+            SET count TO 1
+            SET compressed TO empty list
+            FOR i FROM 1 TO LENGTH OF word MINUS 1
+                IF character AT word[i] EQUALS character AT word[i - 1]
+                    INCREMENT count BY 1
+                ELSE
+                    APPEND (character AT word[i - 1], count) TO compressed
+                    SET count TO 1
+            END FOR
+            APPEND (last character of word, count) TO compressed
+            RETURN compressed
+        END FUNCTION
+        
+        FUNCTION is_stretchy(s_compressed: list, word_compressed: list) RETURNS boolean
+            IF LENGTH OF s_compressed NOT EQUAL TO LENGTH OF word_compressed
+                RETURN False
+            FOR EACH pair (sc, sc_count), (wc, wc_count) IN zipped s_compressed AND word_compressed
+                IF sc NOT EQUAL TO wc
+                    RETURN False
+                IF sc_count NOT EQUAL TO wc_count AND (sc_count LESS THAN 3 OR sc_count LESS THAN wc_count)
+                    RETURN False
+            END FOR
+            RETURN True
+        END FUNCTION
+        
+        SET s_compressed TO compress(s)
+        SET stretchy_count TO 0
+        
+        FOR EACH word IN words
+            SET word_compressed TO compress(word)
+            IF is_stretchy(s_compressed, word_compressed)
+                INCREMENT stretchy_count BY 1
+        END FOR
+        
+        RETURN stretchy_count
+    END FUNCTION
+END CLASS

@@ -1,0 +1,44 @@
+CLASS Solution  
+    FUNCTION largestPathValue(colors list_of_characters edges list_of_lists_of_integers)  
+        SET number_of_nodes TO the LENGTH OF colors  
+        SET graph TO an empty mapping from node TO list of nodes  
+        SET in_degree TO a list of zeroes of length number_of_nodes  
+        
+        FOR each pair of nodes current_node AND adjacent_node IN edges  
+            APPEND adjacent_node TO the list associated WITH current_node IN graph  
+            INCREMENT the element at position adjacent_node OF in_degree BY one  
+        END FOR  
+        
+        SET queue TO a new double ended collection initialized WITH all indices i FROM zero TO number_of_nodes MINUS one WHERE the element at position i OF in_degree EQUALS zero  
+        SET dp TO a list of number_of_nodes elements EACH BEING a list of twenty six zeroes  
+        SET visited_nodes_count TO zero  
+        SET maximum_color_value TO zero  
+        
+        WHILE queue IS NOT empty  
+            REMOVE the first element FROM queue AND ASSIGN TO current_node  
+            INCREMENT the element at position the numerical representation of the character at position current_node of colors MINUS the numerical representation of the lowercase letter a OF the list at position current_node OF dp BY one  
+            IF the element at position the numerical representation of the character at position current_node of colors MINUS the numerical representation of the lowercase letter a OF the list at position current_node OF dp IS GREATER THAN maximum_color_value THEN  
+                SET maximum_color_value TO that element  
+            END IF  
+            INCREMENT visited_nodes_count BY one  
+            
+            FOR each adjacent_node IN the list associated WITH current_node IN graph  
+                FOR color_index FROM zero TO twenty five  
+                    IF the element at position color_index OF the list at position adjacent_node OF dp IS LESS THAN the element at position color_index OF the list at position current_node OF dp THEN  
+                        SET the element at position color_index OF the list at position adjacent_node OF dp TO the element at position color_index OF the list at position current_node OF dp  
+                    END IF  
+                END FOR  
+                DECREMENT the element at position adjacent_node OF in_degree BY one  
+                IF the element at position adjacent_node OF in_degree EQUALS zero THEN  
+                    APPEND adjacent_node TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        IF visited_nodes_count EQUALS number_of_nodes THEN  
+            RETURN maximum_color_value  
+        ELSE  
+            RETURN negative one  
+        END IF  
+    END FUNCTION  
+END CLASS

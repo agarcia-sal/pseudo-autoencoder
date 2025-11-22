@@ -1,0 +1,63 @@
+CLASS Solution  
+    FUNCTION minOperationsToFlip(expression)  
+        SET stack TO an empty list  
+        
+        FOR each element e IN expression  
+            IF e IS EQUAL TO an opening parenthesis OR e IS EQUAL TO an ampersand OR e IS EQUAL TO a vertical bar  
+                APPEND a pair containing e AND zero TO stack  
+                CONTINUE to the next iteration  
+            END IF  
+            
+            IF e IS EQUAL TO a closing parenthesis  
+                SET lastPair TO the element REMOVED FROM stack AT the last position  
+                REMOVE the element REMOVED FROM stack AT the last position  // This discards the opening parenthesis  
+            ELSE  
+                // e IS EQUAL TO zero OR e IS EQUAL TO one  
+                SET lastPair TO a pair containing e AND one  // The cost to change zero TO one OR one TO zero is one  
+            END IF  
+            
+            IF stack IS NOT empty AND the first element of the element AT the last position IN stack IS EQUAL TO an ampersand OR a vertical bar  
+                SET op TO the first element of the element REMOVED FROM stack AT the last position  
+                SET a AND costA TO the elements of the element REMOVED FROM stack AT the last position  
+                SET b AND costB TO the elements of lastPair  
+                
+                IF op IS EQUAL TO an ampersand  
+                    IF a IS EQUAL TO zero AND b IS EQUAL TO zero  
+                        // Change ampersand TO vertical bar AND result of OR operation TO one  
+                        SET lastPair TO a pair containing zero AND one PLUS the minimum OF costA AND costB  
+                    ELSE IF a IS EQUAL TO zero AND b IS EQUAL TO one  
+                        // Change ampersand TO vertical bar  
+                        SET lastPair TO a pair containing zero AND one  
+                    ELSE IF a IS EQUAL TO one AND b IS EQUAL TO zero  
+                        // Change ampersand TO vertical bar  
+                        SET lastPair TO a pair containing zero AND one  
+                    ELSE  
+                        // a IS EQUAL TO one AND b IS EQUAL TO one  
+                        // Change OR operation result TO zero  
+                        SET lastPair TO a pair containing one AND the minimum OF costA AND costB  
+                    END IF  
+                ELSE  
+                    // op IS EQUAL TO vertical bar  
+                    IF a IS EQUAL TO zero AND b IS EQUAL TO zero  
+                        // Change OR operation result TO one  
+                        SET lastPair TO a pair containing zero AND the minimum OF costA AND costB  
+                    ELSE IF a IS EQUAL TO zero AND b IS EQUAL TO one  
+                        // Change vertical bar TO ampersand  
+                        SET lastPair TO a pair containing one AND one  
+                    ELSE IF a IS EQUAL TO one AND b IS EQUAL TO zero  
+                        // Change vertical bar TO ampersand  
+                        SET lastPair TO a pair containing one AND one  
+                    ELSE  
+                        // a IS EQUAL TO one AND b IS EQUAL TO one  
+                        // Change vertical bar TO ampersand AND OR operation result TO zero  
+                        SET lastPair TO a pair containing one AND one PLUS the minimum OF costA AND costB  
+                    END IF  
+                END IF  
+            END IF  
+            
+            APPEND lastPair TO stack  
+        END FOR  
+        
+        RETURN the second element OF the element AT the last position IN stack  
+    END FUNCTION  
+END CLASS

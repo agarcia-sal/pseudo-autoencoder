@@ -1,0 +1,49 @@
+CLASS Solution
+    FUNCTION isValid(code)
+        CALL import_module WITH parameter re
+        
+        SET cdata_pattern TO auxiliary_FUNCTION_for_cdata_pattern
+        
+        SET code TO CALL re.sub WITH parameters cdata_pattern AND empty_string AND code
+        
+        SET stack TO empty list
+        
+        SET i TO zero
+        WHILE i LESS THAN the LENGTH OF code holds
+            IF element at position i of code EQUALS less than symbol
+                SET j TO CALL code.find WITH parameters greater than symbol AND i PLUS one
+                
+                IF j EQUALS negative one
+                    RETURN false
+                END IF
+                
+                SET tag_content TO substring from position i PLUS one TO position j MINUS one of code
+                
+                IF tag_content IS empty
+                    RETURN false
+                END IF
+                
+                IF element at position zero of tag_content EQUALS forward slash symbol
+                    SET tag_name TO substring from position one TO end of tag_content
+                    IF stack IS empty OR element at position negative one of stack NOT EQUALS tag_name
+                        RETURN false
+                    END IF
+                    REMOVE element at position negative one FROM stack
+                ELSE IF element at position zero of tag_content EQUALS exclamation mark symbol
+                    RETURN false
+                ELSE
+                    IF NOT (the LENGTH OF tag_content GREATER THAN OR EQUAL TO one AND the LENGTH OF tag_content LESS THAN OR EQUAL TO nine AND tag_content IS uppercase)
+                        RETURN false
+                    END IF
+                    APPEND tag_content TO stack
+                END IF
+                
+                SET i TO j PLUS one
+            ELSE
+                INCREMENT i BY one
+            END IF
+        END WHILE
+        
+        RETURN stack IS empty AND the LENGTH OF CALL re.findall WITH parameters pattern matching uppercase tags AND code GREATER THAN zero
+    END FUNCTION
+END CLASS

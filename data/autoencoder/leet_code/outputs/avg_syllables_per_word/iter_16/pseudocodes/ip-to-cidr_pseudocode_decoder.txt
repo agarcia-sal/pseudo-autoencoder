@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION ipToCIDR(ip, n)  
+        FUNCTION ip_to_int(ip)  
+            SET parts TO list of CONVERTED TO INTEGER substrings from SPLITTING ip BY dot  
+            SET res TO zero  
+            FOR each part IN parts  
+                SET res TO res MULTIPLIED BY two HUNDRED FIFTY SIX PLUS part  
+            END FOR  
+            RETURN res  
+        END FUNCTION  
+        
+        FUNCTION int_to_ip(num)  
+            SET string_parts TO empty list  
+            FOR index FROM three TO zero DECREMENT BY one  
+                SET part_value TO num DIVIDED BY two HUNDRED FIFTY SIX TO THE POWER OF index MODULO two HUNDRED FIFTY SIX  
+                APPEND CONVERT part_value TO STRING TO string_parts  
+            END FOR  
+            RETURN CONCATENATION OF string_parts USING dot AS SEPARATOR  
+        END FUNCTION  
+        
+        FUNCTION largest_cidr_size(start, n)  
+            IF start MODULO two EQUALS one  
+                RETURN one  
+            END IF  
+            SET x TO one  
+            WHILE x IS LESS THAN OR EQUAL TO n AND the BITWISE AND OF start AND x MINUS one EQUALS zero  
+                SET x TO x MULTIPLIED BY two  
+            END WHILE  
+            RETURN x DIVIDED BY two  
+        END FUNCTION  
+        
+        SET result TO empty list  
+        SET start_ip TO CALL ip_to_int WITH ip  
+        
+        WHILE n IS GREATER THAN zero  
+            SET size TO CALL largest_cidr_size WITH start_ip AND n  
+            SET prefix_length TO number THIRTY TWO MINUS (BIT LENGTH OF size MINUS one)  
+            SET cidr_notation TO CONCATENATION OF CALL int_to_ip WITH start_ip, slash, AND prefix_length AS STRING  
+            APPEND cidr_notation TO result  
+            INCREMENT start_ip BY size  
+            DECREMENT n BY size  
+        END WHILE  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

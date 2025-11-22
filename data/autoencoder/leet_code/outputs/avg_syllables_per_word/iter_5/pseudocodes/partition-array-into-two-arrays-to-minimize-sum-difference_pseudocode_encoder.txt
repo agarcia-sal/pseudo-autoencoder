@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION minimumDifference(nums)  
+        SET n TO LENGTH OF nums DIVIDED BY 2  
+        SET total_sum TO SUM OF nums  
+        SET target TO total_sum DIVIDED BY 2  
+        SET min_diff TO infinity  
+        
+        SET left_half TO FIRST n ELEMENTS OF nums  
+        SET right_half TO ELEMENTS OF nums FROM n TO END  
+        
+        SET left_sums TO LIST OF n PLUS 1 EMPTY DICTIONARIES  
+        SET right_sums TO LIST OF n PLUS 1 EMPTY DICTIONARIES  
+        
+        FOR i FROM 0 TO n INCLUSIVE  
+            FOR each combination OF left_half TAKING i ELEMENTS  
+                SET subset_sum TO SUM OF combination  
+                IF subset_sum NOT IN left_sums AT i  
+                    SET left_sums AT i AT subset_sum TO 0  
+                INCREMENT left_sums AT i AT subset_sum BY 1  
+            
+            FOR each combination OF right_half TAKING i ELEMENTS  
+                SET subset_sum TO SUM OF combination  
+                IF subset_sum NOT IN right_sums AT i  
+                    SET right_sums AT i AT subset_sum TO 0  
+                INCREMENT right_sums AT i AT subset_sum BY 1  
+        
+        FOR i FROM 0 TO n INCLUSIVE  
+            SET left_values TO SORTED KEYS OF left_sums AT i  
+            SET right_values TO SORTED KEYS OF right_sums AT n MINUS i  
+            
+            SET j TO 0  
+            SET k TO LENGTH OF right_values MINUS 1  
+            WHILE j LESS THAN LENGTH OF left_values AND k GREATER THAN OR EQUAL TO 0  
+                SET current_sum TO left_values AT j PLUS right_values AT k  
+                SET min_diff TO MINIMUM OF min_diff AND ABSOLUTE VALUE OF total_sum MINUS 2 TIMES current_sum  
+                
+                IF current_sum LESS THAN target  
+                    INCREMENT j BY 1  
+                ELSE IF current_sum GREATER THAN target  
+                    DECREMENT k BY 1  
+                ELSE  
+                    RETURN 0  
+        
+        RETURN min_diff  
+    END FUNCTION  
+END CLASS

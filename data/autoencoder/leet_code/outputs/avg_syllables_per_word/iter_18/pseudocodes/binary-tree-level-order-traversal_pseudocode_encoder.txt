@@ -1,0 +1,69 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val EQUAL TO zero left EQUAL TO none right EQUAL TO none  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETERS values AS list  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO NEW TreeNode initialized WITH the element at position zero of values  
+    SET index_tracker TO one  
+    SET node_queue TO an empty double ended queue  
+    APPEND root TO node_queue  
+    WHILE node_queue IS NOT empty  
+        SET current_node TO the leftmost element REMOVED FROM node_queue  
+        IF index_tracker IS less than the LENGTH OF values AND the element at position index_tracker of values IS NOT none  
+            SET current_node.left TO NEW TreeNode initialized WITH the element at position index_tracker of values  
+            APPEND current_node.left TO node_queue  
+        END IF  
+        INCREMENT index_tracker BY one  
+        IF index_tracker IS less than the LENGTH OF values AND the element at position index_tracker of values IS NOT none  
+            SET current_node.right TO NEW TreeNode initialized WITH the element at position index_tracker of values  
+            APPEND current_node.right TO node_queue  
+        END IF  
+        INCREMENT index_tracker BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF the val attribute of p IS NOT EQUALS TO the val attribute of q  
+        RETURN false  
+    ELSE  
+        RETURN the result of is_same_tree CALLED WITH the left attribute of p AND the left attribute of q AND the result of is_same_tree CALLED WITH the right attribute of p AND the right attribute of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION levelOrder WITH PARAMETERS root AS optional TreeNode  
+        IF root IS none  
+            RETURN an empty list  
+        END IF  
+        SET result TO an empty list  
+        SET node_queue TO a double ended queue INITIALIZED WITH root  
+        WHILE node_queue IS NOT empty  
+            SET level_size TO the LENGTH OF node_queue  
+            SET current_level TO an empty list  
+            FOR each element FROM zero TO level_size MINUS one  
+                SET current_node TO the leftmost element REMOVED FROM node_queue  
+                APPEND the val attribute of current_node TO current_level  
+                IF the left attribute of current_node IS NOT none  
+                    APPEND the left attribute of current_node TO node_queue  
+                END IF  
+                IF the right attribute of current_node IS NOT none  
+                    APPEND the right attribute of current_node TO node_queue  
+                END IF  
+            END FOR  
+            APPEND current_level TO result  
+        END WHILE  
+        RETURN result  
+    END FUNCTION  
+END CLASS

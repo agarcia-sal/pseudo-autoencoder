@@ -1,0 +1,78 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, n)  
+        SET self.parent TO list of integers FROM zero TO n MINUS one  
+        SET self.size TO list of the integer one repeated n times  
+    END FUNCTION  
+
+    FUNCTION find(self, u)  
+        IF element at position u of self.parent NOT EQUALS u  
+            SET element at position u of self.parent TO the result of calling find with argument element at position u of self.parent  
+        END IF  
+        RETURN element at position u of self.parent  
+    END FUNCTION  
+
+    FUNCTION union(self, u, v)  
+        SET root_u TO the result of calling find with argument u  
+        SET root_v TO the result of calling find with argument v  
+        IF root_u NOT EQUALS root_v  
+            IF element at position root_u of self.size GREATER THAN element at position root_v of self.size  
+                SET element at position root_v of self.parent TO root_u  
+                INCREMENT element at position root_u of self.size BY element at position root_v of self.size  
+            ELSE  
+                SET element at position root_u of self.parent TO root_v  
+                INCREMENT element at position root_v of self.size BY element at position root_u of self.size  
+            END IF  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION friendRequests(self, n, restrictions, requests)  
+        SET uf TO new instance of UnionFind with argument n  
+        SET result TO empty list  
+        SET restriction_map TO empty mapping  
+
+        FOR each pair x and y IN restrictions  
+            IF x NOT IN keys of restriction_map  
+                ASSIGN to key x in restriction_map an empty set  
+            END IF  
+            IF y NOT IN keys of restriction_map  
+                ASSIGN to key y in restriction_map an empty set  
+            END IF  
+            ADD y TO the set at key x in restriction_map  
+            ADD x TO the set at key y in restriction_map  
+        END FOR  
+
+        FUNCTION can_union(u, v)  
+            SET root_u TO the result of calling uf.find with argument u  
+            SET root_v TO the result of calling uf.find with argument v  
+
+            FOR each person IN the set at key root_u in restriction_map or empty set if not present  
+                IF uf.find with argument person EQUALS root_v  
+                    RETURN False  
+                END IF  
+            END FOR  
+
+            FOR each person IN the set at key root_v in restriction_map or empty set if not present  
+                IF uf.find with argument person EQUALS root_u  
+                    RETURN False  
+                END IF  
+            END FOR  
+
+            RETURN True  
+        END FUNCTION  
+
+        FOR each pair u and v IN requests  
+            IF uf.find with argument u EQUALS uf.find with argument v  
+                APPEND True TO result  
+            ELSE IF can_union with arguments u and v  
+                CALL uf.union with arguments u and v  
+                APPEND True TO result  
+            ELSE  
+                APPEND False TO result  
+            END IF  
+        END FOR  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

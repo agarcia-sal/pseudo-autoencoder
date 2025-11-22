@@ -1,0 +1,41 @@
+```
+CLASS Solution
+    FUNCTION alienOrder(words: List of String) RETURNS String
+        SET graph TO map from character TO set of characters
+        SET indegree TO map from character TO integer
+        
+        SET all_chars TO set of all characters in words
+        
+        FOR i FROM 0 TO LENGTH OF words MINUS 2
+            SET word1 TO words[i]
+            SET word2 TO words[i + 1]
+            SET min_length TO minimum of LENGTH OF word1 AND LENGTH OF word2
+            SET found TO false
+            FOR j FROM 0 TO min_length MINUS 1
+                IF character at position j of word1 IS NOT EQUAL TO character at position j of word2 THEN
+                    IF character at position j of word2 IS NOT IN graph[character at position j of word1] THEN
+                        ADD character at position j of word2 TO graph[character at position j of word1]
+                        INCREMENT indegree[character at position j of word2] BY 1
+                    SET found TO true
+                    BREAK inner FOR loop
+            IF found IS false AND LENGTH OF word1 IS GREATER THAN LENGTH OF word2 THEN
+                RETURN empty string
+        
+        SET queue TO list of characters IN all_chars WHERE indegree OF character IS 0
+        SET result TO empty list
+        
+        WHILE queue IS NOT empty
+            REMOVE first character FROM queue AND ASSIGN TO char
+            APPEND char TO result
+            FOR each neighbor IN graph[char]
+                DECREMENT indegree[neighbor] BY 1
+                IF indegree[neighbor] IS 0 THEN
+                    APPEND neighbor TO queue
+        
+        IF LENGTH OF result IS NOT EQUAL TO LENGTH OF all_chars THEN
+            RETURN empty string
+        
+        RETURN concatenation of characters in result
+    END FUNCTION
+END CLASS
+```

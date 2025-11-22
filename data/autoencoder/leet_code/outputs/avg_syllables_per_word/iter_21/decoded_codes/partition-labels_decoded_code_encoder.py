@@ -1,0 +1,18 @@
+class Solution:
+    def partitionLabels(self, s: str) -> list[int]:
+        last_occurrence = self.get_last_occurrence_dictionary(s)
+        start = 0
+        end = 0
+        partition_sizes = []
+        for i, char in enumerate(s):
+            end = max(end, last_occurrence[char])
+            if i == end:
+                partition_sizes.append(end - start + 1)
+                start = i + 1
+        return partition_sizes
+
+    def get_last_occurrence_dictionary(self, s: str) -> dict[str, int]:
+        result = {}
+        for idx, char in enumerate(s):
+            result[char] = idx
+        return result

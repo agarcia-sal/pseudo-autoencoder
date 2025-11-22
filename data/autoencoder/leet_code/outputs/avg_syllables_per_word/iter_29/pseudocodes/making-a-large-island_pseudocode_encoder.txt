@@ -1,0 +1,66 @@
+CLASS Solution  
+    FUNCTION largestIsland(grid)  
+        IF grid IS empty OR the LENGTH OF the element at position zero OF grid EQUALS zero  
+            RETURN zero  
+        END IF  
+        
+        SET n TO the LENGTH OF grid  
+        SET directions TO a collection of pairs of integers namely zero and one then one and zero then zero and negative one then negative one and zero  
+        
+        FUNCTION is_valid(x y)  
+            RETURN the condition that zero IS LESS THAN OR EQUAL TO x AND x IS LESS THAN n AND zero IS LESS THAN OR EQUAL TO y AND y IS LESS THAN n  
+        END FUNCTION  
+        
+        FUNCTION dfs(x y index)  
+            SET area TO one  
+            SET the element at position x OF grid and position y TO index  
+            FOR each pair of integers dx dy IN directions  
+                SET nx TO x PLUS dx  
+                SET ny TO y PLUS dy  
+                IF is_valid(nx ny) AND the element at position nx OF grid and position ny EQUALS one  
+                    INCREMENT area BY dfs(nx ny index)  
+                END IF  
+            END FOR  
+            RETURN area  
+        END FUNCTION  
+        
+        SET island_areas TO an empty mapping  
+        SET index TO two  
+        
+        FOR i FROM zero TO n MINUS one  
+            FOR j FROM zero TO n MINUS one  
+                IF the element at position i OF grid and position j EQUALS one  
+                    SET the element at key index OF island_areas TO dfs(i j index)  
+                    INCREMENT index BY one  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        IF island_areas IS empty  
+            RETURN one  
+        END IF  
+        
+        SET max_island_size TO the maximum value among all values OF island_areas  
+        
+        FOR i FROM zero TO n MINUS one  
+            FOR j FROM zero TO n MINUS one  
+                IF the element at position i OF grid and position j EQUALS zero  
+                    SET neighbors TO an empty set  
+                    FOR each pair of integers dx dy IN directions  
+                        SET nx TO i PLUS dx  
+                        SET ny TO j PLUS dy  
+                        IF is_valid(nx ny) AND the element at position nx OF grid and position ny IS GREATER THAN one  
+                            ADD the element at position nx OF grid and position ny TO neighbors  
+                        END IF  
+                    END FOR  
+                    SET current_island_size TO one PLUS the sum of the values at keys in neighbors OF island_areas  
+                    IF current_island_size IS GREATER THAN max_island_size  
+                        SET max_island_size TO current_island_size  
+                    END IF  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        RETURN max_island_size  
+    END FUNCTION  
+END CLASS

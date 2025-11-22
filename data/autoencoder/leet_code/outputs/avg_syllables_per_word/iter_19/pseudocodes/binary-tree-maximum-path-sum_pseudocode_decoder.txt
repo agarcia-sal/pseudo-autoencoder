@@ -1,0 +1,60 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val EQUALS zero left EQUALS none right EQUALS none  
+        SET self dot val TO val  
+        SET self dot left TO left  
+        SET self dot right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETERS values  
+    IF the LENGTH OF values EQUALS zero  
+        RETURN none  
+    END IF  
+    SET root TO a new TreeNode initialized WITH the element at position zero of values  
+    SET i TO one  
+    SET queue TO an empty double ended queue  
+    APPEND root TO queue  
+    WHILE the LENGTH OF queue IS GREATER THAN zero  
+        SET node TO the element removed from the left of queue  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT none  
+            SET node dot left TO a new TreeNode initialized WITH the element at position i of values  
+            APPEND node dot left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT none  
+            SET node dot right TO a new TreeNode initialized WITH the element at position i of values  
+            APPEND node dot right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF the val attribute of p IS NOT EQUALS TO the val attribute of q  
+        RETURN False  
+    ELSE  
+        RETURN the result of is_same_tree called WITH the left attribute of p AND the left attribute of q AND the result of is_same_tree called WITH the right attribute of p AND the right attribute of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION maxPathSum WITH PARAMETERS self root  
+        FUNCTION helper WITH PARAMETERS node  
+            IF node IS none  
+                RETURN the smallest possible floating point value NEGATIVE_INFINITY AND the smallest possible floating point value NEGATIVE_INFINITY  
+            END IF  
+            SET left_max AND left_gain TO the result of calling helper WITH the left attribute of node  
+            SET right_max AND right_gain TO the result of calling helper WITH the right attribute of node  
+            SET current_max TO the val attribute of node PLUS the greater value AMONG left_gain AND zero PLUS the greater value AMONG right_gain AND zero  
+            SET current_gain TO the val attribute of node PLUS the greatest value AMONG left_gain AND right_gain AND zero  
+            SET global_max TO the greatest value AMONG left_max AND right_max AND current_max  
+            RETURN global_max AND current_gain  
+        END FUNCTION  
+        RETURN the first element of the result of calling helper WITH root  
+    END FUNCTION  
+END CLASS

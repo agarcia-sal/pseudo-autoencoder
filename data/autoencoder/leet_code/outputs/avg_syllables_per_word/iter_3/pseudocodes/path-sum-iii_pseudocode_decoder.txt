@@ -1,0 +1,58 @@
+CLASS TreeNode
+    FUNCTION __init__(val = 0, left = None, right = None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values: list)
+    IF values IS EMPTY
+        RETURN None
+    SET root TO NEW TreeNode(values[0])
+    SET i TO 1
+    INITIALIZE queue AS deque
+    APPEND root TO queue
+    WHILE queue IS NOT EMPTY
+        SET node TO REMOVE FIRST ELEMENT FROM queue
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.left TO NEW TreeNode(values[i])
+            APPEND node.left TO queue
+        INCREMENT i BY 1
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.right TO NEW TreeNode(values[i])
+            APPEND node.right TO queue
+        INCREMENT i BY 1
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val IS NOT EQUAL TO q.val
+        RETURN False
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+END FUNCTION
+
+CLASS Solution
+    FUNCTION pathSum(root: Optional[TreeNode], targetSum: int) RETURNS int
+        FUNCTION helper(node, current_sum, prefix_sums)
+            IF node IS None
+                RETURN 0
+            SET current_sum TO current_sum + node.val
+            SET paths_to_here TO prefix_sums VALUE FOR KEY (current_sum - targetSum) OR 0 IF KEY NOT PRESENT
+            SET prefix_sums[current_sum] TO prefix_sums VALUE FOR KEY current_sum OR 0 PLUS 1
+            SET paths_in_left TO helper(node.left, current_sum, prefix_sums)
+            SET paths_in_right TO helper(node.right, current_sum, prefix_sums)
+            DECREMENT prefix_sums[current_sum] BY 1
+            RETURN paths_to_here + paths_in_left + paths_in_right
+        END FUNCTION
+
+        INITIALIZE prefix_sums DICTIONARY WITH KEY 0 AND VALUE 1
+        RETURN helper(root, 0, prefix_sums)
+    END FUNCTION
+END CLASS

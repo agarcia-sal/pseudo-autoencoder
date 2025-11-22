@@ -1,0 +1,52 @@
+CLASS Solution  
+    FUNCTION possibleToStamp(grid AS List OF List OF Integer stampHeight AS Integer stampWidth AS Integer) RETURNS Boolean  
+        SET m TO the LENGTH OF grid  
+        SET n TO the LENGTH OF element at position zero of grid  
+        
+        FUNCTION prefix_sum(matrix) RETURNS matrix  
+            SET p TO a new matrix of dimension m PLUS one BY n PLUS one with all elements SET TO zero  
+            FOR r FROM one TO m  
+                FOR c FROM one TO n  
+                    SET element at position r and c of p TO element at position r MINUS one and c MINUS one of matrix PLUS element at position r MINUS one and c of p PLUS element at position r and c MINUS one of p MINUS element at position r MINUS one and c MINUS one of p  
+                END FOR  
+            END FOR  
+            RETURN p  
+        END FUNCTION  
+        
+        FUNCTION submatrix_sum(p AS matrix r1 AS Integer c1 AS Integer r2 AS Integer c2 AS Integer) RETURNS Integer  
+            RETURN element at position r2 PLUS one and c2 PLUS one of p MINUS element at position r2 PLUS one and c1 of p MINUS element at position r1 and c2 PLUS one of p PLUS element at position r1 and c1 of p  
+        END FUNCTION  
+        
+        SET p_grid TO prefix_sum(grid)  
+        
+        SET p_stamps TO a new matrix of dimension m PLUS one BY n PLUS one with all elements SET TO zero  
+        
+        FOR r FROM zero TO m MINUS one  
+            FOR c FROM zero TO n MINUS one  
+                IF element at position r and c of grid EQUALS zero THEN  
+                    IF r PLUS stampHeight LESS THAN OR EQUAL TO m AND c PLUS stampWidth LESS THAN OR EQUAL TO n THEN  
+                        IF submatrix_sum(p_grid r c r PLUS stampHeight MINUS one c PLUS stampWidth MINUS one) EQUALS zero THEN  
+                            INCREMENT element at position r and c of p_stamps BY one  
+                        END IF  
+                    END IF  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET p_stamps TO prefix_sum(p_stamps)  
+        
+        FOR r FROM zero TO m MINUS one  
+            FOR c FROM zero TO n MINUS one  
+                IF element at position r and c of grid EQUALS zero THEN  
+                    SET row_start TO the GREATER OF zero AND r MINUS stampHeight PLUS one  
+                    SET col_start TO the GREATER OF zero AND c MINUS stampWidth PLUS one  
+                    IF submatrix_sum(p_stamps row_start col_start r c) EQUALS zero THEN  
+                        RETURN False  
+                    END IF  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        RETURN True  
+    END FUNCTION  
+END CLASS

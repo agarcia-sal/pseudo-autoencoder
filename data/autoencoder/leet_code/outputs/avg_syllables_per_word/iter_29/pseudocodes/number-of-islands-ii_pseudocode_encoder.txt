@@ -1,0 +1,64 @@
+CLASS UnionFind  
+    FUNCTION __init__(self)  
+        SET self.parent TO empty mapping  
+        SET self.count TO zero  
+    END FUNCTION  
+
+    FUNCTION make_set(self, x)  
+        IF the key x IS NOT IN the mapping self.parent  
+            SET the value at key x in self.parent TO x  
+            INCREMENT self.count BY one  
+        END IF  
+    END FUNCTION  
+
+    FUNCTION find(self, x)  
+        IF the value at key x in self.parent IS NOT EQUAL TO x  
+            SET the value at key x in self.parent TO the result of calling find on the value at key x in self.parent  
+        END IF  
+        RETURN the value at key x in self.parent  
+    END FUNCTION  
+
+    FUNCTION union(self, x, y)  
+        SET rootX TO the result of calling find on x  
+        SET rootY TO the result of calling find on y  
+        IF rootX IS NOT EQUAL TO rootY  
+            SET the value at key rootX in self.parent TO rootY  
+            DECREMENT self.count BY one  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION numIslands2(self, m, n, positions)  
+        FUNCTION is_valid(x, y)  
+            RETURN the logical expression where the value zero IS LESS THAN OR EQUAL TO x AND x IS LESS THAN m AND zero IS LESS THAN OR EQUAL TO y AND y IS LESS THAN n  
+        END FUNCTION  
+
+        SET directions TO the list containing the tuples of one and zero then MINUS one and zero then zero and one then zero and MINUS one  
+        SET uf TO a new instance of UnionFind  
+        SET grid TO a two dimensional list with m elements each containing a list of n zeros  
+        SET result TO an empty list  
+
+        FOR each pair r and c IN positions  
+            IF the element at position r of grid at position c IS EQUAL TO one  
+                APPEND the value of uf.count TO result  
+                CONTINUE with the next iteration  
+            END IF  
+
+            SET the element at position r of grid at position c TO one  
+            CALL the function make_set from uf with parameter the pair r and c  
+
+            FOR each pair dr and dc IN directions  
+                SET nr TO the sum of r PLUS dr  
+                SET nc TO the sum of c PLUS dc  
+                IF the result of calling is_valid with nr and nc IS true AND the element at position nr of grid at position nc IS EQUAL TO one  
+                    CALL the function union from uf with parameters the pair r and c and the pair nr and nc  
+                END IF  
+            END FOR  
+
+            APPEND the value of uf.count TO result  
+        END FOR  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

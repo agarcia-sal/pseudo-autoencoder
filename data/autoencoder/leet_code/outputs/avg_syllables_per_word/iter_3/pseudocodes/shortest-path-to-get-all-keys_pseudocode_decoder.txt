@@ -1,0 +1,49 @@
+CLASS Solution
+    FUNCTION shortestPathAllKeys(grid)
+        SET directions TO [(0, 1), (0, -1), (1, 0), (-1, 0)]
+        SET m TO LENGTH OF grid
+        SET n TO LENGTH OF grid[0]
+        SET start TO None
+        SET num_keys TO 0
+
+        FOR i FROM 0 TO m - 1
+            FOR j FROM 0 TO n - 1
+                IF grid[i][j] EQUALS '@' THEN
+                    SET start TO (i, j)
+                ELSE IF grid[i][j] IS LOWERCASE LETTER THEN
+                    INCREMENT num_keys BY 1
+
+        INITIALIZE queue WITH (start[0], start[1], 0, 0)
+        INITIALIZE visited WITH (start[0], start[1], 0)
+
+        WHILE queue IS NOT EMPTY
+            DEQUEUE (x, y, keys, steps) FROM queue
+
+            FOR EACH (dx, dy) IN directions
+                SET nx TO x + dx
+                SET ny TO y + dy
+
+                IF nx IS BETWEEN 0 AND m - 1 AND ny IS BETWEEN 0 AND n - 1 THEN
+                    SET cell TO grid[nx][ny]
+
+                    IF cell EQUALS '#' THEN
+                        CONTINUE TO NEXT DIRECTION
+
+                    IF cell IS UPPERCASE LETTER THEN
+                        SET key_needed TO 1 SHIFTED LEFT BY (ASCII VALUE OF LOWERCASE OF cell MINUS ASCII VALUE OF 'a')
+                        IF keys BITWISE-AND key_needed EQUALS 0 THEN
+                            CONTINUE TO NEXT DIRECTION
+
+                    IF cell IS LOWERCASE LETTER THEN
+                        SET new_keys TO keys BITWISE-OR 1 SHIFTED LEFT BY (ASCII VALUE OF cell MINUS ASCII VALUE OF 'a')
+                        IF new_keys EQUALS (1 SHIFTED LEFT BY num_keys) MINUS 1 THEN
+                            RETURN steps + 1
+                    ELSE
+                        SET new_keys TO keys
+
+                    IF (nx, ny, new_keys) NOT IN visited THEN
+                        ADD (nx, ny, new_keys) TO visited
+                        ENQUEUE (nx, ny, new_keys, steps + 1) TO queue
+
+        RETURN -1
+END CLASS

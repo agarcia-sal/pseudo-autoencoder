@@ -1,0 +1,35 @@
+CLASS Solution  
+    FUNCTION maximalPathQuality(values, edges, maxTime)  
+        SET graph TO a new mapping from keys to lists with default empty list  
+        FOR each u AND v AND time IN edges  
+            APPEND the pair of neighbor v AND time TO the list at key u in graph  
+            APPEND the pair of neighbor u AND time TO the list at key v in graph  
+        END FOR  
+        
+        SET visited TO an empty set  
+        SET max_quality TO zero  
+        
+        FUNCTION dfs(node, current_time, current_quality)  
+            IF node EQUALS zero THEN  
+                SET max_quality TO the greater value BETWEEN max_quality AND current_quality  
+            END IF  
+            
+            FOR each neighbor AND time IN the list at key node in graph  
+                IF time IS LESS THAN OR EQUAL TO current_time THEN  
+                    IF neighbor IS NOT IN visited THEN  
+                        ADD neighbor TO visited  
+                        CALL dfs WITH neighbor AND current_time MINUS time AND current_quality PLUS element at position neighbor of values  
+                        REMOVE neighbor FROM visited  
+                    ELSE  
+                        CALL dfs WITH neighbor AND current_time MINUS time AND current_quality  
+                    END IF  
+                END IF  
+            END FOR  
+        END FUNCTION  
+        
+        ADD zero TO visited  
+        CALL dfs WITH zero AND maxTime AND element at position zero of values  
+        
+        RETURN max_quality  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,39 @@
+CLASS Solution  
+    FUNCTION waysToBuildRooms(parameter prevRoom AS List OF Integer) RETURNS Integer  
+        IMPORT the default dictionary data structure from collections  
+
+        SET variable n TO the LENGTH OF prevRoom  
+        SET variable graph TO a new default dictionary with default type list  
+
+        FOR variable room FROM one TO variable n MINUS one  
+            APPEND variable room TO the list corresponding to the element at position room of prevRoom in the graph dictionary  
+        END FOR  
+
+        FUNCTION dp(parameter node) RETURNS a tuple of two integers  
+            IF the list corresponding to parameter node in graph IS empty  
+                RETURN a tuple of integer one and integer one  
+            END IF  
+
+            SET variable total_ways TO integer one  
+            SET variable total_size TO integer one  
+
+            SET variable child_results TO an empty list  
+            FOR each variable child IN the list corresponding to parameter node in graph  
+                SET tuple ways_size TO the result of FUNCTION dp called with parameter child  
+                APPEND tuple ways_size TO variable child_results  
+                INCREMENT total_size BY the second element of tuple ways_size  
+            END FOR  
+
+            SET variable current_size TO integer one  
+            FOR each tuple of ways and size IN child_results  
+                SET total_ways TO total_ways MULTIPLIED BY the mathematical combination of current_size PLUS size MINUS one CHOOSE size MULTIPLIED BY ways  
+                SET total_ways TO total_ways MODULO the constant MOD  
+                INCREMENT current_size BY size  
+            END FOR  
+
+            RETURN a tuple of total_ways and total_size  
+        END FUNCTION  
+
+        RETURN the first element of the tuple returned by FUNCTION dp called with parameter zero  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,37 @@
+CLASS Solution  
+    FUNCTION areConnected(n, threshold, queries)  
+        IF threshold EQUALS 0 THEN  
+            RETURN list of True repeated LENGTH OF queries times  
+        END IF  
+
+        SET parent TO list of integers FROM 0 TO n  
+
+        FUNCTION find(x)  
+            IF parent at x NOT EQUALS x THEN  
+                SET parent at x TO CALL find WITH parent at x  
+            END IF  
+            RETURN parent at x  
+        END FUNCTION  
+
+        FUNCTION union(x, y)  
+            SET rootX TO CALL find WITH x  
+            SET rootY TO CALL find WITH y  
+            IF rootX NOT EQUALS rootY THEN  
+                SET parent at rootY TO rootX  
+            END IF  
+        END FUNCTION  
+
+        FOR i FROM threshold PLUS 1 TO n  
+            FOR j FROM i MULTIPLIED BY 2 TO n STEP i  
+                CALL union WITH i AND j  
+            END FOR  
+        END FOR  
+
+        SET result TO empty list  
+        FOR each pair (a, b) IN queries  
+            APPEND (CALL find WITH a EQUALS CALL find WITH b) TO result  
+        END FOR  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,59 @@
+CLASS BIT  
+    FUNCTION __init__(self, n)  
+        SET the instance variable size TO n  
+        SET the instance variable tree TO a list of zero repeated for the quantity of n PLUS one times  
+    END FUNCTION  
+
+    FUNCTION update(self, idx, delta)  
+        WHILE idx LESS THAN OR EQUAL TO the instance variable size  
+            SET the element at position idx of the instance variable tree TO the element at position idx of the instance variable tree PLUS delta  
+            SET idx TO idx PLUS the result of bitwise AND between idx and the negation of idx  
+        END WHILE  
+    END FUNCTION  
+
+    FUNCTION query(self, idx)  
+        SET result TO zero  
+        WHILE idx GREATER THAN zero  
+            SET result TO result PLUS the element at position idx of the instance variable tree  
+            SET idx TO idx MINUS the result of bitwise AND between idx and the negation of idx  
+        END WHILE  
+        RETURN result  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION goodTriplets(self, nums1, nums2)  
+        SET n TO the LENGTH OF nums1  
+
+        SET pos TO a list of zero repeated for the quantity of n times  
+        FOR each pair of index i AND number num IN the enumeration of nums1  
+            SET the element at position num of pos TO i  
+        END FOR  
+
+        SET compressed TO a list by mapping each num in nums2 to the element at position num of pos  
+
+        SET bit TO a new instance of BIT with n as parameter  
+
+        SET smaller_count TO a list of zero repeated for the quantity of n times  
+        SET larger_count TO a list of zero repeated for the quantity of n times  
+
+        FOR i FROM zero TO n MINUS one  
+            SET the element at position i of smaller_count TO the result of bit.query with the element at position i of compressed as parameter  
+            CALL bit.update with the element at position i of compressed PLUS one and one as parameters  
+        END FOR  
+
+        SET bit TO a new instance of BIT with n as parameter  
+
+        FOR i FROM n MINUS one DOWN TO zero INCLUSIVE  
+            SET the element at position i of larger_count TO the result of bit.query with n as parameter MINUS the result of bit.query with the element at position i of compressed PLUS one as parameter  
+            CALL bit.update with the element at position i of compressed PLUS one and one as parameters  
+        END FOR  
+
+        SET good_triplets TO zero  
+        FOR i FROM zero TO n MINUS one  
+            SET good_triplets TO good_triplets PLUS the product of the element at position i of smaller_count AND the element at position i of larger_count  
+        END FOR  
+
+        RETURN good_triplets  
+    END FUNCTION  
+END CLASS

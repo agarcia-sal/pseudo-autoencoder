@@ -1,0 +1,39 @@
+```
+CLASS Solution
+    FUNCTION getMaxRepetitions(s1, n1, s2, n2)
+        IF n1 EQUALS 0 THEN
+            RETURN 0
+        END IF
+
+        SET s2_count TO list of zeros with length LENGTH OF s2 PLUS 1
+        SET index_map TO list of zeros with length LENGTH OF s2 PLUS 1
+        SET current_index_s2 TO 0
+        SET s1_count TO 0
+
+        WHILE s1_count LESS THAN n1
+            INCREMENT s1_count BY 1
+            FOR EACH char IN s1
+                IF char EQUALS s2[current_index_s2] THEN
+                    INCREMENT current_index_s2 BY 1
+                    IF current_index_s2 EQUALS LENGTH OF s2 THEN
+                        SET s2_count[s1_count] TO s2_count[s1_count MINUS 1] PLUS 1
+                        SET current_index_s2 TO 0
+                    END IF
+                END IF
+                SET index_map[s1_count] TO current_index_s2
+            END FOR
+
+            IF current_index_s2 IS IN index_map FROM START TO s1_count MINUS 1 THEN
+                SET start TO POSITION OF current_index_s2 IN index_map
+                SET cycle_length TO s1_count MINUS start
+                SET cycles_fit TO (n1 MINUS start) DIVIDED BY cycle_length
+                SET remainder TO (n1 MINUS start) MODULO cycle_length
+                SET total_s2_count TO s2_count[start] PLUS cycles_fit TIMES (s2_count[start PLUS cycle_length] MINUS s2_count[start]) PLUS s2_count[start PLUS remainder] MINUS s2_count[start]
+                RETURN total_s2_count DIVIDED BY n2
+            END IF
+        END WHILE
+
+        RETURN s2_count[s1_count] DIVIDED BY n2
+    END FUNCTION
+END CLASS
+```

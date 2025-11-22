@@ -1,0 +1,46 @@
+CLASS Solution
+    FUNCTION updateBoard(board, click)
+        FUNCTION count_adjacent_mines(row, column)
+            SET count TO zero
+            FOR index i FROM one LESS THAN row TO one GREATER THAN row INCLUSIVE
+                FOR index j FROM one LESS THAN column TO one GREATER THAN column INCLUSIVE
+                    IF index i IS GREATER THAN OR EQUAL TO zero AND index i IS LESS THAN the LENGTH OF board AND index j IS GREATER THAN OR EQUAL TO zero AND index j IS LESS THAN the LENGTH OF element at position zero OF board AND element at position index i OF board AT position index j EQUALS the letter M
+                        INCREMENT count BY one
+                    END IF
+                END FOR
+            END FOR
+            RETURN count
+        END FUNCTION
+        
+        FUNCTION dfs(row, column)
+            IF NOT (row IS GREATER THAN OR EQUAL TO zero AND row IS LESS THAN the LENGTH OF board AND column IS GREATER THAN OR EQUAL TO zero AND column IS LESS THAN the LENGTH OF element at position zero OF board)
+                RETURN
+            END IF
+            IF element at position row OF board AT position column IS NOT the letter E
+                RETURN
+            END IF
+            
+            SET mine_count TO count_adjacent_mines(row, column)
+            IF mine_count IS GREATER THAN zero
+                SET element at position row OF board AT position column TO the STRING REPRESENTATION OF mine_count
+            ELSE
+                SET element at position row OF board AT position column TO the letter B
+                FOR index i FROM one LESS THAN row TO one GREATER THAN row INCLUSIVE
+                    FOR index j FROM one LESS THAN column TO one GREATER THAN column INCLUSIVE
+                        CALL dfs WITH arguments i, j
+                    END FOR
+                END FOR
+            END IF
+        END FUNCTION
+        
+        SET row TO element at position zero OF click
+        SET col TO element at position one OF click
+        IF element at position row OF board AT position col IS the letter M
+            SET element at position row OF board AT position col TO the letter X
+            RETURN board
+        END IF
+        
+        CALL dfs WITH arguments row, col
+        RETURN board
+    END FUNCTION
+END CLASS

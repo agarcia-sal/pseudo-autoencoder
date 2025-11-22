@@ -1,0 +1,76 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val equals zero, left equals None, right equals None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values list)
+    IF values IS empty
+        RETURN None
+    END IF
+    SET root TO A NEW TreeNode WITH element at position zero of values
+    SET i TO one
+    SET queue TO CALL deque WITH no parameters
+    CALL APPEND root TO queue
+    WHILE queue HOLDS
+        SET node TO CALL popleft ON queue
+        IF i LESS THAN the LENGTH OF values AND element at position i of values IS NOT None
+            SET node.left TO A NEW TreeNode WITH element at position i of values
+            CALL APPEND node.left TO queue
+        END IF
+        INCREMENT i BY one
+        IF i LESS THAN the LENGTH OF values AND element at position i of values IS NOT None
+            SET node.right TO A NEW TreeNode WITH element at position i of values
+            CALL APPEND node.right TO queue
+        END IF
+        INCREMENT i BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val NOT EQUALS q.val
+        RETURN False
+    ELSE
+        RETURN CALL is_same_tree WITH p.left, q.left AND CALL is_same_tree WITH p.right, q.right
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION verticalTraversal(self, root Optional TreeNode)
+        IF root IS None
+            RETURN an empty list
+        END IF
+        SET node_dict TO CALL defaultdict WITH list AS parameter
+        SET min_col TO zero
+        SET max_col TO zero
+
+        FUNCTION dfs(node, row, col)
+            IF node IS None
+                RETURN
+            END IF
+            CALL APPEND the tuple of row AND node.val TO the list AT key col IN node_dict
+            SET min_col TO the SMALLER OF min_col AND col
+            SET max_col TO the LARGER OF max_col AND col
+            CALL dfs WITH node.left, row PLUS one, col MINUS one
+            CALL dfs WITH node.right, row PLUS one, col PLUS one
+        END FUNCTION
+
+        CALL dfs WITH root, zero, zero
+
+        SET result TO an empty list
+        FOR col FROM min_col TO max_col
+            SET sorted_list TO the SORTED list AT key col IN node_dict BY row THEN BY node value
+            SET values_only TO the list OF the second element OF each tuple IN sorted_list
+            CALL APPEND values_only TO result
+        END FOR
+
+        RETURN result
+    END FUNCTION
+END CLASS

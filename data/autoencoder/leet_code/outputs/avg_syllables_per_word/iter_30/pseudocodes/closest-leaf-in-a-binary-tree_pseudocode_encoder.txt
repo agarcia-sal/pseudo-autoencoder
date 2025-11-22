@@ -1,0 +1,80 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO new TreeNode with value at position zero OF values  
+    SET i TO one  
+    SET queue TO new empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO element removed from left OF queue  
+        IF i LESS THAN length OF values AND element at position i OF values IS NOT none  
+            SET node.left TO new TreeNode with value at position i OF values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN length OF values AND element at position i OF values IS NOT none  
+            SET node.right TO new TreeNode with value at position i OF values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF value at p.val IS NOT EQUAL TO value at q.val  
+        RETURN false  
+    ELSE  
+        RETURN is_same_tree(value at p.left, value at q.left) AND is_same_tree(value at p.right, value at q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION findClosestLeaf(self, root, k)  
+        IF root.left IS none AND root.right IS none  
+            RETURN root.val  
+        END IF  
+        SET graph TO new mapping from values to list  
+        FUNCTION dfs(node, parent EQUALS none)  
+            IF parent IS NOT none  
+                APPEND value at parent.val TO list at graph with key node.val  
+                APPEND value at node.val TO list at graph with key parent.val  
+            END IF  
+            IF node.left IS NOT none  
+                CALL dfs with node.left and node  
+            END IF  
+            IF node.right IS NOT none  
+                CALL dfs with node.right and node  
+            END IF  
+        END FUNCTION  
+        CALL dfs with root  
+        SET queue TO new deque containing k  
+        SET visited TO new empty set  
+        WHILE queue IS NOT empty  
+            SET current TO element removed from left OF queue  
+            ADD current TO visited  
+            IF length of list at graph with key current EQUALS one AND current IS NOT EQUAL TO root.val  
+                RETURN current  
+            END IF  
+            FOR each neighbor IN list at graph with key current  
+                IF neighbor IS NOT IN visited  
+                    APPEND neighbor TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

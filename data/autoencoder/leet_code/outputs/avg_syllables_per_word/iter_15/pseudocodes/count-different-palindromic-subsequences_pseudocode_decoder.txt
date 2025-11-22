@@ -1,0 +1,61 @@
+CLASS Solution  
+    FUNCTION countPalindromicSubsequences(s)  
+        SET MOD TO one billion PLUS seven  
+        SET n TO the LENGTH OF s  
+          
+        FUNCTION initialize_two_dimensional_list(rows, columns, initial_value)  
+            CREATE a TWO DIMENSIONAL LIST with the number of rows and columns  
+            SET each element TO initial_value  
+            RETURN the created TWO DIMENSIONAL LIST  
+        END FUNCTION  
+          
+        SET next_occurrence TO initialize_two_dimensional_list four BY n FILLED WITH negative one  
+        SET prev_occurrence TO initialize_two_dimensional_list four BY n FILLED WITH negative one  
+          
+        FOR c FROM zero TO three  
+            SET char TO the character at position c steps after the character a in the alphabet  
+            SET last TO negative one  
+            FOR i FROM zero TO n MINUS one  
+                IF the character at position i of s EQUALS char THEN  
+                    SET last TO i  
+                END IF  
+                SET element at position c and i of prev_occurrence TO last  
+            END FOR  
+              
+            SET last TO negative one  
+            FOR i FROM n MINUS one DOWN TO zero  
+                IF the character at position i of s EQUALS char THEN  
+                    SET last TO i  
+                END IF  
+                SET element at position c and i of next_occurrence TO last  
+            END FOR  
+        END FOR  
+          
+        SET dp TO initialize_two_dimensional_list n BY n FILLED WITH zero  
+          
+        FOR i FROM zero TO n MINUS one  
+            SET element at position i and i of dp TO one  
+        END FOR  
+          
+        FOR length FROM two TO n  
+            FOR i FROM zero TO n MINUS length  
+                SET j TO i PLUS length MINUS one  
+                FOR c FROM zero TO three  
+                    SET char TO the character at position c steps after the character a in the alphabet  
+                    SET left TO element at position c and i of next_occurrence  
+                    SET right TO element at position c and j of prev_occurrence  
+                      
+                    IF left GREATER THAN j OR right LESS THAN i THEN  
+                        CONTINUE TO the next iteration of the loop  
+                    ELSE IF left EQUALS right THEN  
+                        SET element at position i and j of dp TO the remainder of the sum of the element at position i and j of dp PLUS one DIVIDED BY MOD  
+                    ELSE  
+                        SET element at position i and j of dp TO the remainder of the sum of the element at position i and j of dp PLUS the element at position left PLUS one and right MINUS one of dp PLUS two DIVIDED BY MOD  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+          
+        RETURN the element at position zero and n MINUS one of dp  
+    END FUNCTION  
+END CLASS

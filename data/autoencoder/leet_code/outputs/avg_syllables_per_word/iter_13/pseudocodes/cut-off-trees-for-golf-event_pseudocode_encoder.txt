@@ -1,0 +1,57 @@
+CLASS Solution  
+    FUNCTION cutOffTree(forest)  
+        IF forest EQUALS empty OR the element at position zero of forest EQUALS empty  
+            RETURN negative one  
+        END IF  
+        
+        SET trees TO a collection of tuples consisting of the element at position i of forest at position j, followed by i, followed by j FOR index i FROM zero TO the length of forest MINUS one AND FOR index j FROM zero TO the length of the element at position zero of forest MINUS one WHERE the element at position i of forest at position j IS GREATER THAN one  
+        SORT trees IN ascending order  
+        
+        FUNCTION bfs(start, end)  
+            IF start EQUALS end  
+                RETURN zero  
+            END IF  
+            SET m TO the length of forest  
+            SET n TO the length of the element at position zero of forest  
+            SET queue TO a double ended queue initialized with start  
+            SET visited TO a set containing start  
+            SET steps TO zero  
+            
+            WHILE queue IS NOT empty  
+                FOR each element IN the range from zero TO the length of queue MINUS one  
+                    REMOVE the element at the front of queue AND ASSIGN TO x and y  
+                    FOR each pair dx and dy IN the collection of four pairs consisting of minus one and zero, one and zero, zero and minus one, zero and one  
+                        SET nx TO x PLUS dx  
+                        SET ny TO y PLUS dy  
+                        IF nx IS GREATER THAN OR EQUAL TO zero AND nx IS LESS THAN m AND ny IS GREATER THAN OR EQUAL TO zero AND ny IS LESS THAN n AND the tuple of nx and ny IS NOT IN visited AND the element at position nx of forest at position ny IS NOT EQUAL TO zero  
+                            IF the tuple of nx and ny EQUALS end  
+                                RETURN steps PLUS one  
+                            END IF  
+                            ADD the tuple of nx and ny TO visited  
+                            APPEND the tuple of nx and ny TO queue  
+                        END IF  
+                    END FOR  
+                END FOR  
+                INCREMENT steps BY one  
+            END WHILE  
+            
+            RETURN negative one  
+        END FUNCTION  
+        
+        SET x TO zero  
+        SET y TO zero  
+        SET total_steps TO zero  
+        
+        FOR each height, tx, ty IN trees  
+            SET steps TO the result of calling bfs WITH start AS the tuple of x and y AND end AS the tuple of tx and ty  
+            IF steps EQUALS negative one  
+                RETURN negative one  
+            END IF  
+            INCREMENT total_steps BY steps  
+            SET x TO tx  
+            SET y TO ty  
+        END FOR  
+        
+        RETURN total_steps  
+    END FUNCTION  
+END CLASS

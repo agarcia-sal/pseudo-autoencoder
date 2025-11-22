@@ -1,0 +1,60 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val EQUAL TO zero, left EQUAL TO none, right EQUAL TO none  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values EQUALS empty  
+        RETURN none  
+    END IF  
+    SET root TO new TreeNode WITH val EQUAL TO element at position zero OF values  
+    SET i TO one  
+    SET queue TO empty double-ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        REMOVE first element FROM queue AND SET TO node  
+        IF i LESS THAN LENGTH OF values AND element at position i OF values IS NOT none  
+            SET node.left TO new TreeNode WITH val EQUAL TO element at position i OF values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN LENGTH OF values AND element at position i OF values IS NOT none  
+            SET node.right TO new TreeNode WITH val EQUAL TO element at position i OF values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p, q  
+    IF p EQUALS none AND q EQUALS none  
+        RETURN true  
+    ELSE IF p EQUALS none OR q EQUALS none  
+        RETURN false  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN false  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETERS p.left, q.left AND is_same_tree WITH PARAMETERS p.right, q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION maxPathSum WITH PARAMETERS root  
+        FUNCTION helper WITH PARAMETER node  
+            IF node EQUALS none  
+                RETURN negative infinity, negative infinity  
+            END IF  
+            SET left_max, left_gain TO helper WITH PARAMETERS node.left  
+            SET right_max, right_gain TO helper WITH PARAMETERS node.right  
+            SET current_max TO node.val PLUS maximum of left_gain AND zero PLUS maximum of right_gain AND zero  
+            SET current_gain TO node.val PLUS maximum of left_gain, right_gain, AND zero  
+            SET global_max TO maximum of left_max, right_max, AND current_max  
+            RETURN global_max, current_gain  
+        END FUNCTION  
+        RETURN first element OF helper WITH PARAMETERS root  
+    END FUNCTION  
+END CLASS

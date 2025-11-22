@@ -1,0 +1,32 @@
+CLASS Solution  
+    FUNCTION makeArrayIncreasing(arr1 WITH TYPE List OF integers, arr2 WITH TYPE List OF integers) RETURNS integer  
+        CALL sort ON arr2 to ORDER elements IN ASCENDING order  
+          
+        SET dp TO a dictionary WITH key as negative one AND value as zero representing the empty subsequence and zero operations  
+          
+        FOR each num IN arr1  
+            SET new_dp TO an empty dictionary  
+            FOR each last_num AND ops IN dp items  
+                IF num GREATER THAN last_num THEN  
+                    SET current_min TO the value in new_dp at key num IF it EXISTS OTHERWISE positive infinity  
+                    SET new_dp at key num TO the MINIMUM BETWEEN current_min AND ops  
+                END IF  
+                  
+                SET idx TO the position to INSERT right IN arr2 FOR last_num USING binary search method bisect_right  
+                IF idx LESS THAN the LENGTH OF arr2 THEN  
+                    SET candidate TO the element at position idx of arr2  
+                    SET current_min_replacement TO the value in new_dp at key candidate IF it EXISTS OTHERWISE positive infinity  
+                    SET new_dp at key candidate TO the MINIMUM BETWEEN current_min_replacement AND ops PLUS one  
+                END IF  
+            END FOR  
+              
+            IF the LENGTH OF new_dp EQUALS zero THEN  
+                RETURN negative one  
+            END IF  
+              
+            SET dp TO new_dp  
+        END FOR  
+          
+        RETURN the MINIMUM value AMONG all values IN dp  
+    END FUNCTION  
+END CLASS

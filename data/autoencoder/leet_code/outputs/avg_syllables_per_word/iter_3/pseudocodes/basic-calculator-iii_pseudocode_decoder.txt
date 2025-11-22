@@ -1,0 +1,37 @@
+CLASS Solution
+    FUNCTION calculate(s: string) RETURNS integer
+        FUNCTION helper(s: list of characters) RETURNS integer
+            SET stack TO empty list
+            SET num TO 0
+            SET sign TO '+'
+            WHILE LENGTH OF s > 0
+                SET char TO REMOVE first element FROM s
+                IF char IS digit THEN
+                    SET num TO num MULTIPLIED BY 10 PLUS integer value of char
+                END IF
+                IF char IS '(' THEN
+                    SET num TO helper(s)
+                END IF
+                IF char IS one of '+', '-', '*', '/', '(', ')' OR LENGTH OF s IS 0 THEN
+                    IF sign IS '+' THEN
+                        APPEND num TO stack
+                    ELSE IF sign IS '-' THEN
+                        APPEND negative num TO stack
+                    ELSE IF sign IS '*' THEN
+                        SET last element of stack TO last element MULTIPLIED BY num
+                    ELSE IF sign IS '/' THEN
+                        SET last element of stack TO integer division of last element BY num (truncate towards zero)
+                    END IF
+                    SET sign TO char
+                    SET num TO 0
+                END IF
+                IF char IS ')' THEN
+                    BREAK loop
+                END IF
+            END WHILE
+            RETURN sum of elements in stack
+        END FUNCTION
+        SET s TO list of characters from input string s
+        RETURN helper(s)
+    END FUNCTION
+END CLASS

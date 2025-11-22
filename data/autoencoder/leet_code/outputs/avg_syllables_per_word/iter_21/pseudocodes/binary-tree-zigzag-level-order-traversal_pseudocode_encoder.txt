@@ -1,0 +1,75 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO A NEW TreeNode INITIALIZED WITH the element at position zero OF values  
+    SET i TO one  
+    SET queue TO A NEW deque INITIALIZED EMPTY  
+    CALL queue APPEND WITH PARAMETERS root  
+    WHILE queue IS NOT empty  
+        SET node TO CALL queue POP LEFT WITH NO PARAMETERS  
+        IF i LESS THAN THE LENGTH OF values AND the element at position i OF values IS NOT none  
+            SET node.left TO A NEW TreeNode INITIALIZED WITH the element at position i OF values  
+            CALL queue APPEND WITH PARAMETERS node.left  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN THE LENGTH OF values AND the element at position i OF values IS NOT none  
+            SET node.right TO A NEW TreeNode INITIALIZED WITH the element at position i OF values  
+            CALL queue APPEND WITH PARAMETERS node.right  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN false  
+    ELSE  
+        RETURN CALL is_same_tree WITH PARAMETERS p.left, q.left AND CALL is_same_tree WITH PARAMETERS p.right, q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION zigzagLevelOrder(self, root)  
+        IF root IS none  
+            RETURN an empty list  
+        END IF  
+        SET result TO an empty list  
+        SET queue TO A NEW deque INITIALIZED WITH THE element root  
+        SET left_to_right TO true  
+        WHILE queue IS NOT empty  
+            SET level_size TO THE LENGTH OF queue  
+            SET current_level TO A NEW deque INITIALIZED EMPTY  
+            FOR each _ FROM zero TO level_size MINUS one  
+                SET node TO CALL queue POP LEFT WITH NO PARAMETERS  
+                IF left_to_right IS true  
+                    CALL current_level APPEND WITH PARAMETERS node.val  
+                ELSE  
+                    CALL current_level APPEND LEFT WITH PARAMETERS node.val  
+                END IF  
+                IF node.left IS NOT none  
+                    CALL queue APPEND WITH PARAMETERS node.left  
+                END IF  
+                IF node.right IS NOT none  
+                    CALL queue APPEND WITH PARAMETERS node.right  
+                END IF  
+            END FOR  
+            CALL result APPEND WITH PARAMETERS THE LIST CONVERTED FROM current_level  
+            SET left_to_right TO NOT left_to_right  
+        END WHILE  
+        RETURN result  
+    END FUNCTION  
+END CLASS

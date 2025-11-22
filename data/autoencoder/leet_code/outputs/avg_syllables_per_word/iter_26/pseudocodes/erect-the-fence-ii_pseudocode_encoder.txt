@@ -1,0 +1,55 @@
+CLASS Solution
+    FUNCTION outerTrees(trees)
+        FUNCTION dist_sq(p1, p2)
+            RETURN the SUM OF the SQUARE OF the DIFFERENCE BETWEEN the element at position zero OF point p1 AND the element at position zero OF point p2 AND the SQUARE OF the DIFFERENCE BETWEEN the element at position one OF point p1 AND the element at position one OF point p2
+        END FUNCTION
+
+        FUNCTION circumcenter(p1, p2, p3)
+            SET ax TO the element at position zero OF point p1
+            SET ay TO the element at position one OF point p1
+            SET bx TO the element at position zero OF point p2
+            SET by TO the element at position one OF point p2
+            SET cx TO the element at position zero OF point p3
+            SET cy TO the element at position one OF point p3
+
+            SET d TO the MULTIPLICATION OF two BY the SUM OF the MULTIPLICATION OF ax BY the DIFFERENCE BETWEEN by AND cy AND the MULTIPLICATION OF bx BY the DIFFERENCE BETWEEN cy AND ay AND the MULTIPLICATION OF cx BY the DIFFERENCE BETWEEN ay AND by
+
+            SET ux TO the DIVISION OF the SUM OF the MULTIPLICATION OF the SUM OF the SQUARE OF ax AND the SQUARE OF ay BY the DIFFERENCE BETWEEN by AND cy AND the MULTIPLICATION OF the SUM OF the SQUARE OF bx AND the SQUARE OF by BY the DIFFERENCE BETWEEN cy AND ay AND the MULTIPLICATION OF the SUM OF the SQUARE OF cx AND the SQUARE OF cy BY the DIFFERENCE BETWEEN ay AND by BY d
+
+            SET uy TO the DIVISION OF the SUM OF the MULTIPLICATION OF the SUM OF the SQUARE OF ax AND the SQUARE OF ay BY the DIFFERENCE BETWEEN cx AND bx AND the MULTIPLICATION OF the SUM OF the SQUARE OF bx AND the SQUARE OF by BY the DIFFERENCE BETWEEN ax AND cx AND the MULTIPLICATION OF the SUM OF the SQUARE OF cx AND the SQUARE OF cy BY the DIFFERENCE BETWEEN bx AND ax BY d
+
+            RETURN a list containing ux and uy AND the SQUARE ROOT OF the SUM OF the SQUARE OF the DIFFERENCE BETWEEN ux AND ax AND the SQUARE OF the DIFFERENCE BETWEEN uy AND ay
+        END FUNCTION
+
+        FUNCTION welzl(points, boundary, n)
+            IF n EQUALS zero OR the LENGTH OF boundary EQUALS three THEN
+                IF the LENGTH OF boundary EQUALS zero THEN
+                    RETURN a list containing zero AND zero AND zero
+                ELSE IF the LENGTH OF boundary EQUALS one THEN
+                    RETURN the element at position zero OF boundary AND zero
+                ELSE IF the LENGTH OF boundary EQUALS two THEN
+                    SET center TO a list containing the DIVISION OF the SUM OF the element at position zero OF element at position zero OF boundary AND the element at position zero OF element at position one OF boundary BY two AND the DIVISION OF the SUM OF the element at position one OF element at position zero OF boundary AND the element at position one OF element at position one OF boundary BY two
+                    SET radius TO the SQUARE ROOT OF dist_sq BETWEEN the element at position zero OF boundary AND the element at position one OF boundary DIVIDED BY two
+                    RETURN center AND radius
+                ELSE
+                    RETURN the RESULT OF circumcenter APPLIED TO the unpacked elements of boundary
+                END IF
+            END IF
+
+            SET p TO the element at position n MINUS one OF points
+            SET center AND radius TO the RESULT OF welzl APPLIED TO points AND boundary AND n MINUS one
+
+            IF dist_sq BETWEEN center AND p LESS THAN OR EQUAL TO the MULTIPLICATION OF radius BY radius THEN
+                RETURN center AND radius
+            END IF
+
+            RETURN the RESULT OF welzl APPLIED TO points AND the concatenation of boundary WITH a list containing p AND n MINUS one
+        END FUNCTION
+
+        PERFORM random SHUFFLE ON trees
+
+        SET center AND radius TO the RESULT OF welzl APPLIED TO trees AND an empty list AND the LENGTH OF trees
+
+        RETURN a list containing the element at position zero OF center AND the element at position one OF center AND radius
+    END FUNCTION
+END CLASS

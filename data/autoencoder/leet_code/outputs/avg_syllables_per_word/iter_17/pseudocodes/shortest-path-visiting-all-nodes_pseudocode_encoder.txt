@@ -1,0 +1,50 @@
+CLASS Solution
+    FUNCTION shortestPathLength(graph)
+        IF graph IS empty
+            RETURN zero
+        END IF
+
+        SET number_of_nodes TO the LENGTH OF graph
+        CALL initialize_queue_with_node_bitmasks WITH number_of_nodes RETURNING queue
+        CALL initialize_visited_states_with_node_bitmasks WITH number_of_nodes RETURNING visited
+
+        SET steps TO zero
+        SET all_nodes_visited TO one SHIFTED LEFT BY number_of_nodes MINUS one
+
+        WHILE queue IS NOT empty
+            FOR each index FROM zero TO the LENGTH OF queue MINUS one
+                CALL remove_element_at_front OF queue RETURNING current_node_and_visited_nodes
+                SET current_node TO element at position zero of current_node_and_visited_nodes
+                SET visited_nodes TO element at position one of current_node_and_visited_nodes
+
+                IF visited_nodes EQUALS all_nodes_visited
+                    RETURN steps
+                END IF
+
+                FOR each neighbor IN element at position current_node of graph
+                    SET next_visited_nodes TO visited_nodes OR one SHIFTED LEFT BY neighbor
+                    SET next_state TO tuple OF neighbor AND next_visited_nodes
+
+                    IF next_state IS NOT IN visited
+                        CALL add next_state TO visited
+                        CALL append next_state TO queue
+                    END IF
+                END FOR
+            END FOR
+
+            INCREMENT steps BY one
+        END WHILE
+
+        RETURN negative one
+    END FUNCTION
+
+    FUNCTION initialize_queue_with_node_bitmasks(number_of_nodes)
+        CALL auxiliary FUNCTION TO create queue containing each tuple OF node AND one SHIFTED LEFT BY node FOR each node FROM zero TO number_of_nodes MINUS one
+        RETURN queue
+    END FUNCTION
+
+    FUNCTION initialize_visited_states_with_node_bitmasks(number_of_nodes)
+        CALL auxiliary FUNCTION TO create set containing each tuple OF node AND one SHIFTED LEFT BY node FOR each node FROM zero TO number_of_nodes MINUS one
+        RETURN visited
+    END FUNCTION
+END CLASS

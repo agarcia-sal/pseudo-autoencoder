@@ -1,0 +1,38 @@
+CLASS Solution  
+    FUNCTION countSmaller(nums)  
+        SET sorted_nums TO the sorted list of unique elements in nums  
+        SET rank TO an empty dictionary  
+        SET idx TO one  
+        FOR each val IN sorted_nums  
+            ASSIGN val AS KEY WITH VALUE idx IN rank  
+            INCREMENT idx BY one  
+        END FOR  
+        
+        SET bit TO a list of zeros with length equal to the LENGTH OF sorted_nums PLUS one  
+        
+        FUNCTION get_sum(idx)  
+            SET res TO zero  
+            WHILE idx GREATER THAN zero  
+                INCREMENT res BY element at position idx of bit  
+                DECREMENT idx BY the bitwise AND of idx AND its negation as a positive integer  
+            END WHILE  
+            RETURN res  
+        END FUNCTION  
+        
+        FUNCTION update(idx, delta)  
+            WHILE idx LESS THAN the LENGTH OF bit  
+                INCREMENT element at position idx of bit BY delta  
+                INCREMENT idx BY the bitwise AND of idx AND its negation as a positive integer  
+            END WHILE  
+        END FUNCTION  
+        
+        SET counts TO an empty list  
+        FOR each num IN nums traversed from last to first  
+            SET r TO value in rank for key num  
+            APPEND get_sum(r MINUS one) TO counts  
+            CALL update with parameters r AND one  
+        END FOR  
+        
+        RETURN counts traversed from last to first  
+    END FUNCTION  
+END CLASS

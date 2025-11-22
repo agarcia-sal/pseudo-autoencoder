@@ -1,0 +1,33 @@
+CLASS Solution
+    FUNCTION minimumDeleteSum(s1, s2)
+        SET length_m TO the LENGTH OF s1
+        SET length_n TO the LENGTH OF s2
+
+        # Create a two dimensional DP array to store the minimum ASCII sum of deleted characters
+        SET dp TO a two dimensional list consisting of the integer zero repeated for each position in the range from zero to length_n inclusive, repeated for each position in the range from zero to length_m inclusive
+
+        # Fill the first row with the ASCII sum of characters to delete from s2
+        FOR index_j FROM one TO length_n INCLUSIVE
+            SET element at position index_j OF the first list in dp TO the element at position index_j MINUS one OF the first list in dp PLUS the ASCII value of the character at position index_j MINUS one OF s2
+        END FOR
+
+        # Fill the first column with the ASCII sum of characters to delete from s1
+        FOR index_i FROM one TO length_m INCLUSIVE
+            SET element at position zero OF the list at position index_i OF dp TO the element at position zero OF the list at position index_i MINUS one OF dp PLUS the ASCII value of the character at position index_i MINUS one OF s1
+        END FOR
+
+        # Fill the rest of the DP table
+        FOR index_i FROM one TO length_m INCLUSIVE
+            FOR index_j FROM one TO length_n INCLUSIVE
+                IF the character at position index_i MINUS one OF s1 EQUALS the character at position index_j MINUS one OF s2
+                    SET the element at position index_j OF the list at position index_i OF dp TO the element at position index_j MINUS one OF the list at position index_i MINUS one OF dp
+                ELSE
+                    SET the element at position index_j OF the list at position index_i OF dp TO the minimum of the sum of the element at position index_j OF the list at position index_i MINUS one OF dp and the ASCII value of the character at position index_i MINUS one OF s1, and the sum of the element at position index_j MINUS one OF the list at position index_i OF dp and the ASCII value of the character at position index_j MINUS one OF s2
+                END IF
+            END FOR
+        END FOR
+
+        # The answer is in the bottom right corner of the DP table
+        RETURN the element at position length_n OF the list at position length_m OF dp
+    END FUNCTION
+END CLASS

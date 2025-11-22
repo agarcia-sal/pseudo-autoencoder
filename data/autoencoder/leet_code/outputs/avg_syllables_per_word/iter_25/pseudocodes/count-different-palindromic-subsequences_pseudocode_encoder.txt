@@ -1,0 +1,57 @@
+CLASS Solution  
+    FUNCTION countPalindromicSubsequences WITH PARAMETER s  
+        SET MODULO TO ten RAISED TO THE power of nine PLUS seven  
+        SET length_of_s TO the LENGTH OF s  
+        
+        SET next_occurrence TO a list OF four lists EACH CONTAINING length_of_s elements ALL SET TO minus one  
+        SET previous_occurrence TO a list OF four lists EACH CONTAINING length_of_s elements ALL SET TO minus one  
+        
+        FOR each integer c FROM zero TO three  
+            SET character TO the character REPRESENTED BY the DIGITAL code of character a PLUS c  
+            SET last_position TO minus one  
+            
+            FOR each integer i FROM zero TO length_of_s MINUS one  
+                IF the element at position i of s EQUALS character THEN  
+                    SET last_position TO i  
+                END IF  
+                SET the element at position i of the list at position c of previous_occurrence TO last_position  
+            END FOR  
+            
+            SET last_position TO minus one  
+            FOR each integer i FROM length_of_s MINUS one DOWN TO zero  
+                IF the element at position i of s EQUALS character THEN  
+                    SET last_position TO i  
+                END IF  
+                SET the element at position i of the list at position c of next_occurrence TO last_position  
+            END FOR  
+        END FOR  
+        
+        SET dp_table TO a two-dimensional list OF length_of_s BY length_of_s FILLED WITH zeros  
+        
+        FOR each integer i FROM zero TO length_of_s MINUS one  
+            SET the element at position i of dp_table AT position i TO one  
+        END FOR  
+        
+        FOR each integer length FROM two TO length_of_s  
+            FOR each integer i FROM zero TO length_of_s MINUS length  
+                SET j TO i PLUS length MINUS one  
+                
+                FOR each integer c FROM zero TO three  
+                    SET character TO the character REPRESENTED BY the DIGITAL code of character a PLUS c  
+                    SET left_position TO the element at position i of the list at position c of next_occurrence  
+                    SET right_position TO the element at position j of the list at position c of previous_occurrence  
+                    
+                    IF left_position GREATER THAN j OR right_position LESS THAN i THEN  
+                        CONTINUE TO the next iteration  
+                    ELSE IF left_position EQUALS right_position THEN  
+                        SET the element at position i of dp_table AT position j TO the element at position i of dp_table AT position j PLUS one MODULO MODULO  
+                    ELSE  
+                        SET the element at position i of dp_table AT position j TO the element at position i of dp_table AT position j PLUS the element at position left_position PLUS one of dp_table AT position right_position MINUS one PLUS two MODULO MODULO  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+        
+        RETURN the element at position zero of dp_table AT position length_of_s MINUS one  
+    END FUNCTION  
+END CLASS

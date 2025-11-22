@@ -1,0 +1,45 @@
+CLASS Solution  
+    FUNCTION checkWays(pairs)  
+        SET graph TO CALL defaultdict WITH PARAMETERS set  
+        FOR each element pair IN pairs  
+            SET x TO element at position zero OF pair  
+            SET y TO element at position one OF pair  
+            CALL add y TO the set of elements connected to x IN graph  
+            CALL add x TO the set of elements connected to y IN graph  
+        END FOR  
+        SET max_degree TO the element IN graph WITH the maximum LENGTH OF the connected set  
+        SET n TO the LENGTH OF graph  
+        IF the LENGTH OF the connected set for max_degree NOT EQUALS n MINUS one  
+            RETURN zero  
+        END IF  
+        FUNCTION can_be_parent(u, v)  
+            FOR each neighbor IN the connected set for v IN graph  
+                IF neighbor NOT IN the connected set for u IN graph AND neighbor NOT EQUALS u  
+                    RETURN false  
+                END IF  
+            END FOR  
+            RETURN true  
+        END FUNCTION  
+        SET ways TO one  
+        FOR each u IN graph  
+            IF u EQUALS max_degree  
+                CONTINUE to next iteration  
+            END IF  
+            SET parent TO null  
+            FOR each v IN the connected set for u IN graph  
+                IF v IN graph AND the LENGTH OF the connected set for v IN graph GREATER THAN OR EQUAL TO the LENGTH OF the connected set for u IN graph AND CALL can_be_parent WITH PARAMETERS v, u RETURNS true  
+                    IF parent IS null OR the LENGTH OF the connected set for v IN graph LESS THAN the LENGTH OF the connected set for parent IN graph  
+                        SET parent TO v  
+                    END IF  
+                END IF  
+            END FOR  
+            IF parent IS null  
+                RETURN zero  
+            END IF  
+            IF the LENGTH OF the connected set for parent IN graph EQUALS the LENGTH OF the connected set for u IN graph  
+                SET ways TO two  
+            END IF  
+        END FOR  
+        RETURN ways  
+    END FUNCTION  
+END CLASS

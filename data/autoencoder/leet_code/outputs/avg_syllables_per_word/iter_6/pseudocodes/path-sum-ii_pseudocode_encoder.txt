@@ -1,0 +1,57 @@
+CLASS TreeNode  
+    FUNCTION __init__(val DEFAULTS TO 0, left DEFAULTS TO None, right DEFAULTS TO None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET root TO CALL TreeNode WITH values AT FIRST POSITION  
+    SET i TO 1  
+    SET queue TO NEW dequeue collection  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO REMOVE FIRST ITEM FROM queue  
+        IF i IS LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.left TO CALL TreeNode WITH values AT i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i IS LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.right TO CALL TreeNode WITH values AT i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN CALL is_same_tree WITH p.left AND q.left AND CALL is_same_tree WITH p.right AND q.right  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION pathSum(root, targetSum)  
+        FUNCTION dfs(node, current_sum, path)  
+            IF node IS None  
+                RETURN  
+            APPEND node.val TO path  
+            SET current_sum TO current_sum PLUS node.val  
+            IF node.left IS None AND node.right IS None AND current_sum EQUALS targetSum  
+                APPEND COPY OF path TO result  
+            CALL dfs WITH node.left, current_sum, path  
+            CALL dfs WITH node.right, current_sum, path  
+            REMOVE LAST ITEM FROM path  
+        END FUNCTION  
+        SET result TO EMPTY LIST  
+        CALL dfs WITH root, 0, EMPTY LIST  
+        RETURN result  
+    END FUNCTION  
+END CLASS

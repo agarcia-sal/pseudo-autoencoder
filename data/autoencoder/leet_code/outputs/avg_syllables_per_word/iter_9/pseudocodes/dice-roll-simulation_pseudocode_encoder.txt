@@ -1,0 +1,70 @@
+CLASS Solution  
+    FUNCTION dieSimulator(self, n, rollMax)  
+        SET MOD TO one billion PLUS seven  
+        
+        CALL FUNCTION max_rollMax WITH rollMax  
+        SET max_consecutive TO result of max_rollMax  
+        
+        CALL FUNCTION initialize_dp WITH n AND max_consecutive  
+        SET dp TO result of initialize_dp  
+        
+        FOR j FROM zero TO five  
+            SET dp at index one, j, one TO one  
+        END FOR  
+        
+        FOR i FROM two TO n  
+            FOR j FROM zero TO five  
+                FOR k FROM one TO rollMax at index j  
+                    IF k GREATER THAN one THEN  
+                        SET dp at index i, j, k TO dp at index i MINUS one, j, k MINUS one  
+                    ELSE  
+                        CALL FUNCTION sum_other_sequences WITH dp, i MINUS one, j, rollMax, AND MOD  
+                        SET dp at index i, j, k TO result of sum_other_sequences  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+        
+        CALL FUNCTION sum_final_ways WITH dp, n, rollMax, AND MOD  
+        RETURN result of sum_final_ways  
+    END FUNCTION  
+
+    FUNCTION max_rollMax(rollMax)  
+        SET max_value TO zero  
+        FOR each value IN rollMax  
+            IF value GREATER THAN max_value THEN  
+                SET max_value TO value  
+            END IF  
+        END FOR  
+        RETURN max_value  
+    END FUNCTION  
+
+    FUNCTION initialize_dp(n, max_consecutive)  
+        CREATE three dimensional array dp with dimensions (n PLUS one) by six by (max_consecutive PLUS one) filled with zeros  
+        RETURN dp  
+    END FUNCTION  
+
+    FUNCTION sum_other_sequences(dp, previous_i, current_j, rollMax, MOD)  
+        SET total TO zero  
+        FOR x FROM zero TO five  
+            IF x NOT EQUALS current_j THEN  
+                FOR y FROM one TO rollMax at index x  
+                    INCREMENT total BY dp at index previous_i, x, y  
+                    SET total TO total MODULO MOD  
+                END FOR  
+            END IF  
+        END FOR  
+        RETURN total  
+    END FUNCTION  
+
+    FUNCTION sum_final_ways(dp, n, rollMax, MOD)  
+        SET total TO zero  
+        FOR j FROM zero TO five  
+            FOR k FROM one TO rollMax at index j  
+                INCREMENT total BY dp at index n, j, k  
+                SET total TO total MODULO MOD  
+            END FOR  
+        END FOR  
+        RETURN total  
+    END FUNCTION  
+END CLASS

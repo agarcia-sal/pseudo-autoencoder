@@ -1,0 +1,51 @@
+CLASS Solution  
+    FUNCTION numPoints(darts, r)  
+        FUNCTION distance(p1, p2)  
+            RETURN square root of ((p1 at index 0 minus p2 at index 0) squared plus (p1 at index 1 minus p2 at index 1) squared)  
+        END FUNCTION  
+        
+        FUNCTION circle_center(p1, p2, r)  
+            SET d TO distance between p1 and p2  
+            IF d GREATER THAN 2 times r THEN  
+                RETURN None  
+            END IF  
+            SET a TO square root of (r squared minus (d divided by 2) squared)  
+            SET h TO list containing (p1 at index 0 plus p2 at index 0 divided by 2) and (p1 at index 1 plus p2 at index 1 divided by 2)  
+            SET dx TO (p2 at index 1 minus p1 at index 1) times a divided by d  
+            SET dy TO (p2 at index 0 minus p1 at index 0) times a divided by d  
+            RETURN list of two points:  
+                first point is (h at index 0 minus dx, h at index 1 plus dy)  
+                second point is (h at index 0 plus dx, h at index 1 minus dy)  
+        END FUNCTION  
+        
+        FUNCTION is_inside(circle, point, r)  
+            RETURN distance between circle and point LESS THAN OR EQUAL TO r  
+        END FUNCTION  
+        
+        SET n TO length of darts  
+        IF n EQUAL TO 1 THEN  
+            RETURN 1  
+        END IF  
+        
+        SET max_count TO 1  
+        
+        FOR i FROM 0 TO n MINUS 1 DO  
+            FOR j FROM i PLUS 1 TO n MINUS 1 DO  
+                SET centers TO circle_center with parameters darts at i, darts at j, and r  
+                IF centers IS NOT None THEN  
+                    FOR each center IN centers DO  
+                        SET count TO 0  
+                        FOR each dart IN darts DO  
+                            IF is_inside with center, dart, and r RETURNS true THEN  
+                                INCREMENT count BY 1  
+                            END IF  
+                        END FOR  
+                        SET max_count TO the greater of max_count and count  
+                    END FOR  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        RETURN max_count  
+    END FUNCTION  
+END CLASS

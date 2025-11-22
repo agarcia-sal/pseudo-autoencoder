@@ -1,0 +1,34 @@
+CLASS Solution
+    FUNCTION updateBoard(board, click)
+        FUNCTION count_adjacent_mines(r, c)
+            SET count TO 0
+            FOR i FROM r - 1 TO r + 1
+                FOR j FROM c - 1 TO c + 1
+                    IF i IS WITHIN ROW BOUNDS OF board AND j IS WITHIN COLUMN BOUNDS OF board AND board[i][j] EQUALS 'M'
+                        INCREMENT count BY 1
+            RETURN count
+        END FUNCTION
+
+        FUNCTION dfs(r, c)
+            IF r IS NOT WITHIN ROW BOUNDS OF board OR c IS NOT WITHIN COLUMN BOUNDS OF board
+                RETURN
+            IF board[r][c] IS NOT 'E'
+                RETURN
+            SET mine_count TO count_adjacent_mines(r, c)
+            IF mine_count GREATER THAN 0
+                SET board[r][c] TO STRING REPRESENTATION OF mine_count
+            ELSE
+                SET board[r][c] TO 'B'
+                FOR i FROM r - 1 TO r + 1
+                    FOR j FROM c - 1 TO c + 1
+                        CALL dfs(i, j)
+        END FUNCTION
+
+        SET row TO click[0]
+        SET col TO click[1]
+        IF board[row][col] EQUALS 'M'
+            SET board[row][col] TO 'X'
+            RETURN board
+        CALL dfs(row, col)
+        RETURN board
+END CLASS

@@ -1,0 +1,64 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val WITH DEFAULT zero LEFT WITH DEFAULT none RIGHT WITH DEFAULT none  
+        SET the attribute val TO val  
+        SET the attribute left TO left  
+        SET the attribute right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF the LENGTH OF values EQUALS zero THEN  
+        RETURN none  
+    END IF  
+    SET root TO a new instance of TreeNode initialized with the element at position zero of values  
+    SET i TO one  
+    SET queue TO a new deque  
+    APPEND root TO queue  
+    WHILE the LENGTH OF queue IS GREATER THAN zero DO  
+        SET node TO the first element removed FROM queue  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT none THEN  
+            SET the left attribute OF node TO a new instance of TreeNode initialized with the element at position i of values  
+            APPEND the left attribute OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT none THEN  
+            SET the right attribute OF node TO a new instance of TreeNode initialized with the element at position i of values  
+            APPEND the right attribute OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none THEN  
+        RETURN True  
+    ELSE IF p IS none OR q IS none THEN  
+        RETURN False  
+    ELSE IF the val attribute OF p IS NOT EQUAL TO the val attribute OF q THEN  
+        RETURN False  
+    ELSE  
+        RETURN the result of is_same_tree called with the left attribute OF p AND the left attribute OF q AND the result of is_same_tree called with the right attribute OF p AND the right attribute OF q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION pathSum WITH PARAMETERS root targetSum  
+        FUNCTION dfs WITH PARAMETERS node current_sum path  
+            IF node IS none THEN  
+                RETURN  
+            END IF  
+            APPEND the val attribute OF node TO path  
+            SET current_sum TO current_sum PLUS the val attribute OF node  
+            IF the left attribute OF node IS none AND the right attribute OF node IS none AND current_sum EQUALS targetSum THEN  
+                APPEND a copy of path TO result  
+            END IF  
+            CALL dfs WITH PARAMETERS the left attribute OF node current_sum path  
+            CALL dfs WITH PARAMETERS the right attribute OF node current_sum path  
+            REMOVE the last element FROM path  
+        END FUNCTION  
+        SET result TO an empty list  
+        CALL dfs WITH PARAMETERS root zero an empty list  
+        RETURN result  
+    END FUNCTION  
+END CLASS

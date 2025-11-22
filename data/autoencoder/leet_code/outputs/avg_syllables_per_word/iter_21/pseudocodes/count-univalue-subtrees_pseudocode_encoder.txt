@@ -1,0 +1,63 @@
+CLASS TreeNode  
+    FUNCTION __init__(val EQUALS zero, left EQUALS None, right EQUALS None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    END IF  
+    SET root TO NEW TreeNode WITH PARAMETERS val EQUALS element at position zero OF values  
+    SET i TO one  
+    SET queue TO NEW deque  
+    CALL queue.append WITH PARAMETERS root  
+    WHILE queue IS NOT EMPTY  
+        SET node TO CALL queue.popleft WITH NO PARAMETERS  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i OF values IS NOT None  
+            SET node.left TO NEW TreeNode WITH PARAMETERS val EQUALS element at position i OF values  
+            CALL queue.append WITH PARAMETERS node.left  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i OF values IS NOT None  
+            SET node.right TO NEW TreeNode WITH PARAMETERS val EQUALS element at position i OF values  
+            CALL queue.append WITH PARAMETERS node.right  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF value at attribute val OF p IS NOT EQUALS value at attribute val OF q  
+        RETURN False  
+    ELSE  
+        RETURN CALL is_same_tree WITH PARAMETERS p.left, q.left AND CALL is_same_tree WITH PARAMETERS p.right, q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION countUnivalSubtrees(root)  
+        FUNCTION helper(node)  
+            IF node IS None  
+                RETURN True, zero  
+            END IF  
+            SET is_left_unival, left_count TO CALL helper WITH PARAMETERS node.left  
+            SET is_right_unival, right_count TO CALL helper WITH PARAMETERS node.right  
+            IF is_left_unival IS True AND is_right_unival IS True  
+                IF (node.left IS None OR value at attribute val OF node.left IS EQUALS value at attribute val OF node) AND (node.right IS None OR value at attribute val OF node.right IS EQUALS value at attribute val OF node)  
+                    RETURN True, left_count PLUS right_count PLUS one  
+                END IF  
+            END IF  
+            RETURN False, left_count PLUS right_count  
+        END FUNCTION  
+        SET _, count TO CALL helper WITH PARAMETERS root  
+        RETURN count  
+    END FUNCTION  
+END CLASS

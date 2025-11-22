@@ -1,0 +1,67 @@
+CLASS Solution  
+    FUNCTION shortestPathAllKeys(grid)  
+        SET directions TO list containing  
+            pair of zero PLUS one  
+            pair of zero MINUS one  
+            pair of one PLUS zero  
+            pair of minus one PLUS zero  
+        
+        SET m TO the LENGTH OF grid  
+        SET n TO the LENGTH OF element at position zero of grid  
+        SET start TO None  
+        SET num_keys TO zero  
+        
+        FOR i FROM zero TO m MINUS one  
+            FOR j FROM zero TO n MINUS one  
+                IF element at position i of grid EQUALS at symbol THEN  
+                    SET start TO pair of i PLUS j  
+                ELSE IF element at position i of grid AT position j IS a lowercase letter THEN  
+                    INCREMENT num_keys BY one  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET queue TO a double ended queue initialized with tuple containing element at position zero of start PLUS element at position one of start PLUS zero PLUS zero  
+        SET visited TO a set initialized with tuple containing element at position zero of start PLUS element at position one of start PLUS zero  
+        
+        WHILE queue holds elements  
+            REMOVE element FROM the left end of queue AND ASSIGN TO x PLUS y PLUS keys PLUS steps  
+            
+            FOR each pair dx PLUS dy IN directions  
+                SET nx TO x PLUS dx  
+                SET ny TO y PLUS dy  
+                
+                IF nx IS GREATER THAN OR EQUAL TO zero AND nx IS LESS THAN m AND ny IS GREATER THAN OR EQUAL TO zero AND ny IS LESS THAN n THEN  
+                    SET cell TO element at position nx of grid AT position ny  
+                    
+                    IF cell EQUALS hash symbol THEN  
+                        CONTINUE to the next iteration  
+                    END IF  
+                    
+                    IF cell IS an uppercase letter THEN  
+                        SET key_needed TO one SHIFTED LEFT BY the difference BETWEEN the ASCII value of cell converted to lowercase AND the ASCII value of letter a  
+                        IF the bitwise AND of keys AND key_needed EQUALS zero THEN  
+                            CONTINUE to the next iteration  
+                        END IF  
+                    END IF  
+                    
+                    IF cell IS a lowercase letter THEN  
+                        SET new_keys TO the bitwise OR of keys AND one SHIFTED LEFT BY the difference BETWEEN the ASCII value of cell AND the ASCII value of letter a  
+                        IF new_keys EQUALS one SHIFTED LEFT BY num_keys MINUS one THEN  
+                            RETURN steps PLUS one  
+                        END IF  
+                    ELSE  
+                        SET new_keys TO keys  
+                    END IF  
+                    
+                    IF the tuple of nx PLUS ny PLUS new_keys IS NOT IN visited THEN  
+                        ADD the tuple of nx PLUS ny PLUS new_keys TO visited  
+                        APPEND the tuple of nx PLUS ny PLUS new_keys PLUS steps PLUS one TO queue  
+                    END IF  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN minus one  
+    END FUNCTION  
+END CLASS

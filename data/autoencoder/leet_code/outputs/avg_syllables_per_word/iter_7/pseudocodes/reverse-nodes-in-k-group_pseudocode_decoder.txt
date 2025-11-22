@@ -1,0 +1,68 @@
+CLASS ListNode  
+    FUNCTION __init__(self, val = 0, next = None)  
+        SET self.val TO val  
+        SET self.next TO next  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION list_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET head TO new ListNode with first value of values  
+    SET p TO head  
+    FOR each val IN values from second element onward  
+        SET node TO new ListNode with val  
+        SET p.next TO node  
+        SET p TO node  
+    END FOR  
+    RETURN head  
+END FUNCTION  
+
+FUNCTION is_same_list(p1, p2)  
+    IF p1 IS None AND p2 IS None  
+        RETURN True  
+    IF p1 IS None OR p2 IS None  
+        RETURN False  
+    RETURN p1.val EQUALS p2.val AND is_same_list(p1.next, p2.next)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION reverseKGroup(self, head, k)  
+        FUNCTION reverseLinkedList(start, end)  
+            SET prev TO None  
+            SET curr TO start  
+            WHILE curr NOT EQUAL TO end  
+                SET next_node TO curr.next  
+                SET curr.next TO prev  
+                SET prev TO curr  
+                SET curr TO next_node  
+            END WHILE  
+            SET curr.next TO prev  
+            RETURN end, start  
+        END FUNCTION  
+
+        SET dummy TO new ListNode with val 0  
+        SET dummy.next TO head  
+        SET prev_group_end TO dummy  
+
+        WHILE True  
+            SET kth_node TO prev_group_end  
+            FOR i FROM 1 TO k  
+                SET kth_node TO kth_node.next  
+                IF kth_node IS None  
+                    RETURN dummy.next  
+                END IF  
+            END FOR  
+
+            SET next_group_start TO kth_node.next  
+            SET kth_node.next TO None  
+            SET new_group_start, new_group_end TO reverseLinkedList(prev_group_end.next, kth_node)  
+
+            SET prev_group_end.next TO new_group_start  
+            SET new_group_end.next TO next_group_start  
+            SET prev_group_end TO new_group_end  
+        END WHILE  
+
+        RETURN dummy.next  
+    END FUNCTION  
+END CLASS

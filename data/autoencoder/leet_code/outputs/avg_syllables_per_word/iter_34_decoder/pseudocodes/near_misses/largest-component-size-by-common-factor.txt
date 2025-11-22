@@ -1,0 +1,75 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.parent TO list of integers from zero TO size MINUS one  
+        SET self.rank TO list of integer one repeated size times  
+        SET self.size TO list of integer one repeated size times  
+    END FUNCTION  
+
+    FUNCTION find(self, u)  
+        IF element at position u of self.parent NOT EQUALS u THEN  
+            SET element at position u of self.parent TO self.find(element at position u of self.parent)  
+        END IF  
+        RETURN element at position u of self.parent  
+    END FUNCTION  
+
+    FUNCTION union(self, u, v)  
+        SET rootU TO self.find(u)  
+        SET rootV TO self.find(v)  
+        IF rootU NOT EQUALS rootV THEN  
+            IF element at position rootU of self.rank GREATER THAN element at position rootV of self.rank THEN  
+                SET element at position rootV of self.parent TO rootU  
+                INCREMENT element at position rootU of self.size BY element at position rootV of self.size  
+            ELSE IF element at position rootU of self.rank LESS THAN element at position rootV of self.rank THEN  
+                SET element at position rootU of self.parent TO rootV  
+                INCREMENT element at position rootV of self.size BY element at position rootU of self.size  
+            ELSE  
+                SET element at position rootV of self.parent TO rootU  
+                INCREMENT element at position rootU of self.rank BY integer one  
+                INCREMENT element at position rootU of self.size BY element at position rootV of self.size  
+            END IF  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION largestComponentSize(self, nums)  
+        SET max_num TO the maximum value in nums  
+        SET uf TO a new UnionFind object initialized with max_num PLUS one  
+        SET prime_to_index TO an empty dictionary  
+        FOR each num IN nums  
+            FOR each prime IN self.prime_factors(num)  
+                IF prime IN prime_to_index THEN  
+                    CALL uf.union(element at prime in prime_to_index, num)  
+                ELSE  
+                    ASSIGN num TO prime_to_index at prime  
+                END IF  
+            END FOR  
+        END FOR  
+        SET max_component_size TO integer zero  
+        FOR each num IN nums  
+            SET root TO uf.find(num)  
+            IF element at root in uf.size GREATER THAN max_component_size THEN  
+                SET max_component_size TO element at root in uf.size  
+            END IF  
+        END FOR  
+        RETURN max_component_size  
+    END FUNCTION  
+
+    FUNCTION prime_factors(self, n)  
+        SET factors TO an empty set  
+        WHILE n MODULO integer two EQUALS integer zero  
+            ADD integer two TO factors  
+            SET n TO n DIVIDED BY integer two  
+        END WHILE  
+        FOR i FROM integer three TO the integer part of the square root of n PLUS integer one STEP integer two  
+            WHILE n MODULO i EQUALS integer zero  
+                ADD i TO factors  
+                SET n TO n DIVIDED BY i  
+            END WHILE  
+        END FOR  
+        IF n GREATER THAN integer two THEN  
+            ADD n TO factors  
+        END IF  
+        RETURN factors  
+    END FUNCTION  
+END CLASS

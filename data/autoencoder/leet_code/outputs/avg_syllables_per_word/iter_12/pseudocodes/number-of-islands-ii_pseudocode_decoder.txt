@@ -1,0 +1,64 @@
+CLASS UnionFind  
+    FUNCTION __init__(self)  
+        SET self.parent TO an empty map  
+        SET self.count TO zero  
+    END FUNCTION  
+  
+    FUNCTION make_set(self, x)  
+        IF x NOT IN self.parent THEN  
+            SET element at key x of self.parent TO x  
+            INCREMENT self.count BY one  
+        END IF  
+    END FUNCTION  
+  
+    FUNCTION find(self, x)  
+        IF element at key x of self.parent NOT EQUALS x THEN  
+            SET element at key x of self.parent TO self.find(element at key x of self.parent)  
+        END IF  
+        RETURN element at key x of self.parent  
+    END FUNCTION  
+  
+    FUNCTION union(self, x, y)  
+        SET rootX TO self.find(x)  
+        SET rootY TO self.find(y)  
+        IF rootX NOT EQUALS rootY THEN  
+            SET element at key rootX of self.parent TO rootY  
+            DECREMENT self.count BY one  
+        END IF  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION numIslands2(self, m, n, positions)  
+        FUNCTION is_valid(x, y)  
+            RETURN zero LESS THAN OR EQUAL TO x AND x LESS THAN m AND zero LESS THAN OR EQUAL TO y AND y LESS THAN n  
+        END FUNCTION  
+  
+        SET directions TO list containing the pairs: (one, zero), (negative one, zero), (zero, one), (zero, negative one)  
+        SET uf TO new UnionFind instance  
+        CALL auxiliary FUNCTION create_grid with parameters m AND n TO SET grid  (This FUNCTION initializes a two-dimensional list of zeroes with m rows and n columns)  
+        SET result TO an empty list  
+  
+        FOR each pair r, c IN positions  
+            IF element at position r, c of grid EQUALS one THEN  
+                APPEND uf.count TO result  
+                CONTINUE to next iteration  
+            END IF  
+  
+            SET element at position r, c of grid TO one  
+            CALL uf.make_set with argument pair (r, c)  
+  
+            FOR each pair dr, dc IN directions  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                IF is_valid(nr, nc) AND element at position nr, nc of grid EQUALS one THEN  
+                    CALL uf.union with arguments pair (r, c) AND pair (nr, nc)  
+                END IF  
+            END FOR  
+  
+            APPEND uf.count TO result  
+        END FOR  
+  
+        RETURN result  
+    END FUNCTION  
+END CLASS

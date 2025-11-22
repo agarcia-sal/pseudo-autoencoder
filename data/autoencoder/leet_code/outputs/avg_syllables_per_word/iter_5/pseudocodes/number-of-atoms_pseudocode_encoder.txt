@@ -1,0 +1,49 @@
+CLASS Solution  
+    FUNCTION countOfAtoms(formula)  
+        FUNCTION parse(segment)  
+            SET atom_count TO empty mapping from element to integer with default 0  
+            SET elements TO list of pairs of element symbols and counts extracted from segment  
+            FOR each element, count IN elements  
+                IF count is non-empty  
+                    INCREMENT atom_count[element] BY integer value of count  
+                ELSE  
+                    INCREMENT atom_count[element] BY 1  
+            RETURN atom_count  
+        END FUNCTION  
+        
+        FUNCTION multiply_counts(counts, multiplier)  
+            FOR each element IN counts  
+                MULTIPLY counts[element] BY multiplier  
+            RETURN counts  
+        END FUNCTION  
+        
+        SET stack TO list containing one empty mapping from element to integer with default 0  
+        SET i TO 0  
+        WHILE i LESS THAN length of formula  
+            IF formula at position i is '('  
+                APPEND empty mapping from element to integer with default 0 TO stack  
+                INCREMENT i BY 1  
+            ELSE IF formula at position i is ')'  
+                SET j TO i plus 1  
+                WHILE j LESS THAN length of formula AND formula at position j is a digit  
+                    INCREMENT j BY 1  
+                IF j GREATER THAN i plus 1  
+                    SET multiplier TO integer value of substring of formula from i plus 1 up to j  
+                ELSE  
+                    SET multiplier TO 1  
+                SET segment_count TO multiply_counts(pop last mapping from stack, multiplier)  
+                FOR each element IN segment_count  
+                    INCREMENT stack last mapping at element BY segment_count[element]  
+                SET i TO j  
+            ELSE  
+                SET j TO i plus 1  
+                WHILE j LESS THAN length of formula AND (formula at position j is lowercase letter OR formula at position j is digit)  
+                    INCREMENT j BY 1  
+                SET segment_count TO parse(substring of formula from i up to j)  
+                FOR each element IN segment_count  
+                    INCREMENT stack last mapping at element BY segment_count[element]  
+                SET i TO j  
+        SET final_count TO pop last mapping from stack  
+        RETURN concatenation of each element in sorted keys of final_count followed by (string of final_count[element] if final_count[element] GREATER THAN 1 ELSE empty string)  
+    END FUNCTION  
+END CLASS

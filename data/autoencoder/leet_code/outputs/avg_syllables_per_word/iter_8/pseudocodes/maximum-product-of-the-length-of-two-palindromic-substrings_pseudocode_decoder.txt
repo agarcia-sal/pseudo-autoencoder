@@ -1,0 +1,42 @@
+CLASS Solution  
+    FUNCTION maxProduct(s)  
+        SET n TO LENGTH OF s  
+        
+        SET max_len_end TO LIST OF SIZE n FILLED WITH 1  
+        SET max_len_start TO LIST OF SIZE n FILLED WITH 1  
+        
+        FUNCTION expand_around_center(left, right)  
+            WHILE left GREATER THAN OR EQUAL TO 0 AND right LESS THAN n AND s AT left EQUALS s AT right  
+                SET length TO right MINUS left PLUS 1  
+                SET max_len_end AT right TO MAXIMUM OF max_len_end AT right AND length  
+                SET max_len_start AT left TO MAXIMUM OF max_len_start AT left AND length  
+                DECREMENT left BY 1  
+                INCREMENT right BY 1  
+            END WHILE  
+        END FUNCTION  
+        
+        FOR i FROM 0 TO n MINUS 1  
+            CALL expand_around_center WITH i AND i  
+        END FOR  
+        
+        SET prefix_max TO LIST OF SIZE n FILLED WITH 0  
+        SET suffix_max TO LIST OF SIZE n FILLED WITH 0  
+        
+        SET prefix_max AT 0 TO max_len_end AT 0  
+        FOR i FROM 1 TO n MINUS 1  
+            SET prefix_max AT i TO MAXIMUM OF prefix_max AT i MINUS 1 AND max_len_end AT i  
+        END FOR  
+        
+        SET suffix_max AT n MINUS 1 TO max_len_start AT n MINUS 1  
+        FOR i FROM n MINUS 2 DOWN TO 0  
+            SET suffix_max AT i TO MAXIMUM OF suffix_max AT i PLUS 1 AND max_len_start AT i  
+        END FOR  
+        
+        SET max_product TO 0  
+        FOR i FROM 0 TO n MINUS 2  
+            SET max_product TO MAXIMUM OF max_product AND prefix_max AT i MULTIPLIED BY suffix_max AT i PLUS 1  
+        END FOR  
+        
+        RETURN max_product  
+    END FUNCTION  
+END CLASS

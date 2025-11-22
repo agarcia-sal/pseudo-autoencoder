@@ -1,0 +1,57 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val EQUALS zero left EQUALS None right EQUALS None  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values IS EMPTY  
+        RETURN None  
+    END IF  
+    SET root TO NEW TreeNode WITH PARAMETER element at position zero of values  
+    SET i TO one  
+    INITIALIZE queue AS DEQUEUE DATA STRUCTURE  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO REMOVE FIRST ELEMENT FROM queue  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i of values IS NOT None  
+            SET node.left TO NEW TreeNode WITH PARAMETER element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i of values IS NOT None  
+            SET node.right TO NEW TreeNode WITH PARAMETER element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUALS TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETERS p.left AND q.left AND is_same_tree WITH PARAMETERS p.right AND q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION buildTree WITH PARAMETERS self preorder inorder  
+        IF preorder IS EMPTY OR inorder IS EMPTY  
+            RETURN None  
+        END IF  
+        SET root_val TO element at position zero of preorder  
+        SET root TO NEW TreeNode WITH PARAMETER root_val  
+        SET root_index_inorder TO THE POSITION OF root_val IN inorder  
+        SET root.left TO self.buildTree WITH PARAMETERS sublist of preorder FROM position one TO root_index_inorder PLUS one AND sublist of inorder FROM position zero TO root_index_inorder MINUS one PLUS one  
+        SET root.right TO self.buildTree WITH PARAMETERS sublist of preorder FROM position root_index_inorder PLUS one TO THE END AND sublist of inorder FROM position root_index_inorder PLUS one TO THE END  
+        RETURN root  
+    END FUNCTION  
+END CLASS

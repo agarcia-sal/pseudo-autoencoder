@@ -1,0 +1,64 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val EQUALS zero LEFT EQUALS none RIGHT EQUALS none  
+        SET val TO val  
+        SET left TO LEFT  
+        SET right TO RIGHT  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values IS EMPTY  
+        RETURN none  
+    END IF  
+    SET root TO NEW TreeNode WITH PARAMETER the element at position zero of values  
+    SET i TO one  
+    SET queue TO NEW EMPTY double ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO THE FIRST ELEMENT REMOVED FROM queue  
+        IF i IS LESS THAN THE LENGTH OF values AND the element at position i of values IS NOT none  
+            SET node.left TO NEW TreeNode WITH PARAMETER the element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN THE LENGTH OF values AND the element at position i of values IS NOT none  
+            SET node.right TO NEW TreeNode WITH PARAMETER the element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p AND q  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUALS TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETERS p.left AND q.left AND is_same_tree WITH PARAMETERS p.right AND q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION findLeaves WITH PARAMETERS root  
+        FUNCTION collectLeaves WITH PARAMETER node  
+            IF node IS none  
+                RETURN minus one  
+            END IF  
+            SET left_height TO collectLeaves WITH PARAMETER node.left  
+            SET right_height TO collectLeaves WITH PARAMETER node.right  
+            SET current_height TO THE GREATER OF left_height AND right_height PLUS one  
+            IF current_height IS GREATER THAN OR EQUAL TO THE LENGTH OF result  
+                APPEND EMPTY LIST TO result  
+            END IF  
+            APPEND node.val TO THE ELEMENT AT POSITION current_height OF result  
+            RETURN current_height  
+        END FUNCTION  
+        SET result TO EMPTY LIST  
+        CALL collectLeaves WITH PARAMETER root  
+        RETURN result  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,42 @@
+CLASS Solution
+    FUNCTION ipToCIDR(ip, n)
+        FUNCTION ip_to_int(ip)
+            SET parts TO SPLIT ip BY '.'
+            CONVERT each part TO integer
+            SET res TO 0
+            FOR each part IN parts
+                SET res TO res SHIFTED LEFT BY 8 PLUS part
+            RETURN res
+        END FUNCTION
+
+        FUNCTION int_to_ip(num)
+            SET ip_parts TO EMPTY LIST
+            FOR i FROM 3 DOWNTO 0
+                SET part TO (num SHIFTED RIGHT BY (8 TIMES i)) MODULO 256
+                APPEND part AS STRING TO ip_parts
+            RETURN JOIN ip_parts BY '.'
+        END FUNCTION
+
+        FUNCTION largest_cidr_size(start, n)
+            IF start BITWISE AND 1 IS 1
+                RETURN 1
+            SET x TO 1
+            WHILE x LESS THAN OR EQUAL TO n AND (start BITWISE AND (x MINUS 1)) EQUALS 0
+                SET x TO x TIMES 2
+            RETURN x DIVIDED BY 2
+        END FUNCTION
+
+        SET result TO EMPTY LIST
+        SET start_ip TO ip_to_int(ip)
+
+        WHILE n GREATER THAN 0
+            SET size TO largest_cidr_size(start_ip, n)
+            SET prefix_length TO 32 MINUS (BIT LENGTH OF size MINUS 1)
+            SET cidr_block TO CONCATENATE int_to_ip(start_ip), '/', prefix_length
+            APPEND cidr_block TO result
+            SET start_ip TO start_ip PLUS size
+            SET n TO n MINUS size
+
+        RETURN result
+    END FUNCTION
+END CLASS

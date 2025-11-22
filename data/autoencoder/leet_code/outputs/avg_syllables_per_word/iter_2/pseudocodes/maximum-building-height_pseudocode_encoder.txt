@@ -1,0 +1,29 @@
+CLASS Solution
+    FUNCTION maxBuilding(n, restrictions)
+        APPEND [1, 0] TO restrictions
+        SORT restrictions BY first element
+        
+        FOR i FROM 1 TO LENGTH OF restrictions MINUS 1
+            SET idx, height TO restrictions[i]
+            SET prev_idx, prev_height TO restrictions[i - 1]
+            SET restrictions[i][1] TO MINIMUM OF height AND (prev_height PLUS (idx MINUS prev_idx))
+        
+        FOR i FROM LENGTH OF restrictions MINUS 2 DOWNTO 0
+            SET idx, height TO restrictions[i]
+            SET next_idx, next_height TO restrictions[i + 1]
+            SET restrictions[i][1] TO MINIMUM OF height AND (next_height PLUS (next_idx MINUS idx))
+        
+        SET max_height TO 0
+        SET prev_idx, prev_height TO restrictions[0]
+        
+        FOR i FROM 1 TO LENGTH OF restrictions MINUS 1
+            SET idx, height TO restrictions[i]
+            SET candidate_height TO (idx MINUS prev_idx PLUS prev_height PLUS height) DIVIDED BY 2
+            SET max_height TO MAXIMUM OF max_height AND candidate_height
+            SET prev_idx, prev_height TO idx, height
+        
+        SET max_height TO MAXIMUM OF max_height AND (prev_height PLUS (n MINUS prev_idx))
+        
+        RETURN max_height
+    END FUNCTION
+END CLASS

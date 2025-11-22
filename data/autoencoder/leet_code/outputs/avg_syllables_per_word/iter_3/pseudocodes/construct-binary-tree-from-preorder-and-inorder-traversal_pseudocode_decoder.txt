@@ -1,0 +1,68 @@
+CLASS TreeNode
+    FUNCTION __init__(val = 0, left = None, right = None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values: list)
+    IF values IS EMPTY
+        RETURN None
+    END IF
+
+    SET root TO TreeNode(values at index 0)
+    SET i TO 1
+    INITIALIZE queue AS new deque
+    APPEND root TO queue
+
+    WHILE queue IS NOT EMPTY
+        SET node TO REMOVE FIRST ELEMENT FROM queue
+
+        IF i LESS THAN LENGTH OF values AND values at index i IS NOT None
+            SET node.left TO TreeNode(values at index i)
+            APPEND node.left TO queue
+        END IF
+        INCREMENT i BY 1
+
+        IF i LESS THAN LENGTH OF values AND values at index i IS NOT None
+            SET node.right TO TreeNode(values at index i)
+            APPEND node.right TO queue
+        END IF
+        INCREMENT i BY 1
+    END WHILE
+
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val IS NOT EQUAL TO q.val
+        RETURN False
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION buildTree(preorder: List[int], inorder: List[int]) -> Optional[TreeNode]
+        IF preorder IS EMPTY OR inorder IS EMPTY
+            RETURN None
+        END IF
+
+        SET root_val TO preorder at index 0
+        SET root TO TreeNode(root_val)
+
+        SET root_index_inorder TO INDEX OF root_val IN inorder
+
+        SET root.left TO buildTree(SUBLIST OF preorder FROM 1 TO root_index_inorder + 1,
+                                  SUBLIST OF inorder FROM START TO root_index_inorder)
+        SET root.right TO buildTree(SUBLIST OF preorder FROM root_index_inorder + 1 TO END,
+                                   SUBLIST OF inorder FROM root_index_inorder + 1 TO END)
+
+        RETURN root
+    END FUNCTION
+END CLASS

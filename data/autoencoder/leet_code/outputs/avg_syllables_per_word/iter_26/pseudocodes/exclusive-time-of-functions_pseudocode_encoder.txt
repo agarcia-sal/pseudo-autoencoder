@@ -1,0 +1,29 @@
+CLASS Solution
+    FUNCTION exclusiveTime(n, logs)
+        SET exclusive_time TO a list of zero repeated n times
+        SET stack TO an empty list
+
+        FOR each log_entry IN logs
+            SPLIT log_entry INTO function_id_string AND action_string AND timestamp_string USING the colon character
+            CONVERT function_id_string TO an integer and SET TO function_id
+            CONVERT timestamp_string TO an integer and SET TO timestamp
+
+            IF action_string EQUALS the word start
+                IF stack is not empty
+                    SET prev_function_id TO the function identifier AT the last position OF stack
+                    SET prev_timestamp TO the timestamp AT the last position OF stack
+                    INCREMENT exclusive_time AT position prev_function_id BY timestamp MINUS prev_timestamp
+                END IF
+                APPEND a tuple of function_id AND timestamp TO stack
+            ELSE
+                REMOVE and RETURN the last element FROM stack AND UNPACK INTO prev_function_id AND prev_timestamp
+                INCREMENT exclusive_time AT position prev_function_id BY timestamp MINUS prev_timestamp PLUS one
+                IF stack is not empty
+                    SET the second part of the last element OF stack TO timestamp PLUS one
+                END IF
+            END IF
+        END FOR
+
+        RETURN exclusive_time
+    END FUNCTION
+END CLASS

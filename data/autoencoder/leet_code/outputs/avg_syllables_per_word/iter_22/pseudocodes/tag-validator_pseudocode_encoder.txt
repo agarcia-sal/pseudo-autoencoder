@@ -1,0 +1,50 @@
+CLASS Solution  
+    FUNCTION isValid(code)  
+        IMPORT regular expression as re  
+        
+        SET cdata_pattern TO the pattern for left angle bracket exclamation mark open square bracket CDATA open square bracket followed by any sequence of characters followed by close square bracket close square bracket greater than sign  
+        
+        SET code TO the result of replacing all occurrences of cdata_pattern in code with empty string using regular expression substitution  
+        
+        SET stack TO an empty list  
+        
+        SET i TO zero  
+        WHILE i LESS THAN the length of code  
+            IF the element at position i of code EQUALS left angle bracket  
+                SET j TO the position of the next greater than sign in code starting from one position after i  
+                IF j EQUALS negative one  
+                    RETURN false  
+                END IF  
+                
+                SET tag_content TO the substring of code from the position one after i TO the position just before j  
+                
+                IF tag_content EQUALS empty string  
+                    RETURN false  
+                END IF  
+                
+                IF the element at position zero of tag_content EQUALS forward slash  
+                    SET tag_name TO the substring of tag_content from position one TO the end  
+                    IF stack IS empty OR the element at the last position of stack NOT EQUALS tag_name  
+                        RETURN false  
+                    END IF  
+                    REMOVE the element at the last position FROM stack  
+                ELSE IF the element at position zero of tag_content EQUALS exclamation mark  
+                    RETURN false  
+                ELSE  
+                    IF the length of tag_content LESS THAN one OR the length of tag_content GREATER THAN nine OR the entirety of tag_content IS NOT uppercase letters  
+                        RETURN false  
+                    END IF  
+                    APPEND tag_content TO stack  
+                END IF  
+                
+                SET i TO j PLUS one  
+            ELSE  
+                INCREMENT i BY one  
+            END IF  
+        END WHILE  
+        
+        SET pattern_match_count TO the count of all occurrences matching the pattern of left angle bracket followed by one or more uppercase letters followed by right angle bracket followed by any sequence of characters followed by left angle bracket forward slash followed by one or more uppercase letters followed by right angle bracket in code using regular expression find all  
+        
+        RETURN true IF stack IS empty AND pattern_match_count GREATER THAN zero ELSE false  
+    END FUNCTION  
+END CLASS

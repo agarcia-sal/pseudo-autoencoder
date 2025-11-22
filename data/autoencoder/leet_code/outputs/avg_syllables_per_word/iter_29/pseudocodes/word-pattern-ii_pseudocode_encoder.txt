@@ -1,0 +1,38 @@
+CLASS Solution  
+    FUNCTION wordPatternMatch(pattern string_parameter pattern string_parameter s) RETURNS boolean  
+        FUNCTION backtrack(integer_parameter pattern_index integer_parameter string_index mapping_parameter mapping set_parameter used) RETURNS boolean  
+            IF pattern_index EQUALS the LENGTH OF pattern AND string_index EQUALS the LENGTH OF s THEN  
+                RETURN True  
+            END IF  
+            IF pattern_index EQUALS the LENGTH OF pattern OR string_index EQUALS the LENGTH OF s THEN  
+                RETURN False  
+            END IF  
+            SET current_char TO character at position pattern_index of pattern  
+            IF current_char IS IN mapping THEN  
+                SET word TO mapping value ASSOCIATED WITH current_char  
+                IF substring from position string_index TO position string_index PLUS the LENGTH OF word of s DOES NOT EQUAL word THEN  
+                    RETURN False  
+                END IF  
+                IF backtrack(pattern_index PLUS one, string_index PLUS the LENGTH OF word, mapping, used) IS True THEN  
+                    RETURN True  
+                END IF  
+            ELSE  
+                FOR end FROM string_index PLUS one TO the LENGTH OF s PLUS one  
+                    SET word TO substring from position string_index TO position end of s  
+                    IF word IS IN used THEN  
+                        CONTINUE  
+                    END IF  
+                    SET mapping value ASSOCIATED WITH current_char TO word  
+                    ADD word TO used  
+                    IF backtrack(pattern_index PLUS one, end, mapping, used) IS True THEN  
+                        RETURN True  
+                    END IF  
+                    REMOVE mapping entry ASSOCIATED WITH current_char  
+                    REMOVE word FROM used  
+                END FOR  
+            END IF  
+            RETURN False  
+        END FUNCTION  
+        RETURN backtrack zero zero empty mapping empty used set  
+    END FUNCTION  
+END CLASS

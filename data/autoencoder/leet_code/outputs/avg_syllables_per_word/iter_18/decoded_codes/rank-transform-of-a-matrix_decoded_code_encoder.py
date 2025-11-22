@@ -1,0 +1,50 @@
+from collections import defaultdict
+
+class UnionFind:
+    def __init__(self, size):
+        self.parent = list(range(size))
+
+    def find(self, u):
+        if self.parent[u] != u:
+            self.parent[u] = self.find(self.parent[u])
+        return self.parent[u]
+
+    def union(self, u, v):
+        root_u = self.find(u)
+        root_v = self.find(v)
+        if root_u != root_v:
+            self.parent[root_u] = root_v
+
+class Solution:
+    def matrixRankTransform(self, matrix):
+        m, n = len(matrix), len(matrix[0])
+        value_to_indices = defaultdict(list)
+        for r in range(m):
+            for c in range(n):
+                value_to_indices[matrix[r][c]].append((r, c))
+
+        row_rank = [0] * m
+        col_rank = [0] * n
+        result = [[0] * n for _ in range(m)]
+
+        for value in sorted(value_to_indices):
+            uf = UnionFind(m + n)
+            rank = {}
+
+            # Union rows and columns for the same values
+            for r, c in value_to_indices[value]:
+                uf.union(r, c + m)
+
+            # Find the max rank for each connected component
+            for r, c in value_to_indices[value]:
+                root = uf.find(r)
+                rank[root] = max(rank.get(root, 0), max(row_rank[r], col_rank[c]) + 1)
+
+            # Assign ranks and update row_rank and col_rank
+            for r, c in value_to_indices[value]:
+                root = uf.find(r)
+                result[r][c] = rank[root]
+                row_rank[r] = rank[root]
+                col_rank[c] = rank[root]
+
+        return result

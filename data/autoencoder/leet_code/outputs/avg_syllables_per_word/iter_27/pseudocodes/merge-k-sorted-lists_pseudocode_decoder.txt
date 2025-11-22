@@ -1,0 +1,54 @@
+CLASS ListNode  
+    FUNCTION __init__ WITH PARAMETERS self val MINUS zero next MINUS None  
+        SET self.val TO val  
+        SET self.next TO next  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION list_node WITH PARAMETERS values  
+    IF the LENGTH OF values EQUALS zero THEN  
+        RETURN None  
+    END IF  
+    SET head TO A NEW ListNode CREATED WITH THE element at position one of values  
+    SET p TO head  
+    FOR each val IN the SUBSEQUENCE OF values FROM POSITION two TO THE END  
+        SET node TO A NEW ListNode CREATED WITH val  
+        SET p.next TO node  
+        SET p TO node  
+    END FOR  
+    RETURN head  
+END FUNCTION  
+
+FUNCTION is_same_list WITH PARAMETERS p1 p2  
+    IF p1 EQUALS None AND p2 EQUALS None THEN  
+        RETURN True  
+    END IF  
+    IF p1 EQUALS None OR p2 EQUALS None THEN  
+        RETURN False  
+    END IF  
+    RETURN the CONDITION THAT the element val of p1 EQUALS the element val of p2 AND is_same_list CALLED WITH the element next of p1 AND the element next of p2  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION mergeKLists WITH PARAMETERS self lists  
+        SET min_heap TO an EMPTY LIST  
+        SET i TO zero  
+        FOR each lst IN lists  
+            IF lst IS NOT None THEN  
+                PERFORM heapq PUSH ON min_heap THE TUPLE CONTAINING element val of lst AND i AND lst  
+            END IF  
+            INCREMENT i BY one  
+        END FOR  
+        SET dummy TO A NEW ListNode WITH DEFAULT PARAMETERS  
+        SET current TO dummy  
+        WHILE min_heap IS NOT EMPTY  
+            PERFORM heapq POP FROM min_heap INTO VARIABLES val i node  
+            SET current.next TO node  
+            SET current TO the element next of current  
+            IF the element next of node IS NOT None THEN  
+                PERFORM heapq PUSH ON min_heap THE TUPLE CONTAINING the element val of the element next of node AND i AND the element next of node  
+            END IF  
+        END WHILE  
+        RETURN the element next of dummy  
+    END FUNCTION  
+END CLASS

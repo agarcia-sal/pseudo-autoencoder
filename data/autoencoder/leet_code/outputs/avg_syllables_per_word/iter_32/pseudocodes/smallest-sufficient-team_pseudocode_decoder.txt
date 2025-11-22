@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION smallestSufficientTeam(req_skills, people)  
+        SET skill_to_index TO a new empty mapping from string to integer  
+        FOR each index i AND skill s IN enumeration of req_skills  
+            SET the mapping for skill s TO i in skill_to_index  
+        END FOR  
+        SET m TO the length of req_skills  
+        SET n TO the length of people  
+        SET skill_bits_list TO a list of size n filled with zero  
+        FOR each index i AND skill_set ss IN enumeration of people  
+            FOR each skill s IN ss  
+                SET skill_bits_list at position i TO the bitwise OR of current value and one shifted left by the mapping of skill s in skill_to_index  
+            END FOR  
+        END FOR  
+        SET maximum_mask TO one shifted left by m  
+        SET f TO a list of size maximum_mask filled with infinity  
+        SET g TO a list of size maximum_mask filled with zero  
+        SET h TO a list of size maximum_mask filled with zero  
+        SET the element at position zero of f TO zero  
+        FOR each integer i FROM zero TO maximum_mask MINUS one  
+            IF f at position i EQUALS infinity  
+                CONTINUE to the next iteration of the loop  
+            END IF  
+            FOR each integer j FROM zero TO n MINUS one  
+                IF f at position i PLUS one LESS THAN f at position bitwise OR of i and skill_bits_list at position j  
+                    SET f at position bitwise OR of i and skill_bits_list at position j TO f at position i PLUS one  
+                    SET g at position bitwise OR of i and skill_bits_list at position j TO j  
+                    SET h at position bitwise OR of i and skill_bits_list at position j TO i  
+                END IF  
+            END FOR  
+        END FOR  
+        SET i TO maximum_mask MINUS one  
+        SET ans TO a new empty list  
+        WHILE i NOT EQUALS zero  
+            APPEND the element at position i of g TO ans  
+            SET i TO the element at position i of h  
+        END WHILE  
+        RETURN ans  
+    END FUNCTION  
+END CLASS

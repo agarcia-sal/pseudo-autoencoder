@@ -1,0 +1,84 @@
+CLASS Solution
+
+    FUNCTION maximumInvitations(parameter favorite AS List OF integers) RETURNS integer
+        SET n TO the LENGTH OF favorite
+        SET graph TO a new DEFAULT DICTIONARY OF list
+        SET in_degree TO a new LIST OF boolean of size n FILLED WITH zero
+        
+        FOR index i FROM zero TO n MINUS one INCLUSIVE
+            APPEND element i TO the LIST AT key element at position i OF favorite IN graph
+            INCREMENT element at position element at position i OF favorite IN in_degree BY one
+        END FOR
+
+        SET mutual_chains TO zero
+        SET visited TO a new LIST OF boolean of size n FILLED WITH False
+
+        FOR index i FROM zero TO n MINUS one INCLUSIVE
+            IF element at position element at position i OF favorite EQUALS i AND i LESS THAN element at position i OF favorite THEN
+                SET a TO i
+                SET b TO element at position i OF favorite
+                SET chain_a TO the RESULT OF find_chain_length WITH PARAMETERS a, graph, visited
+                SET chain_b TO the RESULT OF find_chain_length WITH PARAMETERS b, graph, visited
+                INCREMENT mutual_chains BY chain_a PLUS chain_b
+            END IF
+        END FOR
+
+        SET longest_cycle TO zero
+        SET visited TO a new LIST OF boolean of size n FILLED WITH False
+
+        FOR index i FROM zero TO n MINUS one INCLUSIVE
+            IF element at position i OF visited IS False THEN
+                SET cycle_length TO the RESULT OF find_cycle_length WITH PARAMETERS i, graph, visited, favorite
+                SET longest_cycle TO the GREATER OF longest_cycle AND cycle_length
+            END IF
+        END FOR
+
+        RETURN the GREATER OF mutual_chains AND longest_cycle
+    END FUNCTION
+
+
+    FUNCTION find_chain_length(parameter start AS integer, parameter graph AS DEFAULT DICTIONARY, parameter visited AS List OF booleans) RETURNS integer
+        SET length TO zero
+        SET queue TO a new DOUBLE ENDED QUEUE INITIALIZED WITH start
+        SET element at position start OF visited TO True
+
+        WHILE queue IS NOT empty
+            REMOVE the element at the FRONT OF queue AND ASSIGN TO current
+            FOR each neighbor IN element at position current OF graph
+                IF element at position neighbor OF visited IS False THEN
+                    SET element at position neighbor OF visited TO True
+                    APPEND neighbor TO queue
+                    INCREMENT length BY one
+                END IF
+            END FOR
+        END WHILE
+
+        RETURN length
+    END FUNCTION
+
+
+    FUNCTION find_cycle_length(parameter start AS integer, parameter graph AS DEFAULT DICTIONARY, parameter visited AS List OF booleans, parameter favorite AS List OF integers) RETURNS integer
+        IF element at position start OF visited IS True THEN
+            RETURN zero
+        END IF
+
+        SET stack TO an empty LIST
+        SET current TO start
+
+        WHILE element at position current OF visited IS False
+            SET element at position current OF visited TO True
+            APPEND current TO stack
+            SET current TO element at position current OF favorite
+        END WHILE
+
+        IF current IS NOT an element OF stack THEN
+            RETURN zero
+        END IF
+
+        SET cycle_start_index TO the POSITION OF current IN stack
+        SET cycle_length TO the LENGTH OF stack MINUS cycle_start_index
+
+        RETURN cycle_length
+    END FUNCTION
+
+END CLASS

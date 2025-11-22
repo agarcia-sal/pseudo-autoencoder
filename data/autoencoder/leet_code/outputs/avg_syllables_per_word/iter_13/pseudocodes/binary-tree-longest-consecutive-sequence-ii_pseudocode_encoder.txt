@@ -1,0 +1,78 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val defaulted TO zero left defaulted TO none right defaulted TO none  
+        SET the value attribute TO val  
+        SET the left attribute TO left  
+        SET the right attribute TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETERS values as list  
+    IF the absence of values holds  
+        RETURN none  
+    END IF  
+    SET root TO new instance of TreeNode with element at position zero of values  
+    SET i TO one  
+    SET queue TO new double ended queue structure  
+    APPEND root TO queue  
+    WHILE queue is not empty  
+        SET node TO element removed from front of queue  
+        IF i is less than the length of values AND element at position i of values is not none  
+            SET node's left attribute TO new instance of TreeNode with element at position i of values  
+            APPEND node's left attribute TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i is less than the length of values AND element at position i of values is not none  
+            SET node's right attribute TO new instance of TreeNode with element at position i of values  
+            APPEND node's right attribute TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF the absence of p AND the absence of q both hold  
+        RETURN true  
+    ELSE IF the absence of p OR the absence of q holds  
+        RETURN false  
+    ELSE IF the value attribute of p is not equal to the value attribute of q  
+        RETURN false  
+    ELSE  
+        RETURN the logical AND of the recursive call of is_same_tree with parameters the left attribute of p AND the left attribute of q AND the recursive call of is_same_tree with parameters the right attribute of p AND the right attribute of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION longestConsecutive WITH PARAMETERS root as optional TreeNode  
+        FUNCTION dfs WITH PARAMETERS node  
+            IF the absence of node holds  
+                RETURN zero and zero  
+            END IF  
+            SET increment length TO one  
+            SET decrement length TO one  
+            SET left increment TO first result of calling dfs with node's left attribute  
+            SET left decrement TO second result of calling dfs with node's left attribute  
+            SET right increment TO first result of calling dfs with node's right attribute  
+            SET right decrement TO second result of calling dfs with node's right attribute  
+            IF node's left attribute exists  
+                IF the value attribute of node is equal to the value attribute of node's left attribute PLUS one  
+                    SET decrement length TO left decrement PLUS one  
+                ELSE IF the value attribute of node is equal to the value attribute of node's left attribute MINUS one  
+                    SET increment length TO left increment PLUS one  
+                END IF  
+            END IF  
+            IF node's right attribute exists  
+                IF the value attribute of node is equal to the value attribute of node's right attribute PLUS one  
+                    SET decrement length TO the maximum of decrement length AND right decrement PLUS one  
+                ELSE IF the value attribute of node is equal to the value attribute of node's right attribute MINUS one  
+                    SET increment length TO the maximum of increment length AND right increment PLUS one  
+                END IF  
+            END IF  
+            SET the nonlocal variable max length TO the maximum of current max length AND increment length PLUS decrement length MINUS one  
+            RETURN increment length AND decrement length  
+        END FUNCTION  
+        SET max length TO zero  
+        CALL dfs with root  
+        RETURN max length  
+    END FUNCTION  
+END CLASS

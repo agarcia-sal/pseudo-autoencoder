@@ -1,0 +1,107 @@
+CLASS ListNode  
+    FUNCTION __init__ WITH PARAMETERS val EQUALS zero AND next EQUALS none  
+        SET self.val TO val  
+        SET self.next TO next  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION list_node WITH PARAMETERS values  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET head TO NEW ListNode WITH parameter element at position zero of values  
+    SET p TO head  
+    FOR each val IN the elements of values FROM the second element TO the last element  
+        SET node TO NEW ListNode WITH parameter val  
+        SET p.next TO node  
+        SET p TO node  
+    END FOR  
+    RETURN head  
+END FUNCTION  
+
+FUNCTION is_same_list WITH PARAMETERS p1 AND p2  
+    IF p1 IS none AND p2 IS none  
+        RETURN true  
+    END IF  
+    IF p1 IS none OR p2 IS none  
+        RETURN false  
+    END IF  
+    RETURN the value at property val of p1 EQUALS the value at property val of p2 AND is_same_list INVOKED WITH parameters the value at property next of p1 AND the value at property next of p2  
+END FUNCTION  
+
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val EQUALS zero AND left EQUALS none AND right EQUALS none  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETERS values  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO NEW TreeNode WITH parameter element at position zero of values  
+    SET i TO one  
+    SET queue TO a new double ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO the first element removed from the left side of queue  
+        IF i IS LESS THAN the length of values AND the element at position i of values IS NOT none  
+            SET the value at property left of node TO NEW TreeNode WITH parameter the element at position i of values  
+            APPEND the value at property left of node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the length of values AND the element at position i of values IS NOT none  
+            SET the value at property right of node TO NEW TreeNode WITH parameter the element at position i of values  
+            APPEND the value at property right of node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p AND q  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF the value at property val of p IS NOT EQUALS TO the value at property val of q  
+        RETURN false  
+    ELSE  
+        RETURN is_same_tree INVOKED WITH parameters the value at property left of p AND the value at property left of q AND is_same_tree INVOKED WITH parameters the value at property right of p AND the value at property right of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION sortedListToBST WITH PARAMETERS head  
+        IF head IS none  
+            RETURN none  
+        END IF  
+
+        FUNCTION findMiddle WITH PARAMETERS left AND right  
+            SET slow TO left  
+            SET fast TO left  
+            WHILE fast IS NOT EQUALS TO right AND the value at property next of fast IS NOT EQUALS TO right  
+                SET slow TO the value at property next of slow  
+                SET fast TO the value at property next of the value at property next of fast  
+            END WHILE  
+            RETURN slow  
+        END FUNCTION  
+
+        FUNCTION convertListToBST WITH PARAMETERS left AND right  
+            IF left IS EQUALS TO right  
+                RETURN none  
+            END IF  
+
+            SET mid TO findMiddle INVOKED WITH parameters left AND right  
+
+            SET node TO NEW TreeNode WITH parameter the value at property val of mid  
+            SET the value at property left of node TO convertListToBST INVOKED WITH parameters left AND mid  
+            SET the value at property right of node TO convertListToBST INVOKED WITH parameters the value at property next of mid AND right  
+            RETURN node  
+        END FUNCTION  
+
+        RETURN convertListToBST INVOKED WITH parameters head AND none  
+    END FUNCTION  
+END CLASS

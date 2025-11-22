@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION ipToCIDR(ip STRING_PARAMETER ip  n INTEGER_PARAMETER n) RETURNS LIST OF STRINGS  
+        
+        FUNCTION ip_to_int(ip STRING_PARAMETER ip) RETURNS INTEGER  
+            SET parts TO list of integer conversion of each substring separated by dot in ip  
+            SET res TO zero  
+            FOR each part IN parts  
+                SET res TO res MULTIPLIED BY two TO THE POWER OF eight PLUS part  
+            END FOR  
+            RETURN res  
+        END FUNCTION  
+        
+        FUNCTION int_to_ip(num INTEGER_PARAMETER num) RETURNS STRING  
+            RETURN concatenation of string conversion of element at position index of list where index goes from three DOWNTO zero AND element is num DIVIDED BY two TO THE POWER OF (eight MULTIPLIED BY index) MODULO two hundred fifty six joined by dot  
+        END FUNCTION  
+        
+        FUNCTION largest_cidr_size(start INTEGER_PARAMETER start  n INTEGER_PARAMETER n) RETURNS INTEGER  
+            IF bitwise AND of start AND one EQUALS one  
+                RETURN one  
+            END IF  
+            SET x TO one  
+            WHILE x LESS THAN OR EQUAL TO n AND bitwise AND of start AND (x MINUS one) EQUALS zero  
+                SET x TO x MULTIPLIED BY two  
+            END WHILE  
+            RETURN x DIVIDED BY two  
+        END FUNCTION  
+        
+        SET result TO empty list  
+        SET start_ip TO call ip_to_int with ip  
+        
+        WHILE n GREATER THAN zero  
+            SET size TO call largest_cidr_size with start_ip AND n  
+            APPEND concatenation of call int_to_ip with start_ip  forward slash  string conversion of thirty two MINUS (bit length of size MINUS one) TO result  
+            INCREMENT start_ip BY size  
+            DECREMENT n BY size  
+        END WHILE  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

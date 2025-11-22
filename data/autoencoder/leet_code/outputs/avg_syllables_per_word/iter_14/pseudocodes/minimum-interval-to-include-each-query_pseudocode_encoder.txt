@@ -1,0 +1,30 @@
+CLASS Solution  
+    FUNCTION minInterval WITH PARAMETERS intervals AND queries  
+        CALL sort ON intervals TO ORDER intervals BY START TIME  
+        SET sorted_queries TO A LIST OF PAIRS WHERE EACH PAIR CONSISTS OF query AND ITS ORIGINAL POSITION IN queries SORTED IN ASCENDING ORDER BY query  
+        
+        SET min_heap TO A NEW EMPTY COLLECTION HAVING PRIORITY QUEUE PROPERTIES  
+        SET result TO A NEW LIST WITH THE LENGTH OF queries FILLED WITH negative one  
+        
+        SET interval_index TO zero  
+        FOR EACH pair query AND original_index IN sorted_queries  
+            WHILE interval_index IS LESS THAN THE LENGTH OF intervals AND the START TIME OF THE element at position interval_index OF intervals IS LESS THAN OR EQUAL TO query  
+                SET start TO THE START TIME OF THE element at position interval_index OF intervals  
+                SET end TO THE END TIME OF THE element at position interval_index OF intervals  
+                SET interval_size TO end MINUS start PLUS one  
+                INSERT THE PAIR interval_size AND end INTO min_heap PRESERVING THE PRIORITY ORDER BY interval_size  
+                INCREMENT interval_index BY one  
+            END WHILE  
+            
+            WHILE min_heap IS NOT EMPTY AND THE END TIME OF THE INTERVAL AT THE TOP OF min_heap IS LESS THAN query  
+                REMOVE THE TOP ELEMENT FROM min_heap  
+            END WHILE  
+            
+            IF min_heap IS NOT EMPTY  
+                SET THE ELEMENT AT POSITION original_index OF result TO THE INTERVAL SIZE OF THE TOP ELEMENT OF min_heap  
+            END IF  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,56 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.parent TO A list containing integers FROM zero TO size MINUS one  
+        SET self.rank TO A list containing the integer one repeated size TIMES  
+    END FUNCTION  
+
+    FUNCTION find(self, p)  
+        IF the element at position p OF self.parent NOT EQUALS p THEN  
+            SET the element at position p OF self.parent TO CALL self.find WITH PARAMETERS the element at position p OF self.parent  
+        END IF  
+        RETURN the element at position p OF self.parent  
+    END FUNCTION  
+
+    FUNCTION union(self, p, q)  
+        SET rootP TO CALL self.find WITH PARAMETERS p  
+        SET rootQ TO CALL self.find WITH PARAMETERS q  
+        IF rootP EQUALS rootQ THEN  
+            RETURN False  
+        END IF  
+        IF the element at position rootP OF self.rank GREATER THAN the element at position rootQ OF self.rank THEN  
+            SET the element at position rootQ OF self.parent TO rootP  
+        ELSE IF the element at position rootP OF self.rank LESS THAN the element at position rootQ OF self.rank THEN  
+            SET the element at position rootP OF self.parent TO rootQ  
+        ELSE  
+            SET the element at position rootQ OF self.parent TO rootP  
+            INCREMENT the element at position rootP OF self.rank BY one  
+        END IF  
+        RETURN True  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION gcdSort(self, nums)  
+        SET sorted_nums TO A list containing the elements of nums arranged IN ascending order  
+        SET max_val TO the greatest element IN nums  
+        CALL UnionFind WITH PARAMETERS max_val PLUS one AND ASSIGN reference TO uf  
+        
+        FOR each num IN nums  
+            SET factor_limit TO CALL the integer part OF the square root OF num PLUS one  
+            FOR factor FROM two TO factor_limit MINUS one  
+                IF num MODULO factor EQUALS zero THEN  
+                    CALL uf.union WITH PARAMETERS num AND factor  
+                    CALL uf.union WITH PARAMETERS num AND num DIVIDED BY factor  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        FOR index FROM zero TO the LENGTH OF nums MINUS one  
+            IF CALL uf.find WITH PARAMETERS the element at position index OF nums NOT EQUALS CALL uf.find WITH PARAMETERS the element at position index OF sorted_nums THEN  
+                RETURN False  
+            END IF  
+        END FOR  
+        
+        RETURN True  
+    END FUNCTION  
+END CLASS

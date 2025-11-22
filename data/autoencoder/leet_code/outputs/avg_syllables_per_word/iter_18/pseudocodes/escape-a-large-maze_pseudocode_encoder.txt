@@ -1,0 +1,37 @@
+CLASS Solution  
+    FUNCTION isEscapePossible WITH PARAMETERS blocked AS List OF List OF integers source AS List OF integers target AS List OF integers  
+        IF blocked IS empty collection  
+            RETURN true  
+        END IF  
+        
+        SET blocked_set TO set OF tuple FOR each block IN blocked  
+        SET n TO the LENGTH OF blocked  
+        SET max_steps TO n MULTIPLIED BY n MINUS one DIVIDED BY two  
+        
+        FUNCTION bfs WITH PARAMETERS start AS List OF integers end AS List OF integers  
+            SET queue TO double-ended queue INITIALIZED WITH tuple OF start  
+            SET visited TO set INITIALIZED WITH queue  
+            
+            WHILE queue IS NOT empty  
+                EXTRACT first element FROM queue ASSIGN TO x AND y  
+                
+                IF the SIZE OF visited IS greater THAN max_steps OR x EQUALS the ELEMENT at position zero OF end AND y EQUALS the ELEMENT at position one OF end  
+                    RETURN true  
+                END IF  
+                
+                FOR each dx AND dy IN the four pairs of integers zero AND one zero AND negative one one AND zero negative one AND zero  
+                    SET nx TO x PLUS dx  
+                    SET ny TO y PLUS dy  
+                    IF nx IS GREATER THAN OR EQUAL TO zero AND nx IS LESS THAN one million AND ny IS GREATER THAN OR EQUAL TO zero AND ny IS LESS THAN one million AND tuple OF nx AND ny NOT IN blocked_set AND tuple OF nx AND ny NOT IN visited  
+                        ADD tuple OF nx AND ny TO visited  
+                        APPEND tuple OF nx AND ny TO queue  
+                    END IF  
+                END FOR  
+            END WHILE  
+            
+            RETURN false  
+        END FUNCTION  
+        
+        RETURN bfs WITH arguments source AND target AND bfs WITH arguments target AND source  
+    END FUNCTION  
+END CLASS

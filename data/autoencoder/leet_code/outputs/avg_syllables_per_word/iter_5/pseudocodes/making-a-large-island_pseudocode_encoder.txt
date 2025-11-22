@@ -1,0 +1,64 @@
+CLASS Solution  
+    FUNCTION largestIsland(grid)  
+        IF grid IS empty OR grid[0] IS empty THEN  
+            RETURN 0  
+        END IF  
+        
+        SET n TO LENGTH OF grid  
+        SET directions TO list of (0, 1), (1, 0), (0, -1), (-1, 0)  
+        
+        FUNCTION is_valid(x, y)  
+            RETURN x IS GREATER THAN OR EQUAL TO 0 AND x IS LESS THAN n AND y IS GREATER THAN OR EQUAL TO 0 AND y IS LESS THAN n  
+        END FUNCTION  
+        
+        FUNCTION dfs(x, y, index)  
+            SET area TO 1  
+            SET grid[x][y] TO index  
+            FOR each dx, dy IN directions  
+                SET nx TO x PLUS dx  
+                SET ny TO y PLUS dy  
+                IF is_valid(nx, ny) AND grid[nx][ny] IS EQUAL TO 1 THEN  
+                    SET area TO area PLUS dfs(nx, ny, index)  
+                END IF  
+            END FOR  
+            RETURN area  
+        END FUNCTION  
+        
+        SET island_areas TO empty mapping  
+        SET index TO 2  
+        
+        FOR i FROM 0 TO n MINUS 1  
+            FOR j FROM 0 TO n MINUS 1  
+                IF grid[i][j] IS EQUAL TO 1 THEN  
+                    SET island_areas[index] TO dfs(i, j, index)  
+                    INCREMENT index BY 1  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        IF island_areas IS empty THEN  
+            RETURN 1  
+        END IF  
+        
+        SET max_island_size TO maximum value IN island_areas  
+        
+        FOR i FROM 0 TO n MINUS 1  
+            FOR j FROM 0 TO n MINUS 1  
+                IF grid[i][j] IS EQUAL TO 0 THEN  
+                    SET neighbors TO empty set  
+                    FOR each dx, dy IN directions  
+                        SET nx TO i PLUS dx  
+                        SET ny TO j PLUS dy  
+                        IF is_valid(nx, ny) AND grid[nx][ny] IS GREATER THAN 1 THEN  
+                            ADD grid[nx][ny] TO neighbors  
+                        END IF  
+                    END FOR  
+                    SET current_island_size TO 1 PLUS sum of island_areas[index] FOR each index IN neighbors  
+                    SET max_island_size TO the greater of max_island_size AND current_island_size  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        RETURN max_island_size  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,39 @@
+CLASS Solution
+    FUNCTION stoneGameV(list_of_stoneValue)
+        CALL construct_prefix_sum WITH parameter list_of_stoneValue RETURNING prefix_sum_array
+
+        FUNCTION get_range_sum(left_index, right_index)
+            SET sum_value TO element at position right_index PLUS one of prefix_sum_array MINUS element at position left_index of prefix_sum_array
+            RETURN sum_value
+        END FUNCTION
+
+        FUNCTION dp(left_index, right_index)
+            IF left_index EQUALS right_index
+                RETURN zero
+            END IF
+            SET max_score TO zero
+            FOR index FROM left_index TO right_index MINUS one
+                SET left_sum TO CALL get_range_sum WITH left_index AND index
+                SET right_sum TO CALL get_range_sum WITH index PLUS one AND right_index
+                IF left_sum LESS THAN right_sum
+                    SET max_score TO the GREATER OF max_score AND left_sum PLUS CALL dp WITH left_index AND index
+                ELSE IF left_sum GREATER THAN right_sum
+                    SET max_score TO the GREATER OF max_score AND right_sum PLUS CALL dp WITH index PLUS one AND right_index
+                ELSE
+                    SET max_score TO the GREATER OF max_score AND left_sum PLUS CALL dp WITH left_index AND index AND right_sum PLUS CALL dp WITH index PLUS one AND right_index
+                END IF
+            END FOR
+            RETURN max_score
+        END FUNCTION
+
+        RETURN CALL dp WITH zero AND the LENGTH OF list_of_stoneValue MINUS one
+    END FUNCTION
+
+    FUNCTION construct_prefix_sum(list_of_values)
+        SET prefix_sum_list TO a list OF zero ELEMENTS OF LENGTH the LENGTH OF list_of_values PLUS one
+        FOR index FROM zero TO the LENGTH OF list_of_values MINUS one
+            SET element at position index PLUS one of prefix_sum_list TO element at position index of prefix_sum_list PLUS element at position index of list_of_values
+        END FOR
+        RETURN prefix_sum_list
+    END FUNCTION
+END CLASS

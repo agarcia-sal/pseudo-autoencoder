@@ -1,0 +1,146 @@
+CLASS Term  
+    FUNCTION __init__ WITH coefficient AND variables  
+        SET the coefficient property TO coefficient  
+        SET the variables property TO variables  
+    END FUNCTION  
+
+    FUNCTION __lt__ WITH other  
+        IF the LENGTH OF the variables property IS NOT EQUAL TO the LENGTH OF other variables property  
+            RETURN the LENGTH OF the variables property IS GREATER THAN the LENGTH OF other variables property  
+        END IF  
+        RETURN the JOINING WITH MULTIPLICATION SIGN OF the variables property IS LESS THAN the JOINING WITH MULTIPLICATION SIGN OF other variables property  
+    END FUNCTION  
+
+    FUNCTION __repr__  
+        IF the variables property IS EMPTY  
+            RETURN the STRING REPRESENTATION OF the coefficient property  
+        END IF  
+        RETURN the STRING CONCATENATION OF the coefficient property FOLLOWED BY MULTIPLICATION SIGN FOLLOWED BY the JOINING WITH MULTIPLICATION SIGN OF the variables property  
+    END FUNCTION  
+END CLASS  
+
+CLASS Expression  
+    FUNCTION __init__  
+        SET the terms property TO a DEFAULTDICTIONARY WITH DEFAULT VALUE ZERO  
+    END FUNCTION  
+
+    FUNCTION add_term WITH term  
+        SET key TO the SORTED TUPLE OF the variables property OF term  
+        INCREMENT the VALUE AT key IN the terms property BY the coefficient property OF term  
+    END FUNCTION  
+
+    FUNCTION multiply WITH other  
+        SET result TO a NEW Expression  
+        FOR each pair vars1 AND coeff1 IN the items OF the terms property  
+            FOR each pair vars2 AND coeff2 IN the items OF the terms property OF other  
+                SET combined_vars TO the SORTED LIST COMPRISING vars1 AND vars2  
+                CALL add_term ON result WITH a NEW Term CREATED WITH coeff1 MULTIPLIED BY coeff2 AND combined_vars  
+            END FOR  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+
+    FUNCTION add WITH other  
+        FOR each pair vars AND coeff IN the items OF the terms property OF other  
+            CALL add_term ON self WITH a NEW Term CREATED WITH coeff AND the LIST VERSION OF vars  
+        END FOR  
+        RETURN self  
+    END FUNCTION  
+
+    FUNCTION subtract WITH other  
+        FOR each pair vars AND coeff IN the items OF the terms property OF other  
+            CALL add_term ON self WITH a NEW Term CREATED WITH NEGATIVE coeff AND the LIST VERSION OF vars  
+        END FOR  
+        RETURN self  
+    END FUNCTION  
+
+    FUNCTION evaluate WITH var_map  
+        SET result TO a NEW Expression  
+        FOR each pair vars AND coeff IN the items OF the terms property  
+            SET new_vars TO an EMPTY LIST  
+            FOR each var IN vars  
+                IF var EXISTS AS A KEY IN var_map  
+                    APPEND the STRING VERSION OF var_map AT var TO new_vars  
+                ELSE  
+                    APPEND var TO new_vars  
+                END IF  
+            END FOR  
+            IF new_vars IS NOT EMPTY  
+                SET new_coeff TO the EVALUATION OF THE JOINING OF new_vars AS A STRING AS A MATHEMATICAL EXPRESSION  
+            ELSE  
+                SET new_coeff TO ONE  
+            END IF  
+            CALL add_term ON result WITH a NEW Term CREATED WITH coeff MULTIPLIED BY new_coeff AND an EMPTY LIST  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+
+    FUNCTION simplify  
+        SET simplified_terms TO a LIST OF Term OBJECTS CREATED FROM coeff AND LIST VERSION OF vars FOR EACH pair vars AND coeff IN ITEMS OF terms property WHERE coeff IS NOT ZERO  
+        SORT simplified_terms BY THEIR INHERENT ORDER  
+        RETURN simplified_terms  
+    END FUNCTION  
+
+    FUNCTION __repr__  
+        RETURN the JOINING WITH PLUS SIGN OF the STRING REPRESENTATIONS OF the OBJECTS RETURNED BY simplify  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION basicCalculatorIV WITH expression AND evalvars AND evalints  
+        SET var_map TO a MAPPING OF evalvars TO evalints BY PAIRING EACH ELEMENT OF evalvars TO THE CORRESPONDING ELEMENT OF evalints  
+        SET tokens TO the LIST OF ALL MATCHES IN expression OF OPEN PARENTHESIS OR CLOSE PARENTHESIS OR PLUS SIGN OR MINUS SIGN OR MULTIPLICATION SIGN OR SEQUENCE OF DIGITS OR SEQUENCE OF WORD CHARACTERS  
+        SET output TO an EMPTY LIST  
+        SET operators TO an EMPTY LIST  
+        
+        FUNCTION apply_operator  
+            SET right TO the LAST ELEMENT POPPED FROM output  
+            SET left TO the LAST ELEMENT POPPED FROM output  
+            SET op TO the LAST ELEMENT POPPED FROM operators  
+            IF op IS PLUS SIGN  
+                APPEND TO output THE RESULT OF CALLING add ON left WITH right  
+            ELSE IF op IS MINUS SIGN  
+                APPEND TO output THE RESULT OF CALLING subtract ON left WITH right  
+            ELSE IF op IS MULTIPLICATION SIGN  
+                APPEND TO output THE RESULT OF CALLING multiply ON left WITH right  
+            END IF  
+        END FUNCTION  
+        
+        SET i TO ZERO  
+        WHILE i IS LESS THAN THE LENGTH OF tokens  
+            SET token TO the ELEMENT AT POSITION i OF tokens  
+            IF token CONSISTS OF DIGITS ONLY  
+                APPEND A NEW Expression TO output  
+                CALL add_term ON THE LAST ELEMENT OF output WITH A NEW Term CREATED WITH THE INTEGER VALUE OF token AND AN EMPTY LIST  
+            ELSE IF token CONSISTS OF ALPHABETIC CHARACTERS ONLY  
+                APPEND A NEW Expression TO output  
+                SET coef TO THE VALUE FROM var_map AT token IF IT EXISTS otherwise ONE  
+                IF coef IS EQUAL TO ONE  
+                    CALL add_term ON THE LAST ELEMENT OF output WITH A NEW Term CREATED WITH ONE AND A LIST CONTAINING token IF token IS NOT A KEY IN var_map OTHERWISE AN EMPTY LIST  
+                ELSE  
+                    CALL add_term ON THE LAST ELEMENT OF output WITH A NEW Term CREATED WITH coef AND AN EMPTY LIST  
+                END IF  
+            ELSE IF token IS OPEN PARENTHESIS  
+                APPEND token TO operators  
+            ELSE IF token IS CLOSE PARENTHESIS  
+                WHILE operators IS NOT EMPTY AND THE LAST ELEMENT OF operators IS NOT OPEN PARENTHESIS  
+                    CALL apply_operator  
+                END WHILE  
+                REMOVE THE LAST ELEMENT FROM operators  
+            ELSE IF token IS PLUS SIGN OR MINUS SIGN OR MULTIPLICATION SIGN  
+                WHILE operators IS NOT EMPTY AND THE LAST ELEMENT OF operators IS NOT OPEN PARENTHESIS AND (token IS PLUS SIGN OR MINUS SIGN OR THE LAST ELEMENT OF operators IS MULTIPLICATION SIGN)  
+                    CALL apply_operator  
+                END WHILE  
+                APPEND token TO operators  
+            END IF  
+            INCREMENT i BY ONE  
+        END WHILE  
+        
+        WHILE operators IS NOT EMPTY  
+            CALL apply_operator  
+        END WHILE  
+        
+        SET simplified_terms TO THE RESULT OF CALLING simplify ON THE FIRST ELEMENT OF output  
+        RETURN A LIST COMPRISING FOR EACH term IN simplified_terms A STRING WITH THE coefficient PROPERTY OF term FOLLOWED BY MULTIPLICATION SIGN FOLLOWED BY THE JOINING WITH MULTIPLICATION SIGN OF the variables PROPERTY OF term IF variables PROPERTY IS NOT EMPTY OTHERWISE THE STRING REPRESENTATION OF THE coefficient PROPERTY OF term  
+    END FUNCTION  
+END CLASS

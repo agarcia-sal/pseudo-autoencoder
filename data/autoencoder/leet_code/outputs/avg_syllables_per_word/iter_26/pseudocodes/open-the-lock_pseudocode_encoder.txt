@@ -1,0 +1,45 @@
+CLASS Solution
+    FUNCTION openLock(deadends AS list OF strings, target AS string) RETURNS integer
+        SET deadends_set TO the SET CONTAINING all elements FROM deadends
+        
+        IF the string composed of four zero characters IS IN deadends_set
+            RETURN the NEGATIVE of one
+        END IF
+        
+        IF target EQUALS the string composed of four zero characters
+            RETURN zero
+        END IF
+        
+        SET queue TO a double ended queue INITIALIZED WITH the tuple CONTAINING the string composed of four zero characters AND zero
+        SET visited TO the SET CONTAINING the string composed of four zero characters
+        
+        FUNCTION neighbors(state AS string) RETURNS list OF strings
+            SET result TO an empty list
+            FOR each index i FROM zero TO three INCLUSIVE
+                SET digit TO the INTEGER VALUE OF element at position i OF state
+                FOR each move IN the list CONTAINING the negative of one AND one
+                    SET new_digit TO the remainder after DIVIDING the SUM of digit AND move BY ten
+                    SET new_state TO the concatenation of the substring FROM position zero TO position i MINUS one OF state, THE STRING REPRESENTATION OF new_digit, AND the substring FROM position i PLUS one TO the END OF state
+                    APPEND new_state TO result
+                END FOR
+            END FOR
+            RETURN result
+        END FUNCTION
+        
+        WHILE queue HOLDS elements
+            SET current_state, steps TO the first element REMOVED FROM the left side OF queue
+            
+            FOR each neighbor IN neighbors(current_state)
+                IF neighbor NOT IN visited AND neighbor NOT IN deadends_set
+                    IF neighbor EQUALS target
+                        RETURN the SUM of steps AND one
+                    END IF
+                    ADD neighbor TO visited
+                    APPEND the tuple CONTAINING neighbor AND the SUM of steps AND one TO queue
+                END IF
+            END FOR
+        END WHILE
+        
+        RETURN the NEGATIVE of one
+    END FUNCTION
+END CLASS

@@ -1,0 +1,70 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val DEFAULT zero left DEFAULT none right DEFAULT none  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values IS EMPTY  
+        RETURN none  
+    END IF  
+    SET root TO A NEW TreeNode WITH parameter element at position zero of values  
+    SET i TO one  
+    SET queue TO A NEW deque COLLECTION  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO THE FIRST ELEMENT REMOVED FROM queue  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i of values IS NOT none  
+            SET node.left TO A NEW TreeNode WITH parameter element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i of values IS NOT none  
+            SET node.right TO A NEW TreeNode WITH parameter element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETERS p.left q.left AND is_same_tree WITH PARAMETERS p.right q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION minCameraCover WITH PARAMETERS self root  
+        FUNCTION dfs WITH PARAMETER node  
+            IF node IS none  
+                RETURN zero ZERO AND positive infinity AS A TRIPLE  
+            END IF  
+            SET left_no_camera TO THE FIRST ELEMENT OF dfs WITH PARAMETER node.left  
+            SET left_monitored TO THE SECOND ELEMENT OF dfs WITH PARAMETER node.left  
+            SET left_camera TO THE THIRD ELEMENT OF dfs WITH PARAMETER node.left  
+            SET right_no_camera TO THE FIRST ELEMENT OF dfs WITH PARAMETER node.right  
+            SET right_monitored TO THE SECOND ELEMENT OF dfs WITH PARAMETER node.right  
+            SET right_camera TO THE THIRD ELEMENT OF dfs WITH PARAMETER node.right  
+            SET no_camera TO left_monitored PLUS right_monitored  
+            SET monitored TO THE MINIMUM OF  
+                left_camera PLUS THE MINIMUM OF right_monitored AND right_camera  
+                right_camera PLUS THE MINIMUM OF left_monitored AND left_camera  
+                left_camera PLUS right_camera  
+            SET camera TO one PLUS THE MINIMUM OF left_no_camera left_monitored AND left_camera PLUS THE MINIMUM OF right_no_camera right_monitored AND right_camera  
+            RETURN THE TRIPLE no_camera monitored camera  
+        END FUNCTION  
+        SET root_no_camera TO THE FIRST ELEMENT OF dfs WITH PARAMETER root  
+        SET root_monitored TO THE SECOND ELEMENT OF dfs WITH PARAMETER root  
+        SET root_camera TO THE THIRD ELEMENT OF dfs WITH PARAMETER root  
+        RETURN THE MINIMUM OF root_monitored AND root_camera  
+    END FUNCTION  
+END CLASS

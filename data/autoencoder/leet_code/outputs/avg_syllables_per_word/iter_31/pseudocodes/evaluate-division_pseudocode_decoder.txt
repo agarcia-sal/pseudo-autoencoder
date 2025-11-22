@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION calcEquation(equations, values, queries)  
+        SET graph TO a new mapping with default value as an empty mapping  
+        FOR each pair of elements a and b AND corresponding value IN the parallel collections equations AND values  
+            SET element at position b of mapping at position a of graph TO value  
+            SET element at position a of mapping at position b of graph TO one DIVIDED BY value  
+        END FOR  
+        
+        FUNCTION dfs(start, end, visited)  
+            IF start NOT IN graph OR end NOT IN graph THEN  
+                RETURN negative one  
+            END IF  
+            IF start EQUALS end THEN  
+                RETURN one  
+            END IF  
+            ADD start TO visited  
+            FOR each neighbor AND associated weight IN the mapping at position start of graph  
+                IF neighbor NOT IN visited THEN  
+                    SET result TO dfs(neighbor, end, visited)  
+                    IF result NOT EQUALS negative one THEN  
+                        RETURN weight MULTIPLIED BY result  
+                    END IF  
+                END IF  
+            END FOR  
+            REMOVE start FROM visited  
+            RETURN negative one  
+        END FUNCTION  
+        
+        SET results TO an empty list  
+        FOR each query IN queries  
+            SET start TO element at position zero of query  
+            SET end TO element at position one of query  
+            SET visited TO an empty set  
+            SET result TO dfs(start, end, visited)  
+            APPEND result TO results  
+        END FOR  
+        
+        RETURN results  
+    END FUNCTION  
+END CLASS

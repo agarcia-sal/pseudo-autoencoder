@@ -1,0 +1,60 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.parent TO list of integers FROM zero TO size MINUS one  
+    END FUNCTION  
+
+    FUNCTION find(self, u)  
+        IF element at position u of self.parent NOT EQUALS u  
+            SET element at position u of self.parent TO self.find(element at position u of self.parent)  
+        END IF  
+        RETURN element at position u of self.parent  
+    END FUNCTION  
+
+    FUNCTION union(self, u, v)  
+        SET root_u TO self.find(u)  
+        SET root_v TO self.find(v)  
+        IF root_u NOT EQUALS root_v  
+            SET element at position root_u of self.parent TO root_v  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION matrixRankTransform(self, matrix)  
+        SET m TO the LENGTH OF matrix  
+        SET n TO the LENGTH OF element at position zero of matrix  
+        SET value_to_indices TO a new map that returns an empty list for missing keys  
+
+        FOR each r FROM zero TO m MINUS one  
+            FOR each c FROM zero TO n MINUS one  
+                APPEND tuple r AND c TO element at key element at position r of matrix at position c of value_to_indices  
+            END FOR  
+        END FOR  
+
+        SET row_rank TO a list of zero repeated m times  
+        SET col_rank TO a list of zero repeated n times  
+        SET result TO a two dimensional list of zero with m rows and n columns  
+
+        FOR each value IN the sorted keys of value_to_indices  
+            SET uf TO a new UnionFind object with parameter m PLUS n  
+            SET rank TO a new map that returns zero for missing keys  
+
+            FOR each tuple r and c IN element at key value of value_to_indices  
+                CALL uf.union with parameters r and c PLUS m  
+            END FOR  
+
+            FOR each tuple r and c IN element at key value of value_to_indices  
+                SET root TO uf.find(r)  
+                SET element at key root of rank TO the maximum OF element at key root of rank AND the maximum OF element at position r of row_rank AND element at position c of col_rank PLUS one  
+            END FOR  
+
+            FOR each tuple r and c IN element at key value of value_to_indices  
+                SET element at position r and c of result TO element at key uf.find(r) of rank  
+                SET element at position r of row_rank TO element at key uf.find(r) of rank  
+                SET element at position c of col_rank TO element at key uf.find(r) of rank  
+            END FOR  
+        END FOR  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

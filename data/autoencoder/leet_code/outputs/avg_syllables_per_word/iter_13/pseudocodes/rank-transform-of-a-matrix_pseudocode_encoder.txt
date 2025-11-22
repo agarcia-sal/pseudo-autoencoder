@@ -1,0 +1,61 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.parent TO list of integers FROM zero TO size MINUS one  
+    END FUNCTION  
+
+    FUNCTION find(self, u)  
+        IF element at position u of self.parent IS NOT EQUAL TO u THEN  
+            SET element at position u of self.parent TO the result of self.find WITH element at position u of self.parent AS argument  
+        END IF  
+        RETURN element at position u of self.parent  
+    END FUNCTION  
+
+    FUNCTION union(self, u, v)  
+        SET root_u TO the result of self.find WITH u AS argument  
+        SET root_v TO the result of self.find WITH v AS argument  
+        IF root_u IS NOT EQUAL TO root_v THEN  
+            SET element at position root_u of self.parent TO root_v  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION matrixRankTransform(self, matrix)  
+        SET m TO the LENGTH OF matrix  
+        SET n TO the LENGTH OF element at position zero of matrix  
+        SET value_to_indices TO a default dictionary mapping values TO empty lists  
+        
+        FOR r FROM zero TO m MINUS one  
+            FOR c FROM zero TO n MINUS one  
+                APPEND the tuple consisting of r AND c TO the list at key element at position r of matrix AND position c of matrix IN value_to_indices  
+            END FOR  
+        END FOR  
+        
+        SET row_rank TO a list of zeros WITH length m  
+        SET col_rank TO a list of zeros WITH length n  
+        SET result TO a list of lists each containing zeros WITH m elements EACH CONTAINING n elements  
+        
+        FOR each value IN the sorted sequence of keys IN value_to_indices  
+            SET uf TO a new UnionFind object INITIALIZED WITH argument m PLUS n  
+            SET rank TO a default dictionary mapping integers TO zero  
+            
+            FOR each tuple r AND c IN the list at key value IN value_to_indices  
+                CALL uf.union WITH arguments r AND c PLUS m  
+            END FOR  
+            
+            FOR each tuple r AND c IN the list at key value IN value_to_indices  
+                SET root TO the result of uf.find WITH argument r  
+                SET element at key root IN rank TO the maximum of element at key root IN rank AND the maximum of element at position r IN row_rank AND element at position c IN col_rank PLUS one  
+            END FOR  
+            
+            FOR each tuple r AND c IN the list at key value IN value_to_indices  
+                SET root TO the result of uf.find WITH argument r  
+                SET element at position r AND c of result TO element at key root IN rank  
+                SET element at position r IN row_rank TO element at key root IN rank  
+                SET element at position c IN col_rank TO element at key root IN rank  
+            END FOR  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

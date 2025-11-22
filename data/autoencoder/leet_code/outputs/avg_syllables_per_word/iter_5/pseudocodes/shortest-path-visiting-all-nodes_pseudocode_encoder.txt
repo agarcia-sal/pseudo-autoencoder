@@ -1,0 +1,38 @@
+CLASS Solution  
+    FUNCTION shortestPathLength(graph)  
+        IF graph IS EMPTY THEN  
+            RETURN 0  
+        END IF  
+        
+        SET n TO LENGTH OF graph  
+        SET queue TO deque CONTAINING EACH (node, bitmask_with_node_visited) FOR node FROM 0 TO n MINUS 1  
+        SET visited TO SET OF EACH (node, bitmask_with_node_visited) FOR node FROM 0 TO n MINUS 1  
+        
+        SET steps TO 0  
+        SET all_nodes_visited TO bitmask WITH n BITS ALL SET TO 1  
+        
+        WHILE queue IS NOT EMPTY  
+            FOR each element IN CURRENT LENGTH OF queue  
+                SET current_node, visited_nodes TO queue REMOVE FRONT  
+                
+                IF visited_nodes EQUALS all_nodes_visited THEN  
+                    RETURN steps  
+                END IF  
+                
+                FOR each neighbor IN graph AT current_node  
+                    SET next_visited_nodes TO visited_nodes WITH neighbor BIT SET  
+                    SET next_state TO (neighbor, next_visited_nodes)  
+                    
+                    IF next_state IS NOT IN visited THEN  
+                        ADD next_state TO visited  
+                        ADD next_state TO queue  
+                    END IF  
+                END FOR  
+            END FOR  
+            
+            INCREMENT steps BY 1  
+        END WHILE  
+        
+        RETURN MINUS 1  
+    END FUNCTION  
+END CLASS

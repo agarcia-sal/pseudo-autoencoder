@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION pyramidTransition(bottom, allowed)  
+        CALL createAllowedMap WITH PARAMETERS allowed  
+        ASSIGN reference TO the RESULT OF createAllowedMap WITH PARAMETERS allowed  
+        SET allowed_map TO reference  
+        
+        FUNCTION can_build_pyramid(current_bottom, current_top)  
+            IF the LENGTH OF current_bottom EQUALS one  
+                RETURN True  
+            END IF  
+            
+            IF the LENGTH OF current_top EQUALS the LENGTH OF current_bottom MINUS one  
+                RETURN the RESULT OF calling can_build_pyramid WITH PARAMETERS current_top AND an EMPTY list  
+            END IF  
+            
+            SET left TO element at position the LENGTH OF current_top OF current_bottom  
+            SET right TO element at position the LENGTH OF current_top PLUS one OF current_bottom  
+            
+            IF left EXISTS AS a key IN allowed_map AND right EXISTS AS a key IN element at key left OF allowed_map  
+                FOR each top_element IN element at key right OF element at key left OF allowed_map  
+                    IF the RESULT OF calling can_build_pyramid WITH PARAMETERS current_bottom AND the concatenation of current_top AND top_element HOLDS True  
+                        RETURN True  
+                    END IF  
+                END FOR  
+            END IF  
+            
+            RETURN False  
+        END FUNCTION  
+        
+        RETURN the RESULT OF calling can_build_pyramid WITH PARAMETERS bottom AND an EMPTY list  
+    END FUNCTION  
+    
+    FUNCTION createAllowedMap(allowed)  
+        ASSIGN reference TO a new dictionary that returns a new dictionary that returns an empty list for any missing key  
+        SET allowed_map TO reference  
+        
+        FOR each rule IN allowed  
+            SET left TO element at position zero OF rule  
+            SET right TO element at position one OF rule  
+            SET top TO element at position two OF rule  
+            APPEND top TO element at key right OF element at key left OF allowed_map  
+        END FOR  
+        
+        RETURN allowed_map  
+    END FUNCTION  
+END CLASS

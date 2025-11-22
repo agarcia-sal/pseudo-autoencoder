@@ -1,0 +1,58 @@
+CLASS TrieNode  
+    FUNCTION __init__()  
+        SET children TO an empty mapping from bits TO TrieNode objects  
+        SET count TO zero  
+    END FUNCTION  
+END CLASS  
+
+CLASS Trie  
+    FUNCTION __init__(bit_length)  
+        SET root TO a new TrieNode object  
+        SET bit_length TO the value of parameter bit_length  
+    END FUNCTION  
+
+    FUNCTION insert(num)  
+        SET node TO root  
+        FOR i FROM bit_length DOWN TO zero  
+            SET bit TO the value of the bit at position i in num extracted by a bitwise right shift of num by i AND the value one  
+            IF bit is not a key in element children of node  
+                ASSIGN pointer/reference TO a new TrieNode object TO element children at key bit of node  
+            END IF  
+            ASSIGN pointer/reference TO element children at key bit of node TO node  
+            INCREMENT the count property of node BY one  
+        END FOR  
+    END FUNCTION  
+
+    FUNCTION count_less_than(num, threshold)  
+        SET count TO zero  
+        SET node TO root  
+        FOR i FROM bit_length DOWN TO zero  
+            IF node is null  
+                STOP the loop  
+            END IF  
+            SET bit TO the value of the bit at position i in num extracted by a bitwise right shift of num by i AND the value one  
+            SET threshold_bit TO the value of the bit at position i in threshold extracted by a bitwise right shift of threshold by i AND the value one  
+            IF threshold_bit EQUALS one  
+                INCREMENT count BY the count property of child node at key bit of node if it exists otherwise zero  
+                ASSIGN pointer/reference TO child node at the key that is bit EXCLUSIVE OR one of node TO node  
+            ELSE  
+                ASSIGN pointer/reference TO child node at key bit of node TO node  
+            END IF  
+        END FOR  
+        RETURN count  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION countPairs(nums, low, high)  
+        SET trie TO a new Trie object instantiated with default bit length  
+        SET nice_pairs TO zero  
+
+        FOR each num IN nums  
+            INCREMENT nice_pairs BY the value returned from trie counting numbers less than high incremented by one with argument num MINUS the value returned from trie counting numbers less than low with argument num  
+            CALL method insert of trie with argument num  
+        END FOR  
+        
+        RETURN nice_pairs  
+    END FUNCTION  
+END CLASS

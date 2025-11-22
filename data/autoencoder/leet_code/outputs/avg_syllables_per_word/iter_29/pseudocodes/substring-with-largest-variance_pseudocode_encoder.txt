@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION largestVariance(s)  
+        FUNCTION calculate_variance(substring character_a character_b)  
+            SET maximum_variance TO zero  
+            SET count_character_a TO zero  
+            SET count_character_b TO zero  
+            SET has_character_b_occurred TO false  
+            SET first_character_b_flag TO false  
+            
+            FOR each character IN substring  
+                IF character EQUALS character_a  
+                    INCREMENT count_character_a BY one  
+                ELSE IF character EQUALS character_b  
+                    INCREMENT count_character_b BY one  
+                    SET has_character_b_occurred TO true  
+                END ELSE IF  
+                
+                IF count_character_b GREATER THAN zero  
+                    SET maximum_variance TO the GREATER OF maximum_variance AND count_character_a MINUS count_character_b  
+                ELSE IF count_character_b EQUALS zero AND first_character_b_flag IS true  
+                    SET maximum_variance TO the GREATER OF maximum_variance AND count_character_a MINUS one  
+                END ELSE IF  
+                
+                IF count_character_b GREATER THAN count_character_a  
+                    SET count_character_a TO zero  
+                    SET count_character_b TO zero  
+                    SET first_character_b_flag TO has_character_b_occurred  
+                END IF  
+            END FOR  
+            
+            RETURN maximum_variance  
+        END FUNCTION  
+        
+        SET maximum_variance OVERALL TO zero  
+        SET unique_characters TO the SET OF all UNIQUE CHARACTERS IN s  
+        
+        FOR each ordered_pair OF two DISTINCT CHARACTERS character_a character_b IN all PERMUTATIONS OF unique_characters TAKING two AT A TIME  
+            IF character_a EQUALS character_b  
+                CONTINUE TO next iteration  
+            END IF  
+            SET maximum_variance OVERALL TO the GREATER OF maximum_variance OVERALL AND calculate_variance APPLIED TO s character_a character_b  
+        END FOR  
+        
+        RETURN maximum_variance OVERALL  
+    END FUNCTION  
+END CLASS

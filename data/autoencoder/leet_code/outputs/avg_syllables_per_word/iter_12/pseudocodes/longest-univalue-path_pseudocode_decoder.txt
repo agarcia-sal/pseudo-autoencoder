@@ -1,0 +1,68 @@
+CLASS TreeNode  
+    FUNCTION __init__ (self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN None  
+    END IF  
+    SET root TO TreeNode initialized WITH element at position zero of values  
+    SET i TO one  
+    SET queue TO new deque collection  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO first element REMOVED FROM queue  
+        IF i IS LESS THAN length of values AND element at position i of values IS NOT None  
+            SET node.left TO TreeNode initialized WITH element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN length of values AND element at position i of values IS NOT None  
+            SET node.right TO TreeNode initialized WITH element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN result of is_same_tree called WITH p.left AND q.left AND result of is_same_tree called WITH p.right AND q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION longestUnivaluePath(self, root)  
+        FUNCTION dfs(node)  
+            IF node IS None  
+                RETURN zero, zero  
+            END IF  
+            SET left_length, left_value TO result of dfs called WITH node.left  
+            SET right_length, right_value TO result of dfs called WITH node.right  
+            SET left_arrow TO zero  
+            SET right_arrow TO zero  
+            IF node.left IS NOT None AND node.left.val EQUALS node.val  
+                SET left_arrow TO left_length PLUS one  
+            END IF  
+            IF node.right IS NOT None AND node.right.val EQUALS node.val  
+                SET right_arrow TO right_length PLUS one  
+            END IF  
+            SET self.max_length TO maximum OF self.max_length AND left_arrow PLUS right_arrow  
+            RETURN maximum OF left_arrow AND right_arrow, node.val  
+        END FUNCTION  
+        SET self.max_length TO zero  
+        CALL dfs WITH root  
+        RETURN self.max_length  
+    END FUNCTION  
+END CLASS

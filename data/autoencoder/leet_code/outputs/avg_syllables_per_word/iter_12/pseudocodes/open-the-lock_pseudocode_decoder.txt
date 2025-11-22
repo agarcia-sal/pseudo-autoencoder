@@ -1,0 +1,45 @@
+CLASS Solution  
+    FUNCTION openLock(deadends, target)  
+        SET deadends_set TO a set created from deadends  
+        
+        IF the string "0000" IS IN deadends_set  
+            RETURN minus one  
+        END IF  
+        
+        IF target EQUALS the string "0000"  
+            RETURN zero  
+        END IF  
+        
+        INITIALIZE queue TO a deque containing a tuple of the string "0000" and zero  
+        INITIALIZE visited TO a set containing the string "0000"  
+        
+        FUNCTION neighbors(state)  
+            INITIALIZE result TO an empty list  
+            FOR index FROM zero TO three  
+                SET digit TO the integer conversion of the character at position index of state  
+                FOR move IN the list containing minus one and one  
+                    SET new_digit TO the sum of digit and move modulo ten  
+                    SET new_state TO the concatenation of the substring of state from start TO index MINUS one, the string conversion of new_digit, and the substring of state from index PLUS one TO end  
+                    APPEND new_state TO result  
+                END FOR  
+            END FOR  
+            RETURN result  
+        END FUNCTION  
+        
+        WHILE queue IS NOT empty  
+            REMOVE first element FROM queue AND UNPACK INTO current_state AND steps  
+            
+            FOR neighbor IN neighbors(current_state)  
+                IF neighbor IS NOT IN visited AND neighbor IS NOT IN deadends_set  
+                    IF neighbor EQUALS target  
+                        RETURN steps PLUS one  
+                    END IF  
+                    ADD neighbor TO visited  
+                    APPEND tuple of neighbor and steps PLUS one TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN minus one  
+    END FUNCTION  
+END CLASS

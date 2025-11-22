@@ -1,0 +1,33 @@
+CLASS Solution  
+    FUNCTION findCheapestPrice(n number_of_cities flights list_of_lists_of_integers src starting_city dst destination_city k maximum_allowed_stops RETURNS integer)  
+        SET graph TO an empty mapping from integer TO empty lists  
+        FOR each index FROM zero TO number_of_cities MINUS one  
+            SET the element at position index of graph TO an empty list  
+        END FOR  
+        FOR each flight IN flights  
+            DECOMPOSE flight INTO origin destination price  
+            APPEND the ordered pair destination AND price TO the list at element origin of graph  
+        END FOR  
+        SET min_heap TO a list containing a tuple of zero cost an integer minus one representing stops and starting_city  
+        SET min_cost TO a mapping with key starting_city and value minus one representing stops to reach  
+        WHILE min_heap IS NOT empty  
+            EXTRACT from min_heap the smallest element and assign components TO cost stops city  
+            IF city EQUALS destination_city  
+                RETURN cost  
+            END IF  
+            IF stops GREATER THAN OR EQUAL TO maximum_allowed_stops  
+                CONTINUE to next iteration  
+            END IF  
+            FOR each neighbor_price_pair IN the list at element city of graph  
+                DECOMPOSE neighbor_price_pair INTO neighbor price  
+                SET next_cost TO cost PLUS price  
+                SET next_stops TO stops PLUS one  
+                IF neighbor NOT IN min_cost OR next_stops LESS THAN the value at key neighbor of min_cost OR next_cost LESS THAN the cost value at the first element of min_heap  
+                    SET the value at key neighbor of min_cost TO next_stops  
+                    ADD the tuple next_cost next_stops neighbor TO min_heap maintaining heap order  
+                END IF  
+            END FOR  
+        END WHILE  
+        RETURN minus one  
+    END FUNCTION  
+END CLASS

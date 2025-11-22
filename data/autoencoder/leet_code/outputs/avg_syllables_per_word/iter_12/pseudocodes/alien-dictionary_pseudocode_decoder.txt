@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION alienOrder(words)  
+        SET graph TO a new default dictionary of sets  
+        SET indegree TO a new default dictionary of integers  
+      
+        SET all_chars TO the set of all characters in all words concatenated  
+      
+        FOR index FROM zero TO the LENGTH OF words MINUS one MINUS one  
+            SET word1 TO the element at position index of words  
+            SET word2 TO the element at position index PLUS one of words  
+            SET min_length TO the smaller value between the LENGTH OF word1 and the LENGTH OF word2  
+            SET found TO false  
+            FOR j FROM zero TO min_length MINUS one  
+                IF the character at position j of word1 DOES NOT EQUAL the character at position j of word2  
+                    IF the character at position j of word2 IS NOT IN the set at graph for the character at position j of word1  
+                        ADD the character at position j of word2 TO the set at graph for the character at position j of word1  
+                        INCREMENT indegree of the character at position j of word2 BY one  
+                    END IF  
+                    SET found TO true  
+                    BREAK the FOR loop  
+                END IF  
+            END FOR  
+            IF found EQUALS false AND the LENGTH OF word1 GREATER THAN the LENGTH OF word2  
+                RETURN empty string  
+            END IF  
+        END FOR  
+      
+        SET queue TO a new deque containing each character IN all_chars WHERE its indegree EQUALS zero  
+        SET result TO an empty list  
+      
+        WHILE queue IS NOT empty  
+            REMOVE and RETURN the first element FROM queue INTO char  
+            APPEND char TO result  
+            FOR each neighbor IN the set at graph for char  
+                DECREMENT indegree of neighbor BY one  
+                IF indegree of neighbor EQUALS zero  
+                    APPEND neighbor TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+      
+        IF the LENGTH OF result DOES NOT EQUAL the LENGTH OF all_chars  
+            RETURN empty string  
+        END IF  
+      
+        RETURN the concatenation of all elements IN result as a string  
+    END FUNCTION  
+END CLASS

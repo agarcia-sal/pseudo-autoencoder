@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION isValid(code)  
+        IMPORT regular expression module as re  
+        SET cdata_pattern TO the regular expression pattern for the sequence starting with less than and exclamation mark bracket CDATA bracket open followed by zero or more any character non-greedily followed by bracket close and greater than  
+        SET code TO the result of substituting all occurrences matching cdata_pattern in code with the empty string  
+        SET stack TO an empty list  
+        SET i TO zero  
+        WHILE i LESS THAN the length of code  
+            IF element at position i of code EQUALS the less than character  
+                SET j TO the position of the first occurrence of the greater than character in code starting from position i incremented by one  
+                IF j EQUALS minus one  
+                    RETURN false  
+                END IF  
+                SET tag_content TO the substring of code from position i incremented by one TO position j exclusive  
+                IF the LENGTH OF tag_content EQUALS zero  
+                    RETURN false  
+                END IF  
+                IF element at position zero of tag_content EQUALS the forward slash character  
+                    SET tag_name TO the substring of tag_content from position one TO the end  
+                    IF stack is empty OR element at the last position of stack NOT EQUALS tag_name  
+                        RETURN false  
+                    END IF  
+                    REMOVE the element at the last position from stack  
+                ELSE IF element at position zero of tag_content EQUALS the exclamation mark character  
+                    RETURN false  
+                ELSE  
+                    IF the LENGTH OF tag_content LESS THAN one OR the LENGTH OF tag_content GREATER THAN nine OR NOT all characters in tag_content are uppercase letters in the English alphabet  
+                        RETURN false  
+                    END IF  
+                    APPEND tag_content TO stack  
+                END IF  
+                SET i TO j incremented by one  
+            ELSE  
+                INCREMENT i BY one  
+            END IF  
+        END WHILE  
+        SET pattern_to_check_tags TO the regular expression pattern that matches less than followed by one or more uppercase letters followed by greater than followed by zero or more any character followed by less than forward slash followed by one or more uppercase letters followed by greater than  
+        RETURN the logical AND of stack being empty AND the count of matches of pattern_to_check_tags in code is greater than zero  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,70 @@
+CLASS Solution
+    FUNCTION getCoprimes(nums, edges)
+        SET number_of_nodes TO the LENGTH OF nums
+        CALL build_tree WITH nums_arguments number_of_nodes AND edges TO tree_structure
+
+        CALL precompute_coprime_pairs TO coprime_matrix
+
+        CALL initialize_result_array WITH number_of_nodes TO result_array
+        CALL initialize_ancestor_stack TO ancestor_stack
+
+        FUNCTION dfs(node, parent, depth)
+            SET closest_ancestor TO negative one
+            SET maximum_depth TO negative one
+            FOR value FROM one TO fifty
+                IF element at position nums at node of coprime_matrix at position value IS TRUE AND element at position value of ancestor_stack IS NOT NONE
+                    SET ancestor_node, ancestor_depth TO element at position value of ancestor_stack
+                    IF ancestor_depth IS GREATER THAN maximum_depth
+                        SET maximum_depth TO ancestor_depth
+                        SET closest_ancestor TO ancestor_node
+                    END IF
+                END IF
+            END FOR
+            SET element at position node of result_array TO closest_ancestor
+
+            SET original_ancestor TO element at position nums at node of ancestor_stack
+            SET element at position nums at node of ancestor_stack TO tuple of node AND depth
+
+            FOR each child IN element at position node of tree_structure
+                IF child IS NOT EQUAL TO parent
+                    CALL dfs WITH parameters child, node, depth PLUS one
+                END IF
+            END FOR
+
+            SET element at position nums at node of ancestor_stack TO original_ancestor
+        END FUNCTION
+
+        CALL dfs WITH parameters zero, negative one, zero
+
+        RETURN result_array
+    END FUNCTION
+
+    FUNCTION build_tree(number_of_nodes, edges)
+        INITIALIZE tree_structure AS a DEFAULT DICTIONARY OF LIST
+        FOR each u, v IN edges
+            APPEND v TO element at position u of tree_structure
+            APPEND u TO element at position v of tree_structure
+        END FOR
+        RETURN tree_structure
+    END FUNCTION
+
+    FUNCTION precompute_coprime_pairs
+        INITIALIZE coprime_matrix AS two dimensional list of FALSE values with size fifty BY fifty
+        FOR i FROM one TO fifty
+            FOR j FROM one TO fifty
+                IF greatest_common_divisor OF i AND j EQUALS one
+                    SET element at position i, j of coprime_matrix TO TRUE
+                END IF
+            END FOR
+        END FOR
+        RETURN coprime_matrix
+    END FUNCTION
+
+    FUNCTION initialize_result_array(size)
+        RETURN list of negative one repeated size times
+    END FUNCTION
+
+    FUNCTION initialize_ancestor_stack
+        RETURN list of NONE repeated fifty one times
+    END FUNCTION
+END CLASS

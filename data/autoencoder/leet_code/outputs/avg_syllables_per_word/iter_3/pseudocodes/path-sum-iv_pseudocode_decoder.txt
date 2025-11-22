@@ -1,0 +1,32 @@
+CLASS Solution
+    FUNCTION pathSum(nums)
+        SET tree TO empty dictionary
+        
+        FOR each num IN nums
+            SET depth TO num DIVIDED BY 100
+            SET pos TO (num DIVIDED BY 10) MODULO 10
+            SET value TO num MODULO 10
+            SET tree[(depth, pos)] TO value
+        
+        FUNCTION dfs(depth, pos, path_sum)
+            SET current_value TO tree GET VALUE AT (depth, pos)
+            IF current_value IS None THEN
+                RETURN 0
+            
+            SET new_path_sum TO path_sum PLUS current_value
+            
+            SET left_child TO (depth PLUS 1, 2 TIMES pos MINUS 1)
+            SET right_child TO (depth PLUS 1, 2 TIMES pos)
+            
+            IF left_child NOT IN tree AND right_child NOT IN tree THEN
+                RETURN new_path_sum
+            
+            SET left_sum TO dfs(left_child FIRST ELEMENT, left_child SECOND ELEMENT, new_path_sum)
+            SET right_sum TO dfs(right_child FIRST ELEMENT, right_child SECOND ELEMENT, new_path_sum)
+            
+            RETURN left_sum PLUS right_sum
+        END FUNCTION
+        
+        RETURN dfs(1, 1, 0)
+    END FUNCTION
+END CLASS

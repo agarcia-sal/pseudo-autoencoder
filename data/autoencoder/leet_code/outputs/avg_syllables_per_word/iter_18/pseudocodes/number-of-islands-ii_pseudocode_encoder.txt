@@ -1,0 +1,64 @@
+CLASS UnionFind  
+    FUNCTION __init__  
+        SET parent TO an empty mapping  
+        SET count TO zero  
+    END FUNCTION  
+  
+    FUNCTION make_set WITH PARAMETER x  
+        IF x NOT IN mapping parent THEN  
+            SET mapping parent at key x TO x  
+            INCREMENT count BY one  
+        END IF  
+    END FUNCTION  
+  
+    FUNCTION find WITH PARAMETER x  
+        IF mapping parent at key x NOT EQUALS x THEN  
+            SET mapping parent at key x TO the RESULT OF find WITH PARAMETER mapping parent at key x  
+        END IF  
+        RETURN mapping parent at key x  
+    END FUNCTION  
+  
+    FUNCTION union WITH PARAMETERS x and y  
+        SET rootX TO the RESULT OF find WITH PARAMETER x  
+        SET rootY TO the RESULT OF find WITH PARAMETER y  
+        IF rootX NOT EQUALS rootY THEN  
+            SET mapping parent at key rootX TO rootY  
+            DECREMENT count BY one  
+        END IF  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION numIslands2 WITH PARAMETERS m and n and positions  
+        FUNCTION is_valid WITH PARAMETERS x and y  
+            RETURN the condition that zero IS LESS THAN OR EQUAL TO x AND x IS LESS THAN m AND zero IS LESS THAN OR EQUAL TO y AND y IS LESS THAN n  
+        END FUNCTION  
+  
+        SET directions TO a list containing pairs of one and zero MINUS one and zero zero and one zero and MINUS one  
+        SET uf TO a NEW INSTANCE OF UnionFind  
+        SET grid TO a two dimensional list with m ROWS EACH containing n zeros  
+        SET result TO an empty list  
+  
+        FOR each pair r and c IN positions  
+            IF element at position r of grid AND element at position c of that row EQUALS one THEN  
+                APPEND the value of count field in uf TO result  
+                CONTINUE to next iteration  
+            END IF  
+  
+            SET element at position r of grid AND element at position c of that row TO one  
+            CALL make_set METHOD of uf WITH PARAMETER the pair r and c  
+  
+            FOR each pair dr and dc IN directions  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                IF the RESULT of is_valid WITH PARAMETERS nr and nc AND element at position nr of grid AND element at position nc of that row EQUALS one THEN  
+                    CALL union METHOD of uf WITH PARAMETERS pair r and c AND pair nr and nc  
+                END IF  
+            END FOR  
+  
+            APPEND the value of count field in uf TO result  
+        END FOR  
+  
+        RETURN result  
+    END FUNCTION  
+END CLASS

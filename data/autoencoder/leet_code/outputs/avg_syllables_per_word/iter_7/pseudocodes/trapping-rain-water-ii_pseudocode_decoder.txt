@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION trapRainWater(heightMap)  
+        IF heightMap IS EMPTY OR heightMap AT INDEX 0 IS EMPTY  
+            RETURN 0  
+        SET m TO LENGTH OF heightMap  
+        SET n TO LENGTH OF heightMap AT INDEX 0  
+        SET visited TO 2-D LIST OF BOOLEAN FALSE WITH DIMENSIONS m BY n  
+        SET min_heap TO EMPTY LIST  
+        
+        FOR i FROM 0 TO m MINUS 1  
+            PUSH heightMap AT i AND 0 WITH COORDINATES (i, 0) INTO min_heap  
+            PUSH heightMap AT i AND n MINUS 1 WITH COORDINATES (i, n MINUS 1) INTO min_heap  
+            SET visited AT i AND 0 TO TRUE  
+            SET visited AT i AND n MINUS 1 TO TRUE  
+        
+        FOR j FROM 0 TO n MINUS 1  
+            PUSH heightMap AT 0 AND j WITH COORDINATES (0, j) INTO min_heap  
+            PUSH heightMap AT m MINUS 1 AND j WITH COORDINATES (m MINUS 1, j) INTO min_heap  
+            SET visited AT 0 AND j TO TRUE  
+            SET visited AT m MINUS 1 AND j TO TRUE  
+        
+        SET directions TO LIST OF TUPLES [(-1, 0), (1, 0), (0, -1), (0, 1)]  
+        SET water_trapped TO 0  
+        
+        WHILE min_heap IS NOT EMPTY  
+            POP the SMALLEST element FROM min_heap INTO height, x, y  
+            
+            FOR EACH dx, dy IN directions  
+                SET nx TO x PLUS dx  
+                SET ny TO y PLUS dy  
+                
+                IF nx IS GREATER THAN OR EQUAL TO 0 AND nx IS LESS THAN m AND ny IS GREATER THAN OR EQUAL TO 0 AND ny IS LESS THAN n AND visited AT nx AND ny IS FALSE  
+                    SET visited AT nx AND ny TO TRUE  
+                    SET trapped_amount TO MAXIMUM OF 0 AND height MINUS heightMap AT nx AND ny  
+                    INCREMENT water_trapped BY trapped_amount  
+                    PUSH MAXIMUM OF height AND heightMap AT nx AND ny WITH COORDINATES (nx, ny) INTO min_heap  
+        
+        RETURN water_trapped  
+    END FUNCTION  
+END CLASS

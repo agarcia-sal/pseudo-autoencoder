@@ -1,0 +1,32 @@
+CLASS Solution
+    FUNCTION waysToBuildRooms(prevRoom)
+        SET n TO LENGTH OF prevRoom
+        SET graph TO DEFAULT DICTIONARY OF LISTS
+
+        FOR room FROM 1 TO n MINUS 1
+            APPEND room TO graph[prevRoom[room]]
+
+        FUNCTION dp(node)
+            IF graph[node] IS EMPTY
+                RETURN 1, 1
+
+            SET total_ways TO 1
+            SET total_size TO 1
+
+            SET child_results TO EMPTY LIST
+            FOR child IN graph[node]
+                SET ways, size TO dp(child)
+                APPEND (ways, size) TO child_results
+                INCREMENT total_size BY size
+
+            SET current_size TO 1
+            FOR ways, size IN child_results
+                SET total_ways TO (total_ways MULTIPLIED BY comb(current_size + size MINUS 1, size) MULTIPLIED BY ways) MODULO MOD
+                INCREMENT current_size BY size
+
+            RETURN total_ways, total_size
+        END FUNCTION
+
+        RETURN dp(0)[0]
+    END FUNCTION
+END CLASS

@@ -1,0 +1,36 @@
+CLASS Solution  
+    FUNCTION minTransfers WITH transactions AS List OF List OF integer  
+        SET balance TO empty mapping from persons TO their net amounts  
+        FOR each tuple frm TO to TO amount IN transactions  
+            SET balance AT key frm TO value obtained by GETTING current value from balance AT key frm OR zero MINUS amount  
+            SET balance AT key to TO value obtained by GETTING current value from balance AT key to OR zero PLUS amount  
+        END FOR  
+        SET balances TO empty list  
+        FOR each net IN all values IN balance  
+            IF net NOT EQUALS zero  
+                APPEND net TO balances  
+            END IF  
+        END FOR  
+        IF balances IS empty  
+            RETURN zero  
+        END IF  
+        FUNCTION settle WITH start AS integer AND cnt AS integer  
+            WHILE start LESS THAN the LENGTH OF balances AND the element at position start of balances EQUALS zero  
+                INCREMENT start BY one  
+            END WHILE  
+            IF start EQUALS the LENGTH OF balances  
+                RETURN cnt  
+            END IF  
+            SET min_cnt TO positive infinity  
+            FOR each index i FROM start PLUS one TO the LENGTH OF balances MINUS one  
+                IF the element at position start of balances MULTIPLIED BY the element at position i of balances IS LESS THAN zero  
+                    SET element at position i of balances TO element at position i of balances PLUS element at position start of balances  
+                    SET min_cnt TO THE SMALLER VALUE BETWEEN min_cnt AND RESULT OF settle WITH start PLUS one AND cnt PLUS one  
+                    SET element at position i of balances TO element at position i of balances MINUS element at position start of balances  
+                END IF  
+            END FOR  
+            RETURN min_cnt  
+        END FUNCTION  
+        RETURN settle WITH zero AND zero  
+    END FUNCTION  
+END CLASS

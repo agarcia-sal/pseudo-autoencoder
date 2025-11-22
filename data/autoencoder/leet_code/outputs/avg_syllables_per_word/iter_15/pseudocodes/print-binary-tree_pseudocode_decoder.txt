@@ -1,0 +1,71 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN none  
+    END IF  
+    SET root TO NEW TreeNode WITH parameter element at position zero of values  
+    SET i TO one  
+    SET queue TO NEW double ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO REMOVE first element FROM queue  
+        IF i LESS THAN LENGTH OF values AND element at position i of values IS NOT none  
+            SET node.left TO NEW TreeNode WITH parameter element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN LENGTH OF values AND element at position i of values IS NOT none  
+            SET node.right TO NEW TreeNode WITH parameter element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF property val OF p NOT EQUALS property val OF q  
+        RETURN False  
+    ELSE  
+        RETURN RESULT OF is_same_tree WITH parameters property left OF p AND property left OF q AND is_same_tree WITH parameters property right OF p AND property right OF q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION printTree(self, root)  
+        FUNCTION getHeight(node)  
+            IF node IS none  
+                RETURN zero  
+            END IF  
+            RETURN one PLUS MAXIMUM OF getHeight CALLED WITH parameter property left OF node AND getHeight CALLED WITH parameter property right OF node  
+        END FUNCTION  
+
+        SET height TO getHeight CALLED WITH parameter root  
+        SET width TO TWO EXPONENTIATED BY height MINUS one  
+        SET res TO LIST OF height ELEMENTS EACH BEING LIST OF width ELEMENTS EACH BEING empty string  
+
+        FUNCTION placeNode(node, row, left, right)  
+            IF node IS none  
+                RETURN  
+            END IF  
+            SET mid TO THE INTEGER RESULT OF THE SUM OF left AND right DIVIDED BY two  
+            SET element at position mid of list at position row of res TO STRING REPRESENTATION OF property val OF node  
+            CALL placeNode WITH parameters property left OF node, row PLUS one, left, mid  
+            CALL placeNode WITH parameters property right OF node, row PLUS one, mid, right  
+        END FUNCTION  
+
+        CALL placeNode WITH parameters root, zero, zero, width  
+        RETURN res  
+    END FUNCTION  
+END CLASS

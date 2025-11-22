@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION updateBoard(self, board, click)  
+        FUNCTION count_adjacent_mines(r, c)  
+            SET count TO 0  
+            FOR i FROM r MINUS 1 TO r PLUS 1  
+                FOR j FROM c MINUS 1 TO c PLUS 1  
+                    IF i GREATER THAN OR EQUAL TO 0 AND i LESS THAN length of board AND j GREATER THAN OR EQUAL TO 0 AND j LESS THAN length of board at index 0 AND board at i and j EQUALS character 'M' THEN  
+                        INCREMENT count BY 1  
+                    END IF  
+                END FOR  
+            END FOR  
+            RETURN count  
+        END FUNCTION  
+      
+        FUNCTION dfs(r, c)  
+            IF r LESS THAN 0 OR r GREATER THAN OR EQUAL TO length of board OR c LESS THAN 0 OR c GREATER THAN OR EQUAL TO length of board at index 0 THEN  
+                RETURN  
+            END IF  
+            IF board at r and c NOT EQUALS character 'E' THEN  
+                RETURN  
+            END IF  
+          
+            SET mine_count TO result of count_adjacent_mines called with r and c  
+            IF mine_count GREATER THAN 0 THEN  
+                SET board at r and c TO string representation of mine_count  
+            ELSE  
+                SET board at r and c TO character 'B'  
+                FOR i FROM r MINUS 1 TO r PLUS 1  
+                    FOR j FROM c MINUS 1 TO c PLUS 1  
+                        CALL dfs with i and j  
+                    END FOR  
+                END FOR  
+            END IF  
+        END FUNCTION  
+      
+        SET row TO first element of click  
+        SET col TO second element of click  
+        IF board at row and col EQUALS character 'M' THEN  
+            SET board at row and col TO character 'X'  
+            RETURN board  
+        END IF  
+      
+        CALL dfs with row and col  
+        RETURN board  
+    END FUNCTION  
+END CLASS

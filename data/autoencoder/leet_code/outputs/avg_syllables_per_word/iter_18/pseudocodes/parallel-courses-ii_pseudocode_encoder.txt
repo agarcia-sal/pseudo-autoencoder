@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION minNumberOfSemesters(n INTEGER PARAMETER, relations LIST OF LIST OF INTEGER PARAMETER, k INTEGER PARAMETER) RETURNS INTEGER  
+        SET graph TO a new mapping with default value as empty list  
+        SET in_degree TO a list of zero repeated the LENGTH OF n PLUS one times  
+        
+        FOR each pair previous_course and next_course IN relations  
+            APPEND next_course TO the list at key previous_course in graph  
+            INCREMENT the element at position next_course of in_degree BY one  
+        END FOR  
+        
+        SET queue TO a new double ended list structure  
+        
+        FOR each course INTEGER FROM one TO n  
+            IF the element at position course of in_degree EQUALS zero THEN  
+                APPEND course TO queue  
+            END IF  
+        END FOR  
+        
+        SET semesters TO zero  
+        
+        WHILE queue has any element DO  
+            SET number_of_courses_to_take TO the lesser BETWEEN k AND the LENGTH OF queue  
+            
+            FOR index INTEGER FROM one TO number_of_courses_to_take  
+                REMOVE and ASSIGN the first element of queue TO current_course  
+                
+                FOR each next_course IN the list at key current_course of graph  
+                    DECREMENT the element at position next_course of in_degree BY one  
+                    IF the element at position next_course of in_degree EQUALS zero THEN  
+                        APPEND next_course TO queue  
+                    END IF  
+                END FOR  
+            END FOR  
+            
+            INCREMENT semesters BY one  
+        END WHILE  
+        
+        RETURN semesters  
+    END FUNCTION  
+END CLASS

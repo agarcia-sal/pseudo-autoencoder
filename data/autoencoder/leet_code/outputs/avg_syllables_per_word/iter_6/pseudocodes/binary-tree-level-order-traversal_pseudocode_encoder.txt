@@ -1,0 +1,59 @@
+CLASS TreeNode  
+    FUNCTION __init__(val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET root TO NEW TreeNode WITH values AT FIRST POSITION  
+    SET i TO 1  
+    SET queue TO NEW DEQUE  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO REMOVE FIRST ELEMENT FROM queue  
+        IF i LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.left TO NEW TreeNode WITH values AT i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.right TO NEW TreeNode WITH values AT i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN CALL is_same_tree WITH p.left AND q.left AND CALL is_same_tree WITH p.right AND q.right  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION levelOrder(root)  
+        IF root IS None  
+            RETURN EMPTY LIST  
+        SET result TO EMPTY LIST  
+        SET queue TO NEW DEQUE INITIALIZED WITH root  
+        WHILE queue IS NOT EMPTY  
+            SET level_size TO LENGTH OF queue  
+            SET current_level TO EMPTY LIST  
+            FOR index FROM 1 TO level_size  
+                SET node TO REMOVE FIRST ELEMENT FROM queue  
+                APPEND node.val TO current_level  
+                IF node.left IS NOT None  
+                    APPEND node.left TO queue  
+                IF node.right IS NOT None  
+                    APPEND node.right TO queue  
+            APPEND current_level TO result  
+        RETURN result  
+    END FUNCTION  
+END CLASS

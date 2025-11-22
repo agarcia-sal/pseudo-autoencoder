@@ -1,0 +1,46 @@
+CLASS Solution
+    FUNCTION gridIllumination(parameter n NAMED n, parameter lamps NAMED lamps, parameter queries NAMED queries)
+        ASSIGN reference TO a new default dictionary OF integer named row_count
+        ASSIGN reference TO a new default dictionary OF integer named col_count
+        ASSIGN reference TO a new default dictionary OF integer named diag_count
+        ASSIGN reference TO a new default dictionary OF integer named anti_diag_count
+        
+        ASSIGN reference TO a new empty set named lamp_positions
+        
+        FOR each pair of values NAMED r and c IN lamps
+            IF the pair consisting of r and c IS NOT IN lamp_positions
+                ADD the pair consisting of r and c TO lamp_positions
+                INCREMENT the value at key r IN row_count BY one
+                INCREMENT the value at key c IN col_count BY one
+                INCREMENT the value at key the result of r MINUS c IN diag_count BY one
+                INCREMENT the value at key the result of r PLUS c IN anti_diag_count BY one
+            END IF
+        END FOR
+        
+        ASSIGN reference TO a list containing the pairs of integers named directions AS the pairs where first elements and second elements are negative one and negative one, negative one and zero, negative one and one, zero and negative one, zero and zero, zero and one, one and negative one, one and zero, one and one
+        
+        ASSIGN reference TO a new empty list named result
+        
+        FOR each pair of values NAMED r and c IN queries
+            IF the value at key r IN row_count IS GREATER THAN zero OR the value at key c IN col_count IS GREATER THAN zero OR the value at key the result of r MINUS c IN diag_count IS GREATER THAN zero OR the value at key the result of r PLUS c IN anti_diag_count IS GREATER THAN zero
+                APPEND the integer one TO result
+            ELSE
+                APPEND the integer zero TO result
+            END IF
+            
+            FOR each pair of values NAMED dr and dc IN directions
+                ASSIGN reference TO the result of r PLUS dr NAMED nr
+                ASSIGN reference TO the result of c PLUS dc NAMED nc
+                IF the pair consisting of nr and nc IS IN lamp_positions
+                    REMOVE the pair consisting of nr and nc FROM lamp_positions
+                    DECREMENT the value at key nr IN row_count BY one
+                    DECREMENT the value at key nc IN col_count BY one
+                    DECREMENT the value at key the result of nr MINUS nc IN diag_count BY one
+                    DECREMENT the value at key the result of nr PLUS nc IN anti_diag_count BY one
+                END IF
+            END FOR
+        END FOR
+        
+        RETURN result
+    END FUNCTION
+END CLASS

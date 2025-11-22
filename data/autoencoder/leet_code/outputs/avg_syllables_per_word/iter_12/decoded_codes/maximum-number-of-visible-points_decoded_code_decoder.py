@@ -1,0 +1,32 @@
+import math
+from typing import List
+
+class Solution:
+    def visiblePoints(self, points: List[List[int]], angle: int, location: List[int]) -> int:
+        angles = []
+        extra_points = 0
+
+        loc_x, loc_y = location
+
+        for x, y in points:
+            if x == loc_x and y == loc_y:
+                extra_points += 1
+                continue
+            # Compute the angle from location to the point (in degrees)
+            angle_rad = math.atan2(y - loc_y, x - loc_x)
+            angle_deg = math.degrees(angle_rad)
+            angles.append(angle_deg)
+
+        angles.sort()
+        # Extend the angles list by adding each angle + 360 to handle circular wrap-around
+        extended_angles = angles + [a + 360 for a in angles]
+
+        max_visible = 0
+        left = 0
+
+        for right in range(len(extended_angles)):
+            while extended_angles[right] - extended_angles[left] > angle:
+                left += 1
+            max_visible = max(max_visible, right - left + 1)
+
+        return max_visible + extra_points

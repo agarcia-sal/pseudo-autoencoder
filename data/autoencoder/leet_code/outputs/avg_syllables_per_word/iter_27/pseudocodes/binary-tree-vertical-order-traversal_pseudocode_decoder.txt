@@ -1,0 +1,74 @@
+CLASS TreeNode  
+    FUNCTION __init__ with parameters val left right  
+        SET val attribute TO val parameter  
+        SET left attribute TO left parameter  
+        SET right attribute TO right parameter  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node with parameter values  
+    IF values EQUALS empty  
+        RETURN nothing  
+    END IF  
+    SET root TO new TreeNode with element at position one of values  
+    SET i TO one  
+    SET queue TO a new empty double ended queue  
+    APPEND root TO queue  
+    WHILE queue is not empty  
+        SET node TO first element removed from the left of queue  
+        IF i LESS THAN the length of values AND element at position i of values is not nothing  
+            SET left attribute of node TO new TreeNode with element at position i of values  
+            APPEND left attribute of node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN the length of values AND element at position i of values is not nothing  
+            SET right attribute of node TO new TreeNode with element at position i of values  
+            APPEND right attribute of node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree with parameters p q  
+    IF p is nothing AND q is nothing  
+        RETURN true  
+    ELSE IF p is nothing OR q is nothing  
+        RETURN false  
+    ELSE IF val attribute of p NOT EQUALS val attribute of q  
+        RETURN false  
+    ELSE  
+        RETURN the logical AND of is_same_tree with parameters left attribute of p and left attribute of q AND is_same_tree with parameters right attribute of p and right attribute of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION verticalOrder with parameters self root  
+        IF root is nothing  
+            RETURN an empty list  
+        END IF  
+        SET column_table TO a new default dictionary with default factory of list  
+        SET queue TO a new double ended queue containing a tuple of root and zero  
+        SET min_column TO zero  
+        SET max_column TO zero  
+        WHILE queue is not empty  
+            SET node and column_index TO first element removed from the left of queue  
+            IF node is not nothing  
+                APPEND val attribute of node TO value at key column_index in column_table  
+                IF min_column GREATER THAN column_index  
+                    SET min_column TO column_index  
+                END IF  
+                IF max_column LESS THAN column_index  
+                    SET max_column TO column_index  
+                END IF  
+                APPEND a tuple of left attribute of node and column_index MINUS one TO queue  
+                APPEND a tuple of right attribute of node and column_index PLUS one TO queue  
+            END IF  
+        END WHILE  
+        SET result TO an empty list  
+        FOR index FROM min_column TO max_column  
+            APPEND value at key index in column_table TO result  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+END CLASS

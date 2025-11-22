@@ -1,0 +1,87 @@
+CLASS Solution
+    FUNCTION isSolvable(words, result)
+        SET collection_of_unique_characters TO the set of all characters contained in all elements of words combined with all characters contained in result
+        IF the number of elements in collection_of_unique_characters IS GREATER THAN ten
+            RETURN false
+        END IF
+
+        SET collection_of_characters_that_cannot_be_zero TO the set of first characters of each word in words where the length of the word IS GREATER THAN one UNIONED with the first character of result if the length of result IS GREATER THAN one otherwise the empty string
+
+        SET mapping_from_character_to_digit TO an empty dictionary
+        SET mapping_from_digit_to_character TO an empty dictionary
+
+        FUNCTION can_assign(character, digit)
+            RETURN character NOT IN mapping_from_character_to_digit AND (digit NOT IN mapping_from_digit_to_character OR the element associated with digit in mapping_from_digit_to_character EQUALS character)
+        END FUNCTION
+
+        FUNCTION assign(character, digit)
+            SET the element associated with character in mapping_from_character_to_digit TO digit
+            SET the element associated with digit in mapping_from_digit_to_character TO character
+        END FUNCTION
+
+        FUNCTION unassign(character, digit)
+            REMOVE the element associated with character FROM mapping_from_character_to_digit
+            REMOVE the element associated with digit FROM mapping_from_digit_to_character
+        END FUNCTION
+
+        FUNCTION word_value(word)
+            SET total_value TO zero
+            FOR each index and character IN the enumeration of the characters in word starting from the end towards the beginning
+                INCREMENT total_value BY the element associated with character in mapping_from_character_to_digit MULTIPLIED BY ten RAISED TO THE POWER OF index
+            END FOR
+            RETURN total_value
+        END FUNCTION
+
+        FUNCTION backtrack(index, column, sum_of_column)
+            IF column IS GREATER THAN OR EQUAL TO the maximum length of any word in words AND column IS GREATER THAN OR EQUAL TO the length of result
+                RETURN whether sum_of_column EQUALS zero
+            END IF
+
+            IF index IS EQUAL TO the number of elements in words
+                IF column IS LESS THAN the length of result
+                    SET character_at_position TO the character at the position of the length of result MINUS one MINUS column in result
+                    IF character_at_position IS IN mapping_from_character_to_digit
+                        IF the digit associated with character_at_position in mapping_from_character_to_digit IS EQUAL TO sum_of_column MODULO ten
+                            RETURN the result of calling backtrack with zero, column PLUS one, and sum_of_column INTEGER DIVIDED BY ten
+                        ELSE
+                            RETURN false
+                        END IF
+                    ELSE IF can_assign(character_at_position, sum_of_column MODULO ten) AND (the sum_of_column MODULO ten IS NOT zero OR character_at_position NOT IN collection_of_characters_that_cannot_be_zero)
+                        CALL assign with character_at_position and sum_of_column MODULO ten
+                        IF the result of calling backtrack with zero, column PLUS one, and sum_of_column INTEGER DIVIDED BY ten IS true
+                            RETURN true
+                        END IF
+                        CALL unassign with character_at_position and sum_of_column MODULO ten
+                    END IF
+                ELSE
+                    RETURN whether sum_of_column EQUALS zero
+                END IF
+                RETURN false
+            END IF
+
+            SET current_word TO the element at position index of words
+            IF column IS GREATER THAN OR EQUAL TO the length of current_word
+                RETURN the result of calling backtrack with index PLUS one, column, and sum_of_column
+            END IF
+
+            SET current_character TO the character at the position of the length of current_word MINUS one MINUS column in current_word
+            IF current_character IS IN mapping_from_character_to_digit
+                RETURN the result of calling backtrack with index PLUS one, column, and sum_of_column PLUS the digit associated with current_character in mapping_from_character_to_digit
+            END IF
+
+            FOR digit FROM zero TO nine
+                IF can_assign(current_character, digit) AND (digit IS NOT zero OR current_character NOT IN collection_of_characters_that_cannot_be_zero)
+                    CALL assign with current_character and digit
+                    IF the result of calling backtrack with index PLUS one, column, and sum_of_column PLUS digit IS true
+                        RETURN true
+                    END IF
+                    CALL unassign with current_character and digit
+                END IF
+            END FOR
+
+            RETURN false
+        END FUNCTION
+
+        RETURN the result of calling backtrack with zero zero and zero
+    END FUNCTION
+END CLASS

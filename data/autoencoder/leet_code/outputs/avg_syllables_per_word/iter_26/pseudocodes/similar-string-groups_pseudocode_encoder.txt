@@ -1,0 +1,46 @@
+CLASS Solution
+    FUNCTION numSimilarGroups(strs)
+        FUNCTION are_similar(s1, s2)
+            SET diff TO an empty list
+            FOR index FROM zero TO the LENGTH OF s1 MINUS one INCLUSIVE
+                IF the element at position index OF s1 NOT EQUALS the element at position index OF s2
+                    APPEND index TO diff
+                END IF
+            END FOR
+            RETURN the LENGTH OF diff EQUALS zero OR the LENGTH OF diff EQUALS two AND the element at position the first element OF diff OF s1 EQUALS the element at position the second element OF diff OF s2 AND the element at position the second element OF diff OF s1 EQUALS the element at position the first element OF diff OF s2
+        END FUNCTION
+
+        FUNCTION dfs(node, visited)
+            ADD node TO visited
+            FOR each neighbor IN the list OF neighbors at position node OF graph
+                IF neighbor NOT IN visited
+                    CALL dfs WITH neighbor AND visited
+                END IF
+            END FOR
+        END FUNCTION
+
+        SET n TO the LENGTH OF strs
+        SET graph TO an empty mapping FROM each index FROM zero TO n MINUS one INCLUSIVE TO an empty list
+
+        FOR i FROM zero TO n MINUS one INCLUSIVE
+            FOR j FROM i PLUS one TO n MINUS one INCLUSIVE
+                IF the CALL of are_similar WITH the element at position i OF strs AND the element at position j OF strs HOLDS true
+                    APPEND j TO the list at position i OF graph
+                    APPEND i TO the list at position j OF graph
+                END IF
+            END FOR
+        END FOR
+
+        SET visited TO an empty set
+        SET num_groups TO zero
+
+        FOR i FROM zero TO n MINUS one INCLUSIVE
+            IF i NOT IN visited
+                CALL dfs WITH i AND visited
+                INCREMENT num_groups BY one
+            END IF
+        END FOR
+
+        RETURN num_groups
+    END FUNCTION
+END CLASS

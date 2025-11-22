@@ -1,0 +1,77 @@
+CLASS TreeNode
+    FUNCTION __init__(val=0, left=None, right=None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values: list)
+    IF values IS EMPTY
+        RETURN None
+    END IF
+    SET root TO TreeNode(values[0])
+    SET i TO 1
+    SET queue TO empty queue
+    APPEND root TO queue
+    WHILE queue IS NOT EMPTY
+        SET node TO REMOVE FIRST ELEMENT FROM queue
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.left TO TreeNode(values[i])
+            APPEND node.left TO queue
+        END IF
+        INCREMENT i BY 1
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.right TO TreeNode(values[i])
+            APPEND node.right TO queue
+        END IF
+        INCREMENT i BY 1
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val != q.val
+        RETURN False
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION checkEqualTree(root: Optional[TreeNode]) RETURNS bool
+        FUNCTION subtree_sum(node)
+            IF node IS None
+                RETURN 0
+            END IF
+            RETURN node.val + subtree_sum(node.left) + subtree_sum(node.right)
+        END FUNCTION
+
+        SET total_sum TO subtree_sum(root)
+
+        IF total_sum MODULO 2 IS NOT 0
+            RETURN False
+        END IF
+
+        SET target TO total_sum DIVIDED BY 2
+        SET found TO LIST WITH ONE ELEMENT False
+
+        FUNCTION can_split(node)
+            IF node IS None
+                RETURN 0
+            END IF
+            SET current_sum TO node.val + can_split(node.left) + can_split(node.right)
+            IF current_sum EQUALS target AND node IS NOT root
+                SET found[0] TO True
+            END IF
+            RETURN current_sum
+        END FUNCTION
+
+        CALL can_split(root)
+        RETURN found[0]
+    END FUNCTION
+END CLASS

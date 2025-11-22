@@ -1,0 +1,61 @@
+CLASS Solution
+    FUNCTION rectangleArea(rectangles)
+        SET MODULO TO ten to the power of nine PLUS one
+
+        SET unique_y_coordinates TO empty set
+        FOR each x1 comma y1 comma x2 comma y2 IN rectangles
+            ADD y1 TO unique_y_coordinates
+            ADD y2 TO unique_y_coordinates
+        END FOR
+
+        SET sorted_y_coordinates TO the sorted list of unique_y_coordinates
+
+        SET y_index_mapping TO empty dictionary
+        FOR each index FROM zero TO the LENGTH OF sorted_y_coordinates MINUS one INCLUSIVE
+            SET y_index_mapping AT element at position index OF sorted_y_coordinates TO index
+        END FOR
+
+        SET count_list TO a list of zeroes whose LENGTH IS the LENGTH OF sorted_y_coordinates MINUS one
+
+        SET event_list TO empty list
+        FOR each x1 comma y1 comma x2 comma y2 IN rectangles
+            APPEND the tuple composed of x1 comma one comma y1 comma y2 TO event_list
+            APPEND the tuple composed of x2 comma negative one comma y1 comma y2 TO event_list
+        END FOR
+
+        SORT event_list BY the first element of each tuple which is the x-coordinate
+
+        SET previous_x TO zero
+        SET total_area TO zero
+
+        FOR each tuple composed of x comma event_type comma y1 comma y2 IN event_list
+
+            SET active_length TO zero
+            FOR index FROM one TO the LENGTH OF count_list INCLUSIVE
+                IF the element at position index MINUS one OF count_list IS GREATER THAN zero THEN
+                    INCREMENT active_length BY the element at position index OF sorted_y_coordinates MINUS the element at position index MINUS one OF sorted_y_coordinates
+                END IF
+            END FOR
+
+            SET segment_width TO x MINUS previous_x
+            INCREMENT total_area BY active_length MULTIPLIED BY segment_width
+
+            SET total_area TO the remainder of total_area DIVIDED BY MODULO
+
+            IF event_type EQUALS one THEN
+                FOR index FROM the element at position y_index_mapping AT y1 TO the element at position y_index_mapping AT y2 MINUS one INCLUSIVE
+                    INCREMENT the element at position index OF count_list BY one
+                END FOR
+            ELSE
+                FOR index FROM the element at position y_index_mapping AT y1 TO the element at position y_index_mapping AT y2 MINUS one INCLUSIVE
+                    DECREMENT the element at position index OF count_list BY one
+                END FOR
+            END IF
+
+            SET previous_x TO x
+
+        END FOR
+
+        RETURN total_area
+    END FUNCTION
+END CLASS

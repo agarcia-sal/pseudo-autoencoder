@@ -1,0 +1,60 @@
+CLASS TreeNode  
+    FUNCTION __init__(val EQUALS zero, left EQUALS none, right EQUALS none)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO A new TreeNode OBJECT INITIALIZED WITH element at position zero OF values  
+    SET i TO one  
+    SET queue TO A new empty double-ended queue  
+    APPEND root TO queue  
+    WHILE queue HOLDS ELEMENTS  
+        SET node TO THE FIRST element REMOVED FROM queue  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i OF values IS NOT none  
+            SET node.left TO A new TreeNode OBJECT INITIALIZED WITH element at position i OF values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i OF values IS NOT none  
+            SET node.right TO A new TreeNode OBJECT INITIALIZED WITH element at position i OF values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF p.val IS NOT EQUALS TO q.val  
+        RETURN false  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION rob(root)  
+        FUNCTION rob_from_node(node)  
+            IF node IS none  
+                RETURN zero AND zero  
+            END IF  
+            SET left_robbed, left_not_robbed TO CALL rob_from_node WITH PARAMETERS node.left  
+            SET right_robbed, right_not_robbed TO CALL rob_from_node WITH PARAMETERS node.right  
+            SET rob_this_node TO node.val PLUS left_not_robbed PLUS right_not_robbed  
+            SET not_rob_this_node TO THE MAXIMUM BETWEEN left_robbed AND left_not_robbed PLUS THE MAXIMUM BETWEEN right_robbed AND right_not_robbed  
+            RETURN rob_this_node AND not_rob_this_node  
+        END FUNCTION  
+        SET result TO THE MAXIMUM OF CALL rob_from_node WITH PARAMETERS root  
+        RETURN result  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,53 @@
+CLASS Solution
+    FUNCTION evaluate(expression)
+        FUNCTION get_tokens(expression)
+            SET tokens TO empty list
+            SET buf TO empty string
+            SET depth TO 0
+            FOR each char IN expression
+                IF char IS space AND depth IS 0
+                    APPEND buf TO tokens
+                    SET buf TO empty string
+                ELSE
+                    IF char IS '('
+                        INCREMENT depth BY 1
+                    ELSE IF char IS ')'
+                        DECREMENT depth BY 1
+                    APPEND char TO buf
+            IF buf IS NOT empty
+                APPEND buf TO tokens
+            RETURN tokens
+        END FUNCTION
+
+        FUNCTION evaluate_expression(tokens, context)
+            IF tokens[0] IS 'add'
+                RETURN evaluate_expression(tokens[1], context) PLUS evaluate_expression(tokens[2], context)
+            ELSE IF tokens[0] IS 'mult'
+                RETURN evaluate_expression(tokens[1], context) TIMES evaluate_expression(tokens[2], context)
+            ELSE IF tokens[0] IS 'let'
+                SET new_context TO copy of context
+                SET i TO 1
+                WHILE i IS LESS THAN LENGTH OF tokens MINUS 1
+                    SET var TO tokens[i]
+                    SET expr TO tokens[i + 1]
+                    SET new_context[var] TO evaluate_expression(expr, new_context)
+                    INCREMENT i BY 2
+                RETURN evaluate_expression(tokens[last index], new_context)
+            ELSE
+                TRY
+                    RETURN integer value of tokens[0]
+                CATCH error
+                    RETURN context[tokens[0]]
+        END FUNCTION
+
+        FUNCTION parse_expression(expression)
+            IF first character of expression IS NOT '('
+                RETURN expression
+            SET tokens TO get_tokens(expression WITHOUT first AND last character)
+            RETURN list of parse_expression(token) FOR each token IN tokens
+        END FUNCTION
+
+        SET parsed_expression TO parse_expression(expression)
+        RETURN evaluate_expression(parsed_expression, empty dictionary)
+    END FUNCTION
+END CLASS

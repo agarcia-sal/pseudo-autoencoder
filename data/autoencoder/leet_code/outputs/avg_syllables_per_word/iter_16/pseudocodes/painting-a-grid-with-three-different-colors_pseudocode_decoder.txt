@@ -1,0 +1,70 @@
+CLASS Solution  
+    FUNCTION colorTheGrid(m, n)  
+        SET MOD TO one billion PLUS seven  
+        
+        FUNCTION generate_valid_columns(previous_column)  
+            SET colors TO list containing one two three  
+            SET valid_columns TO empty list  
+            
+            FUNCTION backtrack(current_column, current_row)  
+                IF current_row EQUALS m  
+                    APPEND current_column converted to tuple TO valid_columns  
+                    RETURN  
+                END IF  
+                
+                FOR each color IN colors  
+                    IF current_column is empty OR element at position current_row minus one of current_column NOT EQUALS color  
+                        IF previous_column is not None AND element at position current_row of previous_column EQUALS color  
+                            CONTINUE to next iteration of loop  
+                        END IF  
+                        APPEND color TO current_column  
+                        CALL backtrack WITH current_column AND current_row PLUS one  
+                        REMOVE last element FROM current_column  
+                    END IF  
+                END FOR  
+            END FUNCTION  
+            
+            CALL backtrack WITH empty list AND zero  
+            RETURN valid_columns  
+        END FUNCTION  
+        
+        SET all_valid_columns TO CALL generate_valid_columns WITH None  
+        SET num_valid_columns TO the LENGTH OF all_valid_columns  
+        
+        SET compatible_columns TO dictionary mapping each integer from zero TO num_valid_columns minus one TO empty list  
+        
+        FOR each i FROM zero TO num_valid_columns minus one  
+            FOR each j FROM zero TO num_valid_columns minus one  
+                SET all_positions_different TO True  
+                FOR each k FROM zero TO m minus one  
+                    IF element at position k of element at position i of all_valid_columns EQUALS element at position k of element at position j of all_valid_columns  
+                        SET all_positions_different TO False  
+                        BREAK out of loop  
+                    END IF  
+                END FOR  
+                IF all_positions_different  
+                    APPEND j TO compatible_columns at key i  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET dp TO list containing num_valid_columns elements each initialized to one  
+        
+        FOR each iteration FROM one TO n minus one  
+            SET next_dp TO list containing num_valid_columns elements each initialized to zero  
+            FOR each i FROM zero TO num_valid_columns minus one  
+                FOR each j IN compatible_columns at key i  
+                    SET next_dp at position j TO sum of element at position j of next_dp AND element at position i of dp MODULO MOD  
+                END FOR  
+            END FOR  
+            SET dp TO next_dp  
+        END FOR  
+        
+        SET total_ways TO zero  
+        FOR each value IN dp  
+            INCREMENT total_ways BY value  
+        END FOR  
+        
+        RETURN total_ways MODULO MOD  
+    END FUNCTION  
+END CLASS

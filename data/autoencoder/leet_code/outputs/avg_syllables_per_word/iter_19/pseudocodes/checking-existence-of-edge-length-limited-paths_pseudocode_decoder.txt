@@ -1,0 +1,54 @@
+CLASS UnionFind  
+    FUNCTION __init__ WITH parameter size  
+        SET parent TO a list containing all integers FROM zero TO size MINUS one  
+        SET rank TO a list containing size elements each equal to one  
+    END FUNCTION  
+
+    FUNCTION find WITH parameter p  
+        IF the element at position p of parent is NOT EQUALS TO p THEN  
+            SET the element at position p of parent TO the result of find called WITH the element at position p of parent  
+        END IF  
+        RETURN the element at position p of parent  
+    END FUNCTION  
+
+    FUNCTION union WITH parameters p AND q  
+        SET rootP TO the result of find called WITH p  
+        SET rootQ TO the result of find called WITH q  
+        IF rootP EQUALS rootQ THEN  
+            RETURN false  
+        END IF  
+        IF the element at position rootP of rank IS GREATER THAN the element at position rootQ of rank THEN  
+            SET the element at position rootQ of parent TO rootP  
+        ELSE IF the element at position rootP of rank IS LESS THAN the element at position rootQ of rank THEN  
+            SET the element at position rootP of parent TO rootQ  
+        ELSE  
+            SET the element at position rootQ of parent TO rootP  
+            INCREMENT the element at position rootP of rank BY one  
+        END IF  
+        RETURN true  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION distanceLimitedPathsExist WITH parameters n, edgeList, queries  
+        CALL the sort method of edgeList WITH a key function that returns the element at position two of the input element  
+        SET indexedQueries TO a list constructed by enumerating queries to produce tuples of limit, p, q, and the original index where limit is the element at position two of the query, p is the element at position zero, q is the element at position one, and original index is the enumeration index  
+        CALL the sort method of indexedQueries  
+        SET uf TO a new instance of UnionFind initialized WITH n  
+        SET edgeIndex TO zero  
+        SET numEdges TO the LENGTH OF edgeList  
+        SET results TO a list of boolean false repeated for the LENGTH OF queries  
+        FOR each tuple containing limit, p, q, originalIndex IN indexedQueries  
+            WHILE edgeIndex IS LESS THAN numEdges AND the element at position two of the element at position edgeIndex of edgeList IS LESS THAN limit  
+                SET u TO the element at position zero of the element at position edgeIndex of edgeList  
+                SET v TO the element at position one of the element at position edgeIndex of edgeList  
+                CALL union method of uf WITH u AND v  
+                INCREMENT edgeIndex BY one  
+            END WHILE  
+            IF the result of calling find method of uf WITH p EQUALS the result of calling find method of uf WITH q THEN  
+                SET the element at position originalIndex of results TO true  
+            END IF  
+        END FOR  
+        RETURN results  
+    END FUNCTION  
+END CLASS

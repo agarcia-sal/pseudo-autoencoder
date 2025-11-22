@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION isValid(code)  
+        IMPORT regular expression module AS re  
+        SET cdata_pattern TO string representing the pattern for CDATA sections starting with left angle bracket and exclamation mark square brackets CDATA square brackets zero or more any character zero or more and ending square bracket and right angle bracket  
+        SET code TO the result of replacing all substrings matching cdata_pattern in code with empty string using regular expression substitution  
+        SET stack TO an empty list  
+        SET i TO zero  
+        WHILE i LESS THAN the length of code  
+            IF the element at position i of code EQUALS left angle bracket  
+                SET j TO the position in code of the next right angle bracket after position i  
+                IF j EQUALS negative one  
+                    RETURN false  
+                END IF  
+                SET tag_content TO the substring of code from position i PLUS one TO position j MINUS one  
+                IF tag_content IS empty  
+                    RETURN false  
+                END IF  
+                IF the element at position zero of tag_content EQUALS forward slash  
+                    SET tag_name TO the substring of tag_content from position one TO the end  
+                    IF the stack IS empty OR the last element of stack DOES NOT EQUAL tag_name  
+                        RETURN false  
+                    END IF  
+                    REMOVE the last element FROM stack  
+                ELSE IF the element at position zero of tag_content EQUALS exclamation mark  
+                    RETURN false  
+                ELSE  
+                    IF the length of tag_content IS LESS THAN one OR GREATER THAN nine OR tag_content converted to uppercase DOES NOT EQUAL tag_content  
+                        RETURN false  
+                    END IF  
+                    APPEND tag_content TO stack  
+                END IF  
+                SET i TO j PLUS one  
+            ELSE  
+                INCREMENT i BY one  
+            END IF  
+        END WHILE  
+        SET is_balanced TO true if stack IS empty ELSE false  
+        SET has_valid_tag TO true if the number of substrings matching the pattern of a left angle bracket followed by one or more uppercase letters followed by right angle bracket followed by any characters followed by a left angle bracket forward slash followed by one or more uppercase letters followed by right angle bracket in code IS GREATER THAN zero ELSE false  
+        RETURN true if is_balanced AND has_valid_tag ELSE false  
+    END FUNCTION  
+END CLASS

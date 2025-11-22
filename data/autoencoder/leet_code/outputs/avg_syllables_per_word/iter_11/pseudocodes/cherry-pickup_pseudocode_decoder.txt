@@ -1,0 +1,57 @@
+CLASS Solution  
+    FUNCTION cherryPickup(grid)  
+        SET n TO the LENGTH OF grid  
+        IF element at position zero of element at position zero of grid EQUALS negative one OR element at position (n MINUS one) of element at position (n MINUS one) of grid EQUALS negative one  
+            RETURN zero  
+        END IF  
+
+        CALL auxiliary FUNCTION initialize_dp WITH parameter n AND SET RESULT TO dp  
+        SET element at position zero of element at position zero of element at position zero of dp TO element at position zero of element at position zero of grid  
+
+        SET directions TO list containing pair zero and one, and pair one and zero  
+
+        FOR t FROM one TO (two MULTIPLIED BY n MINUS one) MINUS one  
+            FOR i1 FROM maximum of zero AND (t MINUS (n MINUS one)) TO minimum of n AND (t PLUS one) MINUS one  
+                FOR i2 FROM maximum of zero AND (t MINUS (n MINUS one)) TO minimum of n AND (t PLUS one) MINUS one  
+                    SET j1 TO t MINUS i1  
+                    SET j2 TO t MINUS i2  
+
+                    IF element at position i1 of element at position j1 of grid EQUALS negative one OR element at position i2 of element at position j2 of grid EQUALS negative one  
+                        CONTINUE TO next iteration of inner FOR loop  
+                    END IF  
+
+                    SET prev_max TO negative one  
+
+                    FOR each pair di1, dj1 IN directions  
+                        FOR each pair di2, dj2 IN directions  
+                            SET pi1 TO i1 MINUS di1  
+                            SET pj1 TO j1 MINUS dj1  
+                            SET pi2 TO i2 MINUS di2  
+                            SET pj2 TO j2 MINUS dj2  
+
+                            IF pi1 GREATER THAN OR EQUAL TO zero AND pi1 LESS THAN n AND pj1 GREATER THAN OR EQUAL TO zero AND pj1 LESS THAN n AND pi2 GREATER THAN OR EQUAL TO zero AND pi2 LESS THAN n AND pj2 GREATER THAN OR EQUAL TO zero AND pj2 LESS THAN n  
+                                SET prev_max TO maximum of prev_max AND element at position pi1 of element at position pi2 of element at position pj1 of dp  
+                            END IF  
+                        END FOR  
+                    END FOR  
+
+                    IF prev_max GREATER THAN OR EQUAL TO zero  
+                        IF i1 EQUALS i2  
+                            SET cherries TO element at position i1 of element at position j1 of grid  
+                        ELSE  
+                            SET cherries TO element at position i1 of element at position j1 of grid PLUS element at position i2 of element at position j2 of grid  
+                        END IF  
+                        SET element at position i1 of element at position i2 of element at position j1 of dp TO prev_max PLUS cherries  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+
+        RETURN maximum of zero AND element at position (n MINUS one) of element at position (n MINUS one) of element at position (n MINUS one) of dp  
+    END FUNCTION  
+
+    FUNCTION initialize_dp(n)  
+        CREATE three dimensional list dp with dimensions n BY n BY n where each element IS negative one  
+        RETURN dp  
+    END FUNCTION  
+END CLASS

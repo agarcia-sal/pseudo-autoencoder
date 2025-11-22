@@ -1,0 +1,62 @@
+CLASS Solution
+    FUNCTION evaluate(expression)
+        FUNCTION get_tokens(expression_string)
+            SET tokens TO empty list
+            SET buffer TO empty string
+            SET depth TO zero
+            FOR each character IN expression_string
+                IF character EQUALS space AND depth EQUALS zero
+                    APPEND buffer TO tokens
+                    SET buffer TO empty string
+                ELSE
+                    IF character EQUALS open parenthesis
+                        INCREMENT depth BY one
+                    ELSE IF character EQUALS close parenthesis
+                        DECREMENT depth BY one
+                    END IF
+                    SET buffer TO buffer PLUS character
+                END IF
+            END FOR
+            IF buffer IS NOT empty
+                APPEND buffer TO tokens
+            END IF
+            RETURN tokens
+        END FUNCTION
+
+        FUNCTION evaluate_expression(tokens_list, context_dictionary)
+            IF element at position zero of tokens_list EQUALS add
+                RETURN evaluate_expression(element at position one of tokens_list, context_dictionary) PLUS evaluate_expression(element at position two of tokens_list, context_dictionary)
+            ELSE IF element at position zero of tokens_list EQUALS mult
+                RETURN evaluate_expression(element at position one of tokens_list, context_dictionary) MULTIPLIED BY evaluate_expression(element at position two of tokens_list, context_dictionary)
+            ELSE IF element at position zero of tokens_list EQUALS let
+                SET new_context TO a copy of context_dictionary
+                SET index TO one
+                WHILE index LESS THAN length of tokens_list MINUS one
+                    SET variable_name TO element at position index of tokens_list
+                    SET expression_value TO element at position index PLUS one of tokens_list
+                    SET value TO evaluate_expression(expression_value, new_context)
+                    ASSIGN variable_name IN new_context TO value
+                    INCREMENT index BY two
+                END WHILE
+                RETURN evaluate_expression(element at last position of tokens_list, new_context)
+            ELSE
+                TRY
+                    RETURN integer value of element at position zero of tokens_list
+                CATCH value error
+                    RETURN value from context_dictionary FOR key element at position zero of tokens_list
+                END TRY
+            END IF
+        END FUNCTION
+
+        FUNCTION parse_expression(expression_string)
+            IF element at position zero of expression_string IS NOT open parenthesis
+                RETURN expression_string
+            END IF
+            SET tokens TO get_tokens(substring from position one TO one position before last of expression_string)
+            RETURN a list constructed by CALLING parse_expression WITH each token in tokens
+        END FUNCTION
+
+        SET parsed_expression TO parse_expression(expression)
+        RETURN evaluate_expression(parsed_expression, empty dictionary)
+    END FUNCTION
+END CLASS

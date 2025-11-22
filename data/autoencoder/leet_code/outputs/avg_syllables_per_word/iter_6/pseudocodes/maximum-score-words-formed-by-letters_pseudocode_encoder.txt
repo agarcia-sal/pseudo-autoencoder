@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION maxScoreWords(words, letters, score)  
+        FUNCTION word_score(word, score_map)  
+            RETURN sum of score_map[char] FOR each char IN word  
+        END FUNCTION  
+        
+        FUNCTION can_form(word, letter_count)  
+            SET word_count TO count of each character IN word  
+            FOR each char, count IN word_count  
+                IF letter_count[char] LESS THAN count  
+                    RETURN False  
+            RETURN True  
+        END FUNCTION  
+        
+        FUNCTION update_letter_count(letter_count, word, add)  
+            FOR each char IN word  
+                IF add IS TRUE  
+                    INCREMENT letter_count[char] BY 1  
+                ELSE  
+                    DECREMENT letter_count[char] BY 1  
+        END FUNCTION  
+        
+        FUNCTION backtrack(index, current_score, letter_count)  
+            IF index EQUALS length of words  
+                RETURN current_score  
+            
+            SET max_score TO current_score  
+            FOR i FROM index TO length of words MINUS 1  
+                IF can_form(words[i], letter_count) IS TRUE  
+                    CALL update_letter_count(letter_count, words[i], add EQUALS False)  
+                    SET max_score TO maximum OF max_score AND CALL backtrack(i PLUS 1, current_score PLUS CALL word_score(words[i], score_map), letter_count)  
+                    CALL update_letter_count(letter_count, words[i], add EQUALS True)  
+            RETURN max_score  
+        END FUNCTION  
+        
+        SET score_map TO mapping FROM each letter a TO z TO corresponding element FROM score  
+        SET letter_count TO count of each character IN letters  
+        
+        RETURN CALL backtrack(0, 0, letter_count)  
+    END FUNCTION  
+END CLASS

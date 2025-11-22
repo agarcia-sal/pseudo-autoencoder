@@ -1,0 +1,41 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.parent TO list of integers from 0 TO size MINUS 1  
+        SET self.rank TO list of integer 1 repeated size times  
+    END FUNCTION  
+
+    FUNCTION find(self, p)  
+        IF self.parent AT index p IS NOT EQUAL TO p  
+            SET self.parent AT index p TO self.find(self.parent AT index p)  
+        END IF  
+        RETURN self.parent AT index p  
+    END FUNCTION  
+
+    FUNCTION union(self, p, q)  
+        SET rootP TO self.find(p)  
+        SET rootQ TO self.find(q)  
+        IF rootP IS EQUAL TO rootQ  
+            RETURN False  
+        END IF  
+        IF self.rank AT index rootP IS GREATER THAN self.rank AT index rootQ  
+            SET self.parent AT index rootQ TO rootP  
+        ELSE IF self.rank AT index rootP IS LESS THAN self.rank AT index rootQ  
+            SET self.parent AT index rootP TO rootQ  
+        ELSE  
+            SET self.parent AT index rootQ TO rootP  
+            INCREMENT self.rank AT index rootP BY 1  
+        END IF  
+        RETURN True  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION findRedundantConnection(self, edges)  
+        SET uf TO new UnionFind WITH parameter LENGTH OF edges PLUS 1  
+        FOR each pair u, v IN edges  
+            IF uf.union(u, v) IS False  
+                RETURN list containing u and v  
+            END IF  
+        END FOR  
+    END FUNCTION  
+END CLASS

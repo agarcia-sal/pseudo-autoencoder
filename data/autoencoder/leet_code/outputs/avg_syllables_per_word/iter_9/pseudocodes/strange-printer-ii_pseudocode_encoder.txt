@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION isPrintable(self, targetGrid)  
+        SET color_bounds TO a default mapping from color to list of four values: [positive infinity, positive infinity, negative infinity, negative infinity]  
+
+        FOR r FROM zero TO length of targetGrid MINUS one  
+            FOR c FROM zero TO length of first element in targetGrid MINUS one  
+                SET color TO element at targetGrid position r and c  
+                SET first element of color_bounds for color TO minimum of current first element and r  
+                SET second element of color_bounds for color TO minimum of current second element and c  
+                SET third element of color_bounds for color TO maximum of current third element and r  
+                SET fourth element of color_bounds for color TO maximum of current fourth element and c  
+            END FOR  
+        END FOR  
+
+        SET graph TO a default mapping from color to empty list  
+        SET in_degree TO a default mapping from color to zero  
+
+        FOR each color and its (minr, minc, maxr, maxc) in color_bounds  
+            FOR r FROM minr TO maxr  
+                FOR c FROM minc TO maxc  
+                    IF element at targetGrid position r and c NOT EQUALS color THEN  
+                        SET other_color TO element at targetGrid position r and c  
+                        APPEND color TO graph list for other_color  
+                        INCREMENT in_degree for color BY one  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+
+        SET queue TO a deque containing all colors from color_bounds for which in_degree equals zero  
+        SET visited_colors TO zero  
+
+        WHILE queue is not empty  
+            REMOVE first element from queue and SET to color  
+            INCREMENT visited_colors BY one  
+            FOR each next_color in graph for color  
+                DECREMENT in_degree for next_color BY one  
+                IF in_degree for next_color EQUALS zero THEN  
+                    APPEND next_color TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+
+        RETURN whether visited_colors EQUALS number of keys in color_bounds  
+    END FUNCTION  
+END CLASS

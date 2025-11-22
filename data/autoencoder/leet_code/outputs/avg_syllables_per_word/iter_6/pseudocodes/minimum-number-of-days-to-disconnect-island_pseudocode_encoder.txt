@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION minDays(grid)  
+        FUNCTION dfs(x, y, visited)  
+            IF x LESS THAN 0 OR x GREATER THAN OR EQUAL TO LENGTH OF grid OR y LESS THAN 0 OR y GREATER THAN OR EQUAL TO LENGTH OF grid AT 0 OR TUPLE (x, y) IN visited OR grid AT x AT y EQUALS 0 THEN  
+                RETURN  
+            END IF  
+            ADD TUPLE (x, y) TO visited  
+            FOR EACH (dx, dy) IN LIST OF TUPLES [(-1, 0), (1, 0), (0, -1), (0, 1)]  
+                CALL dfs WITH x PLUS dx, y PLUS dy, visited  
+            END FOR  
+        END FUNCTION  
+
+        FUNCTION is_connected()  
+            SET visited TO EMPTY SET  
+            SET land_cells TO LIST OF TUPLES (i, j) FOR i FROM 0 TO LENGTH OF grid MINUS 1, j FROM 0 TO LENGTH OF grid AT 0 MINUS 1 WHERE grid AT i AT j EQUALS 1  
+            IF land_cells IS EMPTY THEN  
+                RETURN TRUE  
+            END IF  
+            CALL dfs WITH land_cells AT 0 AT 0, land_cells AT 0 AT 1, visited  
+            RETURN LENGTH OF visited EQUALS LENGTH OF land_cells  
+        END FUNCTION  
+
+        IF NOT CALL is_connected() THEN  
+            RETURN 0  
+        END IF  
+
+        FOR i FROM 0 TO LENGTH OF grid MINUS 1  
+            FOR j FROM 0 TO LENGTH OF grid AT 0 MINUS 1  
+                IF grid AT i AT j EQUALS 1 THEN  
+                    SET grid AT i AT j TO 0  
+                    IF NOT CALL is_connected() THEN  
+                        RETURN 1  
+                    END IF  
+                    SET grid AT i AT j TO 1  
+                END IF  
+            END FOR  
+        END FOR  
+
+        RETURN 2  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,71 @@
+```
+CLASS Solution
+    FUNCTION maximumInvitations(favorite: List[int]) RETURNS int
+        SET n TO LENGTH OF favorite
+        SET graph TO DEFAULTDICT OF LIST
+        SET in_degree TO LIST OF ZEROS WITH LENGTH n
+
+        FOR i FROM 0 TO n-1
+            APPEND i TO graph[favorite[i]]
+            INCREMENT in_degree[favorite[i]] BY 1
+
+        SET mutual_chains TO 0
+        SET visited TO LIST OF FALSE WITH LENGTH n
+
+        FOR i FROM 0 TO n-1
+            IF favorite[favorite[i]] EQUALS i AND i LESS THAN favorite[i]
+                SET a TO i
+                SET b TO favorite[i]
+                SET chain_a TO SELF.find_chain_length(a, graph, visited)
+                SET chain_b TO SELF.find_chain_length(b, graph, visited)
+                INCREMENT mutual_chains BY chain_a PLUS chain_b
+
+        SET longest_cycle TO 0
+        SET visited TO LIST OF FALSE WITH LENGTH n
+
+        FOR i FROM 0 TO n-1
+            IF visited[i] IS FALSE
+                SET cycle_length TO SELF.find_cycle_length(i, graph, visited, favorite)
+                SET longest_cycle TO MAXIMUM OF longest_cycle AND cycle_length
+
+        RETURN MAXIMUM OF mutual_chains AND longest_cycle
+    END FUNCTION
+
+    FUNCTION find_chain_length(start: int, graph: DEFAULTDICT, visited: List[bool]) RETURNS int
+        SET length TO 0
+        SET queue TO DEQUE INITIALIZED WITH start
+        SET visited[start] TO TRUE
+
+        WHILE queue IS NOT EMPTY
+            SET current TO POP LEFT FROM queue
+            FOR EACH neighbor IN graph[current]
+                IF visited[neighbor] IS FALSE
+                    SET visited[neighbor] TO TRUE
+                    APPEND neighbor TO queue
+                    INCREMENT length BY 1
+
+        RETURN length
+    END FUNCTION
+
+    FUNCTION find_cycle_length(start: int, graph: DEFAULTDICT, visited: List[bool], favorite: List[int]) RETURNS int
+        IF visited[start] IS TRUE
+            RETURN 0
+
+        SET stack TO EMPTY LIST
+        SET current TO start
+
+        WHILE visited[current] IS FALSE
+            SET visited[current] TO TRUE
+            APPEND current TO stack
+            SET current TO favorite[current]
+
+        IF current NOT IN stack
+            RETURN 0
+
+        SET cycle_start_index TO INDEX OF current IN stack
+        SET cycle_length TO LENGTH OF stack MINUS cycle_start_index
+
+        RETURN cycle_length
+    END FUNCTION
+END CLASS
+```

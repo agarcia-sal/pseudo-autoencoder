@@ -1,0 +1,57 @@
+from collections import defaultdict
+
+class Solution:
+    def countOfAtoms(self, formula: str) -> str:
+        def parse(segment: str) -> defaultdict:
+            atom_count = defaultdict(int)
+            i = 0
+            n = len(segment)
+            while i < n:
+                if segment[i].isupper():
+                    j = i + 1
+                    while j < n and segment[j].islower():
+                        j += 1
+                    element = segment[i:j]
+                    k = j
+                    while k < n and segment[k].isdigit():
+                        k += 1
+                    count = int(segment[j:k]) if j < k else 1
+                    atom_count[element] += count
+                    i = k
+                else:
+                    i += 1
+            return atom_count
+
+        def multiply_counts(counts: defaultdict, multiplier: int) -> defaultdict:
+            for element in counts:
+                counts[element] *= multiplier
+            return counts
+
+        stack = [defaultdict(int)]
+        i, n = 0, len(formula)
+        while i < n:
+            if formula[i] == '(':
+                stack.append(defaultdict(int))
+                i += 1
+            elif formula[i] == ')':
+                j = i + 1
+                while j < n and formula[j].isdigit():
+                    j += 1
+                multiplier = int(formula[i+1:j]) if j > i + 1 else 1
+                segment_count = multiply_counts(stack.pop(), multiplier)
+                for element, count in segment_count.items():
+                    stack[-1][element] += count
+                i = j
+            else:
+                j = i + 1
+                while j < n and (formula[j].islower() or formula[j].isdigit()):
+                    j += 1
+                segment_count = parse(formula[i:j])
+                for element, count in segment_count.items():
+                    stack[-1][element] += count
+                i = j
+        final_count = stack.pop()
+        return ''.join(
+            element + (str(final_count[element]) if final_count[element] > 1 else '')
+            for element in sorted(final_count)
+        )

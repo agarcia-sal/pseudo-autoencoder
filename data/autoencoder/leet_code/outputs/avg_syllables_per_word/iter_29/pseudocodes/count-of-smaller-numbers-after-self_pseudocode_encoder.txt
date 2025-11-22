@@ -1,0 +1,39 @@
+CLASS Solution  
+    FUNCTION countSmaller(nums)  
+        SET sorted_unique_numbers TO the list of unique elements in nums arranged in ascending order  
+        SET rank_mapping TO an empty dictionary  
+        SET position_index TO one  
+        FOR each value IN sorted_unique_numbers  
+            ASSIGN rank_mapping at key value TO position_index  
+            INCREMENT position_index BY one  
+        END FOR  
+        
+        SET binary_indexed_tree TO a list of zeros with length equal to the length of sorted_unique_numbers PLUS one  
+        
+        FUNCTION get_sum(index)  
+            SET result_sum TO zero  
+            WHILE index GREATER THAN zero  
+                INCREMENT result_sum BY element at position index of binary_indexed_tree  
+                SET index TO index MINUS the bitwise AND of index and the negative of index (expressed as the lowest set bit in index)  
+            END WHILE  
+            RETURN result_sum  
+        END FUNCTION  
+        
+        FUNCTION update(index, delta_value)  
+            WHILE index LESS THAN the LENGTH OF binary_indexed_tree  
+                INCREMENT element at position index of binary_indexed_tree BY delta_value  
+                SET index TO index PLUS the bitwise AND of index and the negative of index (expressed as the lowest set bit in index)  
+            END WHILE  
+        END FUNCTION  
+        
+        SET counts_list TO an empty list  
+        FOR each number IN nums iterated from the last element TO the first element  
+            SET current_rank TO rank_mapping at key number  
+            SET smaller_count TO get_sum with argument current_rank MINUS one  
+            APPEND smaller_count TO counts_list  
+            CALL update with arguments current_rank and one  
+        END FOR  
+        
+        RETURN counts_list iterated in reverse order  
+    END FUNCTION  
+END CLASS

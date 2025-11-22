@@ -1,0 +1,32 @@
+CLASS Solution
+    FUNCTION findRotateSteps(ring, key)
+        CALL create_character_positions_dictionary WITH ring
+        SET length_of_ring TO the LENGTH OF ring
+
+        FUNCTION dp(current_index, previous_position)
+            IF current_index EQUALS the LENGTH OF key
+                RETURN zero
+            END IF
+
+            SET minimum_steps TO infinity_value
+            FOR each position IN character_positions AT element at position current_index of key
+                SET clockwise_distance TO (position MINUS previous_position) MODULO length_of_ring
+                SET anticlockwise_distance TO (previous_position MINUS position) MODULO length_of_ring
+                SET steps_required TO the MINIMUM OF clockwise_distance AND anticlockwise_distance PLUS one PLUS CALL dp WITH current_index PLUS one AND position
+                SET minimum_steps TO the MINIMUM OF minimum_steps AND steps_required
+            END FOR
+
+            RETURN minimum_steps
+        END FUNCTION
+
+        RETURN CALL dp WITH zero AND zero
+    END FUNCTION
+
+FUNCTION create_character_positions_dictionary(ring)
+    INITIALIZE character_positions AS a default dictionary OF list
+    FOR index FROM zero TO the LENGTH OF ring MINUS one
+        APPEND index TO character_positions AT element at position index of ring
+    END FOR
+    RETURN character_positions
+END FUNCTION
+END CLASS

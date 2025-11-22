@@ -1,0 +1,50 @@
+CLASS Solution  
+    FUNCTION numberOfPatterns(m, n)  
+        SET jumps TO a dictionary mapping pairs of dots TO the dot that must be visited before jumping as follows  
+            PAIR one AND three MAPS TO two  
+            PAIR one AND seven MAPS TO four  
+            PAIR one AND nine MAPS TO five  
+            PAIR two AND eight MAPS TO five  
+            PAIR three AND one MAPS TO two  
+            PAIR three AND seven MAPS TO five  
+            PAIR three AND nine MAPS TO six  
+            PAIR four AND six MAPS TO five  
+            PAIR five AND five MAPS TO five  
+            PAIR six AND four MAPS TO five  
+            PAIR seven AND one MAPS TO four  
+            PAIR seven AND three MAPS TO five  
+            PAIR seven AND nine MAPS TO eight  
+            PAIR eight AND two MAPS TO five  
+            PAIR nine AND one MAPS TO five  
+            PAIR nine AND three MAPS TO six  
+            PAIR nine AND seven MAPS TO eight  
+        
+        FUNCTION countPatternsFromDot(current, visited, length)  
+            IF length EQUALS n THEN  
+                RETURN one  
+            END IF  
+            SET count TO one IF length IS GREATER THAN OR EQUAL TO m OTHERWISE zero  
+            FOR next_dot FROM one TO nine  
+                IF element at position next_dot OF visited IS false THEN  
+                    SET jump TO the dot mapped by PAIR current AND next_dot FROM jumps OR null IF none  
+                    IF jump IS null OR element at position jump OF visited IS true THEN  
+                        SET element at position next_dot OF visited TO true  
+                        INCREMENT count BY CALL countPatternsFromDot WITH PARAMETERS next_dot, visited, length PLUS one  
+                        SET element at position next_dot OF visited TO false  
+                    END IF  
+                END IF  
+            END FOR  
+            RETURN count  
+        END FUNCTION  
+        
+        SET visited TO a list of ten false values  
+        SET result TO zero  
+        FOR i FROM one TO nine  
+            SET element at position i OF visited TO true  
+            INCREMENT result BY CALL countPatternsFromDot WITH PARAMETERS i, visited, one  
+            SET element at position i OF visited TO false  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

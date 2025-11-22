@@ -1,0 +1,59 @@
+CLASS Trie  
+    FUNCTION __init__()  
+        SET self.children TO list of size 26 with all elements as None  
+        SET self.ref TO -1  
+    END FUNCTION  
+
+    FUNCTION insert(w, ref)  
+        SET node TO self  
+        FOR each character c IN w  
+            SET idx TO Unicode code of c MINUS Unicode code of 'a'  
+            IF node.children at idx IS None THEN  
+                SET node.children at idx TO new Trie  
+            END IF  
+            SET node TO node.children at idx  
+        END FOR  
+        SET node.ref TO ref  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION findWords(board, words)  
+
+        FUNCTION dfs(node, i, j)  
+            SET idx TO Unicode code of board at position [i][j] MINUS Unicode code of 'a'  
+            IF node.children at idx IS None THEN  
+                RETURN  
+            END IF  
+            SET node TO node.children at idx  
+            IF node.ref IS GREATER THAN OR EQUAL TO 0 THEN  
+                APPEND words at node.ref TO ans  
+                SET node.ref TO -1  
+            END IF  
+            SET c TO board at position [i][j]  
+            SET board at position [i][j] TO '#'  
+            FOR each pair (a, b) IN pairs of (-1, 0, 1, 0, -1)  
+                SET x TO i PLUS a  
+                SET y TO j PLUS b  
+                IF x IS GREATER THAN OR EQUAL TO 0 AND x IS LESS THAN m AND y IS GREATER THAN OR EQUAL TO 0 AND y IS LESS THAN n AND board at position [x][y] IS NOT '#' THEN  
+                    CALL dfs(node, x, y)  
+                END IF  
+            END FOR  
+            SET board at position [i][j] TO c  
+        END FUNCTION  
+
+        SET tree TO new Trie  
+        FOR each index i AND word w IN words  
+            CALL tree.insert(w, i)  
+        END FOR  
+        SET m TO LENGTH OF board  
+        SET n TO LENGTH OF board at position 0  
+        SET ans TO empty list  
+        FOR i FROM 0 TO m MINUS 1  
+            FOR j FROM 0 TO n MINUS 1  
+                CALL dfs(tree, i, j)  
+            END FOR  
+        END FOR  
+        RETURN ans  
+    END FUNCTION  
+END CLASS

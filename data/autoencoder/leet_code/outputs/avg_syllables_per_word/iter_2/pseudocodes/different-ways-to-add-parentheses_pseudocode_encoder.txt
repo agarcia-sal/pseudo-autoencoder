@@ -1,0 +1,32 @@
+CLASS Solution
+    FUNCTION diffWaysToCompute(expression)
+        FUNCTION compute(left, right, operator)
+            SET results TO empty list
+            FOR each l IN left
+                FOR each r IN right
+                    IF operator EQUALS '+'
+                        APPEND l PLUS r TO results
+                    ELSE IF operator EQUALS '-'
+                        APPEND l MINUS r TO results
+                    ELSE IF operator EQUALS '*'
+                        APPEND l TIMES r TO results
+            RETURN results
+        END FUNCTION
+
+        FUNCTION helper(sub_expr)
+            IF sub_expr IS DIGITS ONLY
+                RETURN LIST CONTAINING INTEGER VALUE OF sub_expr
+
+            SET results TO empty list
+            FOR i FROM 0 TO LENGTH OF sub_expr MINUS 1
+                IF sub_expr[i] IS ONE OF "+", "-", "*"
+                    SET left_results TO helper(SUBSTRING OF sub_expr FROM START TO i EXCLUSIVE)
+                    SET right_results TO helper(SUBSTRING OF sub_expr FROM i+1 TO END)
+                    APPEND ALL ITEMS FROM compute(left_results, right_results, sub_expr[i]) TO results
+
+            RETURN results
+        END FUNCTION
+
+        RETURN helper(expression)
+    END FUNCTION
+END CLASS

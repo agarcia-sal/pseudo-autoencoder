@@ -1,0 +1,82 @@
+CLASS Solution  
+    FUNCTION containVirus(isInfected)  
+        FUNCTION neighbors(r, c)  
+            RETURN list containing tuple of r PLUS one and c, tuple of r MINUS one and c, tuple of r and c PLUS one, tuple of r and c MINUS one  
+        END FUNCTION
+
+        FUNCTION bfs(r, c)  
+            SET infected TO empty set  
+            SET threatened TO empty set  
+            SET queue TO deque initialized with tuple of r and c  
+            SET visited TO set initialized with tuple of r and c  
+            WHILE queue is not empty  
+                REMOVE first element FROM queue and SET to x and y  
+                ADD tuple of x and y TO infected  
+                FOR each nx and ny IN neighbors(x, y)  
+                    IF nx GREATER THAN OR EQUAL TO zero AND nx LESS THAN m AND ny GREATER THAN OR EQUAL TO zero AND ny LESS THAN n AND tuple of nx and ny NOT IN visited  
+                        ADD tuple of nx and ny TO visited  
+                        IF element at position nx of isInfected at position ny EQUALS one  
+                            APPEND tuple of nx and ny TO queue  
+                        ELSE IF element at position nx of isInfected at position ny EQUALS zero  
+                            ADD tuple of nx and ny TO threatened  
+                        END IF  
+                    END IF  
+                END FOR  
+            END WHILE  
+            RETURN infected and threatened  
+        END FUNCTION
+
+        FUNCTION build_walls(infected)  
+            SET walls TO zero  
+            FOR each x and y IN infected  
+                FOR each nx and ny IN neighbors(x, y)  
+                    IF nx GREATER THAN OR EQUAL TO zero AND nx LESS THAN m AND ny GREATER THAN OR EQUAL TO zero AND ny LESS THAN n AND element at position nx of isInfected at position ny EQUALS zero  
+                        INCREMENT walls BY one  
+                    END IF  
+                END FOR  
+            END FOR  
+            RETURN walls  
+        END FUNCTION
+
+        FUNCTION spread_virus(threatened)  
+            FOR each x and y IN threatened  
+                SET element at position x of isInfected at position y TO one  
+            END FOR  
+        END FUNCTION
+
+        SET m TO LENGTH OF isInfected  
+        SET n TO LENGTH OF element at position zero of isInfected  
+        SET total_walls TO zero
+
+        WHILE TRUE  
+            SET regions TO empty list  
+            SET visited TO empty set  
+            FOR r FROM zero TO m MINUS one  
+                FOR c FROM zero TO n MINUS one  
+                    IF element at position r of isInfected at position c EQUALS one AND tuple of r and c NOT IN visited  
+                        CALL bfs with r and c AND CAPTURE infected and threatened  
+                        APPEND tuple of infected and threatened TO regions  
+                        SET visited TO union of visited AND infected  
+                    END IF  
+                END FOR  
+            END FOR
+
+            IF regions IS empty  
+                BREAK  
+            END IF
+
+            SORT regions BY LENGTH OF second element OF each region IN descending order  
+
+            INCREMENT total_walls BY CALLING build_walls WITH first element OF first region in regions  
+            FOR each x and y IN first element OF first region in regions  
+                SET element at position x of isInfected at position y TO negative one  
+            END FOR
+
+            FOR i FROM one TO LENGTH OF regions MINUS one  
+                CALL spread_virus WITH second element OF element at position i of regions  
+            END FOR  
+        END WHILE
+
+        RETURN total_walls  
+    END FUNCTION  
+END CLASS

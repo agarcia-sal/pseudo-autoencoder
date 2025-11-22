@@ -1,0 +1,47 @@
+CLASS Solution  
+    FUNCTION minSkips(dist, speed, hoursBefore)  
+        SET n TO the LENGTH OF dist  
+        
+        DEFINE dp AS a two dimensional list with n rows and n plus one columns  
+        FOR index FROM zero TO n MINUS one  
+            FOR skip_count FROM zero TO n  
+                SET element at position skip_count of row at position index in dp TO infinity  
+            END FOR  
+        END FOR  
+        
+        SET total_dist TO the SUM OF all elements IN dist  
+        
+        IF total_dist DIVIDED BY speed GREATER THAN hoursBefore  
+            RETURN negative one  
+        END IF  
+        
+        SET element at position zero of row at position zero in dp TO element at position zero of dist  
+        FOR j FROM one TO n MINUS one  
+            SET element at position j of row at position zero in dp TO element at position zero of dist  
+        END FOR  
+        
+        FOR i FROM one TO n MINUS one  
+            FOR j FROM zero TO i  
+                IF j LESS THAN i  
+                    SET dp_value TO element at position j of row at position i MINUS one in dp  
+                    SET divided_time TO dp_value DIVIDED BY speed  
+                    SET ceil_time TO the smallest integer GREATER THAN OR EQUAL TO divided_time  
+                    SET element at position j of row at position i in dp TO ceil_time MULTIPLIED BY speed PLUS element at position i of dist  
+                END IF  
+                
+                IF j GREATER THAN zero  
+                    SET skip_value TO element at position j MINUS one of row at position i MINUS one in dp PLUS element at position i of dist  
+                    SET element at position j of row at position i in dp TO the smaller BETWEEN current element at position j of row at position i in dp AND skip_value  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        FOR j FROM zero TO n MINUS one  
+            IF element at position j of row at position n MINUS one in dp LESS THAN OR EQUAL TO hoursBefore MULTIPLIED BY speed  
+                RETURN j  
+            END IF  
+        END FOR  
+        
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

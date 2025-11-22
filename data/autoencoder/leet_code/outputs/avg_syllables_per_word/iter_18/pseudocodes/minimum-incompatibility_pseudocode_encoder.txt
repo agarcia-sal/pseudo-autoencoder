@@ -1,0 +1,56 @@
+CLASS Solution
+    FUNCTION minimumIncompatibility(nums AS List of integers, k AS integer) RETURNS integer
+        IMPORT Counter FROM collections
+
+        SET n TO the LENGTH OF nums
+        SET subset_size TO n DIVIDED BY k
+
+        IF there EXISTS any count in the VALUES OF Counter applied to nums SUCH THAT count GREATER THAN k
+            RETURN minus one
+        END IF
+
+        SET subset_incompatibility TO an empty mapping
+
+        FOR each binary mask REPRESENTING numbers from zero TO two RAISED TO the power of n MINUS one
+            IF the NUMBER OF ones in the binary representation of mask EQUALS subset_size
+                SET elements TO an empty list
+                FOR each index i FROM zero TO n MINUS one
+                    IF the bit at position i IN mask IS SET
+                        APPEND the element at position i OF nums TO elements
+                    END IF
+                END FOR
+
+                IF the NUMBER OF unique elements in elements EQUALS subset_size
+                    SET incompatibility TO the MAXIMUM element in elements MINUS the MINIMUM element in elements
+                    ASSIGN incompatibility TO the key mask IN subset_incompatibility
+                END IF
+            END IF
+        END FOR
+
+        SET dp TO a list of length two RAISED TO the power of n FILLED WITH infinity
+        SET the element at position zero IN dp TO zero
+
+        FOR each mask FROM zero TO two RAISED TO the power of n MINUS one
+            IF the NUMBER OF ones in the binary representation of mask MODULO subset_size NOT EQUAL TO zero
+                CONTINUE to next iteration
+            END IF
+
+            FOR each subset_mask IN the KEYS of subset_incompatibility
+                IF every bit SET in subset_mask IS ALSO SET in mask
+                    SET dp_at_mask TO the element at position mask IN dp
+                    SET dp_at_mask_minus_subset TO the element at position of mask XOR subset_mask IN dp
+                    SET incompatibility_of_subset TO the value at key subset_mask IN subset_incompatibility
+                    SET dp_at_mask TO the MINIMUM OF dp_at_mask AND dp_at_mask_minus_subset PLUS incompatibility_of_subset
+                    ASSIGN dp_at_mask TO the position mask IN dp
+                END IF
+            END FOR
+        END FOR
+
+        SET full_mask TO two RAISED TO the power of n MINUS one
+        IF the element at position full_mask IN dp NOT EQUAL TO infinity
+            RETURN the element at position full_mask IN dp
+        ELSE
+            RETURN minus one
+        END IF
+    END FUNCTION
+END CLASS

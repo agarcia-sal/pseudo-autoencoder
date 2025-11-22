@@ -1,0 +1,59 @@
+CLASS Solution  
+    FUNCTION minOperations(target, arr)  
+        SET index_map TO CALL create_index_map WITH PARAMETERS target  
+        SET transformed_arr TO CALL transform_array WITH PARAMETERS arr, index_map  
+        SET lis TO CALL find_longest_increasing_subsequence WITH PARAMETERS transformed_arr  
+        SET lcs_length TO THE LENGTH OF lis  
+        SET minimum_operations TO THE LENGTH OF target MINUS lcs_length  
+        RETURN minimum_operations  
+    END FUNCTION  
+  
+    FUNCTION create_index_map(target)  
+        SET map_object TO an empty map  
+        SET index TO zero  
+        FOR each value IN target  
+            SET key value IN map_object TO index  
+            INCREMENT index BY one  
+        END FOR  
+        RETURN map_object  
+    END FUNCTION  
+  
+    FUNCTION transform_array(arr, index_map)  
+        SET result_list TO an empty list  
+        FOR each value IN arr  
+            IF value EXISTS AS A KEY IN index_map  
+                APPEND the value of key value IN index_map TO result_list  
+            END IF  
+        END FOR  
+        RETURN result_list  
+    END FUNCTION  
+  
+    FUNCTION find_longest_increasing_subsequence(sequence)  
+        SET lis TO an empty list  
+        FOR each num IN sequence  
+            SET position TO CALL binary_search_leftmost WITH PARAMETERS lis, num  
+            IF position EQUALS THE LENGTH OF lis  
+                APPEND num TO lis  
+            ELSE  
+                SET the element at position IN lis TO num  
+            END IF  
+        END FOR  
+        RETURN lis  
+    END FUNCTION  
+  
+    FUNCTION binary_search_leftmost(list_values, target_value)  
+        SET left TO zero  
+        SET right TO THE LENGTH OF list_values MINUS one  
+        SET result_position TO zero  
+        WHILE left LESS THAN OR EQUAL TO right HOLDS  
+            SET mid TO the integer part of left PLUS right DIVIDED BY two  
+            IF the element at mid IN list_values LESS THAN target_value  
+                SET left TO mid PLUS one  
+            ELSE  
+                SET result_position TO mid  
+                SET right TO mid MINUS one  
+            END IF  
+        END WHILE  
+        RETURN left  
+    END FUNCTION  
+END CLASS

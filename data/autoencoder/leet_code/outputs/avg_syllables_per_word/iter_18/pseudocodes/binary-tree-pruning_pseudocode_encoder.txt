@@ -1,0 +1,57 @@
+CLASS TreeNode  
+    FUNCTION __init__(val WITH DEFAULT zero, left WITH DEFAULT none, right WITH DEFAULT none)  
+        SET this dot val TO val  
+        SET this dot left TO left  
+        SET this dot right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO NEW TreeNode WITH val EQUAL TO element at position zero of values  
+    SET index_counter TO one  
+    SET queue TO NEW deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET current_node TO element at position zero REMOVED FROM queue  
+        IF index_counter IS LESS THAN the LENGTH OF values AND element at position index_counter of values IS NOT none  
+            SET current_node dot left TO NEW TreeNode WITH val EQUAL TO element at position index_counter of values  
+            APPEND current_node dot left TO queue  
+        END IF  
+        INCREMENT index_counter BY one  
+        IF index_counter IS LESS THAN the LENGTH OF values AND element at position index_counter of values IS NOT none  
+            SET current_node dot right TO NEW TreeNode WITH val EQUAL TO element at position index_counter of values  
+            APPEND current_node dot right TO queue  
+        END IF  
+        INCREMENT index_counter BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF p dot val IS NOT EQUAL TO q dot val  
+        RETURN false  
+    ELSE  
+        RETURN is_same_tree WITH p dot left AND q dot left AND is_same_tree WITH p dot right AND q dot right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION pruneTree(root)  
+        IF root IS none  
+            RETURN none  
+        END IF  
+        SET root dot left TO self dot pruneTree WITH root dot left  
+        SET root dot right TO self dot pruneTree WITH root dot right  
+        IF root dot val EQUALS zero AND root dot left IS none AND root dot right IS none  
+            RETURN none  
+        END IF  
+        RETURN root  
+    END FUNCTION  
+END CLASS

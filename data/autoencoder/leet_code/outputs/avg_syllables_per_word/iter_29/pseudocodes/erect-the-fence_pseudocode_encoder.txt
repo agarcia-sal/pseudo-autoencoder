@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION outerTrees(trees)  
+        FUNCTION cross(index_i index_j index_k)  
+            SET point_a TO element at position index_i of trees  
+            SET point_b TO element at position index_j of trees  
+            SET point_c TO element at position index_k of trees  
+            SET horizontal_difference_first TO the first coordinate of point_b MINUS the first coordinate of point_a  
+            SET vertical_difference_second TO the second coordinate of point_c MINUS the second coordinate of point_b  
+            SET horizontal_difference_third TO the second coordinate of point_b MINUS the second coordinate of point_a  
+            SET vertical_difference_fourth TO the first coordinate of point_c MINUS the first coordinate of point_b  
+            RETURN horizontal_difference_first MULTIPLIED BY vertical_difference_second MINUS horizontal_difference_third MULTIPLIED BY vertical_difference_fourth  
+        END FUNCTION  
+
+        SET number_of_trees TO the LENGTH OF trees  
+        IF number_of_trees LESS THAN four  
+            RETURN trees  
+        END IF  
+
+        SORT trees IN ASCENDING ORDER  
+        SET visited_flags TO a list of boolean False values of length number_of_trees  
+        SET stack TO a list containing zero  
+        FOR index_i FROM one TO number_of_trees MINUS one  
+            WHILE the LENGTH OF stack GREATER THAN one AND the result of cross with the element at position two before the last in stack the element at position one before the last in stack and index_i LESS THAN zero HOLDS  
+                SET removed_index TO remove the last element from stack  
+                SET the element at position removed_index of visited_flags TO False  
+            END WHILE  
+            SET the element at position index_i of visited_flags TO True  
+            APPEND index_i TO stack  
+        END FOR  
+
+        SET middle_length TO the LENGTH OF stack  
+        FOR index_i FROM number_of_trees MINUS two DOWNTO zero  
+            IF the element at position index_i of visited_flags IS True  
+                CONTINUE to the next iteration of the loop  
+            END IF  
+            WHILE the LENGTH OF stack GREATER THAN middle_length AND the result of cross with the element at position two before the last in stack the element at position one before the last in stack and index_i LESS THAN zero HOLDS  
+                REMOVE the last element from stack  
+            END WHILE  
+            APPEND index_i TO stack  
+        END FOR  
+        REMOVE the last element from stack  
+        SET result_points TO an empty list  
+        FOR each index IN stack  
+            APPEND the element at position index of trees TO result_points  
+        END FOR  
+        RETURN result_points  
+    END FUNCTION  
+END CLASS

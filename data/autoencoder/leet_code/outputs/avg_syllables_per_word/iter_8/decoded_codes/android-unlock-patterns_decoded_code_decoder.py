@@ -1,0 +1,40 @@
+class Solution:
+    def numberOfPatterns(self, m, n):
+        jumps = {}
+        jumps[(1, 3)] = 2
+        jumps[(3, 1)] = 2
+        jumps[(1, 7)] = 4
+        jumps[(7, 1)] = 4
+        jumps[(3, 9)] = 6
+        jumps[(9, 3)] = 6
+        jumps[(7, 9)] = 8
+        jumps[(9, 7)] = 8
+        jumps[(1, 9)] = 5
+        jumps[(9, 1)] = 5
+        jumps[(3, 7)] = 5
+        jumps[(7, 3)] = 5
+        jumps[(4, 6)] = 5
+        jumps[(6, 4)] = 5
+        jumps[(2, 8)] = 5
+        jumps[(8, 2)] = 5
+
+        def countPatternsFromDot(current, visited, length):
+            if length == n:
+                return 1
+            count = 1 if length >= m else 0
+            for next_dot in range(1, 10):
+                if not visited[next_dot]:
+                    jump = jumps.get((current, next_dot), None)
+                    if jump is None or visited[jump]:
+                        visited[next_dot] = True
+                        count += countPatternsFromDot(next_dot, visited, length + 1)
+                        visited[next_dot] = False
+            return count
+
+        visited = [False] * 10
+        result = 0
+        for i in range(1, 10):
+            visited[i] = True
+            result += countPatternsFromDot(i, visited, 1)
+            visited[i] = False
+        return result

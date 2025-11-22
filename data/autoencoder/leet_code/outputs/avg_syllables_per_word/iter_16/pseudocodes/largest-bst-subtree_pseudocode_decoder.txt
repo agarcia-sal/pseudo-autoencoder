@@ -1,0 +1,60 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self, val EQUALS zero, left EQUALS none, right EQUALS none  
+        SET self dot val TO val  
+        SET self dot left TO left  
+        SET self dot right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETERS values  
+    IF values IS EMPTY  
+        RETURN none  
+    END IF  
+    SET root TO A NEW TreeNode CREATED WITH element at position zero OF values  
+    SET i TO one  
+    SET queue TO A NEW double ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO THE FIRST ELEMENT REMOVED FROM queue  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i OF values IS NOT none  
+            SET node dot left TO A NEW TreeNode CREATED WITH element at position i OF values  
+            APPEND node dot left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i OF values IS NOT none  
+            SET node dot right TO A NEW TreeNode CREATED WITH element at position i OF values  
+            APPEND node dot right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p, q  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF p dot val NOT EQUALS q dot val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETERS p dot left, q dot left AND is_same_tree WITH PARAMETERS p dot right, q dot right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION largestBSTSubtree WITH PARAMETERS self, root  
+        FUNCTION dfs WITH PARAMETER node  
+            IF node IS none  
+                RETURN positive infinity, negative infinity, zero  
+            END IF  
+            SET left_min, left_max, left_size TO THE RESULTS OF CALLING dfs WITH node dot left  
+            SET right_min, right_max, right_size TO THE RESULTS OF CALLING dfs WITH node dot right  
+            IF left_max IS LESS THAN node dot val AND node dot val IS LESS THAN right_min  
+                RETURN THE SMALLER OF node dot val AND left_min, THE LARGER OF node dot val AND right_max, left_size PLUS right_size PLUS one  
+            END IF  
+            RETURN negative infinity, positive infinity, THE LARGER OF left_size AND right_size  
+        END FUNCTION  
+        RETURN THE THIRD ELEMENT OF THE RESULT OF dfs CALLED WITH root  
+    END FUNCTION  
+END CLASS

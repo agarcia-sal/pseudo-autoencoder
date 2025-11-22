@@ -1,0 +1,52 @@
+CLASS Solution  
+    FUNCTION solveNQueens WITH PARAMETER n  
+        FUNCTION is_not_under_attack WITH PARAMETERS row col  
+            RETURN logical NOT of the SUM of the element at position col of cols PLUS the element at position row MINUS col of hills PLUS the element at position row PLUS col of dales EQUALS zero  
+        END FUNCTION  
+        
+        FUNCTION place_queen WITH PARAMETERS row col  
+            ADD the pair consisting of row and col TO queens  
+            SET the element at position col of cols TO one  
+            SET the element at position row MINUS col of hills TO one  
+            SET the element at position row PLUS col of dales TO one  
+        END FUNCTION  
+        
+        FUNCTION remove_queen WITH PARAMETERS row col  
+            REMOVE the pair consisting of row and col FROM queens  
+            SET the element at position col of cols TO zero  
+            SET the element at position row MINUS col of hills TO zero  
+            SET the element at position row PLUS col of dales TO zero  
+        END FUNCTION  
+        
+        FUNCTION add_solution  
+            SET solution TO an empty list  
+            FOR each pair of ignored element and col IN the sorted elements of queens  
+                SET line TO the concatenation of the repetition of the character dot for col times PLUS the character Q PLUS the repetition of the character dot for the difference of n MINUS col MINUS one times  
+                APPEND line TO solution  
+            END FOR  
+            APPEND solution TO output  
+        END FUNCTION  
+        
+        FUNCTION backtrack WITH PARAMETER row defaulting to zero  
+            FOR col FROM zero TO the difference of n MINUS one  
+                IF is_not_under_attack WITH row and col returns true  
+                    CALL place_queen WITH row and col  
+                    IF the sum of row PLUS one EQUALS n  
+                        CALL add_solution  
+                    ELSE  
+                        CALL backtrack WITH the sum of row PLUS one  
+                    END IF  
+                    CALL remove_queen WITH row and col  
+                END IF  
+            END FOR  
+        END FUNCTION  
+        
+        SET cols TO a list of zero repeated n times  
+        SET hills TO a list of zero repeated the difference of two TIMES n MINUS one times  
+        SET dales TO a list of zero repeated the difference of two TIMES n MINUS one times  
+        SET queens TO an empty set  
+        SET output TO an empty list  
+        CALL backtrack  
+        RETURN output  
+    END FUNCTION  
+END CLASS

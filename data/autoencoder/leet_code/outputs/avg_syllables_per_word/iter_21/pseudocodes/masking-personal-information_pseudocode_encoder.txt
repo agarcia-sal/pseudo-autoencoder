@@ -1,0 +1,51 @@
+CLASS Solution  
+    FUNCTION maskPII(s)  
+        IF the CHARACTER at ANY POSITION IN s EQUALS the EMAIL SEPARATOR SYMBOL  
+            CALL split_string WITH PARAMETERS s AND the EMAIL SEPARATOR SYMBOL RETURNING local AND domain  
+            CALL mask_local_part WITH PARAMETER local RETURNING masked_local  
+            CALL convert_to_lowercase WITH PARAMETER masked_local RETURNING lowercase_masked_local  
+            CALL convert_to_lowercase WITH PARAMETER domain RETURNING lowercase_domain  
+            SET result TO concatenate lowercase_masked_local WITH the EMAIL SEPARATOR SYMBOL AND lowercase_domain  
+            RETURN result  
+        ELSE  
+            CALL extract_digits FROM s RETURNING digits  
+            CALL construct_local_phone_number WITH PARAMETER digits RETURNING local_number  
+            IF the LENGTH OF digits EQUALS ten  
+                RETURN local_number  
+            ELSE  
+                CALL determine_country_code_length WITH PARAMETERS digits AND ten RETURNING country_code_length  
+                CALL construct_country_code_mask WITH PARAMETER country_code_length RETURNING country_code  
+                SET result TO concatenate country_code WITH local_number  
+                RETURN result  
+            END IF  
+        END IF  
+    END FUNCTION  
+  
+    FUNCTION split_string(string_value, separator)  
+        DESCRIBE as splitting string_value into two parts at the first occurrence of separator RETURNING part_before AND part_after  
+    END FUNCTION  
+  
+    FUNCTION mask_local_part(local_part)  
+        DESCRIBE as creating a new string by KEEPING the FIRST CHARACTER of local_part, FOLLOWED BY five MASKING CHARACTERS, FOLLOWED BY the LAST CHARACTER of local_part RETURNING masked_string  
+    END FUNCTION  
+  
+    FUNCTION convert_to_lowercase(input_string)  
+        DESCRIBE as converting all CHARACTERS in input_string TO their lowercase forms RETURNING lowercase_string  
+    END FUNCTION  
+  
+    FUNCTION extract_digits(input_string)  
+        DESCRIBE as filtering all CHARACTERS in input_string TO KEEP ONLY the DIGITS, THEN concatenating them into a single string RETURNING digits_only_string  
+    END FUNCTION  
+  
+    FUNCTION construct_local_phone_number(digits_string)  
+        DESCRIBE as concatenating three MASKING DIGITS, a DASH, three MASKING DIGITS, a DASH, AND the LAST four CHARACTERS of digits_string TO FORM the local phone number format RETURNING formatted_local_number  
+    END FUNCTION  
+  
+    FUNCTION determine_country_code_length(digits_string, base_length)  
+        DESCRIBE as subtracting base_length FROM the LENGTH OF digits_string RETURNING the difference AS the length of the country code  
+    END FUNCTION  
+  
+    FUNCTION construct_country_code_mask(length)  
+        DESCRIBE as concatenating the plus symbol, length number of MASKING DIGITS, and a DASH RETURNING the country code mask  
+    END FUNCTION  
+END CLASS

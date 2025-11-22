@@ -1,0 +1,39 @@
+CLASS Solution  
+    FUNCTION mostSimilar(n, roads, names, targetPath)  
+        SET graph TO a new mapping with default empty list  
+        FOR each pair u, v IN roads  
+            APPEND v TO graph at key u  
+            APPEND u TO graph at key v  
+        
+        SET m TO length of targetPath  
+        
+        FUNCTION dp(i, j) WITH memoization  
+            IF i EQUALS 0 THEN  
+                IF names at j NOT EQUALS targetPath at i THEN  
+                    RETURN 1 AND list containing j  
+                ELSE  
+                    RETURN 0 AND list containing j  
+            
+            SET min_cost TO positive infinity  
+            SET min_path TO empty list  
+            FOR each k IN graph at j  
+                CALL dp WITH i MINUS 1 AND k, RECEIVE cost AND path  
+                IF cost LESS THAN min_cost THEN  
+                    SET min_cost TO cost  
+                    SET min_path TO path  
+            
+            SET current_cost TO min_cost PLUS (1 IF names at j NOT EQUALS targetPath at i ELSE 0)  
+            RETURN current_cost AND min_path concatenated with j  
+        END FUNCTION  
+        
+        SET min_cost TO positive infinity  
+        SET min_path TO empty list  
+        FOR j FROM 0 TO n MINUS 1  
+            CALL dp WITH m MINUS 1 AND j, RECEIVE cost AND path  
+            IF cost LESS THAN min_cost THEN  
+                SET min_cost TO cost  
+                SET min_path TO path  
+        
+        RETURN min_path  
+    END FUNCTION  
+END CLASS

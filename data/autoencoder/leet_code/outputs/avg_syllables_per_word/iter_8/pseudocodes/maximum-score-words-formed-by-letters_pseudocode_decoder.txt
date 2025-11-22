@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION maxScoreWords(words, letters, score)  
+        FUNCTION word_score(word, score_map)  
+            SET total_score TO 0  
+            FOR each character IN word  
+                INCREMENT total_score BY score_map AT character  
+            RETURN total_score  
+        END FUNCTION  
+        
+        FUNCTION can_form(word, letter_count)  
+            SET word_count TO count occurrences of each character in word  
+            FOR each character, count IN word_count  
+                IF letter_count AT character IS LESS THAN count  
+                    RETURN False  
+            RETURN True  
+        END FUNCTION  
+        
+        FUNCTION update_letter_count(letter_count, word, add)  
+            FOR each character IN word  
+                IF add IS True  
+                    INCREMENT letter_count AT character BY 1  
+                ELSE  
+                    DECREMENT letter_count AT character BY 1  
+        END FUNCTION  
+        
+        FUNCTION backtrack(index, current_score, letter_count)  
+            IF index IS EQUAL TO LENGTH OF words  
+                RETURN current_score  
+            
+            SET max_score TO current_score  
+            FOR i FROM index TO LENGTH OF words MINUS 1  
+                IF can_form(words AT i, letter_count) IS True  
+                    CALL update_letter_count(letter_count, words AT i, add False)  
+                    SET candidate_score TO backtrack(i PLUS 1, current_score PLUS word_score(words AT i, score_map), letter_count)  
+                    IF candidate_score IS GREATER THAN max_score  
+                        SET max_score TO candidate_score  
+                    CALL update_letter_count(letter_count, words AT i, add True)  
+            RETURN max_score  
+        END FUNCTION  
+        
+        SET score_map TO a mapping from each letter 'a' TO 'z' TO corresponding value in score  
+        SET letter_count TO counts of each character in letters  
+        
+        RETURN backtrack(0, 0, letter_count)  
+    END FUNCTION  
+END CLASS

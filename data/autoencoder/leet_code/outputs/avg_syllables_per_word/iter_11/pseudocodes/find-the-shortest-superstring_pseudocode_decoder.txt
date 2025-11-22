@@ -1,0 +1,48 @@
+CLASS Solution
+    FUNCTION shortestSuperstring(words)
+        SET n TO the LENGTH OF words
+
+        FUNCTION overlap(i, j)
+            FOR k FROM the MINIMUM OF the LENGTH OF element at position i of words AND the LENGTH OF element at position j of words DOWN TO one
+                IF the SUFFIX of element at position i of words of LENGTH k EQUALS the PREFIX of element at position j of words of LENGTH k
+                    RETURN k
+                END IF
+            END FOR
+            RETURN zero
+        END FUNCTION
+
+        FUNCTION dp(mask, i)
+            IF mask EQUALS (one LEFT SHIFTED BY n) MINUS one
+                RETURN a TUPLE of zero AND an EMPTY STRING
+            END IF
+
+            SET min_len TO infinity
+            SET best_path TO an EMPTY STRING
+            FOR j FROM zero TO n MINUS one
+                IF the BITWISE AND of mask AND (one LEFT SHIFTED BY j) EQUALS zero
+                    SET length AND path TO THE RESULT OF dp with PARAMETERS (the BITWISE OR of mask AND (one LEFT SHIFTED BY j), j)
+                    SET length TO length PLUS (the LENGTH OF element at position j of words MINUS overlap(i, j))
+                    IF length LESS THAN min_len
+                        SET min_len TO length
+                        SET best_path TO the SUBSTRING of element at position j of words FROM overlap(i, j) TO END CONCATENATED WITH path
+                    END IF
+                END IF
+            END FOR
+
+            RETURN a TUPLE of min_len AND best_path
+        END FUNCTION
+
+        SET min_len TO infinity
+        SET shortest_path TO an EMPTY STRING
+        FOR i FROM zero TO n MINUS one
+            SET length AND path TO THE RESULT OF dp with PARAMETERS (one LEFT SHIFTED BY i, i)
+            SET length TO length PLUS the LENGTH OF element at position i of words
+            IF length LESS THAN min_len
+                SET min_len TO length
+                SET shortest_path TO element at position i of words CONCATENATED WITH path
+            END IF
+        END FOR
+
+        RETURN shortest_path
+    END FUNCTION
+END CLASS

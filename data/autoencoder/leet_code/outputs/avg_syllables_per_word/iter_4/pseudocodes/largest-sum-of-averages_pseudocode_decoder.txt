@@ -1,0 +1,27 @@
+```
+CLASS Solution
+    FUNCTION largestSumOfAverages(nums, k)
+        SET n TO LENGTH OF nums
+        SET prefix_sum TO LIST OF ZEROS WITH LENGTH n + 1
+        FOR i FROM 0 TO n - 1
+            SET prefix_sum[i + 1] TO prefix_sum[i] PLUS nums[i]
+
+        FUNCTION average(i, j)
+            RETURN (prefix_sum[j + 1] MINUS prefix_sum[i]) DIVIDED BY (j MINUS i PLUS 1)
+        END FUNCTION
+
+        SET dp TO 2D LIST OF ZEROS WITH DIMENSIONS (n + 1) BY (k + 1)
+
+        FOR i FROM 0 TO n - 1
+            SET dp[i][1] TO average(i, n - 1)
+
+        FOR i FROM n - 1 DOWNTO 0
+            FOR partitions FROM 2 TO k
+                FOR j FROM i + 1 TO n - 1
+                    SET candidate TO dp[j][partitions - 1] PLUS average(i, j - 1)
+                    SET dp[i][partitions] TO MAXIMUM OF dp[i][partitions] AND candidate
+
+        RETURN dp[0][k]
+    END FUNCTION
+END CLASS
+```

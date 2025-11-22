@@ -1,0 +1,46 @@
+CLASS Solution
+    FUNCTION numBusesToDestination(routes, source, target)
+        IF source EQUALS target THEN
+            RETURN 0
+        END IF
+
+        SET stop_to_buses TO a default dictionary of list
+        FOR each bus WITH index bus IN routes DO
+            FOR each stop IN route DO
+                APPEND bus TO stop_to_buses[stop]
+            END FOR
+        END FOR
+
+        SET bus_queue TO an empty deque
+        SET visited_buses TO an empty set
+        SET visited_stops TO an empty set
+
+        FOR each bus IN stop_to_buses[source] DO
+            APPEND (bus, 1) TO bus_queue
+            ADD bus TO visited_buses
+        END FOR
+        ADD source TO visited_stops
+
+        WHILE bus_queue IS NOT empty DO
+            SET current_bus, bus_count TO POP left FROM bus_queue
+
+            FOR each stop IN routes[current_bus] DO
+                IF stop EQUALS target THEN
+                    RETURN bus_count
+                END IF
+
+                IF stop NOT IN visited_stops THEN
+                    ADD stop TO visited_stops
+                    FOR each next_bus IN stop_to_buses[stop] DO
+                        IF next_bus NOT IN visited_buses THEN
+                            ADD next_bus TO visited_buses
+                            APPEND (next_bus, bus_count + 1) TO bus_queue
+                        END IF
+                    END FOR
+                END IF
+            END FOR
+        END WHILE
+
+        RETURN -1
+    END FUNCTION
+END CLASS

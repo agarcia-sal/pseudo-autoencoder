@@ -1,0 +1,49 @@
+from typing import List
+
+class Solution:
+    def maximumGap(self, nums: List[int]) -> int:
+        if len(nums) < 2:
+            return 0
+
+        def countingSort(arr: List[int], exp: int) -> None:
+            n = len(arr)
+            output = [0] * n
+            count = [0] * 10
+
+            # Count occurrences of digits
+            for i in range(n):
+                index = (arr[i] // exp) % 10
+                count[index] += 1
+
+            # Change count[i] so that count[i] contains the actual position
+            for i in range(1, 10):
+                count[i] += count[i - 1]
+
+            # Build the output array from end to start to maintain stability
+            i = n - 1
+            while i >= 0:
+                index = (arr[i] // exp) % 10
+                count[index] -= 1
+                output[count[index]] = arr[i]
+                i -= 1
+
+            # Copy the output array to arr
+            for i in range(n):
+                arr[i] = output[i]
+
+        def radixSort(arr: List[int]) -> None:
+            max1 = max(arr)
+            exp = 1
+            while max1 // exp > 0:
+                countingSort(arr, exp)
+                exp *= 10
+
+        radixSort(nums)
+
+        max_diff = 0
+        for i in range(1, len(nums)):
+            current_diff = nums[i] - nums[i - 1]
+            if current_diff > max_diff:
+                max_diff = current_diff
+
+        return max_diff

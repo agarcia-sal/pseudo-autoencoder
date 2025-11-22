@@ -1,0 +1,65 @@
+CLASS ListNode  
+    FUNCTION __init__(self, val, next)  
+        SET self.val TO val  
+        SET self.next TO next  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION list_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET head TO CALL ListNode WITH first element of values AND None  
+    SET p TO head  
+    FOR each val IN values FROM second element TO end  
+        SET node TO CALL ListNode WITH val AND None  
+        SET p.next TO node  
+        SET p TO node  
+    RETURN head  
+END FUNCTION  
+
+FUNCTION is_same_list(p1, p2)  
+    IF p1 IS None AND p2 IS None  
+        RETURN True  
+    IF p1 IS None OR p2 IS None  
+        RETURN False  
+    RETURN (p1.val EQUALS p2.val) AND CALL is_same_list WITH p1.next AND p2.next  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION sortList(self, head)  
+        IF head IS None OR head.next IS None  
+            RETURN head  
+          
+        FUNCTION split(head)  
+            SET slow TO head  
+            SET fast TO head.next  
+            WHILE fast IS NOT None AND fast.next IS NOT None  
+                SET slow TO slow.next  
+                SET fast TO fast.next.next  
+            SET mid TO slow.next  
+            SET slow.next TO None  
+            RETURN head, mid  
+        END FUNCTION  
+          
+        FUNCTION merge(l1, l2)  
+            SET dummy TO CALL ListNode WITH 0 AND None  
+            SET current TO dummy  
+            WHILE l1 IS NOT None AND l2 IS NOT None  
+                IF l1.val LESS THAN l2.val  
+                    SET current.next TO l1  
+                    SET l1 TO l1.next  
+                ELSE  
+                    SET current.next TO l2  
+                    SET l2 TO l2.next  
+                SET current TO current.next  
+            SET current.next TO l1 IF l1 IS NOT None ELSE l2  
+            RETURN dummy.next  
+        END FUNCTION  
+          
+        SET left, right TO CALL split WITH head  
+        SET left TO CALL self.sortList WITH left  
+        SET right TO CALL self.sortList WITH right  
+          
+        RETURN CALL merge WITH left AND right  
+    END FUNCTION  
+END CLASS

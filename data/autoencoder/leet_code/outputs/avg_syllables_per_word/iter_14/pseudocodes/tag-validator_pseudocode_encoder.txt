@@ -1,0 +1,47 @@
+CLASS Solution  
+    FUNCTION isValid(code)  
+        SET code TO the result of REMOVING all substrings MATCHING the regular expression FOR CDATA sections FROM code  
+        
+        SET stack TO an empty list  
+        
+        SET i TO zero  
+        WHILE i IS LESS THAN the LENGTH OF code  
+            IF the character AT position i OF code IS the character less than  
+                SET j TO the position OF the next character greater than FINDING starting FROM position i PLUS one IN code  
+                IF j IS EQUAL TO minus one  
+                    RETURN false  
+                END IF  
+                
+                SET tag_content TO the substring FROM position i PLUS one TO position j MINUS one OF code  
+                
+                IF tag_content IS empty  
+                    RETURN false  
+                END IF  
+                
+                IF the character AT position zero OF tag_content IS the character slash  
+                    SET tag_name TO the substring FROM position one TO the END OF tag_content  
+                    
+                    IF stack IS empty OR the last element OF stack IS NOT EQUAL TO tag_name  
+                        RETURN false  
+                    END IF  
+                    
+                    REMOVE the last element FROM stack  
+                ELSE IF the character AT position zero OF tag_content IS the character exclamation mark  
+                    RETURN false  
+                ELSE  
+                    IF the LENGTH OF tag_content IS LESS THAN one OR GREATER THAN nine OR tag_content IS NOT composed ONLY OF uppercase letters  
+                        RETURN false  
+                    END IF  
+                    
+                    APPEND tag_content TO stack  
+                END IF  
+                
+                SET i TO j PLUS one  
+            ELSE  
+                INCREMENT i BY one  
+            END IF  
+        END WHILE  
+        
+        RETURN stack IS empty AND the number OF substrings MATCHING regular expression FOR tags WITH uppercase letters OPEN AND CLOSE IN code IS GREATER THAN zero  
+    END FUNCTION  
+END CLASS

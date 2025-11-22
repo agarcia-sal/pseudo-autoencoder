@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION openLock(deadends LIST of strings deadends_param, target string target_param) RETURNS integer  
+        SET deadends_set TO a NEW SET created FROM deadends_param  
+        IF the string consisting of digit zero repeated four times IS IN deadends_set  
+            RETURN the integer represented by NEGATIVE ONE  
+        END IF  
+        IF target_param EQUALS the string consisting of digit zero repeated four times  
+            RETURN zero  
+        END IF  
+        SET queue TO a NEW DEQUE initialized WITH a SINGLE tuple of the string consisting of digit zero repeated four times AND zero  
+        SET visited TO a NEW SET initialized WITH the string consisting of digit zero repeated four times  
+        
+        FUNCTION neighbors(state string parameter_state) RETURNS a LIST  
+            SET result TO a NEW EMPTY LIST  
+            FOR index FROM zero TO three  
+                SET digit_char TO the CHARACTER at position index of parameter_state  
+                SET digit TO the integer value REPRESENTED BY digit_char  
+                FOR move_value IN the LIST CONTAINING negative one AND one  
+                    SET new_digit TO the REMAINDER WHEN the SUM of digit AND move_value IS DIVIDED BY ten  
+                    SET new_state TO the concatenation of the SUBSTRING of parameter_state FROM position zero TO position index MINUS one  
+                                             PLUS the string representation of new_digit  
+                                             PLUS the SUBSTRING of parameter_state FROM position index PLUS one TO the end  
+                    APPEND new_state TO result  
+                END FOR  
+            END FOR  
+            RETURN result  
+        END FUNCTION  
+        
+        WHILE the queue IS NOT EMPTY  
+            SET current_tuple TO the REMOVAL of the FIRST ELEMENT from queue  
+            SET current_state TO the FIRST ELEMENT of current_tuple  
+            SET steps TO the SECOND ELEMENT of current_tuple  
+            FOR each neighbor_state IN neighbors(current_state)  
+                IF neighbor_state IS NOT IN visited AND neighbor_state IS NOT IN deadends_set  
+                    IF neighbor_state EQUALS target_param  
+                        RETURN the SUM of steps AND one  
+                    END IF  
+                    ADD neighbor_state TO visited  
+                    ADD the tuple of neighbor_state AND the SUM of steps AND one TO the END OF queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN the integer represented by NEGATIVE ONE  
+    END FUNCTION  
+END CLASS

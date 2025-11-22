@@ -1,0 +1,41 @@
+CLASS Solution
+    FUNCTION pyramidTransition(bottom, allowed)
+        SET allowed_map TO CALL create_defaultdict_of_defaultdict_of_list
+        
+        FOR each rule IN allowed
+            SET left TO element at position zero of rule
+            SET right TO element at position one of rule
+            SET top TO element at position two of rule
+            APPEND top TO list at key right in dictionary at key left in allowed_map
+        END FOR
+        
+        FUNCTION can_build_pyramid(current_bottom, current_top)
+            IF the LENGTH OF current_bottom EQUALS one
+                RETURN True
+            END IF
+            
+            IF the LENGTH OF current_top EQUALS the LENGTH OF current_bottom MINUS one
+                RETURN CALL can_build_pyramid WITH current_top AND an empty list
+            END IF
+            
+            SET left TO element at position the LENGTH OF current_top of current_bottom
+            SET right TO element at position the LENGTH OF current_top PLUS one of current_bottom
+            
+            IF allowed_map HAS key left AND allowed_map at key left HAS key right
+                FOR each top IN allowed_map at key left at key right
+                    IF CALL can_build_pyramid WITH current_bottom AND current_top CONCATENATED WITH top
+                        RETURN True
+                    END IF
+                END FOR
+            END IF
+            
+            RETURN False
+        END FUNCTION
+        
+        RETURN CALL can_build_pyramid WITH bottom AND an empty list
+    END FUNCTION
+END CLASS
+
+FUNCTION create_defaultdict_of_defaultdict_of_list
+    // Auxiliary function representing initialization of nested dictionaries with list defaults
+END FUNCTION

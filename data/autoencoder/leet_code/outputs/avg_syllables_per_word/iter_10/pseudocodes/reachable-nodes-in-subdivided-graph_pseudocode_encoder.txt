@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION reachableNodes(edges, maxMoves, n)  
+        SET graph TO an empty collection mapping each index from zero TO n MINUS one TO an empty list  
+        FOR each u, v, cnt IN edges  
+            APPEND pair of v and cnt TO list at key u IN graph  
+            APPEND pair of u and cnt TO list at key v IN graph  
+        END FOR  
+        
+        SET distances TO a list of length n FILLED WITH infinity  
+        SET element at position zero OF distances TO zero  
+        SET priority_queue TO a list CONTAINING a pair of zero and zero  
+        
+        WHILE priority_queue is not empty  
+            REMOVE smallest distance-node pair FROM priority_queue AND SET TO dist and node  
+            IF dist GREATER THAN element at position node OF distances  
+                CONTINUE to next iteration  
+            END IF  
+            FOR each neighbor and cnt IN list at key node IN graph  
+                SET new_dist TO dist PLUS cnt PLUS one  
+                IF new_dist LESS THAN element at position neighbor OF distances  
+                    SET element at position neighbor OF distances TO new_dist  
+                    INSERT pair of new_dist and neighbor INTO priority_queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        SET reachable_nodes TO zero  
+        
+        FOR each d IN distances  
+            IF d LESS THAN OR EQUAL TO maxMoves  
+                INCREMENT reachable_nodes BY one  
+            END IF  
+        END FOR  
+        
+        SET used_edges TO an empty collection  
+        FOR each u, v, cnt IN edges  
+            SET moves_u TO maximum of zero AND maxMoves MINUS element at position u OF distances  
+            SET moves_v TO maximum of zero AND maxMoves MINUS element at position v OF distances  
+            SET reachable_new_nodes TO minimum of cnt AND moves_u PLUS moves_v  
+            INCREMENT reachable_nodes BY reachable_new_nodes  
+            STORE reachable_new_nodes IN used_edges at key pair of u and v  
+        END FOR  
+        
+        RETURN reachable_nodes  
+    END FUNCTION  
+END CLASS

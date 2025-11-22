@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION maxSumOfThreeSubarrays(list_of_numbers nums, number k) RETURNS list_of_numbers  
+        SET total_length TO the LENGTH OF nums  
+        SET list_of_sums TO a new list of zeros with LENGTH OF total_length MINUS k PLUS one  
+        SET current_sum TO the SUM OF the FIRST k elements OF nums  
+        SET the element at position zero OF list_of_sums TO current_sum  
+        
+        FOR index FROM one TO total_length MINUS k  
+            SET current_sum TO current_sum PLUS the element at position index PLUS k MINUS one OF nums MINUS the element at position index MINUS one OF nums  
+            SET the element at position index OF list_of_sums TO current_sum  
+        END FOR  
+        
+        SET list_left TO a new list of zeros with LENGTH OF total_length MINUS k PLUS one  
+        SET list_right TO a new list where every element is total_length MINUS k with LENGTH OF total_length MINUS k PLUS one  
+        
+        SET max_sum_position TO zero  
+        FOR index FROM zero TO total_length MINUS k  
+            IF the element at position index OF list_of_sums IS GREATER THAN the element at position max_sum_position OF list_of_sums THEN  
+                SET max_sum_position TO index  
+            END IF  
+            SET the element at position index OF list_left TO max_sum_position  
+        END FOR  
+        
+        SET max_sum_position TO total_length MINUS k  
+        FOR index FROM total_length MINUS k DOWN TO zero  
+            IF the element at position index OF list_of_sums IS GREATER THAN OR EQUAL TO the element at position max_sum_position OF list_of_sums THEN  
+                SET max_sum_position TO index  
+            END IF  
+            SET the element at position index OF list_right TO max_sum_position  
+        END FOR  
+        
+        SET max_total_sum TO zero  
+        SET result_indices TO a new list containing three zeros  
+        FOR middle_index FROM k TO total_length MINUS two TIMES k  
+            SET left_index TO the element at position middle_index MINUS k OF list_left  
+            SET right_index TO the element at position middle_index PLUS k OF list_right  
+            SET total_of_three TO the element at position left_index OF list_of_sums PLUS the element at position middle_index OF list_of_sums PLUS the element at position right_index OF list_of_sums  
+            IF total_of_three IS GREATER THAN max_total_sum THEN  
+                SET max_total_sum TO total_of_three  
+                SET result_indices TO a new list containing left_index, middle_index, right_index  
+            END IF  
+        END FOR  
+        
+        RETURN result_indices  
+    END FUNCTION  
+END CLASS

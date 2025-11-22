@@ -1,0 +1,54 @@
+CLASS Solution
+    FUNCTION closestNode(number_of_nodes, list_of_edges, list_of_queries)
+        
+        SET graph TO a new default dictionary with lists as default values
+        
+        FOR each pair U and V IN list_of_edges
+            APPEND V TO the list at key U OF graph
+            APPEND U TO the list at key V OF graph
+        END FOR
+        
+        FUNCTION find_path(start_node, end_node)
+            ASSIGN reference TO a new double ended queue initialized with the tuple of start_node and a list containing start_node
+            SET visited_nodes TO a new set containing only start_node
+            
+            WHILE the queue IS NOT empty
+                REMOVE the leftmost element from the queue and ASSIGN it to node and path
+                IF node EQUALS end_node
+                    RETURN path
+                END IF
+                
+                FOR each neighbor IN the list at key node OF graph
+                    IF neighbor IS NOT IN visited_nodes
+                        ADD neighbor TO visited_nodes
+                        APPEND the tuple of neighbor and the concatenation of path and a list containing neighbor TO the queue
+                    END IF
+                END FOR
+            END WHILE
+        END FUNCTION
+        
+        FUNCTION closest_node_on_path(list_of_path_nodes, target_node)
+            SET minimum_distance TO positive infinity
+            SET closest_node_found TO no value
+            
+            FOR each path_node IN list_of_path_nodes
+                SET distance_to_node TO the LENGTH OF find_path(path_node, target_node) MINUS one
+                IF distance_to_node LESS THAN minimum_distance
+                    SET minimum_distance TO distance_to_node
+                    SET closest_node_found TO path_node
+                END IF
+            END FOR
+            
+            RETURN closest_node_found
+        END FUNCTION
+        
+        SET answer_list TO an empty list
+        
+        FOR each triple start_value, end_value, node_value IN list_of_queries
+            SET current_path TO find_path(start_value, end_value)
+            APPEND closest_node_on_path(current_path, node_value) TO answer_list
+        END FOR
+        
+        RETURN answer_list
+    END FUNCTION
+END CLASS

@@ -1,0 +1,43 @@
+CLASS Solution
+    FUNCTION ipToCIDR(ip, n)
+        FUNCTION ip_to_int(ip_address)
+            SET parts TO CALL map WITH parameters int AND CALL split ON ip_address WITH parameter period
+            SET result TO zero
+            FOR each part IN parts
+                SET result TO result MULTIPLIED BY two HUNDRED FIFTY SIX PLUS part
+            END FOR
+            RETURN result
+        END FUNCTION
+        
+        FUNCTION int_to_ip(number)
+            RETURN CALL join WITH parameters period AND CALL map WITH parameters string AND
+                CALL generator WITH parameters
+                    FOR i FROM three TO zero DECREMENT BY one
+                        SET element TO number SHIFTED RIGHT BY eight MULTIPLIED BY i MODULO two HUNDRED FIFTY SIX
+                    END FOR
+        END FUNCTION
+        
+        FUNCTION largest_cidr_size(start_value, count)
+            IF bitwise AND of start_value AND one EQUALS one
+                RETURN one
+            END IF
+            SET x TO one
+            WHILE x IS LESS THAN OR EQUAL TO count AND bitwise AND of start_value AND x MINUS one EQUALS zero
+                SET x TO x MULTIPLIED BY two
+            END WHILE
+            RETURN x DIVIDED BY two
+        END FUNCTION
+        
+        SET result TO empty list
+        SET start_ip TO CALL ip_to_int WITH parameter ip
+        
+        WHILE n IS GREATER THAN zero
+            SET size TO CALL largest_cidr_size WITH parameters start_ip AND n
+            APPEND CALL int_to_ip WITH parameter start_ip CONCATENATED WITH slash AND thirty TWO MINUS (CALL bit_length ON size MINUS one) TO result
+            INCREMENT start_ip BY size
+            DECREMENT n BY size
+        END WHILE
+        
+        RETURN result
+    END FUNCTION
+END CLASS

@@ -1,0 +1,43 @@
+CLASS Solution  
+    FUNCTION fullJustify(words WITH TYPE List OF strings, maxWidth WITH TYPE integer) RETURNS List OF strings  
+        FUNCTION justify_line(line WITH TYPE List OF strings, num_of_letters WITH TYPE integer, is_last_line WITH TYPE boolean) RETURNS string  
+            IF the LENGTH OF line EQUALS one OR is_last_line EQUALS true THEN  
+                RETURN the CONCATENATION OF each word IN line SEPARATED BY a SINGLE SPACE FOLLOWED BY a NUMBER OF SPACES EQUAL TO maxWidth MINUS num_of_letters MINUS the LENGTH OF line PLUS one  
+            ELSE  
+                SET total_spaces TO maxWidth MINUS num_of_letters  
+                SET num_of_gaps TO the LENGTH OF line MINUS one  
+                SET spaces_between_words TO total_spaces DIVIDED BY num_of_gaps  
+                SET extra_spaces TO total_spaces MODULO num_of_gaps  
+                
+                FOR index FROM zero TO num_of_gaps MINUS one  
+                    IF index LESS THAN extra_spaces THEN  
+                        APPEND a NUMBER OF SPACES EQUAL TO spaces_between_words PLUS one TO the element at position index OF line  
+                    ELSE  
+                        APPEND a NUMBER OF SPACES EQUAL TO spaces_between_words TO the element at position index OF line  
+                    END IF  
+                END FOR  
+                
+                RETURN the CONCATENATION OF all elements IN line WITH NO SEPARATOR  
+            END IF  
+        END FUNCTION  
+        
+        SET result TO an EMPTY list  
+        SET line TO an EMPTY list  
+        SET num_of_letters TO zero  
+        
+        FOR each word IN words  
+            IF num_of_letters PLUS the LENGTH OF word PLUS the LENGTH OF line GREATER THAN maxWidth THEN  
+                APPEND the RESULT OF justify_line WITH PARAMETERS line num_of_letters and false TO result  
+                SET line TO an EMPTY list  
+                SET num_of_letters TO zero  
+            END IF  
+            
+            APPEND word TO line  
+            INCREMENT num_of_letters BY the LENGTH OF word  
+        END FOR  
+        
+        APPEND the RESULT OF justify_line WITH PARAMETERS line num_of_letters and true TO result  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

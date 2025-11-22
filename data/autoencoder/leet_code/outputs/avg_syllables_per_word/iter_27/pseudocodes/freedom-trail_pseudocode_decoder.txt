@@ -1,0 +1,36 @@
+CLASS Solution  
+    FUNCTION findRotateSteps(ring, key)  
+        CREATE empty mapping named char_positions with default as empty list  
+        FOR each index IN range from zero TO the LENGTH OF ring MINUS one  
+            SET char TO element at position index of ring  
+            APPEND index TO the list at char_positions for character char  
+        END FOR  
+        
+        SET n TO the LENGTH OF ring  
+        
+        FUNCTION dp(i, prev_pos)  
+            IF i EQUALS the LENGTH OF key THEN  
+                RETURN zero  
+            END IF  
+            
+            SET min_steps TO positive infinity  
+            FOR each pos IN the list at char_positions for character element at position i of key  
+                SET clockwise TO pos MINUS prev_pos PLUS n MODULO n  
+                SET anticlockwise TO prev_pos MINUS pos PLUS n MODULO n  
+                IF clockwise LESS THAN anticlockwise THEN  
+                    SET current_minimum TO clockwise  
+                ELSE  
+                    SET current_minimum TO anticlockwise  
+                END IF  
+                
+                SET steps TO current_minimum PLUS one PLUS dp(i PLUS one, pos)  
+                IF steps LESS THAN min_steps THEN  
+                    SET min_steps TO steps  
+                END IF  
+            END FOR  
+            RETURN min_steps  
+        END FUNCTION  
+        
+        RETURN dp(zero, zero)  
+    END FUNCTION  
+END CLASS

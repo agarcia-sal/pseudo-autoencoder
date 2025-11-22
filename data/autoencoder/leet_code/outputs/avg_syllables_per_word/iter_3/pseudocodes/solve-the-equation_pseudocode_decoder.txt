@@ -1,0 +1,39 @@
+CLASS Solution
+    FUNCTION solveEquation(equation: string) RETURNS string
+        FUNCTION parse_side(side: string) RETURNS (integer, integer)
+            SET tokens TO side with '+' replaced by "#+" and '-' replaced by "#-"
+            SPLIT tokens BY '#'
+            SET x_count TO 0
+            SET num_sum TO 0
+            FOR each token IN tokens
+                IF token is empty THEN
+                    CONTINUE
+                IF token contains 'x' THEN
+                    IF token IS 'x' OR token IS '+x' THEN
+                        INCREMENT x_count BY 1
+                    ELSE IF token IS '-x' THEN
+                        DECREMENT x_count BY 1
+                    ELSE
+                        SET coefficient TO integer value of token with 'x' removed
+                        INCREMENT x_count BY coefficient
+                ELSE
+                    INCREMENT num_sum BY integer value of token
+            RETURN x_count, num_sum
+        END FUNCTION
+
+        SPLIT equation BY '=' INTO left_side, right_side
+        SET left_x, left_num TO parse_side(left_side)
+        SET right_x, right_num TO parse_side(right_side)
+
+        SET total_x TO left_x MINUS right_x
+        SET total_num TO right_num MINUS left_num
+
+        IF total_x IS 0 THEN
+            IF total_num IS 0 THEN
+                RETURN "Infinite solutions"
+            ELSE
+                RETURN "No solution"
+        ELSE
+            RETURN "x=" CONCATENATED WITH (total_num DIVIDED BY total_x)
+    END FUNCTION
+END CLASS

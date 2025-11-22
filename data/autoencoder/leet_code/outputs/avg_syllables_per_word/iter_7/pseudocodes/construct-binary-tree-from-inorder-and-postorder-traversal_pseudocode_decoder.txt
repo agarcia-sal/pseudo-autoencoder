@@ -1,0 +1,56 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN None  
+    SET root TO new TreeNode with val as first element of values  
+    SET i TO 1  
+    SET queue TO empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO queue removing leftmost element  
+        IF i IS LESS THAN length of values AND values at i IS NOT None  
+            SET node.left TO new TreeNode with val as values at i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i IS LESS THAN length of values AND values at i IS NOT None  
+            SET node.right TO new TreeNode with val as values at i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION buildTree(self, inorder, postorder)  
+        IF inorder IS empty OR postorder IS empty  
+            RETURN None  
+          
+        SET root_val TO postorder removing last element  
+        SET root TO new TreeNode with val as root_val  
+          
+        SET root_index TO position of root_val in inorder  
+          
+        SET root.right TO self.buildTree(sublist of inorder from root_index plus one TO end, postorder)  
+        SET root.left TO self.buildTree(sublist of inorder from start TO root_index, postorder)  
+          
+        RETURN root  
+    END FUNCTION  
+END CLASS

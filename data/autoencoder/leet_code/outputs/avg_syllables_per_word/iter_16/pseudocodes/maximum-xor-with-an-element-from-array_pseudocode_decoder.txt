@@ -1,0 +1,45 @@
+CLASS Solution  
+    FUNCTION maximizeXor(nums AS List of integers, queries AS List of List of integers) RETURNS List of integers  
+        SORT the array nums in ascending order  
+        SET sorted_queries TO the enumerated list of queries sorted by the second element of each query sublist representing the maximum value  
+        SET result TO a list of length equal to the length of queries with all elements set to negative one  
+        SET trie TO an empty map representing the root of the trie  
+        SET num_index TO zero representing the current position in nums  
+        
+        FOR each pair query_index and the tuple containing xi and mi IN sorted_queries  
+            WHILE num_index is less than the LENGTH OF nums AND element at position num_index of nums is less than or equal to mi  
+                SET num TO element at position num_index of nums  
+                SET node TO trie  
+                FOR i FROM thirty one DOWN TO zero  
+                    SET bit TO the value of the bit at position i of num by shifting num right by i positions and performing logical AND with one  
+                    IF bit is not a key in node  
+                        CREATE an empty map at node with the key bit  
+                    END IF  
+                    SET node TO the element at key bit of node  
+                END FOR  
+                INCREMENT num_index BY one  
+            END WHILE  
+            
+            IF trie is empty  
+                CONTINUE to the next iteration of the outer loop  
+            END IF  
+            
+            SET node TO trie  
+            SET max_xor TO zero  
+            FOR i FROM thirty one DOWN TO zero  
+                SET bit TO the value of the bit at position i of xi by shifting xi right by i positions and performing logical AND with one  
+                SET toggle_bit TO one MINUS bit to find the opposite bit  
+                IF toggle_bit is a key in node  
+                    SET max_xor TO max_xor OR the value obtained by shifting one left by i positions  
+                    SET node TO the element at toggle_bit key of node  
+                ELSE  
+                    SET node TO the element at bit key of node  
+                END IF  
+            END FOR  
+            
+            SET element at position query_index of result TO max_xor  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,49 @@
+CLASS Solution  
+    FUNCTION isPrintable(targetGrid)  
+        SET colorBounds TO a default mapping from color to a list containing positive infinity positive infinity negative infinity negative infinity representing minimal row minimal column maximal row maximal column  
+        FOR each rowIndex FROM zero TO the LENGTH OF targetGrid MINUS one  
+            FOR each columnIndex FROM zero TO the LENGTH OF the element at position zero of targetGrid MINUS one  
+                SET color TO element at position rowIndex of targetGrid at position columnIndex  
+                SET element at position zero of the list for color in colorBounds TO the minimum of element at position zero of the list for color in colorBounds AND rowIndex  
+                SET element at position one of the list for color in colorBounds TO the minimum of element at position one of the list for color in colorBounds AND columnIndex  
+                SET element at position two of the list for color in colorBounds TO the maximum of element at position two of the list for color in colorBounds AND rowIndex  
+                SET element at position three of the list for color in colorBounds TO the maximum of element at position three of the list for color in colorBounds AND columnIndex  
+            END FOR  
+        END FOR  
+        
+        SET graph TO a default mapping from color to a list of colors representing edges  
+        SET inDegree TO a default mapping from color to integer zero representing count of incoming edges  
+        
+        FOR each color and boundsList IN colorBounds  
+            SET minimalRow TO element at position zero of boundsList  
+            SET minimalColumn TO element at position one of boundsList  
+            SET maximalRow TO element at position two of boundsList  
+            SET maximalColumn TO element at position three of boundsList  
+            FOR each rowIndex FROM minimalRow TO maximalRow  
+                FOR each columnIndex FROM minimalColumn TO maximalColumn  
+                    IF element at position rowIndex of targetGrid at position columnIndex NOT EQUALS color THEN  
+                        SET otherColor TO element at position rowIndex of targetGrid at position columnIndex  
+                        APPEND color TO the list for otherColor in graph  
+                        INCREMENT inDegree of color BY one  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+        
+        SET queue TO a double ended queue containing all colors from colorBounds for which inDegree is equal to zero  
+        SET visitedColors TO zero  
+        
+        WHILE the queue is not empty  
+            REMOVE and SET color TO the first element from queue  
+            INCREMENT visitedColors BY one  
+            FOR each nextColor IN the list for color in graph  
+                DECREMENT inDegree of nextColor BY one  
+                IF inDegree of nextColor EQUALS zero THEN  
+                    APPEND nextColor TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN whether visitedColors is equal to the LENGTH OF colorBounds  
+    END FUNCTION  
+END CLASS

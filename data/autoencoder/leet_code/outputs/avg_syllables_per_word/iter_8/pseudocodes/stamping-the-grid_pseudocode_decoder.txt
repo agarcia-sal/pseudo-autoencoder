@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION possibleToStamp(grid, stampHeight, stampWidth)  
+        SET m TO LENGTH OF grid  
+        SET n TO LENGTH OF grid AT INDEX 0  
+        
+        FUNCTION prefix_sum(matrix)  
+            SET p TO a matrix of zeros with dimension m plus 1 by n plus 1  
+            FOR r FROM 1 TO m  
+                FOR c FROM 1 TO n  
+                    SET p at r and c TO value at matrix r minus 1 and c minus 1 PLUS p at r minus 1 and c PLUS p at r and c minus 1 MINUS p at r minus 1 and c minus 1  
+            RETURN p  
+        END FUNCTION  
+        
+        FUNCTION submatrix_sum(p, r1, c1, r2, c2)  
+            RETURN p at r2 plus 1 and c2 plus 1 MINUS p at r2 plus 1 and c1 MINUS p at r1 and c2 plus 1 PLUS p at r1 and c1  
+        END FUNCTION  
+        
+        SET p_grid TO CALL prefix_sum WITH grid  
+        
+        SET p_stamps TO a matrix of zeros with dimension m plus 1 by n plus 1  
+        
+        FOR r FROM 0 TO m minus 1  
+            FOR c FROM 0 TO n minus 1  
+                IF value at grid r and c EQUALS 0 THEN  
+                    IF r plus stampHeight LESS THAN OR EQUAL TO m AND c plus stampWidth LESS THAN OR EQUAL TO n THEN  
+                        IF CALL submatrix_sum WITH p_grid, r, c, r plus stampHeight minus 1, c plus stampWidth minus 1 EQUALS 0 THEN  
+                            INCREMENT p_stamps at r and c BY 1  
+                        END IF  
+                    END IF  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET p_stamps TO CALL prefix_sum WITH p_stamps  
+        
+        FOR r FROM 0 TO m minus 1  
+            FOR c FROM 0 TO n minus 1  
+                IF value at grid r and c EQUALS 0 THEN  
+                    IF CALL submatrix_sum WITH p_stamps, MAXIMUM OF 0 AND r minus stampHeight plus 1, MAXIMUM OF 0 AND c minus stampWidth plus 1, r, c EQUALS 0 THEN  
+                        RETURN False  
+                    END IF  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        RETURN True  
+    END FUNCTION  
+END CLASS

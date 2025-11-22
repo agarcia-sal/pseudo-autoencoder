@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION ipToCIDR(ip WITH TYPE string, n WITH TYPE integer) RETURNS list_of_strings  
+        
+        FUNCTION ip_to_int(ip)  
+            SET parts TO list of integer conversions of each substring resulting FROM splitting ip BY the character dot  
+            SET res TO zero  
+            FOR each part IN parts  
+                SET res TO res MULTIPLIED BY two POWERED BY eight PLUS part  
+            END FOR  
+            RETURN res  
+        END FUNCTION  
+        
+        FUNCTION int_to_ip(num)  
+            SET list_of_parts TO empty list  
+            FOR index FROM three DOWN TO zero  
+                SET shifted_value TO num DIVIDED BY two POWERED BY eight MULTIPLIED BY index  
+                SET part_value TO shifted_value MODULO two hundred fifty six  
+                APPEND string conversion of part_value TO list_of_parts  
+            END FOR  
+            RETURN concatenation of list_of_parts separated BY the character dot  
+        END FUNCTION  
+        
+        FUNCTION largest_cidr_size(start, n)  
+            IF start BITWISE AND one EQUALS one  
+                RETURN one  
+            END IF  
+            SET x TO one  
+            WHILE x LESS THAN OR EQUAL TO n AND start BITWISE AND (x MINUS one) EQUALS zero  
+                SET x TO x MULTIPLIED BY two  
+            END WHILE  
+            RETURN x DIVIDED BY two  
+        END FUNCTION  
+        
+        SET result TO empty list  
+        SET start_ip TO ip_to_int(ip)  
+        
+        WHILE n GREATER THAN zero  
+            SET size TO largest_cidr_size(start_ip, n)  
+            SET prefix_length TO thirty two MINUS (bit length of size MINUS one)  
+            SET cidr_block TO concatenation of int_to_ip(start_ip) PLUS the character slash PLUS prefix_length converted TO string  
+            APPEND cidr_block TO result  
+            SET start_ip TO start_ip PLUS size  
+            SET n TO n MINUS size  
+        END WHILE  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

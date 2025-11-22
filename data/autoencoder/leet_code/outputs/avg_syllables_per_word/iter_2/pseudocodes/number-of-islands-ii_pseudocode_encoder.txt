@@ -1,0 +1,66 @@
+```
+CLASS UnionFind
+    FUNCTION __init__()
+        SET parent TO empty dictionary
+        SET count TO 0
+    END FUNCTION
+
+    FUNCTION make_set(x)
+        IF x NOT IN parent THEN
+            SET parent[x] TO x
+            INCREMENT count BY 1
+        END IF
+    END FUNCTION
+
+    FUNCTION find(x)
+        IF parent[x] IS NOT x THEN
+            SET parent[x] TO find(parent[x])
+        END IF
+        RETURN parent[x]
+    END FUNCTION
+
+    FUNCTION union(x, y)
+        SET rootX TO find(x)
+        SET rootY TO find(y)
+        IF rootX IS NOT rootY THEN
+            SET parent[rootX] TO rootY
+            DECREMENT count BY 1
+        END IF
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION numIslands2(m, n, positions)
+        FUNCTION is_valid(x, y)
+            RETURN (x >= 0 AND x < m) AND (y >= 0 AND y < n)
+        END FUNCTION
+
+        SET directions TO list of (1,0), (-1,0), (0,1), (0,-1)
+        SET uf TO new UnionFind
+        SET grid TO 2D list of zeros with dimensions m by n
+        SET result TO empty list
+
+        FOR EACH r, c IN positions DO
+            IF grid[r][c] EQUALS 1 THEN
+                APPEND uf.count TO result
+                CONTINUE TO next iteration
+            END IF
+
+            SET grid[r][c] TO 1
+            CALL uf.make_set((r, c))
+
+            FOR EACH dr, dc IN directions DO
+                SET nr TO r + dr
+                SET nc TO c + dc
+                IF is_valid(nr, nc) AND grid[nr][nc] EQUALS 1 THEN
+                    CALL uf.union((r, c), (nr, nc))
+                END IF
+            END FOR
+
+            APPEND uf.count TO result
+        END FOR
+
+        RETURN result
+    END FUNCTION
+END CLASS
+```

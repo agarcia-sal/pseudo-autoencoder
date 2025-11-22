@@ -1,0 +1,31 @@
+```
+dirs ← [(0,1),(0,-1),(1,0),(-1,0)]
+m,n ← len(grid), len(grid[0])
+start, num_keys ← None, 0
+for i in [0..m-1], j in [0..n-1]:
+  if grid[i][j] = '@': start ← (i,j)
+  else if grid[i][j] is lowercase: num_keys += 1
+
+queue ← deque([(start.x, start.y, 0, 0)])
+visited ← {(start.x, start.y, 0)}
+
+while queue not empty:
+  x,y,keys,steps ← queue.popleft()
+  for dx,dy in dirs:
+    nx,ny ← x+dx, y+dy
+    if 0 ≤ nx < m and 0 ≤ ny < n:
+      c ← grid[nx][ny]
+      if c = '#': continue
+      if c is uppercase:
+        mask ← 1 << (ord(lowercase(c)) - ord('a'))
+        if keys & mask = 0: continue
+      new_keys ← keys
+      if c is lowercase:
+        new_keys ← keys | (1 << (ord(c) - ord('a')))
+        if new_keys = (1 << num_keys) - 1: return steps + 1
+      if (nx, ny, new_keys) ∉ visited:
+        visited.add((nx, ny, new_keys))
+        queue.append((nx, ny, new_keys, steps+1))
+
+return -1
+```

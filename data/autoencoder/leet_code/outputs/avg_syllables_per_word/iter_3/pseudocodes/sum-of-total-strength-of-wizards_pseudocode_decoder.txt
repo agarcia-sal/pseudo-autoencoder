@@ -1,0 +1,48 @@
+```
+CLASS Solution
+    FUNCTION totalStrength(strength: List[int]) RETURNS int
+        SET MOD TO 10^9 + 7
+        SET n TO LENGTH OF strength
+        
+        SET prefix TO array of size n+1 FILLED WITH 0
+        FOR i FROM 0 TO n-1
+            SET prefix[i + 1] TO (prefix[i] + strength[i]) MOD MOD
+        
+        SET prefix_prefix TO array of size n+2 FILLED WITH 0
+        FOR i FROM 0 TO n
+            SET prefix_prefix[i + 1] TO (prefix_prefix[i] + prefix[i]) MOD MOD
+        
+        SET prev_smaller TO array of size n FILLED WITH -1
+        SET next_smaller_or_equal TO array of size n FILLED WITH n
+        
+        SET stack TO empty list
+        FOR i FROM 0 TO n-1
+            WHILE stack IS NOT empty AND strength[LAST ELEMENT OF stack] >= strength[i]
+                REMOVE last element FROM stack
+            IF stack IS NOT empty
+                SET prev_smaller[i] TO LAST ELEMENT OF stack
+            APPEND i TO stack
+        
+        CLEAR stack
+        FOR i FROM n-1 DOWN TO 0 STEP -1
+            WHILE stack IS NOT empty AND strength[LAST ELEMENT OF stack] > strength[i]
+                REMOVE last element FROM stack
+            IF stack IS NOT empty
+                SET next_smaller_or_equal[i] TO LAST ELEMENT OF stack
+            APPEND i TO stack
+        
+        SET total_strength TO 0
+        FOR i FROM 0 TO n-1
+            SET left TO prev_smaller[i] + 1
+            SET right TO next_smaller_or_equal[i]
+            
+            SET sum_left TO (i - left + 1) * (prefix_prefix[right + 1] - prefix_prefix[i + 1]) MOD MOD
+            SET sum_right TO (right - i) * (prefix_prefix[i + 1] - prefix_prefix[left]) MOD MOD
+            
+            SET contribution TO strength[i] * (sum_left - sum_right) MOD MOD
+            SET total_strength TO (total_strength + contribution) MOD MOD
+        
+        RETURN total_strength
+    END FUNCTION
+END CLASS
+```

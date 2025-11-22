@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION isValid(code)  
+        IMPORT regular expression module AS re  
+        
+        SET cdata_pattern TO pattern matching <![CDATA[ ... ]]>  
+        
+        SET code TO result of replacing all cdata_pattern matches in code with empty string  
+        
+        SET stack TO empty list  
+        
+        SET i TO 0  
+        WHILE i LESS THAN length of code  
+            IF character at code position i IS '<'  
+                SET j TO position of next '>' in code after i  
+                IF j EQUALS -1  
+                    RETURN False  
+                
+                SET tag_content TO substring of code between i plus 1 and j  
+                
+                IF tag_content IS empty  
+                    RETURN False  
+                
+                IF first character of tag_content IS '/'  
+                    SET tag_name TO substring of tag_content from second character to end  
+                    IF stack IS empty OR last element of stack IS NOT tag_name  
+                        RETURN False  
+                    REMOVE last element from stack  
+                ELSE IF first character of tag_content IS '!'  
+                    RETURN False  
+                ELSE  
+                    IF length of tag_content LESS THAN 1 OR GREATER THAN 9 OR tag_content IS NOT all uppercase letters  
+                        RETURN False  
+                    APPEND tag_content TO stack  
+                
+                SET i TO j plus 1  
+            ELSE  
+                INCREMENT i BY 1  
+        
+        RETURN True IF stack IS empty AND count of matches of pattern '<[A-Z]+>.*</[A-Z]+>' in code IS GREATER THAN 0 ELSE False  
+    END FUNCTION  
+END CLASS

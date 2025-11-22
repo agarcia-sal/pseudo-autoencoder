@@ -1,0 +1,50 @@
+CLASS Solution  
+    FUNCTION mostSimilar(n target integer, roads list of list of integer, names list of string, targetPath list of string) RETURNS list of integer  
+        SET graph TO a new default dictionary with list as default value  
+        FOR each pair u and v IN roads  
+            APPEND v TO the element at position u of graph  
+            APPEND u TO the element at position v of graph  
+        END FOR  
+        
+        SET m TO the LENGTH OF targetPath  
+        
+        FUNCTION dp(i integer, j integer) RETURNS a tuple of integer and list of integer  
+            IF i EQUALS zero THEN  
+                IF the element at position j of names NOT EQUALS the element at position i of targetPath THEN  
+                    RETURN one AND a new list containing j  
+                ELSE  
+                    RETURN zero AND a new list containing j  
+                END IF  
+            END IF  
+            
+            SET min_cost TO positive infinity  
+            SET min_path TO a new empty list  
+            FOR each element k IN the element at position j of graph  
+                SET cost AND path TO the RESULT OF calling dp with parameters i MINUS one AND k  
+                IF cost LESS THAN min_cost THEN  
+                    SET min_cost TO cost  
+                    SET min_path TO path  
+                END IF  
+            END FOR  
+            
+            IF the element at position j of names NOT EQUALS the element at position i of targetPath THEN  
+                SET current_cost TO min_cost PLUS one  
+            ELSE  
+                SET current_cost TO min_cost  
+            END IF  
+            RETURN current_cost AND the concatenation of min_path AND a new list containing j  
+        END FUNCTION  
+        
+        SET min_cost TO positive infinity  
+        SET min_path TO a new empty list  
+        FOR each integer j FROM zero TO n MINUS one  
+            SET cost AND path TO the RESULT OF calling dp with parameters m MINUS one AND j  
+            IF cost LESS THAN min_cost THEN  
+                SET min_cost TO cost  
+                SET min_path TO path  
+            END IF  
+        END FOR  
+        
+        RETURN min_path  
+    END FUNCTION  
+END CLASS

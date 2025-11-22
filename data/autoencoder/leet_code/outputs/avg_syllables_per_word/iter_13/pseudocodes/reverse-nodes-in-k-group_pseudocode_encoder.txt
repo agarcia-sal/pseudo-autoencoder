@@ -1,0 +1,69 @@
+CLASS ListNode  
+    FUNCTION __init__ WITH PARAMETERS val EQUALS zero AND next EQUALS none  
+        SET the val ATTRIBUTE OF SELF TO val  
+        SET the next ATTRIBUTE OF SELF TO next  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION list_node WITH PARAMETER values LIST  
+    IF values IS EMPTY  
+        RETURN none  
+    END IF  
+    SET head TO A NEW INSTANCE OF ListNode INITIALIZED WITH THE ELEMENT AT POSITION zero OF values  
+    SET p TO head  
+    FOR each val IN THE SUBLIST OF values FROM POSITION one TO THE END  
+        SET node TO A NEW INSTANCE OF ListNode INITIALIZED WITH val  
+        SET the next ATTRIBUTE OF p TO node  
+        SET p TO node  
+    END FOR  
+    RETURN head  
+END FUNCTION  
+
+FUNCTION is_same_list WITH PARAMETERS p1 AND p2  
+    IF p1 IS none AND p2 IS none  
+        RETURN TRUE  
+    END IF  
+    IF p1 IS none OR p2 IS none  
+        RETURN FALSE  
+    END IF  
+    RETURN the val ATTRIBUTE OF p1 EQUALS the val ATTRIBUTE OF p2 AND is_same_list WITH ARGUMENTS the next ATTRIBUTE OF p1 AND the next ATTRIBUTE OF p2  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION reverseKGroup WITH PARAMETERS head AND k  
+        FUNCTION reverseLinkedList WITH PARAMETERS start AND end  
+            SET prev TO none  
+            SET curr TO start  
+            WHILE curr IS NOT end  
+                SET next_node TO the next ATTRIBUTE OF curr  
+                SET the next ATTRIBUTE OF curr TO prev  
+                SET prev TO curr  
+                SET curr TO next_node  
+            END WHILE  
+            SET the next ATTRIBUTE OF curr TO prev  
+            RETURN end AND start  
+        END FUNCTION  
+      
+        SET dummy TO A NEW INSTANCE OF ListNode INITIALIZED WITH zero  
+        SET the next ATTRIBUTE OF dummy TO head  
+        SET prev_group_end TO dummy  
+      
+        WHILE TRUE  
+            SET kth_node TO prev_group_end  
+            FOR each index FROM one TO k  
+                SET kth_node TO the next ATTRIBUTE OF kth_node  
+                IF kth_node IS none  
+                    RETURN the next ATTRIBUTE OF dummy  
+                END IF  
+            END FOR  
+            SET next_group_start TO the next ATTRIBUTE OF kth_node  
+            SET the next ATTRIBUTE OF kth_node TO none  
+            SET new_group_start AND new_group_end TO reverseLinkedList WITH ARGUMENTS the next ATTRIBUTE OF prev_group_end AND kth_node  
+            SET the next ATTRIBUTE OF prev_group_end TO new_group_start  
+            SET the next ATTRIBUTE OF new_group_end TO next_group_start  
+            SET prev_group_end TO new_group_end  
+        END WHILE  
+      
+        RETURN the next ATTRIBUTE OF dummy  
+    END FUNCTION  
+END CLASS

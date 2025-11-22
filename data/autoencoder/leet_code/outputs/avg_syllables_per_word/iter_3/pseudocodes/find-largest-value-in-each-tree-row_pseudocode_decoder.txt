@@ -1,0 +1,71 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val = 0, left = None, right = None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values)
+    IF values IS EMPTY
+        RETURN None
+    END IF
+    SET root TO TreeNode(values[0])
+    SET i TO 1
+    SET queue TO empty deque
+    APPEND root TO queue
+    WHILE queue IS NOT EMPTY
+        SET node TO queue.popleft()
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.left TO TreeNode(values[i])
+            APPEND node.left TO queue
+        END IF
+        INCREMENT i BY 1
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.right TO TreeNode(values[i])
+            APPEND node.right TO queue
+        END IF
+        INCREMENT i BY 1
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val IS NOT EQUAL TO q.val
+        RETURN False
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION largestValues(self, root)
+        IF root IS None
+            RETURN empty list
+        END IF
+        SET queue TO deque containing root
+        SET largest_values TO empty list
+        WHILE queue IS NOT EMPTY
+            SET level_size TO LENGTH OF queue
+            SET max_value TO negative infinity
+            FOR counter FROM 1 TO level_size
+                SET node TO queue.popleft()
+                IF node.val > max_value
+                    SET max_value TO node.val
+                END IF
+                IF node.left IS NOT None
+                    APPEND node.left TO queue
+                END IF
+                IF node.right IS NOT None
+                    APPEND node.right TO queue
+                END IF
+            END FOR
+            APPEND max_value TO largest_values
+        END WHILE
+        RETURN largest_values
+    END FUNCTION
+END CLASS

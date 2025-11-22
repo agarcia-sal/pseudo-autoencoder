@@ -1,0 +1,80 @@
+from collections import deque
+from typing import Optional, List
+
+class TreeNode:
+    def __init__(self, val: int, left: Optional['TreeNode'], right: Optional['TreeNode']):
+        self.val = val
+        self.left = left
+        self.right = right
+
+def tree_node(values: List[Optional[int]]) -> Optional[TreeNode]:
+    if not values:
+        return None
+    root = TreeNode(values[0], None, None)
+    i = 1
+    queue = deque([root])
+    while queue:
+        node = queue.popleft()
+        if i < len(values) and values[i] is not None:
+            node.left = TreeNode(values[i], None, None)
+            queue.append(node.left)
+        i += 1
+        if i < len(values) and values[i] is not None:
+            node.right = TreeNode(values[i], None, None)
+            queue.append(node.right)
+        i += 1
+    return root
+
+def is_same_tree(p: Optional[TreeNode], q: Optional[TreeNode]) -> bool:
+    if p is None and q is None:
+        return True
+    if p is None or q is None:
+        return False
+    if p.val != q.val:
+        return False
+    return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)
+
+class Solution:
+    def boundaryOfBinaryTree(self, root: Optional[TreeNode]) -> List[int]:
+        if root is None:
+            return []
+
+        def is_leaf(node: TreeNode) -> bool:
+            return node.left is None and node.right is None
+
+        left_boundary = []
+        current = root.left
+        while current is not None:
+            if not is_leaf(current):
+                left_boundary.append(current.val)
+            if current.left is not None:
+                current = current.left
+            else:
+                current = current.right
+
+        right_boundary = []
+        current = root.right
+        while current is not None:
+            if not is_leaf(current):
+                right_boundary.append(current.val)
+            if current.right is not None:
+                current = current.right
+            else:
+                current = current.left
+
+        leaves = []
+        def collect_leaves(node: Optional[TreeNode]) -> None:
+            if node is None:
+                return
+            if is_leaf(node):
+                leaves.append(node.val)
+                return
+            collect_leaves(node.left)
+            collect_leaves(node.right)
+
+        collect_leaves(root)
+
+        if is_leaf(root):
+            leaves = []
+
+        return [root.val] + left_boundary + leaves + right_boundary[::-1]

@@ -1,0 +1,64 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.parent TO list of integers from 0 to size MINUS 1  
+        SET self.rank TO list of size with all elements as 1  
+        SET self.size TO list of size with all elements as 1  
+    END FUNCTION  
+
+    FUNCTION find(self, u)  
+        IF self.parent at u IS NOT EQUAL TO u  
+            SET self.parent at u TO self.find(self.parent at u)  
+        RETURN self.parent at u  
+    END FUNCTION  
+
+    FUNCTION union(self, u, v)  
+        SET rootU TO self.find(u)  
+        SET rootV TO self.find(v)  
+        IF rootU IS NOT EQUAL TO rootV  
+            IF self.rank at rootU IS GREATER THAN self.rank at rootV  
+                SET self.parent at rootV TO rootU  
+                INCREMENT self.size at rootU BY self.size at rootV  
+            ELSE IF self.rank at rootU IS LESS THAN self.rank at rootV  
+                SET self.parent at rootU TO rootV  
+                INCREMENT self.size at rootV BY self.size at rootU  
+            ELSE  
+                SET self.parent at rootV TO rootU  
+                INCREMENT self.rank at rootU BY 1  
+                INCREMENT self.size at rootU BY self.size at rootV  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION largestComponentSize(self, nums)  
+        SET max_num TO maximum value in nums  
+        SET uf TO new UnionFind with size max_num PLUS 1  
+        SET prime_to_index TO empty map  
+        FOR each num IN nums  
+            FOR each prime IN self.prime_factors(num)  
+                IF prime IS IN prime_to_index  
+                    CALL uf.union(prime_to_index at prime, num)  
+                ELSE  
+                    SET prime_to_index at prime TO num  
+        SET max_component_size TO 0  
+        FOR each num IN nums  
+            SET root TO uf.find(num)  
+            SET max_component_size TO maximum of max_component_size AND uf.size at root  
+        RETURN max_component_size  
+    END FUNCTION  
+
+    FUNCTION prime_factors(self, n)  
+        SET factors TO empty set  
+        WHILE n MODULO 2 EQUALS 0  
+            ADD 2 TO factors  
+            DIVIDE n BY 2  
+        SET i TO 3  
+        WHILE i LESS THAN OR EQUAL TO square root of n  
+            WHILE n MODULO i EQUALS 0  
+                ADD i TO factors  
+                DIVIDE n BY i  
+            INCREMENT i BY 2  
+        IF n IS GREATER THAN 2  
+            ADD n TO factors  
+        RETURN factors  
+    END FUNCTION  
+END CLASS

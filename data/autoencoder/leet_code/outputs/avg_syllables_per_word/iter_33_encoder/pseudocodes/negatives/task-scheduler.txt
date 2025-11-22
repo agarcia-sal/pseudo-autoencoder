@@ -1,0 +1,34 @@
+CLASS Solution  
+    FUNCTION leastInterval(tasks task_list OF STRING n cooldown_interval OF INTEGER) RETURNS INTEGER  
+        SET task_counts TO a collection mapping each unique element IN task_list TO the number of times it appears  
+        SET max_heap TO an empty list  
+        FOR each count IN the collection of values OF task_counts  
+            APPEND the negative of count TO max_heap  
+        END FOR  
+        CONVERT max_heap INTO a heap structure with smallest element at top  
+        
+        SET time TO zero  
+        SET queue TO an empty list  
+        
+        WHILE max_heap is not empty OR queue is not empty  
+            WHILE queue is not empty AND the first element in queue has a first value EQUALS time  
+                REMOVE the first element of queue AND SET it TO a tuple with first part ignored and second part count_value  
+                IF count_value IS LESS THAN zero  
+                    ADD count_value TO the heap max_heap  
+                END IF  
+            END WHILE  
+            
+            IF max_heap is not empty  
+                REMOVE the smallest element from heap max_heap AND SET it TO count_value  
+                SET count_value TO count_value PLUS one  
+                IF count_value IS LESS THAN zero  
+                    APPEND a tuple consisting of time PLUS cooldown_interval PLUS one AND count_value TO queue  
+                END IF  
+            END IF  
+            
+            INCREMENT time BY one  
+        END WHILE  
+        
+        RETURN time  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,84 @@
+CLASS TrieNode  
+    FUNCTION __init__()  
+        SET children TO a default dictionary mapping to new TrieNode instances  
+        SET count TO zero  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION maxGeneticDifference(parents, queries)  
+        SET tree TO a default dictionary of lists  
+        FOR each index i, element parent IN enumeration of parents  
+            IF parent NOT EQUALS negative one  
+                APPEND i TO the list at position parent in tree  
+            END IF  
+        END FOR  
+
+        SET node_queries TO a default dictionary of lists  
+        FOR each element node, element val IN queries  
+            APPEND val TO the list at position node in node_queries  
+        END FOR  
+
+        SET root TO new instance of TrieNode  
+        SET result TO a list of zeros with length equal to the number of queries  
+
+        FUNCTION dfs(node)  
+            CALL insert with trie_root as root and value as node  
+
+            FOR each val IN the list at position node in node_queries  
+                SET the element at position query_idx at key of tuple node and val in result TO the output of max_xor with trie_root as root and value as val  
+            END FOR  
+
+            FOR each child IN the list at position node in tree  
+                CALL dfs with child  
+            END FOR  
+
+            CALL erase with trie_root as root and value as node  
+        END FUNCTION  
+
+        FUNCTION insert(trie_root, value)  
+            SET current_node TO trie_root  
+            FOR index i FROM seventeen DOWN TO zero  
+                SET bit TO the bit at position i from the left in value interpreted as binary  
+                SET current_node TO the child at position bit in current_node children  
+                INCREMENT current_node count BY one  
+            END FOR  
+        END FUNCTION  
+
+        FUNCTION erase(trie_root, value)  
+            SET current_node TO trie_root  
+            FOR index i FROM seventeen DOWN TO zero  
+                SET bit TO the bit at position i from the left in value interpreted as binary  
+                SET current_node TO the child at position bit in current_node children  
+                DECREMENT current_node count BY one  
+            END FOR  
+        END FUNCTION  
+
+        FUNCTION max_xor(trie_root, value)  
+            SET current_node TO trie_root  
+            SET max_xor_val TO zero  
+            FOR index i FROM seventeen DOWN TO zero  
+                SET bit TO the bit at position i from the left in value interpreted as binary  
+                SET toggled_bit TO one MINUS bit  
+                IF toggled_bit EXISTS as a key in current_node children AND the count of that child IS GREATER THAN zero  
+                    SET max_xor_val TO max_xor_val OR with one LEFT SHIFTED BY i positions  
+                    SET current_node TO the child at position toggled_bit in current_node children  
+                ELSE  
+                    SET current_node TO the child at position bit in current_node children  
+                END IF  
+            END FOR  
+            RETURN max_xor_val  
+        END FUNCTION  
+
+        SET query_idx TO a mapping from tuple of node and val to the index in queries for each index and tuple in enumeration of queries  
+
+        FOR each index i, element parent IN enumeration of parents  
+            IF parent EQUALS negative one  
+                CALL dfs with i  
+                BREAK  
+            END IF  
+        END FOR  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

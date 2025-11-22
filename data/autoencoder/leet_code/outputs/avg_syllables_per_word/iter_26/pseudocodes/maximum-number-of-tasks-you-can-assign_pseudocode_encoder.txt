@@ -1,0 +1,49 @@
+CLASS Solution
+    FUNCTION maxTaskAssign(tasks, workers, pills, strength)
+        CALL tasks.sort
+        CALL workers.sort
+        
+        FUNCTION canAssignTasks(k)
+            SET available_workers TO the LAST k elements OF workers
+            SET pills_used TO zero
+            
+            FOR i FROM k MINUS one DOWN TO zero INCLUSIVE
+                SET task TO the element at position i OF tasks
+                
+                SET worker_idx TO the LEFTMOST POSITION TO INSERT task IN ORDER IN available_workers USING BINARY SEARCH
+                
+                IF worker_idx LESS THAN the LENGTH OF available_workers THEN
+                    REMOVE the element at position worker_idx FROM available_workers
+                ELSE IF pills_used LESS THAN pills THEN
+                    SET worker_idx TO the LEFTMOST POSITION TO INSERT task MINUS strength IN ORDER IN available_workers USING BINARY SEARCH
+                    
+                    IF worker_idx LESS THAN the LENGTH OF available_workers THEN
+                        REMOVE the element at position worker_idx FROM available_workers
+                        INCREMENT pills_used BY one
+                    ELSE
+                        RETURN FALSE
+                    END IF
+                ELSE
+                    RETURN FALSE
+                END IF
+            END FOR
+            
+            RETURN TRUE
+        END FUNCTION
+        
+        SET left TO zero
+        SET right TO the MINIMUM OF the LENGTH OF tasks AND the LENGTH OF workers PLUS one
+        
+        WHILE left LESS THAN right
+            SET mid TO the INTEGER DIVISION OF the SUM OF left AND right BY two
+            
+            IF canAssignTasks(mid) THEN
+                SET left TO mid PLUS one
+            ELSE
+                SET right TO mid
+            END IF
+        END WHILE
+        
+        RETURN left MINUS one
+    END FUNCTION
+END CLASS

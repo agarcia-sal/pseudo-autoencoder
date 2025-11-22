@@ -1,0 +1,98 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.parent TO list of integers from zero TO size MINUS one  
+        SET self.rank TO list of zero of length size  
+        SET self.size TO list of one of length size  
+    END FUNCTION  
+
+    FUNCTION find(self, u)  
+        IF element at position u of self.parent IS NOT EQUAL TO u  
+            SET element at position u of self.parent TO the result of self.find with element at position u of self.parent as parameter  
+        END IF  
+        RETURN element at position u of self.parent  
+    END FUNCTION  
+
+    FUNCTION union(self, u, v)  
+        SET rootU TO the result of self.find with u as parameter  
+        SET rootV TO the result of self.find with v as parameter  
+        IF rootU IS NOT EQUAL TO rootV  
+            IF element at position rootU of self.rank IS GREATER THAN element at position rootV of self.rank  
+                SET element at position rootV of self.parent TO rootU  
+                INCREMENT element at position rootU of self.size BY element at position rootV of self.size  
+            ELSE IF element at position rootU of self.rank IS LESS THAN element at position rootV of self.rank  
+                SET element at position rootU of self.parent TO rootV  
+                INCREMENT element at position rootV of self.size BY element at position rootU of self.size  
+            ELSE  
+                SET element at position rootV of self.parent TO rootU  
+                INCREMENT element at position rootU of self.size BY element at position rootV of self.size  
+                INCREMENT element at position rootU of self.rank BY one  
+            END IF  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION groupStrings(self, words)  
+        FUNCTION bitmask(word)  
+            SET mask TO zero  
+            FOR each char IN word  
+                SET mask TO mask OR ONE LEFT SHIFTED BY the ordinal value of char MINUS the ordinal value of character a  
+            END FOR  
+            RETURN mask  
+        END FUNCTION  
+
+        SET word_map TO a new mapping with default value of list  
+        SET n TO the LENGTH OF words  
+        SET uf TO new instance of UnionFind with n as parameter  
+
+        FOR each index i AND word IN enumeration of words  
+            SET mask TO bitmask with word as parameter  
+            APPEND i TO the list at key mask in word_map  
+        END FOR  
+
+        FOR each index i AND word IN enumeration of words  
+            SET mask TO bitmask with word as parameter  
+            FOR each integer j FROM zero TO twenty five  
+                SET new_mask TO mask EXCLUSIVE OR ONE LEFT SHIFTED BY j  
+                IF new_mask IS A key in word_map  
+                    FOR each element k IN the list at key new_mask in word_map  
+                        CALL uf.union with i AND k as parameters  
+                    END FOR  
+                END IF  
+
+                IF NOT the bitwise AND of mask AND ONE LEFT SHIFTED BY j IS GREATER THAN zero  
+                    SET new_mask TO bitwise OR of mask AND ONE LEFT SHIFTED BY j  
+                    IF new_mask IS A key in word_map  
+                        FOR each element k IN the list at key new_mask in word_map  
+                            CALL uf.union with i AND k as parameters  
+                        END FOR  
+                    END IF  
+                END IF  
+
+                IF the bitwise AND of mask AND ONE LEFT SHIFTED BY j IS GREATER THAN zero  
+                    FOR each integer k FROM zero TO twenty five  
+                        IF NOT the bitwise AND of mask AND ONE LEFT SHIFTED BY k IS GREATER THAN zero  
+                            SET new_mask TO the bitwise OR of the bitwise EXCLUSIVE OR of mask AND ONE LEFT SHIFTED BY j AND ONE LEFT SHIFTED BY k  
+                            IF new_mask IS A key in word_map  
+                                FOR each element l IN the list at key new_mask in word_map  
+                                    CALL uf.union with i AND l as parameters  
+                                END FOR  
+                            END IF  
+                        END IF  
+                    END FOR  
+                END IF  
+            END FOR  
+        END FOR  
+
+        SET root_sizes TO a new mapping with default value of integer zero  
+        FOR each index i FROM zero TO n MINUS one  
+            SET root TO the result of uf.find with i as parameter  
+            INCREMENT element at key root in root_sizes BY one  
+        END FOR  
+
+        SET max_group_size TO the maximum value in root_sizes  
+        SET num_groups TO the number of keys in root_sizes  
+
+        RETURN a list containing num_groups AND max_group_size  
+    END FUNCTION  
+END CLASS

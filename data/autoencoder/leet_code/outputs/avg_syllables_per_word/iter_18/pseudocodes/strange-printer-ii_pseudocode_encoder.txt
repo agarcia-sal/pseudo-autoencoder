@@ -1,0 +1,49 @@
+CLASS Solution  
+    FUNCTION isPrintable(targetGrid)  
+        SET color_bounds TO a new mapping with default value a list containing positive infinity positive infinity negative infinity negative infinity  
+        FOR each row_index FROM zero TO the LENGTH OF targetGrid MINUS one  
+            FOR each column_index FROM zero TO the LENGTH OF element at position zero of targetGrid MINUS one  
+                SET color TO element at position row_index of targetGrid at position column_index  
+                SET element at position zero of element at key color in color_bounds TO the smaller value BETWEEN element at position zero of element at key color in color_bounds AND row_index  
+                SET element at position one of element at key color in color_bounds TO the smaller value BETWEEN element at position one of element at key color in color_bounds AND column_index  
+                SET element at position two of element at key color in color_bounds TO the larger value BETWEEN element at position two of element at key color in color_bounds AND row_index  
+                SET element at position three of element at key color in color_bounds TO the larger value BETWEEN element at position three of element at key color in color_bounds AND column_index  
+            END FOR  
+        END FOR  
+
+        SET graph TO a new mapping with default value an empty list  
+        SET in_degree TO a new mapping with default value zero  
+
+        FOR each color and bounds IN color_bounds  
+            SET minimum_row TO element at position zero of bounds  
+            SET minimum_column TO element at position one of bounds  
+            SET maximum_row TO element at position two of bounds  
+            SET maximum_column TO element at position three of bounds  
+            FOR each row_index FROM minimum_row TO maximum_row  
+                FOR each column_index FROM minimum_column TO maximum_column  
+                    IF element at position row_index of targetGrid at position column_index NOT EQUALS color THEN  
+                        SET other_color TO element at position row_index of targetGrid at position column_index  
+                        APPEND color TO element at key other_color in graph  
+                        INCREMENT element at key color in in_degree BY one  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+
+        SET queue TO a new deque initialized with each color in color_bounds for which element at key color in in_degree EQUALS zero  
+        SET visited_colors TO zero  
+
+        WHILE queue is not empty  
+            SET color TO the first element removed from queue  
+            INCREMENT visited_colors BY one  
+            FOR each next_color IN element at key color in graph  
+                DECREMENT element at key next_color in in_degree BY one  
+                IF element at key next_color in in_degree EQUALS zero THEN  
+                    APPEND next_color TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+
+        RETURN visited_colors EQUALS the LENGTH OF color_bounds  
+    END FUNCTION  
+END CLASS

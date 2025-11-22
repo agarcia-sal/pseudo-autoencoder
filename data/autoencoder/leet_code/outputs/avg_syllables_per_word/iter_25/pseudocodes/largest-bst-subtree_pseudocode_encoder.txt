@@ -1,0 +1,62 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val EQUALS zero, left EQUALS none, right EQUALS none  
+        SET the value property of the instance TO val  
+        SET the left property of the instance TO left  
+        SET the right property of the instance TO right  
+    END FUNCTION  
+END CLASS
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF the list values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO a new instance of TreeNode initialized with the element at position zero of values  
+    SET i TO one  
+    SET queue TO an empty double ended queue  
+    APPEND root TO queue  
+    WHILE queue is not empty  
+        SET node TO the element obtained by removing the first element from queue  
+        IF i is less than the length of values AND the element at position i of values IS NOT none  
+            SET the left property of node TO a new instance of TreeNode initialized with the element at position i of values  
+            APPEND the left property of node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i is less than the length of values AND the element at position i of values IS NOT none  
+            SET the right property of node TO a new instance of TreeNode initialized with the element at position i of values  
+            APPEND the right property of node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION
+
+FUNCTION is_same_tree WITH PARAMETERS p, q  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF the value property of p IS NOT EQUAL TO the value property of q  
+        RETURN false  
+    ELSE  
+        RETURN the result of calling is_same_tree WITH PARAMETERS the left property of p, the left property of q AND the result of calling is_same_tree WITH PARAMETERS the right property of p, the right property of q  
+    END IF  
+END FUNCTION
+
+CLASS Solution  
+    FUNCTION largestBSTSubtree WITH PARAMETERS root  
+        
+        FUNCTION dfs WITH PARAMETER node  
+            IF node IS none  
+                RETURN positive infinity, negative infinity, zero  
+            END IF  
+            SET left_min, left_max, left_size TO the result of calling dfs WITH the left property of node  
+            SET right_min, right_max, right_size TO the result of calling dfs WITH the right property of node  
+            IF left_max IS LESS THAN the value property of node AND the value property of node IS LESS THAN right_min  
+                RETURN the minimum of the value property of node AND left_min, the maximum of the value property of node AND right_max, left_size PLUS right_size PLUS one  
+            END IF  
+            RETURN negative infinity, positive infinity, the maximum of left_size AND right_size  
+        END FUNCTION  
+        
+        RETURN the element at position two of the result of calling dfs WITH root  
+    END FUNCTION  
+END CLASS

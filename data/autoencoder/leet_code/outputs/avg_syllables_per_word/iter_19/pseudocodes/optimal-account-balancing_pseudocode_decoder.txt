@@ -1,0 +1,31 @@
+CLASS Solution  
+    FUNCTION minTransfers(transactions)  
+        SET balance TO an empty mapping from key to value  
+        FOR each triple of variables named frm TO to AND amount IN transactions  
+            SET value at key frm of balance TO the value at key frm of balance OR zero MINUS amount  
+            SET value at key to of balance TO the value at key to of balance OR zero PLUS amount  
+        END FOR  
+        SET balances TO the list of all net values IN the values of balance WHERE each net value IS NOT equal to zero  
+        IF the LENGTH OF balances IS equal to zero  
+            RETURN zero  
+        END IF  
+        FUNCTION settle(start, cnt)  
+            WHILE start IS less than the LENGTH OF balances AND the element at position start of balances IS equal to zero  
+                INCREMENT start BY one  
+            END WHILE  
+            IF start IS equal to the LENGTH OF balances  
+                RETURN cnt  
+            END IF  
+            SET min_cnt TO infinity  
+            FOR each index i FROM start PLUS one TO the LENGTH OF balances MINUS one  
+                IF the element at position start of balances MULTIPLIED BY the element at position i of balances IS LESS THAN zero  
+                    INCREMENT the element at position i of balances BY the element at position start of balances  
+                    SET min_cnt TO the minimum of min_cnt AND the result of calling settle WITH start PLUS one AND cnt PLUS one  
+                    DECREMENT the element at position i of balances BY the element at position start of balances  
+                END IF  
+            END FOR  
+            RETURN min_cnt  
+        END FUNCTION  
+        RETURN the result of calling settle WITH zero AND zero  
+    END FUNCTION  
+END CLASS

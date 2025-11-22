@@ -1,0 +1,50 @@
+CLASS Solution  
+    FUNCTION checkWays(pairs)  
+        SET graph TO a new default dictionary mapping each key to an empty set  
+        FOR each element x and element y IN pairs  
+            ADD element y TO the set associated with element x in graph  
+            ADD element x TO the set associated with element y in graph  
+        END FOR  
+        
+        SET max_degree TO the node in graph having the maximum number of connected nodes  
+        SET n TO the number of keys in graph  
+        
+        IF the number of connected nodes for max_degree does NOT EQUAL n MINUS one THEN  
+            RETURN zero  
+        END IF  
+        
+        FUNCTION can_be_parent(u, v)  
+            RETURN whether for every neighbor in the set associated with element v in graph,  
+            that neighbor is either contained in the set associated with element u in graph OR that neighbor EQUALS element u  
+        END FUNCTION  
+        
+        SET ways TO one  
+        
+        FOR each element u IN the keys of graph  
+            IF element u EQUALS max_degree THEN  
+                CONTINUE to the next iteration  
+            END IF  
+            
+            SET parent TO null  
+            
+            FOR each element v IN the set associated with element u in graph  
+                IF element v is a key in graph AND the number of connected nodes for element v is GREATER THAN OR EQUAL TO the number of connected nodes for element u AND  
+                   can_be_parent with parameters element v and element u RETURNS true THEN  
+                    IF parent IS null OR the number of connected nodes for element v is LESS THAN the number of connected nodes for element parent THEN  
+                        SET parent TO element v  
+                    END IF  
+                END IF  
+            END FOR  
+            
+            IF parent IS null THEN  
+                RETURN zero  
+            END IF  
+            
+            IF the number of connected nodes for element parent EQUALS the number of connected nodes for element u THEN  
+                SET ways TO two  
+            END IF  
+        END FOR  
+        
+        RETURN ways  
+    END FUNCTION  
+END CLASS

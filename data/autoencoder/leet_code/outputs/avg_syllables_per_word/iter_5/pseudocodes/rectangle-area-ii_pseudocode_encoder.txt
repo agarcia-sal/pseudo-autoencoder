@@ -1,0 +1,44 @@
+CLASS Solution  
+    FUNCTION rectangleArea(rectangles)  
+        SET MOD TO 10 raised to the power 9 plus 7  
+        
+        SET y_coords TO empty set  
+        FOR each rectangle with coordinates x1, y1, x2, y2 IN rectangles  
+            ADD y1 TO y_coords  
+            ADD y2 TO y_coords  
+        
+        SET y_coords TO sorted list of y_coords  
+        SET y_index TO mapping from each y in y_coords to its index position  
+        SET count TO list of zeros with length equal to length of y_coords  
+        
+        SET events TO empty list  
+        FOR each rectangle with coordinates x1, y1, x2, y2 IN rectangles  
+            APPEND tuple (x1, 1, y1, y2) TO events  
+            APPEND tuple (x2, negative 1, y1, y2) TO events  
+        
+        SORT events by x-coordinate  
+        
+        SET prev_x TO 0  
+        SET area TO 0  
+        
+        FOR each event with values x, eventType, y1, y2 IN events  
+            SET current_length TO 0  
+            FOR i FROM 1 TO length of count MINUS 1  
+                IF count at position i minus 1 GREATER THAN 0  
+                    INCREMENT current_length BY difference between y_coords at position i and y_coords at position i minus 1  
+            
+            INCREMENT area BY current_length MULTIPLIED BY difference between x and prev_x  
+            SET area TO area MODULO MOD  
+            
+            IF eventType EQUALS 1  
+                FOR i FROM y_index of y1 TO y_index of y2 MINUS 1  
+                    INCREMENT count at position i BY 1  
+            ELSE  
+                FOR i FROM y_index of y1 TO y_index of y2 MINUS 1  
+                    DECREMENT count at position i BY 1  
+            
+            SET prev_x TO x  
+        
+        RETURN area  
+    END FUNCTION  
+END CLASS

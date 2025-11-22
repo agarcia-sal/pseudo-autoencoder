@@ -1,0 +1,37 @@
+CLASS Solution
+    FUNCTION largestSumOfAverages(list_of_numbers, number_of_partitions)
+        SET length_of_list TO the LENGTH OF list_of_numbers
+        SET prefix_sum_list TO a LIST OF zeroes with the LENGTH OF length_of_list PLUS one
+
+        FOR index FROM zero TO length_of_list MINUS one
+            SET element at position index PLUS one OF prefix_sum_list TO element at position index OF prefix_sum_list PLUS element at position index OF list_of_numbers
+        END FOR
+
+        FUNCTION average(start_index, end_index)
+            SET sum_subarray TO element at position end_index PLUS one OF prefix_sum_list MINUS element at position start_index OF prefix_sum_list
+            SET count_subarray TO end_index MINUS start_index PLUS one
+            SET average_value TO sum_subarray DIVIDED BY count_subarray
+            RETURN average_value
+        END FUNCTION
+
+        SET dp_table TO a TWO DIMENSIONAL LIST of zeroes where outer size is length_of_list PLUS one and inner size is number_of_partitions PLUS one
+
+        FOR index FROM zero TO length_of_list MINUS one
+            SET element at position index AND one OF dp_table TO CALL average WITH parameters index AND length_of_list MINUS one
+        END FOR
+
+        FOR index FROM length_of_list MINUS one DOWN TO zero
+            FOR partitions FROM two TO number_of_partitions
+                FOR split_point FROM index PLUS one TO length_of_list MINUS one
+                    SET current_value TO element at position index AND partitions OF dp_table
+                    SET candidate_value TO element at position split_point AND partitions MINUS one OF dp_table PLUS CALL average WITH parameters index AND split_point MINUS one
+                    IF candidate_value GREATER THAN current_value
+                        SET element at position index AND partitions OF dp_table TO candidate_value
+                    END IF
+                END FOR
+            END FOR
+        END FOR
+
+        RETURN element at position zero AND number_of_partitions OF dp_table
+    END FUNCTION
+END CLASS

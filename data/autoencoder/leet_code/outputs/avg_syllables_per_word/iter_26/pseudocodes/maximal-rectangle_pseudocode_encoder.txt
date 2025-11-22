@@ -1,0 +1,61 @@
+CLASS Solution
+    FUNCTION maximalRectangle(matrix AS List OF List OF STRING)
+        IF matrix IS EMPTY OR element at position zero OF matrix IS EMPTY
+            RETURN zero
+        END IF
+
+        SET rows TO the LENGTH OF matrix
+        SET cols TO the LENGTH OF element at position zero OF matrix
+        SET heights TO a LIST OF zero REPEATED cols TIMES
+        SET max_area TO zero
+
+        FOR i FROM zero TO rows MINUS one INCLUSIVE
+            FOR j FROM zero TO cols MINUS one INCLUSIVE
+                IF element at position i OF matrix AT position j EQUALS the STRING one
+                    INCREMENT element at position j OF heights BY one
+                ELSE
+                    SET element at position j OF heights TO zero
+                END IF
+            END FOR
+
+            SET max_area TO the GREATER OF max_area AND the RESULT OF CALLING self.largestRectangleArea WITH heights
+        END FOR
+
+        RETURN max_area
+    END FUNCTION
+
+    FUNCTION largestRectangleArea(heights AS List OF INTEGER)
+        SET stack TO an EMPTY LIST
+        SET max_area TO zero
+        SET index TO zero
+
+        WHILE index IS LESS THAN the LENGTH OF heights HOLDS
+            IF stack IS EMPTY OR element at position index OF heights IS GREATER THAN OR EQUAL TO element at position last element OF stack OF heights
+                APPEND index TO stack
+                INCREMENT index BY one
+            ELSE
+                SET top_of_stack TO the LAST ELEMENT REMOVED FROM stack
+                IF stack IS NOT EMPTY
+                    SET width TO index MINUS last element OF stack MINUS one
+                ELSE
+                    SET width TO index
+                END IF
+                SET area TO element at position top_of_stack OF heights MULTIPLIED BY width
+                SET max_area TO the GREATER OF max_area AND area
+            END IF
+        END WHILE
+
+        WHILE stack IS NOT EMPTY HOLDS
+            SET top_of_stack TO the LAST ELEMENT REMOVED FROM stack
+            IF stack IS NOT EMPTY
+                SET width TO index MINUS last element OF stack MINUS one
+            ELSE
+                SET width TO index
+            END IF
+            SET area TO element at position top_of_stack OF heights MULTIPLIED BY width
+            SET max_area TO the GREATER OF max_area AND area
+        END WHILE
+
+        RETURN max_area
+    END FUNCTION
+END CLASS

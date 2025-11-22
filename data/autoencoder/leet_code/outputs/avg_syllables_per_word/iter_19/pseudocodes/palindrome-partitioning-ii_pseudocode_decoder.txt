@@ -1,0 +1,50 @@
+CLASS Solution  
+    FUNCTION minCut(s)  
+        SET n TO the LENGTH OF s  
+        IF n LESS THAN OR EQUAL TO one  
+            RETURN zero  
+        END IF
+
+        SET is_palindrome TO CALL initialize_two_dimensional_boolean_array WITH n  
+        
+        FOR i FROM zero TO n MINUS one  
+            SET element at position i AND position i OF is_palindrome TO TRUE  
+        END FOR
+
+        FOR length FROM two TO n  
+            FOR start FROM zero TO n MINUS length  
+                SET end TO start PLUS length MINUS one  
+                IF length EQUALS two  
+                    SET element at position start AND position end OF is_palindrome TO THE RESULT OF THE CONDITION element at position start of s EQUALS element at position end of s  
+                ELSE  
+                    SET element at position start AND position end OF is_palindrome TO THE RESULT OF THE CONDITION element at position start of s EQUALS element at position end of s AND element at position start PLUS one AND position end MINUS one OF is_palindrome IS TRUE  
+                END IF  
+            END FOR  
+        END FOR
+
+        SET min_cuts TO CALL initialize_integer_list WITH n  
+
+        FOR i FROM zero TO n MINUS one  
+            IF element at position zero AND position i OF is_palindrome IS TRUE  
+                SET element at position i OF min_cuts TO zero  
+            ELSE  
+                SET element at position i OF min_cuts TO positive infinity  
+                FOR j FROM one TO i  
+                    IF element at position j AND position i OF is_palindrome IS TRUE AND element at position j MINUS one OF min_cuts PLUS one IS LESS THAN element at position i OF min_cuts  
+                        SET element at position i OF min_cuts TO element at position j MINUS one OF min_cuts PLUS one  
+                    END IF  
+                END FOR  
+            END IF  
+        END FOR
+
+        RETURN element at position n MINUS one OF min_cuts  
+    END FUNCTION
+
+    FUNCTION initialize_two_dimensional_boolean_array WITH parameter size  
+        RETURN two dimensional list of boolean false values of size BY size  
+    END FUNCTION
+
+    FUNCTION initialize_integer_list WITH parameter size  
+        RETURN list of integers initialized to zero of length size  
+    END FUNCTION  
+END CLASS

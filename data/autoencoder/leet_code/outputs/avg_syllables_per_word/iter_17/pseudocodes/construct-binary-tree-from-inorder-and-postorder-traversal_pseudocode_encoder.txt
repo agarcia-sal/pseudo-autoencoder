@@ -1,0 +1,57 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(list_of_values)
+    IF list_of_values IS empty
+        RETURN none
+    END IF
+    SET root TO NEW TreeNode WITH element at position zero of list_of_values
+    SET i TO one
+    SET queue TO NEW deque
+    CALL APPEND root TO queue
+    WHILE queue IS NOT empty
+        SET node TO CALL popleft ON queue
+        IF i IS LESS THAN the LENGTH OF list_of_values AND element at position i of list_of_values IS NOT none
+            SET node.left TO NEW TreeNode WITH element at position i of list_of_values
+            CALL APPEND node.left TO queue
+        END IF
+        INCREMENT i BY one
+        IF i IS LESS THAN the LENGTH OF list_of_values AND element at position i of list_of_values IS NOT none
+            SET node.right TO NEW TreeNode WITH element at position i of list_of_values
+            CALL APPEND node.right TO queue
+        END IF
+        INCREMENT i BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS none AND q IS none
+        RETURN true
+    ELSE IF p IS none OR q IS none
+        RETURN false
+    ELSE IF the value attribute of p IS NOT EQUALS the value attribute of q
+        RETURN false
+    ELSE
+        RETURN CALL is_same_tree WITH the left attribute of p AND the left attribute of q AND CALL is_same_tree WITH the right attribute of p AND the right attribute of q
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION buildTree(self, inorder_list, postorder_list)
+        IF inorder_list IS empty OR postorder_list IS empty
+            RETURN none
+        END IF
+        SET root_val TO CALL pop ON postorder_list
+        SET root TO NEW TreeNode WITH root_val
+        SET root_index TO CALL index ON inorder_list WITH root_val
+        SET root.right TO CALL self.buildTree WITH the substring from position root_index PLUS one TO the end of inorder_list AND postorder_list
+        SET root.left TO CALL self.buildTree WITH the substring from position zero TO root_index MINUS one PLUS one of inorder_list AND postorder_list
+        RETURN root
+    END FUNCTION
+END CLASS

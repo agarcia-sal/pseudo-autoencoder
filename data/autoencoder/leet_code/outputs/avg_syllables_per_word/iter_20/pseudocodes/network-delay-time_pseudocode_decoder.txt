@@ -1,0 +1,42 @@
+CLASS Solution  
+    FUNCTION networkDelayTime(times AS list of list of integers, n AS integer, k AS integer) RETURNS integer  
+        SET graph TO an empty mapping from integer to list  
+        FOR each integer i FROM one TO n  
+            SET list AT key i IN graph TO an empty list  
+        END FOR  
+        FOR each element IN times  
+            DESTRUCTURE element INTO u v w  
+            APPEND the pair of v and w TO the list AT key u IN graph  
+        END FOR  
+
+        SET dist TO a mapping from integer to infinity  
+        FOR each integer i FROM one TO n  
+            SET value AT key i IN dist TO infinity  
+        END FOR  
+        SET value AT key k IN dist TO zero  
+
+        SET min_heap TO a list containing the pair of zero and k  
+
+        WHILE the LENGTH OF min_heap is greater than zero  
+            REMOVE and RETURN the pair with the smallest first element FROM min_heap INTO current_dist and node  
+            IF current_dist is GREATER THAN the value AT key node IN dist  
+                CONTINUE to the next iteration of the loop  
+            END IF  
+
+            FOR each pair neighbor and weight IN the list AT key node IN graph  
+                SET distance TO current_dist PLUS weight  
+                IF distance is LESS THAN the value AT key neighbor IN dist  
+                    SET the value AT key neighbor IN dist TO distance  
+                    INSERT the pair of distance and neighbor INTO min_heap maintaining the order by the first element  
+                END IF  
+            END FOR  
+        END WHILE  
+
+        SET max_time TO the maximum value AMONG all values IN dist  
+        IF max_time is EQUALS TO infinity  
+            RETURN negative one  
+        ELSE  
+            RETURN max_time  
+        END IF  
+    END FUNCTION  
+END CLASS

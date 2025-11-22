@@ -1,0 +1,65 @@
+CLASS UnionFind
+    FUNCTION __init__(self)
+        ASSIGN reference TO an empty collection OF parent
+        SET count TO zero
+    END FUNCTION
+
+    FUNCTION make_set(self, x)
+        IF x NOT IN the KEYS OF self.parent
+            SET the ELEMENT at key x OF self.parent TO x
+            INCREMENT count BY one
+        END IF
+    END FUNCTION
+
+    FUNCTION find(self, x)
+        IF the ELEMENT at key x OF self.parent NOT EQUALS x
+            SET the ELEMENT at key x OF self.parent TO the RESULT OF find WITH the ELEMENT at key x OF self.parent AS ARGUMENT
+        END IF
+        RETURN the ELEMENT at key x OF self.parent
+    END FUNCTION
+
+    FUNCTION union(self, x, y)
+        SET rootX TO the RESULT OF find WITH x AS ARGUMENT
+        SET rootY TO the RESULT OF find WITH y AS ARGUMENT
+        IF rootX NOT EQUALS rootY
+            SET the ELEMENT at key rootX OF self.parent TO rootY
+            DECREMENT count BY one
+        END IF
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION numIslands2(self, m, n, positions)
+        FUNCTION is_valid(x, y)
+            RETURN x GREATER THAN OR EQUAL TO zero AND x LESS THAN m AND y GREATER THAN OR EQUAL TO zero AND y LESS THAN n
+        END FUNCTION
+
+        SET directions TO the collection of pairs consisting of element one AND zero, element MINUS one AND zero, zero AND element one, zero AND element MINUS one
+
+        ASSIGN uf TO a new instance OF UnionFind
+        ASSIGN grid TO a collection OF collections, each consisting OF zero REPEATED n TIMES, REPEATED m TIMES
+        ASSIGN result TO an empty list
+
+        FOR each pair r AND c IN positions
+            IF the element at position r OF grid AT position c EQUALS one
+                APPEND the current value OF uf.count TO result
+                CONTINUE TO the next iteration
+            END IF
+
+            SET the element at position r OF grid AT position c TO one
+            CALL uf.make_set WITH the pair consisting OF r AND c AS ARGUMENT
+
+            FOR each pair dr AND dc IN directions
+                SET nr TO r PLUS dr
+                SET nc TO c PLUS dc
+                IF is_valid(nr, nc) HOLDS AND the element at position nr OF grid AT position nc EQUALS one
+                    CALL uf.union WITH the pair consisting OF r AND c AND the pair consisting OF nr AND nc AS ARGUMENTS
+                END IF
+            END FOR
+
+            APPEND the current value OF uf.count TO result
+        END FOR
+
+        RETURN result
+    END FUNCTION
+END CLASS

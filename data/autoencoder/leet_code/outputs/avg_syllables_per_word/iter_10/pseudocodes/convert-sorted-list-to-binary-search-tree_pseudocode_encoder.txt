@@ -1,0 +1,107 @@
+CLASS ListNode  
+    FUNCTION __init__(self, val EQUALS zero, next EQUALS none)  
+        SET self.val TO val  
+        SET self.next TO next  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION list_node(values)  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET head TO CREATE new ListNode WITH val EQUALS element at position zero of values  
+    SET p TO head  
+    FOR each val IN elements of values STARTING from position one TO end  
+        SET node TO CREATE new ListNode WITH val EQUALS val  
+        SET p.next TO node  
+        SET p TO node  
+    END FOR  
+    RETURN head  
+END FUNCTION  
+
+FUNCTION is_same_list(p1, p2)  
+    IF p1 IS none AND p2 IS none  
+        RETURN true  
+    END IF  
+    IF p1 IS none OR p2 IS none  
+        RETURN false  
+    END IF  
+    RETURN element val OF p1 EQUALS element val OF p2 AND CALL is_same_list WITH p1.next AND p2.next  
+END FUNCTION  
+
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO CREATE new TreeNode WITH val EQUALS element at position zero of values  
+    SET i TO one  
+    SET queue TO CREATE empty deque collection  
+    APPEND root TO queue  
+    WHILE queue IS not empty  
+        SET node TO REMOVE first element FROM queue  
+        IF i LESS THAN LENGTH OF values AND element at position i of values IS not none  
+            SET node.left TO CREATE new TreeNode WITH val EQUALS element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN LENGTH OF values AND element at position i of values IS not none  
+            SET node.right TO CREATE new TreeNode WITH val EQUALS element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF element val OF p NOT EQUALS element val OF q  
+        RETURN false  
+    ELSE  
+        RETURN CALL is_same_tree WITH p.left AND q.left AND CALL is_same_tree WITH p.right AND q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION sortedListToBST(self, head)  
+        IF head IS none  
+            RETURN none  
+        END IF  
+        
+        FUNCTION findMiddle(left, right)  
+            SET slow TO left  
+            SET fast TO left  
+            WHILE fast NOT EQUALS right AND fast.next NOT EQUALS right  
+                SET slow TO slow.next  
+                SET fast TO fast.next.next  
+            END WHILE  
+            RETURN slow  
+        END FUNCTION  
+        
+        FUNCTION convertListToBST(left, right)  
+            IF left EQUALS right  
+                RETURN none  
+            END IF  
+            
+            SET mid TO CALL findMiddle WITH left AND right  
+            
+            SET node TO CREATE new TreeNode WITH val EQUALS element val OF mid  
+            SET node.left TO CALL convertListToBST WITH left AND mid  
+            SET node.right TO CALL convertListToBST WITH mid.next AND right  
+            RETURN node  
+        END FUNCTION  
+        
+        RETURN CALL convertListToBST WITH head AND none  
+    END FUNCTION  
+END CLASS

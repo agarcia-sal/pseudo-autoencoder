@@ -1,0 +1,46 @@
+```
+CLASS Solution
+    FUNCTION countPalindromicSubsequences(s)
+        SET MOD TO 10^9 + 7
+        SET n TO LENGTH OF s
+
+        SET next_occurrence TO 2D LIST of size 4 x n FILLED WITH -1
+        SET prev_occurrence TO 2D LIST of size 4 x n FILLED WITH -1
+
+        FOR c FROM 0 TO 3
+            SET char TO CHARACTER REPRESENTED BY ('a' + c)
+            SET last TO -1
+            FOR i FROM 0 TO n - 1
+                IF s[i] EQUALS char THEN
+                    SET last TO i
+                SET prev_occurrence[c][i] TO last
+            
+            SET last TO -1
+            FOR i FROM n - 1 DOWN TO 0
+                IF s[i] EQUALS char THEN
+                    SET last TO i
+                SET next_occurrence[c][i] TO last
+
+        SET dp TO 2D LIST of size n x n FILLED WITH 0
+
+        FOR i FROM 0 TO n - 1
+            SET dp[i][i] TO 1
+
+        FOR length FROM 2 TO n
+            FOR i FROM 0 TO n - length
+                SET j TO i + length - 1
+                FOR c FROM 0 TO 3
+                    SET left TO next_occurrence[c][i]
+                    SET right TO prev_occurrence[c][j]
+
+                    IF left > j OR right < i THEN
+                        CONTINUE
+                    ELSE IF left EQUALS right THEN
+                        SET dp[i][j] TO (dp[i][j] + 1) MODULO MOD
+                    ELSE
+                        SET dp[i][j] TO (dp[i][j] + dp[left + 1][right - 1] + 2) MODULO MOD
+
+        RETURN dp[0][n - 1]
+    END FUNCTION
+END CLASS
+```

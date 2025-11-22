@@ -1,0 +1,40 @@
+```
+CLASS Solution
+    FUNCTION shortestPathLength(graph: List[List[int]]) RETURNS int
+        IF graph IS empty THEN
+            RETURN 0
+        END IF
+
+        SET n TO LENGTH OF graph
+        SET queue TO deque with elements (node, bitmask with node-th bit set) for each node FROM 0 TO n-1
+        SET visited TO set containing each (node, bitmask with node-th bit set) for each node FROM 0 TO n-1
+
+        SET steps TO 0
+        SET all_nodes_visited TO bitmask with n bits all set
+
+        WHILE queue IS NOT empty
+            SET current_level_size TO LENGTH OF queue
+            FOR i FROM 1 TO current_level_size
+                DEQUEUE current_node, visited_nodes FROM queue
+                
+                IF visited_nodes EQUALS all_nodes_visited THEN
+                    RETURN steps
+                END IF
+                
+                FOR each neighbor IN graph[current_node]
+                    SET next_visited_nodes TO visited_nodes OR bitmask with neighbor-th bit set
+                    SET next_state TO (neighbor, next_visited_nodes)
+                    
+                    IF next_state NOT IN visited THEN
+                        ADD next_state TO visited
+                        ENQUEUE next_state INTO queue
+                    END IF
+                END FOR
+            END FOR
+            INCREMENT steps BY 1
+        END WHILE
+        
+        RETURN -1
+    END FUNCTION
+END CLASS
+```

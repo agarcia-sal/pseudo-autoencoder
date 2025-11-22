@@ -1,0 +1,47 @@
+CLASS Solution
+    FUNCTION findMinStep(board, hand)
+        FUNCTION clean(board)
+            SET stack TO empty list
+            FOR each ball IN board
+                IF stack is not empty AND stack last element's ball is not equal to current ball AND stack last element's count is at least 3
+                    REMOVE last element from stack
+                IF stack is empty OR stack last element's ball is not equal to current ball
+                    APPEND [ball, 1] TO stack
+                ELSE
+                    INCREMENT count of stack last element BY 1
+            IF stack is not empty AND stack last element's count is at least 3
+                REMOVE last element from stack
+            SET result TO empty string
+            FOR each (ball, count) IN stack
+                APPEND ball repeated count times TO result
+            RETURN result
+        END FUNCTION
+
+        FUNCTION dfs(board, hand_counter)
+            IF board is empty
+                RETURN 0
+            SET min_steps TO infinity
+            SET i TO 0
+            WHILE i less than LENGTH OF board
+                SET j TO i plus 1
+                WHILE j less than LENGTH OF board AND board[i] equals board[j]
+                    INCREMENT j BY 1
+                SET increment TO 3 minus (j minus i)
+                IF hand_counter[board[i]] is at least increment
+                    SET new_hand_counter TO COPY of hand_counter
+                    DECREMENT new_hand_counter[board[i]] BY increment
+                    SET new_board TO clean(CONCATENATE substring of board before i AND substring of board after j)
+                    SET steps TO dfs(new_board, new_hand_counter)
+                    IF steps is at least 0
+                        SET min_steps TO MINIMUM of min_steps AND steps plus increment
+                SET i TO j
+            IF min_steps equals infinity
+                RETURN -1
+            ELSE
+                RETURN min_steps
+        END FUNCTION
+
+        SET hand_counter TO COUNT OF characters in hand
+        RETURN dfs(board, hand_counter)
+    END FUNCTION
+END CLASS

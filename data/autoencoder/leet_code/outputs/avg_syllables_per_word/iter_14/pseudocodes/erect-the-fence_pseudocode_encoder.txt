@@ -1,0 +1,53 @@
+CLASS Solution  
+    FUNCTION outerTrees(trees)  
+        FUNCTION cross(i, j, k)  
+            SET a TO element at position i OF trees  
+            SET b TO element at position j OF trees  
+            SET c TO element at position k OF trees  
+            RETURN (b at position zero MINUS a at position zero) MULTIPLIED BY (c at position one MINUS b at position one) MINUS (b at position one MINUS a at position one) MULTIPLIED BY (c at position zero MINUS b at position zero)  
+        END FUNCTION
+
+        SET n TO the LENGTH OF trees  
+
+        IF n LESS THAN four  
+            RETURN trees  
+        END IF
+
+        SORT trees IN ASCENDING ORDER BY FIRST coordinate THEN SECOND coordinate  
+
+        SET vis TO a LIST OF BOOLEAN value False REPEATED n TIMES  
+
+        SET stk TO a LIST CONTAINING zero  
+
+        FOR i FROM one TO n MINUS one  
+            WHILE the LENGTH OF stk GREATER THAN one AND cross(element at position LENGTH OF stk MINUS two OF stk, element at position LENGTH OF stk MINUS one OF stk, i) LESS THAN zero  
+                SET element popped FROM stk TO variable popped_index  
+                SET element at position popped_index OF vis TO False  
+            END WHILE  
+            SET element at position i OF vis TO True  
+            APPEND i TO stk  
+        END FOR
+
+        SET m TO the LENGTH OF stk  
+
+        FOR i FROM n MINUS two DOWN TO zero  
+            IF element at position i OF vis IS True  
+                CONTINUE TO next iteration  
+            END IF  
+            WHILE the LENGTH OF stk GREATER THAN m AND cross(element at position LENGTH OF stk MINUS two OF stk, element at position LENGTH OF stk MINUS one OF stk, i) LESS THAN zero  
+                REMOVE element at position LENGTH OF stk MINUS one FROM stk  
+            END WHILE  
+            APPEND i TO stk  
+        END FOR
+
+        REMOVE element at position LENGTH OF stk MINUS one FROM stk  
+
+        SET result TO an EMPTY LIST  
+
+        FOR each index i IN stk  
+            APPEND element at position i OF trees TO result  
+        END FOR
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

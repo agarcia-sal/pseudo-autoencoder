@@ -1,0 +1,74 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values is empty  
+        RETURN none  
+    END IF  
+    SET root TO new TreeNode with value of element at position one of values  
+    SET i TO one  
+    SET queue TO a new deque object  
+    APPEND root TO queue  
+    WHILE queue is not empty  
+        SET node TO element removed from the left of queue  
+        IF i is less than the length of values AND element at position i of values is not none  
+            SET node.left TO new TreeNode with value of element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i is less than the length of values AND element at position i of values is not none  
+            SET node.right TO new TreeNode with value of element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p is none AND q is none  
+        RETURN true  
+    ELSE IF p is none OR q is none  
+        RETURN false  
+    ELSE IF value of p.val is NOT EQUALS to value of q.val  
+        RETURN false  
+    ELSE  
+        RETURN is_same_tree with p.left and q.left AND is_same_tree with p.right and q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION printTree(self, root)  
+        FUNCTION getHeight(node)  
+            IF node is none  
+                RETURN zero  
+            END IF  
+            RETURN one PLUS the maximum of getHeight of node.left AND getHeight of node.right  
+        END FUNCTION  
+
+        SET height TO getHeight of root  
+        SET width TO two RAISED TO THE POWER OF height MINUS one  
+        SET res TO an empty list  
+        FOR each index FROM one TO height  
+            APPEND a list of empty strings of length width TO res  
+        END FOR  
+
+        FUNCTION placeNode(node, row, left, right)  
+            IF node is none  
+                RETURN  
+            END IF  
+            SET mid TO the integer division of the addition of left and right by two  
+            SET element at position mid of element at position row of res TO the string representation of node.val  
+            CALL placeNode with node.left, row PLUS one, left, mid  
+            CALL placeNode with node.right, row PLUS one, mid, right  
+        END FUNCTION  
+
+        CALL placeNode with root, zero, zero, width  
+        RETURN res  
+    END FUNCTION  
+END CLASS

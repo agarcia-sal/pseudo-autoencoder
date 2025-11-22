@@ -1,0 +1,51 @@
+CLASS TreeNode  
+    FUNCTION __init__(val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET root TO TreeNode WITH val AS values AT index ZERO  
+    SET i TO ONE  
+    INITIALIZE queue AS empty double-ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO REMOVE first element FROM queue  
+        IF i LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.left TO TreeNode WITH val AS values AT i  
+            APPEND node.left TO queue  
+        INCREMENT i BY ONE  
+        IF i LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.right TO TreeNode WITH val AS values AT i  
+            APPEND node.right TO queue  
+        INCREMENT i BY ONE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN CALL is_same_tree WITH p.left AND q.left AND CALL is_same_tree WITH p.right AND q.right  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION buildTree(preorder, inorder)  
+        IF preorder IS EMPTY OR inorder IS EMPTY  
+            RETURN None  
+        SET root_val TO ELEMENT AT index ZERO IN preorder  
+        SET root TO TreeNode WITH val AS root_val  
+        SET root_index_inorder TO POSITION OF root_val IN inorder  
+        SET root.left TO CALL buildTree WITH SUBLIST OF preorder FROM index ONE TO root_index_inorder PLUS ONE AND SUBLIST OF inorder UP TO root_index_inorder  
+        SET root.right TO CALL buildTree WITH SUBLIST OF preorder FROM root_index_inorder PLUS ONE TO END AND SUBLIST OF inorder FROM root_index_inorder PLUS ONE TO END  
+        RETURN root  
+    END FUNCTION  
+END CLASS

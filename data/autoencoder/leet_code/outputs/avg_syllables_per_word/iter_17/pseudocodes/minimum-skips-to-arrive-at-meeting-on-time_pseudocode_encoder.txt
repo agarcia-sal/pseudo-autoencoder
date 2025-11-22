@@ -1,0 +1,42 @@
+CLASS Solution
+    FUNCTION minSkips(list_of_distances, speed, hours_before)
+        SET number_of_roads TO the LENGTH OF list_of_distances
+        SET dp TO a two dimensional list OF number_of_roads BY number_of_roads PLUS one EACH INITIALIZED TO positive infinity
+        
+        SET total_distance TO CALL sum WITH list_of_distances
+        
+        IF total_distance DIVIDED BY speed IS GREATER THAN hours_before
+            RETURN negative one
+        END IF
+        
+        SET element at position zero zero OF dp TO the element at position zero OF list_of_distances
+        
+        FOR skip_count FROM one TO number_of_roads MINUS one
+            SET element at position zero skip_count OF dp TO the element at position zero OF list_of_distances
+        END FOR
+        
+        FOR road_index FROM one TO number_of_roads MINUS one
+            FOR skip_count FROM zero TO road_index
+                IF skip_count IS LESS THAN road_index
+                    SET element at position road_index skip_count OF dp TO 
+                        the CEILING OF the element at position road_index MINUS one skip_count OF dp DIVIDED BY speed 
+                        MULTIPLIED BY speed PLUS the element at position road_index OF list_of_distances
+                END IF
+                IF skip_count IS GREATER THAN zero
+                    SET element at position road_index skip_count OF dp TO the MINIMUM OF 
+                        the element at position road_index skip_count OF dp 
+                        AND 
+                        the element at position road_index MINUS one skip_count MINUS one OF dp PLUS the element at position road_index OF list_of_distances
+                END IF
+            END FOR
+        END FOR
+        
+        FOR skip_count FROM zero TO number_of_roads MINUS one
+            IF element at position number_of_roads MINUS one skip_count OF dp IS LESS THAN OR EQUAL TO hours_before MULTIPLIED BY speed
+                RETURN skip_count
+            END IF
+        END FOR
+        
+        RETURN negative one
+    END FUNCTION
+END CLASS

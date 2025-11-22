@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION numBusesToDestination(routes PARAMETER, source PARAMETER, target PARAMETER)  
+        IF source EQUALS target THEN  
+            RETURN zero  
+        END IF  
+
+        SET stop_to_buses TO a default dictionary where each key maps to an empty list  
+        FOR each pair of position bus AND element route IN routes WITH their respective positions  
+            FOR each element stop IN route  
+                APPEND bus TO the list at key stop in stop_to_buses  
+            END FOR  
+        END FOR  
+
+        SET bus_queue TO an empty double-ended queue  
+        SET visited_buses TO an empty set  
+        SET visited_stops TO an empty set  
+
+        FOR each element bus IN the list at key source in stop_to_buses  
+            APPEND the tuple of bus AND one TO bus_queue  
+            ADD bus TO visited_buses  
+            ADD source TO visited_stops  
+        END FOR  
+
+        WHILE the length of bus_queue is greater than zero  
+            REMOVE and RETURN the first element FROM bus_queue AND ASSIGN TO current_bus AND bus_count  
+
+            FOR each element stop IN the element at position current_bus of routes  
+                IF stop EQUALS target THEN  
+                    RETURN bus_count  
+                END IF  
+
+                IF stop NOT IN visited_stops THEN  
+                    ADD stop TO visited_stops  
+                    FOR each element next_bus IN the list at key stop in stop_to_buses  
+                        IF next_bus NOT IN visited_buses THEN  
+                            ADD next_bus TO visited_buses  
+                            APPEND the tuple of next_bus AND bus_count PLUS one TO bus_queue  
+                        END IF  
+                    END FOR  
+                END IF  
+            END FOR  
+        END WHILE  
+
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,35 @@
+from collections import defaultdict
+from typing import List
+
+class Solution:
+    def findBlackPixel(self, picture: List[List[str]], target: int) -> int:
+        if not picture or not picture[0]:
+            return 0
+
+        m, n = len(picture), len(picture[0])
+        row_count = [0] * m
+        col_count = [0] * n
+        row_patterns = defaultdict(int)
+
+        # Count black pixels per row and column, and track row patterns
+        for r in range(m):
+            pattern = ''.join(picture[r][c] for c in range(n))
+            row_patterns[pattern] += 1
+            for c in range(n):
+                if picture[r][c] == 'B':
+                    row_count[r] += 1
+                    col_count[c] += 1
+
+        lonely_pixels = 0
+
+        # Identify lonely pixels according to given conditions
+        for r in range(m):
+            for c in range(n):
+                if picture[r][c] == 'B':
+                    pattern = ''.join(picture[r][cc] for cc in range(n))
+                    if (row_count[r] == target and
+                        col_count[c] == target and
+                        row_patterns[pattern] == target):
+                        lonely_pixels += 1
+
+        return lonely_pixels

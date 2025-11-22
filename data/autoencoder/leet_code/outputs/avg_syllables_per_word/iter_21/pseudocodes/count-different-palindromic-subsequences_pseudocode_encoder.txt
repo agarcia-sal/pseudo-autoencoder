@@ -1,0 +1,64 @@
+CLASS Solution  
+    FUNCTION countPalindromicSubsequences(s)  
+        SET MOD TO one billion PLUS seven  
+        SET n TO the LENGTH OF s  
+        
+        FUNCTION initialize_2d_list(rows, columns, default_value)  
+            CREATE a list of length rows  
+            FOR each index FROM zero TO rows MINUS one  
+                CREATE a list of length columns FILLED WITH default_value  
+                ASSIGN this list TO position index OF the main list  
+            END FOR  
+            RETURN the created two dimensional list  
+        END FUNCTION
+        
+        SET next_occurrence TO CALL initialize_2d_list WITH PARAMETERS four AND n AND minus one  
+        SET prev_occurrence TO CALL initialize_2d_list WITH PARAMETERS four AND n AND minus one  
+        
+        FOR c FROM zero TO three  
+            SET char TO the character THAT IS the result of ADDING c TO the character code of 'a'  
+            SET last TO minus one  
+            FOR i FROM zero TO n MINUS one  
+                IF the character at position i OF s EQUALS char THEN  
+                    SET last TO i  
+                END IF  
+                SET element at position i OF list at position c OF prev_occurrence TO last  
+            END FOR  
+            
+            SET last TO minus one  
+            FOR i FROM n MINUS one DOWN TO zero  
+                IF the character at position i OF s EQUALS char THEN  
+                    SET last TO i  
+                END IF  
+                SET element at position i OF list at position c OF next_occurrence TO last  
+            END FOR  
+        END FOR  
+        
+        SET dp TO CALL initialize_2d_list WITH PARAMETERS n AND n AND zero  
+        
+        FOR i FROM zero TO n MINUS one  
+            SET element at position i OF list at position i OF dp TO one  
+        END FOR  
+        
+        FOR length FROM two TO n  
+            FOR i FROM zero TO n MINUS length  
+                SET j TO i PLUS length MINUS one  
+                FOR c FROM zero TO three  
+                    SET char TO the character THAT IS the result of ADDING c TO the character code of 'a'  
+                    SET left TO element at position i OF list at position c OF next_occurrence  
+                    SET right TO element at position j OF list at position c OF prev_occurrence  
+                    
+                    IF left GREATER THAN j OR right LESS THAN i THEN  
+                        CONTINUE TO the next iteration of the FOR c loop  
+                    ELSE IF left EQUALS right THEN  
+                        SET element at position i OF list at position j OF dp TO the result of adding one TO the current value at element i, j OF dp AND THEN FINDING THE REMAINDER WHEN DIVIDED BY MOD  
+                    ELSE  
+                        SET element at position i OF list at position j OF dp TO the result of adding the current value at element i, j OF dp PLUS the value at element left PLUS one, right MINUS one OF dp PLUS two AND THEN FINDING THE REMAINDER WHEN DIVIDED BY MOD  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+        
+        RETURN the value at element zero, n MINUS one OF dp  
+    END FUNCTION  
+END CLASS

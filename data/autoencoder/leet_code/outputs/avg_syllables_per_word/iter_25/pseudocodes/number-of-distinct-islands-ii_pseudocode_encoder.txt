@@ -1,0 +1,45 @@
+CLASS Solution  
+    FUNCTION numDistinctIslands2 WITH PARAMETERS grid  
+        FUNCTION dfs WITH PARAMETERS x y island  
+            IF x LESS THAN zero OR x GREATER THAN OR EQUAL TO the LENGTH OF grid OR y LESS THAN zero OR y GREATER THAN OR EQUAL TO the LENGTH OF element at position zero of grid OR element at position x of grid at position y EQUALS zero THEN  
+                RETURN  
+            END IF  
+            SET element at position x of grid at position y TO zero  
+            APPEND the TUPLE of x and y TO island  
+            CALL dfs WITH ARGUMENTS x PLUS one y island  
+            CALL dfs WITH ARGUMENTS x MINUS one y island  
+            CALL dfs WITH ARGUMENTS x y PLUS one island  
+            CALL dfs WITH ARGUMENTS x y MINUS one island  
+        END FUNCTION  
+
+        FUNCTION normalize WITH PARAMETERS island  
+            SET shapes TO an empty list  
+            FOR each dx dy in the LIST of the TUPLES one one one MINUS one MINUS one one MINUS one MINUS one MINUS one DO  
+                SET new_island TO an empty list  
+                FOR each x y in island DO  
+                    APPEND the TUPLE of x MULTIPLIED BY dx and y MULTIPLIED BY dy TO new_island  
+                END FOR  
+                SORT new_island in ascending order  
+                SET min_x TO the MINIMUM of x for each x y in new_island  
+                SET min_y TO the MINIMUM of y for each x y in new_island  
+                APPEND to shapes the TUPLE of TUPLES where each inner TUPLE is x MINUS min_x and y MINUS min_y for each x y in new_island  
+            END FOR  
+            FOR each i FROM zero TO the LENGTH OF shapes MINUS one DO  
+                APPEND to shapes the TUPLE of TUPLES where each inner TUPLE is y and MINUS x for each x y in element at position i of shapes  
+            END FOR  
+            RETURN the MINIMUM element of shapes according to natural order  
+        END FUNCTION  
+
+        SET islands TO an empty set  
+        FOR each i FROM zero TO the LENGTH OF grid MINUS one DO  
+            FOR each j FROM zero TO the LENGTH OF element at position zero of grid MINUS one DO  
+                IF element at position i of grid at position j EQUALS one THEN  
+                    SET island TO an empty list  
+                    CALL dfs WITH ARGUMENTS i j island  
+                    ADD the result of normalize WITH ARGUMENT island TO islands  
+                END IF  
+            END FOR  
+        END FOR  
+        RETURN the LENGTH OF islands  
+    END FUNCTION  
+END CLASS

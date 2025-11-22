@@ -1,0 +1,60 @@
+CLASS Solution  
+    FUNCTION distanceToCycle(n, edges)  
+        SET graph TO an empty map with default list  
+        FOR each u, v IN edges  
+            APPEND v TO graph[u]  
+            APPEND u TO graph[v]  
+        END FOR  
+        
+        FUNCTION dfs(node, parent, path, visited)  
+            IF node IS IN visited THEN  
+                SET cycle_start TO the index of node IN path  
+                RETURN the sublist of path FROM cycle_start TO end  
+            END IF  
+            ADD node TO visited  
+            APPEND node TO path  
+            FOR each neighbor IN graph[node]  
+                IF neighbor IS NOT parent THEN  
+                    SET cycle TO dfs(neighbor, node, path, visited)  
+                    IF cycle IS NOT NONE THEN  
+                        RETURN cycle  
+                    END IF  
+                END IF  
+            END FOR  
+            REMOVE the last element from path  
+            RETURN NONE  
+        END FUNCTION  
+        
+        SET visited TO an empty set  
+        SET cycle TO NONE  
+        FOR node FROM 0 TO n MINUS 1  
+            IF node IS NOT IN visited THEN  
+                SET cycle TO dfs(node, -1, empty list, visited)  
+                IF cycle IS NOT NONE THEN  
+                    BREAK  
+                END IF  
+            END IF  
+        END FOR  
+        
+        SET distance TO a list of zeros with length n  
+        SET queue TO a new queue initialized with elements of cycle  
+        SET visited TO a set initialized with elements of cycle  
+        
+        SET level TO 0  
+        WHILE queue IS NOT empty  
+            FOR i FROM 1 TO length of queue  
+                SET node TO the element removed from the front of queue  
+                SET distance[node] TO level  
+                FOR each neighbor IN graph[node]  
+                    IF neighbor IS NOT IN visited THEN  
+                        ADD neighbor TO visited  
+                        APPEND neighbor TO queue  
+                    END IF  
+                END FOR  
+            END FOR  
+            INCREMENT level BY 1  
+        END WHILE  
+        
+        RETURN distance  
+    END FUNCTION  
+END CLASS

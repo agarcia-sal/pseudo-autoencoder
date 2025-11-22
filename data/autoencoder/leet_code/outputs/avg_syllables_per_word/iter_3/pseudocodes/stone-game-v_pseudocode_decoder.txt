@@ -1,0 +1,29 @@
+CLASS Solution
+    FUNCTION stoneGameV(stoneValue)
+        SET prefix_sum TO LIST OF ZEROS WITH LENGTH LENGTH OF stoneValue PLUS 1
+        FOR i FROM 0 TO LENGTH OF stoneValue MINUS 1
+            SET prefix_sum[i + 1] TO prefix_sum[i] PLUS stoneValue[i]
+        
+        FUNCTION get_range_sum(left, right)
+            RETURN prefix_sum[right + 1] MINUS prefix_sum[left]
+        END FUNCTION
+        
+        FUNCTION dp(left, right) WITH MEMOIZATION
+            IF left EQUALS right THEN
+                RETURN 0
+            SET max_score TO 0
+            FOR i FROM left TO right MINUS 1
+                SET left_sum TO get_range_sum(left, i)
+                SET right_sum TO get_range_sum(i + 1, right)
+                IF left_sum LESS THAN right_sum THEN
+                    SET max_score TO MAXIMUM OF max_score AND left_sum PLUS dp(left, i)
+                ELSE IF left_sum GREATER THAN right_sum THEN
+                    SET max_score TO MAXIMUM OF max_score AND right_sum PLUS dp(i + 1, right)
+                ELSE
+                    SET max_score TO MAXIMUM OF max_score, left_sum PLUS dp(left, i), AND right_sum PLUS dp(i + 1, right)
+            RETURN max_score
+        END FUNCTION
+        
+        RETURN dp(0, LENGTH OF stoneValue MINUS 1)
+    END FUNCTION
+END CLASS

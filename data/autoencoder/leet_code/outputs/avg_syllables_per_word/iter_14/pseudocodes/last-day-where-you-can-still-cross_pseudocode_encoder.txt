@@ -1,0 +1,66 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, n)  
+        SET self.parent TO list of integers from zero up to n MINUS one  
+        SET self.rank TO list of zero repeated n times  
+    END FUNCTION  
+
+    FUNCTION find(self, x)  
+        IF element at position x OF self.parent IS NOT EQUAL TO x  
+            SET element at position x OF self.parent TO the result of calling find with argument element at position x OF self.parent  
+        END IF  
+        RETURN element at position x OF self.parent  
+    END FUNCTION  
+
+    FUNCTION union(self, x, y)  
+        SET rootX TO the result of calling find with argument x  
+        SET rootY TO the result of calling find with argument y  
+        IF rootX IS NOT EQUAL TO rootY  
+            IF element at position rootX OF self.rank IS GREATER THAN element at position rootY OF self.rank  
+                SET element at position rootY OF self.parent TO rootX  
+            ELSE IF element at position rootX OF self.rank IS LESS THAN element at position rootY OF self.rank  
+                SET element at position rootX OF self.parent TO rootY  
+            ELSE  
+                SET element at position rootY OF self.parent TO rootX  
+                INCREMENT element at position rootX OF self.rank BY one  
+            END IF  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION latestDayToCross(self, row, col, cells)  
+        SET grid TO a list containing row elements where each element IS a list containing col elements each equal to one  
+        SET uf TO new instance of UnionFind with parameter row MULTIPLIED BY col PLUS two  
+        SET TOP TO row MULTIPLIED BY col  
+        SET BOTTOM TO row MULTIPLIED BY col PLUS one  
+        SET directions TO list of the four pairs negative one and zero, one and zero, zero and negative one, zero and one  
+
+        FOR day FROM the LENGTH OF cells MINUS one DOWN TO zero  
+            SET r TO element at position day OF cells element at position zero MINUS one  
+            SET c TO element at position day OF cells element at position one MINUS one  
+            SET element at position r OF grid element at position c TO zero  
+
+            FOR each pair dr and dc IN directions  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                IF nr IS GREATER THAN OR EQUAL TO zero AND nr IS LESS THAN row AND nc IS GREATER THAN OR EQUAL TO zero AND nc IS LESS THAN col AND element at position nr OF grid element at position nc IS EQUAL TO zero  
+                    CALL union on uf with arguments r MULTIPLIED BY col PLUS c AND nr MULTIPLIED BY col PLUS nc  
+                END IF  
+            END FOR  
+
+            IF r IS EQUAL TO zero  
+                CALL union on uf with arguments r MULTIPLIED BY col PLUS c AND TOP  
+            END IF  
+
+            IF r IS EQUAL TO row MINUS one  
+                CALL union on uf with arguments r MULTIPLIED BY col PLUS c AND BOTTOM  
+            END IF  
+
+            IF call to find on uf with argument TOP IS EQUAL TO call to find on uf with argument BOTTOM  
+                RETURN day  
+            END IF  
+        END FOR  
+
+        RETURN zero  
+    END FUNCTION  
+END CLASS

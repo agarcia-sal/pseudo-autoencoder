@@ -1,0 +1,72 @@
+CLASS TrieNode  
+    FUNCTION __init__  
+        SET children TO a mapping with default value of new TrieNode  
+        SET count TO 0  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION maxGeneticDifference(parents, queries)  
+
+        SET tree TO a mapping with default value of empty list  
+        FOR index FROM 0 TO LENGTH OF parents MINUS 1  
+            SET parent TO element AT index IN parents  
+            IF parent NOT EQUALS -1 THEN  
+                APPEND index TO tree[parent]  
+        
+        SET node_queries TO a mapping with default value of empty list  
+        FOR each (node, val) IN queries  
+            APPEND val TO node_queries[node]  
+        
+        SET root TO new TrieNode  
+        SET result TO list of zeros with LENGTH OF queries  
+
+        FUNCTION insert(trie_root, value)  
+            SET node TO trie_root  
+            FOR i FROM 17 DOWN TO 0  
+                SET bit TO bit at position i of value  
+                SET node TO node.children[bit]  
+                INCREMENT node.count BY 1  
+        END FUNCTION  
+
+        FUNCTION erase(trie_root, value)  
+            SET node TO trie_root  
+            FOR i FROM 17 DOWN TO 0  
+                SET bit TO bit at position i of value  
+                SET node TO node.children[bit]  
+                DECREMENT node.count BY 1  
+        END FUNCTION  
+
+        FUNCTION max_xor(trie_root, value)  
+            SET node TO trie_root  
+            SET max_xor_val TO 0  
+            FOR i FROM 17 DOWN TO 0  
+                SET bit TO bit at position i of value  
+                SET toggled_bit TO 1 MINUS bit  
+                IF toggled_bit IN node.children AND node.children[toggled_bit].count GREATER THAN 0 THEN  
+                    SET max_xor_val TO max_xor_val PLUS (1 SHIFTED LEFT BY i)  
+                    SET node TO node.children[toggled_bit]  
+                ELSE  
+                    SET node TO node.children[bit]  
+            RETURN max_xor_val  
+        END FUNCTION  
+
+        SET query_idx TO mapping from (node, val) TO index for each index and (node, val) IN queries  
+
+        FUNCTION dfs(node)  
+            CALL insert WITH arguments root, node  
+            FOR each val IN node_queries[node]  
+                SET result AT query_idx[(node, val)] TO CALL max_xor WITH arguments root, val  
+            FOR each child IN tree[node]  
+                CALL dfs WITH argument child  
+            CALL erase WITH arguments root, node  
+        END FUNCTION  
+
+        FOR i FROM 0 TO LENGTH OF parents MINUS 1  
+            IF parents[i] EQUALS -1 THEN  
+                CALL dfs WITH argument i  
+                BREAK  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,64 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty THEN  
+        RETURN None  
+    END IF  
+    SET root TO new TreeNode with val AS first element of values  
+    SET i TO 1  
+    INITIALIZE queue as empty double-ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty DO  
+        SET node TO first element removed from queue  
+        IF i LESS THAN length of values AND values at index i IS NOT None THEN  
+            SET node.left TO new TreeNode with val AS values at index i  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY 1  
+        IF i LESS THAN length of values AND values at index i IS NOT None THEN  
+            SET node.right TO new TreeNode with val AS values at index i  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None THEN  
+        RETURN True  
+    ELSE IF p IS None OR q IS None THEN  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val THEN  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION kthSmallest(self, root, k)  
+        INITIALIZE stack as empty list  
+        SET current TO root  
+        SET count TO 0  
+        
+        WHILE stack IS NOT empty OR current IS NOT None DO  
+            WHILE current IS NOT None DO  
+                APPEND current TO stack  
+                SET current TO current.left  
+            END WHILE  
+            REMOVE last element FROM stack AND SET TO current  
+            INCREMENT count BY 1  
+            IF count EQUALS k THEN  
+                RETURN current.val  
+            END IF  
+            SET current TO current.right  
+        END WHILE  
+    END FUNCTION  
+END CLASS

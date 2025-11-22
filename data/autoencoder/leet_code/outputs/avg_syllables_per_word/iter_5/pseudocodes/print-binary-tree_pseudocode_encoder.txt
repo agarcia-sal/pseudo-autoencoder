@@ -1,0 +1,64 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val = 0, left = None, right = None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET root TO new TreeNode with val values at index 0  
+    SET i TO 1  
+    SET queue TO new empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO queue removed from front  
+        IF i IS LESS THAN length of values AND values at i IS NOT None  
+            SET node.left TO new TreeNode with val values at i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i IS LESS THAN length of values AND values at i IS NOT None  
+            SET node.right TO new TreeNode with val values at i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION printTree(self, root)  
+        FUNCTION getHeight(node)  
+            IF node IS None  
+                RETURN 0  
+            RETURN 1 PLUS maximum OF getHeight(node.left) AND getHeight(node.right)  
+        END FUNCTION  
+        
+        SET height TO getHeight(root)  
+        SET width TO 2 RAISED TO height MINUS 1  
+        SET res TO new list WITH height NUMBER OF lists, EACH CONTAINING width NUMBER OF empty strings  
+        
+        FUNCTION placeNode(node, row, left, right)  
+            IF node IS None  
+                RETURN  
+            SET mid TO left PLUS right DIVIDED BY 2  
+            SET res at index row and mid TO string representation OF node.val  
+            CALL placeNode(node.left, row PLUS 1, left, mid)  
+            CALL placeNode(node.right, row PLUS 1, mid, right)  
+        END FUNCTION  
+        
+        CALL placeNode(root, 0, 0, width)  
+        RETURN res  
+    END FUNCTION  
+END CLASS

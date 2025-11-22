@@ -1,0 +1,76 @@
+CLASS Solution  
+    FUNCTION longestRepeating(s, queryCharacters, queryIndices)  
+        FUNCTION merge_intervals()  
+            SET i TO zero  
+            WHILE i LESS THAN LENGTH OF intervals MINUS one  
+                SET start_1 TO element at position i and zero of intervals  
+                SET end_1 TO element at position i and one of intervals  
+                SET char_1 TO element at position i and two of intervals  
+                SET start_2 TO element at position i plus one and zero of intervals  
+                SET end_2 TO element at position i plus one and one of intervals  
+                SET char_2 TO element at position i plus one and two of intervals  
+                IF char_1 EQUALS char_2  
+                    SET new_start TO start_1  
+                    SET new_end TO end_2  
+                    SET merged_char TO char_1  
+                    SET element at position i of intervals TO tuple of new_start, new_end, merged_char  
+                    REMOVE element at position i plus one FROM intervals  
+                ELSE  
+                    INCREMENT i BY one  
+                END IF  
+            END WHILE  
+        END FUNCTION  
+        
+        SET intervals TO an empty list  
+        SET n TO LENGTH OF s  
+        SET start TO zero  
+        FOR i FROM one TO n MINUS one  
+            SET current_char TO element at position i of s  
+            SET start_char TO element at position start of s  
+            IF current_char NOT EQUALS start_char  
+                APPEND tuple of start, i MINUS one, start_char TO intervals  
+                SET start TO i  
+            END IF  
+        END FOR  
+        APPEND tuple of start, n MINUS one, element at position start of s TO intervals  
+        
+        SET results TO an empty list  
+        SET longest TO the maximum of end MINUS start PLUS one for each start, end, char in intervals  
+        
+        FOR each char, idx IN queryCharacters AND queryIndices  
+            SET i TO zero  
+            WHILE i LESS THAN LENGTH OF intervals  
+                SET start TO element at position i and zero of intervals  
+                SET end TO element at position i and one of intervals  
+                SET c TO element at position i and two of intervals  
+                IF start LESS THAN OR EQUAL TO idx AND idx LESS THAN OR EQUAL TO end  
+                    BREAK the loop  
+                END IF  
+                INCREMENT i BY one  
+            END WHILE  
+            
+            SET start TO element at position i and zero of intervals  
+            SET end TO element at position i and one of intervals  
+            SET c TO element at position i and two of intervals  
+            
+            IF idx GREATER THAN start  
+                INSERT tuple of start, idx MINUS one, c INTO position i of intervals  
+                SET element at position i plus one of intervals TO tuple of idx, end, c  
+            END IF  
+            
+            IF idx LESS THAN end  
+                INSERT tuple of idx PLUS one, end, c INTO position i plus one of intervals  
+                SET element at position i of intervals TO tuple of start, idx, c  
+            END IF  
+            
+            SET element at position i of intervals TO tuple of element at position i and zero of intervals, element at position i and one of intervals, char  
+            
+            CALL merge_intervals()  
+            
+            SET longest TO the maximum of end MINUS start PLUS one for each start, end, char in intervals  
+            APPEND longest TO results  
+        END FOR  
+        
+        RETURN results  
+    END FUNCTION  
+END CLASS

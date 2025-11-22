@@ -1,0 +1,37 @@
+CLASS Solution
+    FUNCTION minJumps(arr: List of Integer) RETURNS Integer
+        SET n TO LENGTH OF arr
+        IF n EQUALS 1 THEN
+            RETURN 0
+        END IF
+
+        SET value_indices TO dictionary with default list
+        FOR i FROM 0 TO n - 1
+            APPEND i TO value_indices[arr[i]]
+        END FOR
+
+        SET queue TO new deque containing tuple (0, 0)
+        SET visited TO set containing 0
+
+        WHILE queue IS NOT EMPTY
+            SET current_index, steps TO REMOVE FIRST ELEMENT FROM queue
+
+            IF current_index EQUALS n - 1 THEN
+                RETURN steps
+            END IF
+
+            SET next_indices TO LIST containing current_index + 1, current_index - 1 CONCATENATED WITH value_indices[arr[current_index]]
+
+            FOR EACH next_index IN next_indices
+                IF next_index IS AT LEAST 0 AND LESS THAN n AND next_index NOT IN visited THEN
+                    ADD next_index TO visited
+                    APPEND tuple (next_index, steps + 1) TO queue
+                END IF
+            END FOR
+
+            SET value_indices[arr[current_index]] TO empty list
+        END WHILE
+
+        RETURN -1
+    END FUNCTION
+END CLASS

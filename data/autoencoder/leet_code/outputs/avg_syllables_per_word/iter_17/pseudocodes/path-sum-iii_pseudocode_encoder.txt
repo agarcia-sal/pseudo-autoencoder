@@ -1,0 +1,62 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values)
+    IF values IS empty
+        RETURN none
+    END IF
+    SET root TO CALL TreeNode WITH element at position zero of values
+    SET i TO one
+    SET queue TO CALL deque WITH no parameters
+    CALL APPEND root TO queue
+    WHILE queue IS NOT empty
+        SET node TO CALL popleft ON queue
+        IF i LESS THAN the LENGTH OF values AND element at position i of values IS NOT none
+            SET node.left TO CALL TreeNode WITH element at position i of values
+            CALL APPEND node.left TO queue
+        END IF
+        INCREMENT i BY one
+        IF i LESS THAN the LENGTH OF values AND element at position i of values IS NOT none
+            SET node.right TO CALL TreeNode WITH element at position i of values
+            CALL APPEND node.right TO queue
+        END IF
+        INCREMENT i BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS none AND q IS none
+        RETURN true
+    ELSE IF p IS none OR q IS none
+        RETURN false
+    ELSE IF p.val NOT EQUALS q.val
+        RETURN false
+    ELSE
+        RETURN CALL is_same_tree WITH p.left AND q.left AND CALL is_same_tree WITH p.right AND q.right
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION pathSum(self, root, targetSum)
+        FUNCTION helper(node, current_sum, prefix_sums)
+            IF node IS none
+                RETURN zero
+            END IF
+            SET current_sum TO current_sum PLUS node.val
+            SET paths_to_here TO CALL get ON prefix_sums WITH current_sum MINUS targetSum AND zero
+            SET prefix_sums AT current_sum TO CALL get ON prefix_sums WITH current_sum AND zero PLUS one
+            SET paths_in_left TO CALL helper WITH node.left, current_sum, prefix_sums
+            SET paths_in_right TO CALL helper WITH node.right, current_sum, prefix_sums
+            DECREMENT prefix_sums AT current_sum BY one
+            RETURN paths_to_here PLUS paths_in_left PLUS paths_in_right
+        END FUNCTION
+        SET prefix_sums TO a DICTIONARY WITH key zero AND value one
+        RETURN CALL helper WITH root, zero, prefix_sums
+    END FUNCTION
+END CLASS

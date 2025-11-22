@@ -1,0 +1,34 @@
+CLASS Solution
+    FUNCTION minStickers(list_of_stickers AS List OF strings, target_string AS string) RETURNS integer
+        SET list_of_stickers TO a new list where each element IS the frequency Counter OF the corresponding sticker IN list_of_stickers
+
+        SORT list_of_stickers by the NEGATIVE of the HIGHEST frequency value IN each sticker's Counter values
+        
+        SET queue TO a new double-ended queue initialized WITH a tuple containing target_string AND zero
+        
+        SET memo TO a new mapping WITH target_string AS key AND zero AS value
+        
+        WHILE queue HOLDS elements
+            EXTRACT current_target AND used_stickers FROM the LEFT END OF queue
+            
+            FOR each sticker IN list_of_stickers
+                IF the FIRST character at position zero OF current_target IS NOT FOUND IN keys of sticker
+                    CONTINUE to the next sticker
+                
+                SET remaining TO a new Counter initialized WITH current_target
+                DECREMENT remaining BY sticker
+                
+                SET new_target TO the concatenation of all elements IN sorted order OF the characters FROM remaining.elements
+                
+                IF new_target IS empty
+                    RETURN used_stickers PLUS one
+                
+                IF new_target IS NOT FOUND as a key IN memo
+                    SET memo AT new_target TO used_stickers PLUS one
+                    APPEND the tuple containing new_target AND used_stickers PLUS one TO the RIGHT END OF queue
+            END FOR
+        END WHILE
+        
+        RETURN the negative one as indication of failure
+    END FUNCTION
+END CLASS

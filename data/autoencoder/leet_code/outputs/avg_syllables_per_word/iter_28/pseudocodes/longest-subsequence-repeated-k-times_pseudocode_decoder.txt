@@ -1,0 +1,52 @@
+CLASS Solution  
+    FUNCTION longestSubsequenceRepeatedK(s parameter s OF TYPE string, k parameter k OF TYPE integer) RETURNS string  
+        IMPORT Counter FROM collections  
+  
+        SET freq TO CALL Counter WITH argument s  
+  
+        SET valid_chars TO EMPTY LIST  
+        FOR each character AND its count IN freq items  
+            IF count GREATER THAN OR EQUAL TO k  
+                APPEND character TO valid_chars  
+            END IF  
+        END FOR  
+  
+        CALL valid_chars SORTED IN reverse LEXICOGRAPHICAL ORDER  
+  
+        FUNCTION is_valid_subsequence(candidate parameter candidate OF TYPE string) RETURNS boolean  
+            SET count TO zero  
+            SET index TO zero  
+            FOR each character IN s  
+                IF character EQUALS character at position index OF candidate  
+                    INCREMENT index BY one  
+                    IF index EQUALS LENGTH OF candidate  
+                        INCREMENT count BY one  
+                        SET index TO zero  
+                        IF count EQUALS k  
+                            RETURN true  
+                        END IF  
+                    END IF  
+                END IF  
+            END FOR  
+            RETURN false  
+        END FUNCTION  
+  
+        SET max_length TO LENGTH OF valid_chars DIVIDED BY k  
+        SET best_candidate TO EMPTY STRING  
+  
+        FUNCTION backtrack(candidate parameter candidate OF TYPE string)  
+            IF LENGTH OF candidate GREATER THAN LENGTH OF best_candidate  
+                SET best_candidate TO candidate  
+            END IF  
+            FOR each character IN valid_chars  
+                SET new_candidate TO candidate CONCATENATED WITH character  
+                IF CALL is_valid_subsequence WITH argument new_candidate  
+                    CALL backtrack WITH argument new_candidate  
+                END IF  
+            END FOR  
+        END FUNCTION  
+  
+        CALL backtrack WITH argument EMPTY STRING  
+        RETURN best_candidate  
+    END FUNCTION  
+END CLASS

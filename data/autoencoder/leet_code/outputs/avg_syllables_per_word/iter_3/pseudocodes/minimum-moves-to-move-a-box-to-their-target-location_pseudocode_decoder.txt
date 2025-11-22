@@ -1,0 +1,41 @@
+```
+CLASS Solution
+    FUNCTION minPushBox(grid)
+        SET directions TO [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        FOR i FROM 0 TO LENGTH OF grid MINUS 1
+            FOR j FROM 0 TO LENGTH OF grid[0] MINUS 1
+                IF grid[i][j] EQUALS 'S'
+                    SET player_start TO (i, j)
+                ELSE IF grid[i][j] EQUALS 'B'
+                    SET box_start TO (i, j)
+                ELSE IF grid[i][j] EQUALS 'T'
+                    SET target TO (i, j)
+        SET queue TO NEW deque CONTAINING (player_start, box_start, 0)
+        SET visited TO NEW set
+        ADD (player_start, box_start) TO visited
+        WHILE queue IS NOT EMPTY
+            REMOVE FIRST ELEMENT FROM queue INTO (player_pos, box_pos, push_count)
+            IF box_pos EQUALS target
+                RETURN push_count
+            FOR EACH (dx, dy) IN directions
+                SET new_player_pos TO (player_pos[0] PLUS dx, player_pos[1] PLUS dy)
+                IF self.is_valid_position(new_player_pos, grid)
+                    IF new_player_pos EQUALS box_pos
+                        SET new_box_pos TO (box_pos[0] PLUS dx, box_pos[1] PLUS dy)
+                        IF self.is_valid_position(new_box_pos, grid) AND (new_player_pos, new_box_pos) NOT IN visited
+                            ADD (new_player_pos, new_box_pos) TO visited
+                            APPEND (new_player_pos, new_box_pos, push_count PLUS 1) TO queue
+                    ELSE
+                        IF (new_player_pos, box_pos) NOT IN visited
+                            ADD (new_player_pos, box_pos) TO visited
+                            APPEND (new_player_pos, box_pos, push_count) TO queue
+        RETURN -1
+    END FUNCTION
+
+    FUNCTION is_valid_position(position, grid)
+        SET x TO position[0]
+        SET y TO position[1]
+        RETURN 0 LESS THAN OR EQUAL TO x AND x LESS THAN LENGTH OF grid AND 0 LESS THAN OR EQUAL TO y AND y LESS THAN LENGTH OF grid[0] AND grid[x][y] IS NOT '#'
+    END FUNCTION
+END CLASS
+```

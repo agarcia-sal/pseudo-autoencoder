@@ -1,0 +1,38 @@
+CLASS Solution  
+    FUNCTION reachableNodes(edges, maxMoves, n)  
+        SET graph TO a dictionary mapping each integer from 0 TO n MINUS 1 TO an empty list  
+        FOR each tuple u, v, cnt IN edges  
+            APPEND pair (v, cnt) TO graph at u  
+            APPEND pair (u, cnt) TO graph at v  
+        
+        SET distances TO a list of size n with all values set TO infinity  
+        SET distances at index 0 TO 0  
+        SET priority_queue TO a list containing pair (0, 0)  // distance and node  
+        
+        WHILE priority_queue IS NOT empty  
+            CALL extract the pair with minimum distance FROM priority_queue and SET TO dist, node  
+            IF dist GREATER THAN distances at node  
+                CONTINUE  
+            FOR each pair neighbor, cnt IN graph at node  
+                SET new_dist TO dist PLUS cnt PLUS 1  
+                IF new_dist LESS THAN distances at neighbor  
+                    SET distances at neighbor TO new_dist  
+                    ADD pair (new_dist, neighbor) TO priority_queue  
+        
+        SET reachable_nodes TO 0  
+        
+        FOR each d IN distances  
+            IF d LESS THAN OR EQUAL TO maxMoves  
+                INCREMENT reachable_nodes BY 1  
+        
+        SET used_edges TO an empty dictionary  
+        FOR each tuple u, v, cnt IN edges  
+            SET moves_u TO maximum of 0 and maxMoves MINUS distances at u  
+            SET moves_v TO maximum of 0 and maxMoves MINUS distances at v  
+            SET reachable_new_nodes TO minimum of cnt and moves_u PLUS moves_v  
+            INCREMENT reachable_nodes BY reachable_new_nodes  
+            SET used_edges with key (u, v) TO reachable_new_nodes  
+        
+        RETURN reachable_nodes  
+    END FUNCTION  
+END CLASS

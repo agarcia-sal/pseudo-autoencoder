@@ -1,0 +1,114 @@
+CLASS Solution  
+    FUNCTION canMouseWin(grid, catJump, mouseJump)  
+        SET m TO the LENGTH OF grid  
+        SET n TO the LENGTH OF element at position zero of grid  
+        SET cat_start TO zero  
+        SET mouse_start TO zero  
+        SET food TO zero  
+        SET dirs TO the list containing the elements minus one zero one zero minus one  
+        SET g_mouse TO a new list containing m MULTIPLIED BY n empty lists  
+        SET g_cat TO a new list containing m MULTIPLIED BY n empty lists  
+
+        FOR each index i AND element row IN enumeration of grid  
+            FOR each index j AND element c IN enumeration of row  
+                IF c EQUALS the character representing a wall  
+                    CONTINUE to next iteration of inner loop  
+                END IF  
+                SET v TO i MULTIPLIED BY n PLUS j  
+                IF c EQUALS the character representing the cat  
+                    SET cat_start TO v  
+                ELSE IF c EQUALS the character representing the mouse  
+                    SET mouse_start TO v  
+                ELSE IF c EQUALS the character representing the food  
+                    SET food TO v  
+                END IF  
+                FOR each pair of elements a and b taken from dirs as consecutive pairs  
+                    FOR k FROM zero TO mouseJump INCLUSIVE  
+                        SET x TO i PLUS k MULTIPLIED BY a  
+                        SET y TO j PLUS k MULTIPLIED BY b  
+                        IF x LESS THAN zero OR x GREATER THAN OR EQUAL TO m OR y LESS THAN zero OR y GREATER THAN OR EQUAL TO n OR element at position x of grid EQUALS the character representing a wall  
+                            BREAK inner loop  
+                        END IF  
+                        APPEND x MULTIPLIED BY n PLUS y TO the element at position v of g_mouse  
+                    END FOR  
+                    FOR k FROM zero TO catJump INCLUSIVE  
+                        SET x TO i PLUS k MULTIPLIED BY a  
+                        SET y TO j PLUS k MULTIPLIED BY b  
+                        IF x LESS THAN zero OR x GREATER THAN OR EQUAL TO m OR y LESS THAN zero OR y GREATER THAN OR EQUAL TO n OR element at position x of grid EQUALS the character representing a wall  
+                            BREAK inner loop  
+                        END IF  
+                        APPEND x MULTIPLIED BY n PLUS y TO the element at position v of g_cat  
+                    END FOR  
+                END FOR  
+            END FOR  
+        END FOR  
+        RETURN the result of the FUNCTION calc invoked with g_mouse, g_cat, mouse_start, cat_start, and food EQUALS one  
+    END FUNCTION  
+
+    FUNCTION calc(g_mouse, g_cat, mouse_start, cat_start, hole)  
+        FUNCTION get_prev_states(state)  
+            SET m TO element at position zero of state  
+            SET c TO element at position one of state  
+            SET t TO element at position two of state  
+            SET pt TO t EXCLUSIVE OR one  
+            SET pre TO an empty list  
+            IF pt EQUALS one  
+                FOR each pc IN the element at position c of g_cat  
+                    IF element at position m then pc then one of ans EQUALS zero  
+                        APPEND the tuple containing m pc and pt TO pre  
+                    END IF  
+                END FOR  
+            ELSE  
+                FOR each pm IN the element at position m of g_mouse  
+                    IF element at position pm then c then zero of ans EQUALS zero  
+                        APPEND the tuple containing pm c and zero TO pre  
+                    END IF  
+                END FOR  
+            END IF  
+            RETURN pre  
+        END FUNCTION  
+
+        SET n TO the LENGTH OF g_mouse  
+        SET degree TO a new three dimensional list of size n by n by two filled with zero  
+        FOR i FROM zero TO n MINUS one  
+            FOR j FROM zero TO n MINUS one  
+                SET element at position i then j then zero of degree TO the LENGTH OF element at position i of g_mouse  
+                SET element at position i then j then one of degree TO the LENGTH OF element at position j of g_cat  
+            END FOR  
+        END FOR  
+
+        SET ans TO a new three dimensional list of size n by n by two filled with zero  
+        SET q TO a new empty double-ended queue  
+        FOR i FROM zero TO n MINUS one  
+            SET element at position hole then i then one of ans TO one  
+            SET element at position i then hole then zero of ans TO two  
+            SET element at position i then i then one of ans TO two  
+            SET element at position i then i then zero of ans TO two  
+            APPEND the tuple containing hole i and one TO q  
+            APPEND the tuple containing i hole and zero TO q  
+            APPEND the tuple containing i i and zero TO q  
+            APPEND the tuple containing i i and one TO q  
+        END FOR  
+
+        WHILE q is not empty  
+            SET state TO the element popped from the left of q  
+            SET t TO element at position zero then one then two of ans according to the indices in state  
+            FOR each prev_state IN the result of get_prev_states invoked with state  
+                SET pm TO element at position zero of prev_state  
+                SET pc TO element at position one of prev_state  
+                SET pt TO element at position two of prev_state  
+                IF pt EQUALS t MINUS one  
+                    SET element at position pm then pc then pt of ans TO t  
+                    APPEND prev_state TO q  
+                ELSE  
+                    DECREMENT element at position pm then pc then pt of degree BY one  
+                    IF element at position pm then pc then pt of degree EQUALS zero  
+                        SET element at position pm then pc then pt of ans TO t  
+                        APPEND prev_state TO q  
+                    END IF  
+                END IF  
+            END FOR  
+        END WHILE  
+        RETURN element at position mouse_start then cat_start then zero of ans  
+    END FUNCTION  
+END CLASS

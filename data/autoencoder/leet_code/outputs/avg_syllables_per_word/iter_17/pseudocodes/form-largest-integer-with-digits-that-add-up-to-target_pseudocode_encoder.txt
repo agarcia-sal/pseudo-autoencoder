@@ -1,0 +1,43 @@
+CLASS Solution
+    FUNCTION largestNumber(cost, target)
+        CALL build_cost_to_digit_mapping WITH cost
+        SET cost_to_digit TO RESULT OF build_cost_to_digit_mapping
+
+        CALL initialize_dp_array WITH target
+        SET dp TO RESULT OF initialize_dp_array
+
+        FOR t FROM one TO target
+            FOR each cost_value AND corresponding_digit IN cost_to_digit
+                IF t IS GREATER THAN OR EQUAL TO cost_value AND element at position t MINUS cost_value of dp IS NOT EQUALS minus one
+                    SET candidate_number TO corresponding_digit CONCATENATED WITH element at position t MINUS cost_value of dp
+                    IF element at position t of dp IS EQUALS minus one OR LENGTH OF candidate_number IS GREATER THAN LENGTH OF element at position t of dp OR (LENGTH OF candidate_number IS EQUALS LENGTH OF element at position t of dp AND candidate_number IS GREATER THAN element at position t of dp)
+                        SET element at position t of dp TO candidate_number
+                    END IF
+                END IF
+            END FOR
+        END FOR
+
+        IF element at position target of dp IS NOT EQUALS minus one
+            RETURN element at position target of dp
+        ELSE
+            RETURN zero
+        END IF
+    END FUNCTION
+
+    FUNCTION build_cost_to_digit_mapping(cost)
+        CREATE empty_dictionary called mapping
+        FOR index FROM zero TO LENGTH OF cost MINUS one
+            SET element at position index of cost TO cost_value
+            SET mapping at key cost_value TO string representation of index PLUS one
+        END FOR
+        RETURN mapping
+    END FUNCTION
+
+    FUNCTION initialize_dp_array(target)
+        CREATE list dp WITH empty string at position zero
+        FOR index FROM one TO target
+            APPEND minus one TO dp
+        END FOR
+        RETURN dp
+    END FUNCTION
+END CLASS

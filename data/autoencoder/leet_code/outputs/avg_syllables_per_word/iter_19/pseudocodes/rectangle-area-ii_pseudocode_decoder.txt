@@ -1,0 +1,52 @@
+CLASS Solution  
+    FUNCTION rectangleArea(rectangles)  
+        SET MOD TO ten POWERED BY nine PLUS one  
+
+        SET y_coords TO an empty set  
+        FOR each rectangle DECOMPOSED INTO x1 y1 x2 y2 IN rectangles  
+            ADD y1 TO y_coords  
+            ADD y2 TO y_coords  
+        END FOR  
+
+        SET y_coords TO the sorted elements of y_coords  
+        SET y_index TO a mapping FROM each element y AND its position i IN y_coords TO i  
+        SET count TO a list of zeros WITH length EQUAL TO the LENGTH OF y_coords  
+
+        SET events TO an empty list  
+        FOR each rectangle DECOMPOSED INTO x1 y1 x2 y2 IN rectangles  
+            APPEND a tuple consisting of x1 ONE y1 y2 TO events  
+            APPEND a tuple consisting of x2 MINUS ONE y1 y2 TO events  
+        END FOR  
+
+        SORT events BY the first element of each tuple representing the x-coordinate  
+
+        SET prev_x TO zero  
+        SET area TO zero  
+
+        FOR each event DECOMPOSED INTO x eventType y1 y2 IN events  
+            SET current_length TO zero  
+            FOR index FROM one TO the LENGTH OF count MINUS one  
+                IF element at position index MINUS one OF count IS GREATER THAN zero THEN  
+                    INCREMENT current_length BY the element at position index OF y_coords MINUS the element at position index MINUS one OF y_coords  
+                END IF  
+            END FOR  
+
+            INCREMENT area BY current_length MULTIPLIED BY (x MINUS prev_x)  
+            SET area TO area MODULO MOD  
+
+            IF eventType EQUALS one THEN  
+                FOR index FROM the element at position y1 IN y_index TO the element at position y2 IN y_index MINUS one  
+                    INCREMENT element at position index OF count BY one  
+                END FOR  
+            ELSE  
+                FOR index FROM the element at position y1 IN y_index TO the element at position y2 IN y_index MINUS one  
+                    DECREMENT element at position index OF count BY one  
+                END FOR  
+            END IF  
+
+            SET prev_x TO x  
+        END FOR  
+
+        RETURN area  
+    END FUNCTION  
+END CLASS

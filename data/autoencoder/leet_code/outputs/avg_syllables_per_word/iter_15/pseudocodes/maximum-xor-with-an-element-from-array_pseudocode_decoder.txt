@@ -1,0 +1,45 @@
+CLASS Solution  
+    FUNCTION maximizeXor(nums AS List OF Integer, queries AS List OF List OF Integer) RETURNS List OF Integer  
+        SORT nums IN ASCENDING ORDER  
+        SET sorted_queries TO the LIST OF PAIRS OF the INDEX AND the QUERY IN queries SORTED BY the SECOND ELEMENT OF the QUERY  
+        SET result TO a LIST OF INTEGER with the LENGTH OF queries FILLED WITH negative one  
+        SET trie TO an EMPTY DICTIONARY  
+        SET num_index TO zero  
+        
+        FOR each query_index AND query_pair AS xi AND mi IN sorted_queries  
+            WHILE num_index IS LESS THAN the LENGTH OF nums AND the ELEMENT at position num_index OF nums IS LESS THAN OR EQUAL TO mi  
+                SET num TO the ELEMENT at position num_index OF nums  
+                SET node TO trie  
+                FOR i FROM thirty one DOWNTO zero  
+                    SET bit TO the VALUE OF the INTEGER num DIVIDED BY two TO THE POWER OF i MODULO two  
+                    IF bit IS NOT A KEY IN node  
+                        ASSIGN the VALUE OF AN EMPTY DICTIONARY TO the ELEMENT at key bit OF node  
+                    END IF  
+                    ASSIGN node AT KEY bit TO node AT KEY bit  
+                END FOR  
+                INCREMENT num_index BY one  
+            END WHILE  
+            
+            IF trie IS EMPTY  
+                CONTINUE TO the NEXT ITERATION  
+            END IF  
+            
+            SET node TO trie  
+            SET max_xor TO zero  
+            FOR i FROM thirty one DOWNTO zero  
+                SET bit TO the VALUE OF the INTEGER xi DIVIDED BY two TO THE POWER OF i MODULO two  
+                SET toggle_bit TO one MINUS bit  
+                IF toggle_bit IS A KEY IN node  
+                    INCREMENT max_xor BY two TO THE POWER OF i  
+                    ASSIGN node AT KEY toggle_bit TO node  
+                ELSE  
+                    ASSIGN node AT KEY bit TO node  
+                END IF  
+            END FOR  
+            
+            SET the ELEMENT at position query_index OF result TO max_xor  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

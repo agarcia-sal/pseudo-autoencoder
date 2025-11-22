@@ -1,0 +1,29 @@
+CLASS Solution  
+    FUNCTION minimumWhiteTiles WITH PARAMETERS floor AND numCarpets AND carpetLen  
+        SET n TO the LENGTH OF floor  
+        
+        CALL helper FUNCTION initialize_dp_array WITH PARAMETERS n AND numCarpets RETURNING dp  
+        
+        FOR i FROM one TO n  
+            SET previous_dp_value TO dp AT position i MINUS one AT index zero  
+            SET is_current_tile_white TO one IF the element at position i MINUS one OF floor IS EQUAL TO the character one OTHERWISE zero  
+            SET dp AT position i AT index zero TO previous_dp_value PLUS is_current_tile_white  
+        END FOR  
+        
+        FOR j FROM one TO numCarpets  
+            FOR i FROM one TO n  
+                SET dp_value_without_carpet TO dp AT position i MINUS one AT index j PLUS one IF the element at position i MINUS one OF floor IS EQUAL TO the character one OTHERWISE zero  
+                SET starting_index AS the maximum VALUE BETWEEN zero AND i MINUS carpetLen  
+                SET dp_value_with_carpet TO dp AT position starting_index AT index j MINUS one  
+                SET dp AT position i AT index j TO THE MINIMUM VALUE BETWEEN dp_value_without_carpet AND dp_value_with_carpet  
+            END FOR  
+        END FOR  
+        
+        RETURN dp AT position n AT index numCarpets  
+    END FUNCTION  
+    
+    FUNCTION initialize_dp_array WITH PARAMETERS n AND numCarpets  
+        CREATE a two dimensional list named dp WITH n PLUS one ROWS AND numCarpets PLUS one COLUMNS ALL INITIALIZED TO zero  
+        RETURN dp  
+    END FUNCTION  
+END CLASS

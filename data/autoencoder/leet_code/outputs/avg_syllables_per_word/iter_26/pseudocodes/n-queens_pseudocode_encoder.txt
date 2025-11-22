@@ -1,0 +1,54 @@
+CLASS Solution
+    FUNCTION solveNQueens(parameter n of type integer) RETURNS list of list of strings
+
+        FUNCTION is_not_under_attack(parameter row, parameter col)
+            RETURN the NEGATION OF (the value at position col OF cols PLUS the value at position row MINUS col OF hills PLUS the value at position row PLUS col OF dales)
+        END FUNCTION
+
+        FUNCTION place_queen(parameter row, parameter col)
+            ADD the tuple of row and col TO queens
+            SET the value at position col OF cols TO one
+            SET the value at position row MINUS col OF hills TO one
+            SET the value at position row PLUS col OF dales TO one
+        END FUNCTION
+
+        FUNCTION remove_queen(parameter row, parameter col)
+            REMOVE the tuple of row and col FROM queens
+            SET the value at position col OF cols TO zero
+            SET the value at position row MINUS col OF hills TO zero
+            SET the value at position row PLUS col OF dales TO zero
+        END FUNCTION
+
+        FUNCTION add_solution()
+            SET solution TO an empty list
+            FOR each tuple of underscore and col IN the collection of queens SORTED
+                SET dots_before TO the string of a period REPEATED col times
+                SET queen_string TO the string consisting of dots_before CONCATENATED with the letter Q CONCATENATED with the string of a period REPEATED by n MINUS col MINUS one times
+                APPEND queen_string TO solution
+            END FOR
+            APPEND solution TO output
+        END FUNCTION
+
+        FUNCTION backtrack(parameter row WITH default value zero)
+            FOR col FROM zero TO n MINUS one INCLUSIVE
+                IF is_not_under_attack(row, col) HOLDS
+                    CALL place_queen(row, col)
+                    IF row PLUS one EQUALS n
+                        CALL add_solution()
+                    ELSE
+                        CALL backtrack(row PLUS one)
+                    END IF
+                    CALL remove_queen(row, col)
+                END IF
+            END FOR
+        END FUNCTION
+
+        SET cols TO a list of zeros with length n
+        SET hills TO a list of zeros with length two MULTIPLIED BY n MINUS one
+        SET dales TO a list of zeros with length two MULTIPLIED BY n MINUS one
+        SET queens TO an empty set
+        SET output TO an empty list
+        CALL backtrack()
+        RETURN output
+    END FUNCTION
+END CLASS

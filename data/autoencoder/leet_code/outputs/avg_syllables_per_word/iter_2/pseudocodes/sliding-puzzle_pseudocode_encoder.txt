@@ -1,0 +1,38 @@
+CLASS Solution
+    FUNCTION slidingPuzzle(board)
+        SET start TO tuple of tuples from board rows
+        SET target TO ((1, 2, 3), (4, 5, 0))
+        SET neighbors TO dictionary with keys 0 to 5 mapping to sets of possible moves
+
+        FOR i FROM 0 TO 1
+            FOR j FROM 0 TO 2
+                IF start[i][j] EQUALS 0
+                    SET zero_pos TO i TIMES 3 PLUS j
+
+        SET queue TO deque containing tuple (start, zero_pos, 0)
+        SET visited TO set containing start
+
+        WHILE queue is not empty
+            SET state, zero_pos, moves TO queue front element
+            REMOVE front element from queue
+
+            IF state EQUALS target
+                RETURN moves
+
+            FOR each neighbor IN neighbors[zero_pos]
+                SET new_state TO deep copy of state as list of lists
+                SET i TO zero_pos DIVIDED BY 3
+                SET j TO zero_pos MODULO 3
+                SET ni TO neighbor DIVIDED BY 3
+                SET nj TO neighbor MODULO 3
+
+                SWAP new_state[i][j] WITH new_state[ni][nj]
+
+                SET new_tuple_state TO tuple of tuples from new_state
+
+                IF new_tuple_state NOT IN visited
+                    ADD new_tuple_state TO visited
+                    APPEND (new_tuple_state, neighbor, moves PLUS 1) TO queue
+
+        RETURN -1
+END CLASS

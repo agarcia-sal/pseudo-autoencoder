@@ -1,0 +1,66 @@
+from collections import deque
+from typing import List, Dict
+
+class Solution:
+    def maximumInvitations(self, favorite: List[int]) -> int:
+        n = len(favorite)
+        graph: Dict[int, List[int]] = {i: [] for i in range(n)}
+        in_degree = [0] * n
+
+        for i in range(n):
+            graph[favorite[i]].append(i)
+            in_degree[favorite[i]] += 1
+
+        visited = [False] * n
+        mutual_chains = 0
+        for i in range(n):
+            if favorite[favorite[i]] == i and i < favorite[i]:
+                a, b = i, favorite[i]
+                chain_a = self.find_chain_length(a, graph, visited)
+                chain_b = self.find_chain_length(b, graph, visited)
+                mutual_chains += chain_a + chain_b
+
+        visited = [False] * n
+        longest_cycle = 0
+        for i in range(n):
+            if not visited[i]:
+                cycle_length = self.find_cycle_length(i, graph, visited, favorite)
+                if cycle_length > longest_cycle:
+                    longest_cycle = cycle_length
+
+        return max(mutual_chains, longest_cycle)
+
+    def find_chain_length(self, start: int, graph: Dict[int, List[int]], visited: List[bool]) -> int:
+        length = 0
+        queue = deque([start])
+        visited[start] = True
+
+        while queue:
+            current = queue.popleft()
+            for neighbor in graph[current]:
+                if not visited[neighbor]:
+                    visited[neighbor] = True
+                    queue.append(neighbor)
+                    length += 1
+
+        return length
+
+    def find_cycle_length(self, start: int, graph: Dict[int, List[int]], visited: List[bool], favorite: List[int]) -> int:
+        if visited[start]:
+            return 0
+
+        stack = []
+        current = start
+
+        while not visited[current]:
+            visited[current] = True
+            stack.append(current)
+            current = favorite[current]
+
+        if current not in stack:
+            return 0
+
+        cycle_start_index = stack.index(current)
+        cycle_length = len(stack) - cycle_start_index
+
+        return cycle_length

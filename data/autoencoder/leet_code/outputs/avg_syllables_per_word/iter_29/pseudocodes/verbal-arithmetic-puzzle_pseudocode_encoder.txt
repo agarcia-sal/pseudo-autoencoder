@@ -1,0 +1,90 @@
+CLASS Solution  
+    FUNCTION isSolvable(words, result)  
+        SET unique_characters TO the SET OF all UNIQUE CHARACTERS contained in the concatenation of all strings in words FOLLOWED BY all characters in result  
+        IF the SIZE OF unique_characters GREATER THAN ten  
+            RETURN false  
+        END IF  
+
+        SET non_zero_characters TO the SET OF first character of each word in words WHERE the LENGTH OF word GREATER THAN one UNIONED WITH the SET containing the first character of result IF the LENGTH OF result GREATER THAN one OTHERWISE the SET containing the empty string  
+
+        CREATE empty DICTIONARY char_to_digit  
+        CREATE empty DICTIONARY digit_to_char  
+
+        FUNCTION can_assign(character, digit)  
+            RETURN character NOT IN char_to_digit AND (digit NOT IN digit_to_char OR digit_to_char at key digit EQUALS character)  
+        END FUNCTION  
+
+        FUNCTION assign(character, digit)  
+            SET char_to_digit at key character TO digit  
+            SET digit_to_char at key digit TO character  
+        END FUNCTION  
+
+        FUNCTION unassign(character, digit)  
+            REMOVE the key character FROM char_to_digit  
+            REMOVE the key digit FROM digit_to_char  
+        END FUNCTION  
+
+        FUNCTION word_value(word)  
+            SET total_value TO zero  
+            SET index TO zero  
+            WHILE index LESS THAN the LENGTH OF word  
+                SET character TO the character at position (the LENGTH OF word MINUS one MINUS index) OF word  
+                INCREMENT total_value BY the char_to_digit value at key character MULTIPLIED BY ten POWERED BY index  
+                INCREMENT index BY one  
+            END WHILE  
+            RETURN total_value  
+        END FUNCTION  
+
+        FUNCTION backtrack(index, column, sum_column)  
+            IF column GREATER THAN OR EQUAL TO the MAXIMUM length among all words in words AND column GREATER THAN OR EQUAL TO the LENGTH OF result  
+                RETURN sum_column EQUALS zero  
+            END IF  
+
+            IF index EQUALS the LENGTH OF words  
+                IF column LESS THAN the LENGTH OF result  
+                    SET character TO the character at position (the LENGTH OF result MINUS one MINUS column) OF result  
+                    IF character IN char_to_digit  
+                        IF the value at char_to_digit key character EQUALS the REMAINDER of sum_column DIVIDED BY ten  
+                            RETURN the result of calling backtrack with parameters zero for index column INCREMENTED BY one, sum_column INTEGER DIVIDED BY ten  
+                        ELSE  
+                            RETURN false  
+                        END IF  
+                    ELSE IF can_assign(character, the REMAINDER of sum_column DIVIDED BY ten) AND (the REMAINDER of sum_column DIVIDED BY ten NOT EQUALS zero OR character NOT IN non_zero_characters)  
+                        assign(character, the REMAINDER of sum_column DIVIDED BY ten)  
+                        IF the result of calling backtrack with parameters zero for index, column INCREMENTED BY one, sum_column INTEGER DIVIDED BY ten is true  
+                            RETURN true  
+                        END IF  
+                        unassign(character, the REMAINDER of sum_column DIVIDED BY ten)  
+                    END IF  
+                ELSE  
+                    RETURN sum_column EQUALS zero  
+                END IF  
+                RETURN false  
+            END IF  
+
+            SET word TO the element at position index OF words  
+            IF column GREATER THAN OR EQUAL TO the LENGTH OF word  
+                RETURN the result of calling backtrack with parameters index INCREMENTED BY one, column, sum_column  
+            END IF  
+
+            SET character TO the character at position (the LENGTH OF word MINUS one MINUS column) OF word  
+            IF character IN char_to_digit  
+                RETURN the result of calling backtrack with parameters index INCREMENTED BY one, column, sum_column INCREMENTED BY the value at char_to_digit key character  
+            END IF  
+
+            FOR digit FROM zero TO nine  
+                IF can_assign(character, digit) AND (digit NOT EQUALS zero OR character NOT IN non_zero_characters)  
+                    assign(character, digit)  
+                    IF the result of calling backtrack with parameters index INCREMENTED BY one, column, sum_column INCREMENTED BY digit is true  
+                        RETURN true  
+                    END IF  
+                    unassign(character, digit)  
+                END IF  
+            END FOR  
+
+            RETURN false  
+        END FUNCTION  
+
+        RETURN the result of calling backtrack with zero for index, zero for column, zero for sum_column  
+    END FUNCTION  
+END CLASS

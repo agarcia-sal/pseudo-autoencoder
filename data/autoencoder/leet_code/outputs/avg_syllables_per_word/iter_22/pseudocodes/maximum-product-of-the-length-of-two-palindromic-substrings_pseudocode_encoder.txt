@@ -1,0 +1,43 @@
+CLASS Solution  
+    FUNCTION maxProduct(s)  
+        SET n TO the LENGTH OF s  
+        
+        SET max_len_end TO a list of n elements each set TO one  
+        SET max_len_start TO a list of n elements each set TO one  
+        
+        FUNCTION expand_around_center(left, right)  
+            WHILE left GREATER THAN OR EQUAL TO zero AND right LESS THAN n AND element at position left of s EQUALS element at position right of s  
+                SET length TO right MINUS left PLUS one  
+                SET max_len_end at position right TO the GREATER OF max_len_end at position right AND length  
+                SET max_len_start at position left TO the GREATER OF max_len_start at position left AND length  
+                DECREMENT left BY one  
+                INCREMENT right BY one  
+            END WHILE  
+        END FUNCTION  
+        
+        FOR i FROM zero TO n MINUS one  
+            CALL expand_around_center WITH i AND i  
+        END FOR  
+        
+        SET prefix_max TO a list of n elements each set TO zero  
+        SET suffix_max TO a list of n elements each set TO zero  
+        
+        SET prefix_max at position zero TO max_len_end at position zero  
+        FOR i FROM one TO n MINUS one  
+            SET prefix_max at position i TO the GREATER OF prefix_max at position i MINUS one AND max_len_end at position i  
+        END FOR  
+        
+        SET suffix_max at position n MINUS one TO max_len_start at position n MINUS one  
+        FOR i FROM n MINUS two DOWN TO zero  
+            SET suffix_max at position i TO the GREATER OF suffix_max at position i PLUS one AND max_len_start at position i  
+        END FOR  
+        
+        SET max_product TO zero  
+        FOR i FROM zero TO n MINUS two  
+            SET candidate_product TO prefix_max at position i MULTIPLIED BY suffix_max at position i PLUS one  
+            SET max_product TO the GREATER OF max_product AND candidate_product  
+        END FOR  
+        
+        RETURN max_product  
+    END FUNCTION  
+END CLASS

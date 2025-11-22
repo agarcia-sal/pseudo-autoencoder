@@ -1,0 +1,40 @@
+CLASS Solution
+    FUNCTION minimumFinishTime(tires, changeTime, numLaps)
+        CALL initialize_minimum_times WITH fifteen AS min_times
+
+        FOR each pair first_time_multiplier AND lap_multiplier IN tires
+            SET total_time TO zero
+            FOR lap_index FROM zero TO fourteen
+                CALL calculate_lap_time WITH first_time_multiplier AND lap_multiplier AND lap_index AS lap_time
+                IF lap_time IS GREATER THAN changeTime PLUS first_time_multiplier
+                    BREAK
+                END IF
+                INCREMENT total_time BY lap_time
+                SET min_times AT position lap_index TO the MINIMUM OF element at position lap_index of min_times AND total_time
+            END FOR
+        END FOR
+
+        CALL initialize_dp WITH numLaps PLUS one AS dp
+        SET element at position zero OF dp TO zero
+
+        FOR i FROM one TO numLaps
+            FOR j FROM zero TO the MINIMUM OF i AND fifteen MINUS one
+                SET dp AT position i TO the MINIMUM OF element at position i of dp AND element at position i MINUS j MINUS one of dp PLUS element at position j of min_times PLUS changeTime
+            END FOR
+        END FOR
+
+        RETURN element at position numLaps of dp MINUS changeTime
+    END FUNCTION
+END CLASS
+
+FUNCTION initialize_minimum_times(length)
+    RETURN list of length elements each set to infinity
+END FUNCTION
+
+FUNCTION calculate_lap_time(first_time_multiplier, lap_multiplier, lap_index)
+    RETURN first_time_multiplier MULTIPLIED BY lap_multiplier TO THE POWER OF lap_index
+END FUNCTION
+
+FUNCTION initialize_dp(length)
+    RETURN list of length elements each set to infinity
+END FUNCTION

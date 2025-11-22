@@ -1,0 +1,56 @@
+CLASS TrieNode  
+    FUNCTION __init__()  
+        SET children TO an empty dictionary  
+        SET count TO zero  
+    END FUNCTION  
+END CLASS  
+
+CLASS Trie  
+    FUNCTION __init__(bit_length)  
+        SET root TO a new instance of TrieNode  
+        SET bit_length TO bit_length  
+    END FUNCTION  
+
+    FUNCTION insert(num)  
+        SET node TO root  
+        FOR i FROM bit_length DOWN TO zero  
+            SET bit TO the result of shifting num to the right by i positions ANDed with one  
+            IF the bit is NOT a key in node children THEN  
+                ASSIGN a new instance of TrieNode TO node children at key bit  
+            END IF  
+            SET node TO the child node at key bit of node children  
+            INCREMENT node count BY one  
+        END FOR  
+    END FUNCTION  
+
+    FUNCTION count_less_than(num, threshold)  
+        SET count TO zero  
+        SET node TO root  
+        FOR i FROM bit_length DOWN TO zero  
+            IF node is null or does not exist THEN  
+                BREAK the loop  
+            END IF  
+            SET bit TO the result of shifting num to the right by i positions ANDed with one  
+            SET threshold_bit TO the result of shifting threshold to the right by i positions ANDed with one  
+            IF threshold_bit EQUALS one THEN  
+                INCREMENT count BY the count value of the child at key bit of node children IF it exists OTHERWISE zero  
+                SET node TO the child at key bit XOR one of node children  
+            ELSE  
+                SET node TO the child at key bit of node children  
+            END IF  
+        END FOR  
+        RETURN count  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION countPairs(nums, low, high)  
+        SET trie TO a new instance of Trie with default bit length  
+        SET nice_pairs TO zero  
+        FOR each num IN nums  
+            INCREMENT nice_pairs BY the result of calling trie count_less_than with num and high plus one MINUS the result of calling trie count_less_than with num and low  
+            CALL trie insert with num  
+        END FOR  
+        RETURN nice_pairs  
+    END FUNCTION  
+END CLASS

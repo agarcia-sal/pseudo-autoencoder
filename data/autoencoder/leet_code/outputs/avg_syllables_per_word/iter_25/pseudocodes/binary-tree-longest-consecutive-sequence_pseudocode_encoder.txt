@@ -1,0 +1,65 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val SET TO zero left SET TO None right SET TO None  
+        SET the val attribute of self TO val  
+        SET the left attribute of self TO left  
+        SET the right attribute of self TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF the values collection is empty THEN  
+        RETURN None  
+    END IF  
+    SET root TO a new instance of TreeNode initialized with the element at position zero of values  
+    SET i TO one  
+    SET queue TO an empty double ended queue  
+    APPEND root TO queue  
+    WHILE the queue is not empty DO  
+        SET node TO the element removed from the left end of queue  
+        IF i is less than the LENGTH OF values AND the element at position i of values is not None THEN  
+            SET the left attribute of node TO a new instance of TreeNode initialized with the element at position i of values  
+            APPEND the left attribute of node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i is less than the LENGTH OF values AND the element at position i of values is not None THEN  
+            SET the right attribute of node TO a new instance of TreeNode initialized with the element at position i of values  
+            APPEND the right attribute of node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p is None AND q is None THEN  
+        RETURN True  
+    ELSE IF p is None OR q is None THEN  
+        RETURN False  
+    ELSE IF the val attribute of p NOT EQUALS the val attribute of q THEN  
+        RETURN False  
+    ELSE  
+        RETURN the logical AND of the result of calling is_same_tree with the left attribute of p and the left attribute of q AND the result of calling is_same_tree with the right attribute of p and the right attribute of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION longestConsecutive WITH PARAMETERS self root  
+        IF root is None THEN  
+            RETURN zero  
+        END IF  
+        FUNCTION dfs WITH PARAMETERS node parent current_length  
+            IF node is None THEN  
+                RETURN current_length  
+            END IF  
+            IF parent is not None AND the val attribute of node EQUALS parent PLUS one THEN  
+                INCREMENT current_length BY one  
+            ELSE  
+                SET current_length TO one  
+            END IF  
+            SET left_length TO the result of calling dfs with the left attribute of node the val attribute of node current_length  
+            SET right_length TO the result of calling dfs with the right attribute of node the val attribute of node current_length  
+            RETURN the maximum value among current_length left_length right_length  
+        END FUNCTION  
+        RETURN the result of calling dfs with root None zero  
+    END FUNCTION  
+END CLASS

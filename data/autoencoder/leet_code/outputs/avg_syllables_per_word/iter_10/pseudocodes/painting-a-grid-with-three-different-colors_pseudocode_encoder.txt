@@ -1,0 +1,70 @@
+CLASS Solution  
+    FUNCTION colorTheGrid(m, n)  
+        SET MOD TO one billion PLUS seven  
+        
+        FUNCTION generate_valid_columns(prev_col)  
+            SET colors TO list containing one, two, three  
+            SET valid_cols TO empty list  
+            
+            FUNCTION backtrack(col, row)  
+                IF row EQUALS m  
+                    APPEND tuple version of col TO valid_cols  
+                    RETURN  
+                END IF  
+                FOR each color IN colors  
+                    IF col IS empty OR last element of col NOT EQUALS color  
+                        IF prev_col IS NOT none AND element at position row of prev_col EQUALS color  
+                            CONTINUE to next iteration of FOR  
+                        END IF  
+                        APPEND color TO col  
+                        CALL backtrack WITH col AND row PLUS one  
+                        REMOVE last element FROM col  
+                    END IF  
+                END FOR  
+            END FUNCTION  
+            
+            CALL backtrack WITH empty list AND zero  
+            RETURN valid_cols  
+        END FUNCTION  
+        
+        SET all_valid_cols TO CALL generate_valid_columns WITH none  
+        SET num_valid_cols TO LENGTH OF all_valid_cols  
+        
+        SET compatible_cols TO a mapping FROM each integer i FROM zero TO num_valid_cols MINUS one TO empty list  
+        
+        FOR each i FROM zero TO num_valid_cols MINUS one  
+            FOR each j FROM zero TO num_valid_cols MINUS one  
+                SET is_compatible TO true  
+                FOR each k FROM zero TO m MINUS one  
+                    IF element at position k of element at position i of all_valid_cols EQUALS element at position k of element at position j of all_valid_cols  
+                        SET is_compatible TO false  
+                        BREAK inner FOR loop  
+                    END IF  
+                END FOR  
+                IF is_compatible  
+                    APPEND j TO compatible_cols at key i  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET dp TO list containing num_valid_cols copies of one  
+        
+        FOR each _ FROM one TO n MINUS one  
+            SET next_dp TO list containing num_valid_cols copies of zero  
+            FOR each i FROM zero TO num_valid_cols MINUS one  
+                FOR each j IN compatible_cols at key i  
+                    SET next_dp at position j TO next_dp at position j PLUS dp at position i  
+                    SET next_dp at position j TO next_dp at position j MODULO MOD  
+                END FOR  
+            END FOR  
+            SET dp TO next_dp  
+        END FOR  
+        
+        SET total_ways TO zero  
+        FOR each count IN dp  
+            INCREMENT total_ways BY count  
+        END FOR  
+        
+        RETURN total_ways MODULO MOD  
+    END FUNCTION  
+END CLASS

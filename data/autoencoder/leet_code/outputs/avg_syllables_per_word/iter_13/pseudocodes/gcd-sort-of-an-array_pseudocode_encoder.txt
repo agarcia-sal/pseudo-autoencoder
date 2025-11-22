@@ -1,0 +1,52 @@
+CLASS UnionFind  
+    FUNCTION __init__ with parameter size  
+        SET parent TO a list representing the sequence of integers from zero TO size MINUS one  
+        SET rank TO a list where each element is one and the length is size  
+    END FUNCTION  
+  
+    FUNCTION find with parameter p  
+        IF the element at position p of parent DOES NOT EQUAL p  
+            SET the element at position p of parent TO the result of find with the element at position p of parent  
+        END IF  
+        RETURN the element at position p of parent  
+    END FUNCTION  
+  
+    FUNCTION union with parameters p and q  
+        SET rootP TO the result of find with p  
+        SET rootQ TO the result of find with q  
+        IF rootP EQUALS rootQ  
+            RETURN FALSE  
+        END IF  
+        IF the element at position rootP of rank IS GREATER THAN the element at position rootQ of rank  
+            SET the element at position rootQ of parent TO rootP  
+        ELSE IF the element at position rootP of rank IS LESS THAN the element at position rootQ of rank  
+            SET the element at position rootP of parent TO rootQ  
+        ELSE  
+            SET the element at position rootQ of parent TO rootP  
+            INCREMENT the element at position rootP of rank BY one  
+        END IF  
+        RETURN TRUE  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION gcdSort with parameter nums which is a list of integers  
+        SET sorted_nums TO the result of sorting nums in ascending order  
+        SET max_val TO the maximum value among elements of nums  
+        SET uf TO an instance of UnionFind initialized with max_val PLUS one  
+        FOR each num IN nums  
+            FOR each factor FROM two TO the integer part of the square root of num PLUS one  
+                IF the modulo of num BY factor EQUALS zero  
+                    CALL union on uf with parameters num and factor  
+                    CALL union on uf with parameters num and the integer division of num BY factor  
+                END IF  
+            END FOR  
+        END FOR  
+        FOR each index i FROM zero TO the length of nums MINUS one  
+            IF the result of find on uf with the element at position i of nums DOES NOT EQUAL the result of find on uf with the element at position i of sorted_nums  
+                RETURN FALSE  
+            END IF  
+        END FOR  
+        RETURN TRUE  
+    END FUNCTION  
+END CLASS

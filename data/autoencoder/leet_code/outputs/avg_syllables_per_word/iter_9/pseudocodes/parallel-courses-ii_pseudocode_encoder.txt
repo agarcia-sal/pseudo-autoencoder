@@ -1,0 +1,36 @@
+CLASS Solution  
+    FUNCTION minNumberOfSemesters(self, n, relations, k)  
+        SET graph TO a mapping from keys to empty lists  
+        SET in_degree TO a list of zeros with length n PLUS one  
+        
+        FOR each pair prevCourse, nextCourse IN relations  
+            APPEND nextCourse TO graph at key prevCourse  
+            INCREMENT in_degree at index nextCourse BY one  
+        END FOR  
+        
+        SET queue TO an empty double-ended queue  
+        FOR course FROM one TO n  
+            IF in_degree at index course EQUALS zero THEN  
+                APPEND course TO queue  
+            END IF  
+        END FOR  
+        
+        SET semesters TO zero  
+        
+        WHILE queue is not empty  
+            SET number_of_courses TO the smaller value between k and the length of queue  
+            FOR count FROM one TO number_of_courses  
+                REMOVE first element FROM queue AND SET TO current_course  
+                FOR each next_course IN graph at key current_course  
+                    DECREMENT in_degree at index next_course BY one  
+                    IF in_degree at index next_course EQUALS zero THEN  
+                        APPEND next_course TO queue  
+                    END IF  
+                END FOR  
+            END FOR  
+            INCREMENT semesters BY one  
+        END WHILE  
+        
+        RETURN semesters  
+    END FUNCTION  
+END CLASS

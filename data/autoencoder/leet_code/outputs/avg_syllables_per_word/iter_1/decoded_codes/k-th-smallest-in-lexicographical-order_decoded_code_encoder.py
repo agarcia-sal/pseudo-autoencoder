@@ -1,0 +1,21 @@
+def count_steps(p, n):
+    nxt = p + 1
+    s = 0
+    while p <= n:
+        s += min(n - p + 1, nxt - p)
+        p *= 10
+        nxt *= 10
+    return s
+
+def findKthNumber(n, k):
+    cur = 1
+    k -= 1
+    while k > 0:
+        steps = count_steps(cur, n)
+        if steps <= k:
+            cur += 1
+            k -= steps
+        else:
+            cur *= 10
+            k -= 1
+    return cur

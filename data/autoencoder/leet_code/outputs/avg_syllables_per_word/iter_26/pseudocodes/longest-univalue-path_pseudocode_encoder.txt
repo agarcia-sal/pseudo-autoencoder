@@ -1,0 +1,68 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(list_of_values)
+    IF the list_of_values IS EMPTY
+        RETURN none
+    END IF
+    SET root_node TO a new TreeNode WITH the element at position zero OF list_of_values
+    SET index_counter TO one
+    CREATE an empty deque named node_queue
+    APPEND root_node TO node_queue
+    WHILE node_queue HOLDS elements
+        REMOVE the first element FROM node_queue AND ASSIGN to current_node
+        IF index_counter IS LESS THAN the LENGTH OF list_of_values AND the element at position index_counter OF list_of_values IS NOT none
+            SET current_node.left TO a new TreeNode WITH the element at position index_counter OF list_of_values
+            APPEND current_node.left TO node_queue
+        END IF
+        INCREMENT index_counter BY one
+        IF index_counter IS LESS THAN the LENGTH OF list_of_values AND the element at position index_counter OF list_of_values IS NOT none
+            SET current_node.right TO a new TreeNode WITH the element at position index_counter OF list_of_values
+            APPEND current_node.right TO node_queue
+        END IF
+        INCREMENT index_counter BY one
+    END WHILE
+    RETURN root_node
+END FUNCTION
+
+FUNCTION is_same_tree(p_node, q_node)
+    IF p_node IS none AND q_node IS none
+        RETURN true
+    ELSE IF p_node IS none OR q_node IS none
+        RETURN false
+    ELSE IF the val attribute OF p_node IS NOT EQUAL TO the val attribute OF q_node
+        RETURN false
+    ELSE
+        RETURN the RESULT OF is_same_tree WITH the left attribute OF p_node AND the left attribute OF q_node AND the RESULT OF is_same_tree WITH the right attribute OF p_node AND the right attribute OF q_node
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION longestUnivaluePath(self, root_node OPTIONAL TreeNode)
+        FUNCTION dfs(node)
+            IF node IS none
+                RETURN zero, zero
+            END IF
+            SET left_length, left_value TO the RESULT OF dfs WITH the left attribute OF node
+            SET right_length, right_value TO the RESULT OF dfs WITH the right attribute OF node
+            SET left_arrow TO zero
+            SET right_arrow TO zero
+            IF the left attribute OF node IS NOT none AND the val attribute OF the left attribute OF node IS EQUAL TO the val attribute OF node
+                SET left_arrow TO left_length PLUS one
+            END IF
+            IF the right attribute OF node IS NOT none AND the val attribute OF the right attribute OF node IS EQUAL TO the val attribute OF node
+                SET right_arrow TO right_length PLUS one
+            END IF
+            SET self.max_length TO the GREATER OF self.max_length AND left_arrow PLUS right_arrow
+            RETURN the GREATER OF left_arrow AND right_arrow, the val attribute OF node
+        END FUNCTION
+        SET self.max_length TO zero
+        CALL dfs WITH root_node
+        RETURN self.max_length
+    END FUNCTION
+END CLASS

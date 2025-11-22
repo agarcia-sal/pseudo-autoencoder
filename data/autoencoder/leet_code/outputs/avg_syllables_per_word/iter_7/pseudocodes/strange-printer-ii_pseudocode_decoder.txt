@@ -1,0 +1,42 @@
+CLASS Solution  
+    FUNCTION isPrintable(targetGrid)  
+        SET color_bounds TO default dictionary with default [infinity, infinity, negative infinity, negative infinity]  
+  
+        FOR r FROM 0 TO LENGTH OF targetGrid MINUS 1  
+            FOR c FROM 0 TO LENGTH OF targetGrid AT INDEX 0 MINUS 1  
+                SET color TO targetGrid AT r AT c  
+                SET color_bounds AT color AT 0 TO MINIMUM OF color_bounds AT color AT 0 AND r  
+                SET color_bounds AT color AT 1 TO MINIMUM OF color_bounds AT color AT 1 AND c  
+                SET color_bounds AT color AT 2 TO MAXIMUM OF color_bounds AT color AT 2 AND r  
+                SET color_bounds AT color AT 3 TO MAXIMUM OF color_bounds AT color AT 3 AND c  
+  
+        SET graph TO default dictionary of empty list  
+        SET in_degree TO default dictionary of zero  
+  
+        FOR EACH color AND bounds IN color_bounds  
+            SET minr TO bounds AT 0  
+            SET minc TO bounds AT 1  
+            SET maxr TO bounds AT 2  
+            SET maxc TO bounds AT 3  
+  
+            FOR r FROM minr TO maxr  
+                FOR c FROM minc TO maxc  
+                    IF targetGrid AT r AT c IS NOT EQUAL TO color THEN  
+                        SET other_color TO targetGrid AT r AT c  
+                        APPEND color TO graph AT other_color  
+                        INCREMENT in_degree AT color BY 1  
+  
+        SET queue TO new deque containing colors FROM color_bounds WHERE in_degree AT color IS EQUAL TO 0  
+        SET visited_colors TO 0  
+  
+        WHILE queue IS NOT EMPTY  
+            SET color TO dequeue first element FROM queue  
+            INCREMENT visited_colors BY 1  
+            FOR EACH next_color IN graph AT color  
+                DECREMENT in_degree AT next_color BY 1  
+                IF in_degree AT next_color IS EQUAL TO 0 THEN  
+                    APPEND next_color TO queue  
+  
+        RETURN visited_colors IS EQUAL TO LENGTH OF color_bounds  
+    END FUNCTION  
+END CLASS

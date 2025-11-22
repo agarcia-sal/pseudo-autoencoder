@@ -1,0 +1,83 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.parent TO list of integers from 0 TO size MINUS 1  
+        SET self.rank TO list of 1 repeated size times  
+        SET self.size TO list of 1 repeated size times  
+    END FUNCTION  
+
+    FUNCTION find(self, u)  
+        IF self.parent AT index u IS NOT u THEN  
+            SET self.parent AT index u TO self.find(self.parent AT index u)  
+        END IF  
+        RETURN self.parent AT index u  
+    END FUNCTION  
+
+    FUNCTION union(self, u, v)  
+        SET rootU TO self.find(u)  
+        SET rootV TO self.find(v)  
+        IF rootU IS NOT EQUAL TO rootV THEN  
+            IF self.rank AT index rootU IS GREATER THAN self.rank AT index rootV THEN  
+                SET self.parent AT index rootV TO rootU  
+                INCREMENT self.size AT index rootU BY self.size AT index rootV  
+            ELSE IF self.rank AT index rootU IS LESS THAN self.rank AT index rootV THEN  
+                SET self.parent AT index rootU TO rootV  
+                INCREMENT self.size AT index rootV BY self.size AT index rootU  
+            ELSE  
+                SET self.parent AT index rootV TO rootU  
+                INCREMENT self.rank AT index rootU BY 1  
+                INCREMENT self.size AT index rootU BY self.size AT index rootV  
+            END IF  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION largestComponentSize(self, nums)  
+        SET max_num TO maximum value IN nums  
+        SET uf TO new UnionFind with size max_num PLUS 1  
+
+        SET prime_to_index TO empty map  
+
+        FOR each num IN nums DO  
+            FOR each prime IN self.prime_factors(num) DO  
+                IF prime EXISTS IN prime_to_index THEN  
+                    CALL uf.union(prime_to_index AT prime, num)  
+                ELSE  
+                    SET prime_to_index AT prime TO num  
+                END IF  
+            END FOR  
+        END FOR  
+
+        SET max_component_size TO 0  
+        FOR each num IN nums DO  
+            SET root TO uf.find(num)  
+            SET max_component_size TO maximum value BETWEEN max_component_size AND uf.size AT root  
+        END FOR  
+
+        RETURN max_component_size  
+    END FUNCTION  
+
+    FUNCTION prime_factors(self, n)  
+        SET factors TO empty set  
+
+        WHILE n MODULO 2 IS EQUAL TO 0 DO  
+            ADD 2 TO factors  
+            SET n TO n DIVIDED BY 2  
+        END WHILE  
+
+        SET i TO 3  
+        WHILE i TIMES i IS LESS THAN OR EQUAL TO n DO  
+            WHILE n MODULO i IS EQUAL TO 0 DO  
+                ADD i TO factors  
+                SET n TO n DIVIDED BY i  
+            END WHILE  
+            INCREMENT i BY 2  
+        END WHILE  
+
+        IF n IS GREATER THAN 2 THEN  
+            ADD n TO factors  
+        END IF  
+
+        RETURN factors  
+    END FUNCTION  
+END CLASS

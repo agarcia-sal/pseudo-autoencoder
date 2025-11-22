@@ -1,0 +1,35 @@
+CLASS Solution  
+    FUNCTION fractionToDecimal(numerator, denominator)  
+        IF (numerator LESS THAN 0) XOR (denominator LESS THAN 0)  
+            SET sign TO "-"  
+        ELSE  
+            SET sign TO empty string  
+        
+        SET numerator TO absolute value of numerator  
+        SET denominator TO absolute value of denominator  
+        
+        CALL divmod WITH numerator AND denominator RETURNING quotient AND remainder  
+        SET integer_part TO string representation of quotient  
+        
+        IF remainder EQUALS 0  
+            RETURN concatenation of sign AND integer_part  
+        
+        SET seen_remainders TO empty dictionary  
+        SET fractional_part TO empty list  
+        
+        WHILE remainder NOT EQUALS 0  
+            IF remainder IN seen_remainders  
+                SET start TO value from seen_remainders AT remainder  
+                SET non_repeating TO concatenation of fractional_part elements FROM start 0 TO start  
+                SET repeating TO concatenation of fractional_part elements FROM start TO end  
+                RETURN concatenation of sign, integer_part, ".", non_repeating, "(", repeating, ")"  
+            
+            SET seen_remainders AT remainder TO length of fractional_part  
+            
+            SET remainder TO remainder MULTIPLIED BY 10  
+            CALL divmod WITH remainder AND denominator RETURNING quotient AND remainder  
+            APPEND string representation of quotient TO fractional_part  
+        
+        RETURN concatenation of sign, integer_part, ".", concatenation of fractional_part elements  
+    END FUNCTION  
+END CLASS

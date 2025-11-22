@@ -1,0 +1,55 @@
+CLASS TreeNode  
+    FUNCTION __init__(val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET root TO new TreeNode WITH values AT index ZERO  
+    SET i TO 1  
+    SET queue TO new empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO REMOVE first element FROM queue  
+        IF i LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.left TO new TreeNode WITH values AT i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.right TO new TreeNode WITH values AT i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN CALL is_same_tree WITH p.left AND q.left AND CALL is_same_tree WITH p.right AND q.right  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION countUnivalSubtrees(root)  
+        FUNCTION helper(node)  
+            IF node IS None  
+                RETURN True, ZERO  
+            SET is_left_unival, left_count TO CALL helper WITH node.left  
+            SET is_right_unival, right_count TO CALL helper WITH node.right  
+            IF is_left_unival AND is_right_unival  
+                IF (node.left IS None OR node.left.val EQUALS node.val) AND (node.right IS None OR node.right.val EQUALS node.val)  
+                    RETURN True, left_count PLUS right_count PLUS ONE  
+            RETURN False, left_count PLUS right_count  
+        END FUNCTION  
+        SET _, count TO CALL helper WITH root  
+        RETURN count  
+    END FUNCTION  
+END CLASS  

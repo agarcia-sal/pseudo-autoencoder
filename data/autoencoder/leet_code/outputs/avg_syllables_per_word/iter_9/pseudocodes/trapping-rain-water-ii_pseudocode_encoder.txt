@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION trapRainWater(self, heightMap)  
+        IF heightMap IS empty OR first element of heightMap IS empty THEN  
+            RETURN zero  
+        END IF  
+        
+        SET m TO length of heightMap  
+        SET n TO length of first element of heightMap  
+        SET visited TO two-dimensional list of size m by n with all values false  
+        SET min_heap TO empty list  
+        
+        FOR i FROM zero TO m MINUS one  
+            PUSH tuple of (value at heightMap at row i and column zero, i, zero) INTO min_heap  
+            PUSH tuple of (value at heightMap at row i and column n MINUS one, i, n MINUS one) INTO min_heap  
+            SET visited at row i and column zero TO true  
+            SET visited at row i and column n MINUS one TO true  
+        END FOR  
+        
+        FOR j FROM zero TO n MINUS one  
+            PUSH tuple of (value at heightMap at row zero and column j, zero, j) INTO min_heap  
+            PUSH tuple of (value at heightMap at row m MINUS one and column j, m MINUS one, j) INTO min_heap  
+            SET visited at row zero and column j TO true  
+            SET visited at row m MINUS one and column j TO true  
+        END FOR  
+        
+        SET directions TO list of tuples: (negative one, zero), (one, zero), (zero, negative one), (zero, one)  
+        SET water_trapped TO zero  
+        
+        WHILE min_heap IS NOT empty  
+            REMOVE the smallest element FROM min_heap AND ASSIGN its values TO height, x, y  
+            
+            FOR each dx, dy IN directions  
+                SET nx TO x PLUS dx  
+                SET ny TO y PLUS dy  
+                
+                IF nx GREATER THAN OR EQUAL TO zero AND nx LESS THAN m AND ny GREATER THAN OR EQUAL TO zero AND ny LESS THAN n AND visited at nx and ny IS false THEN  
+                    SET visited at nx and ny TO true  
+                    SET water_trapped TO water_trapped PLUS maximum of zero AND height MINUS value at heightMap at nx and ny  
+                    PUSH tuple of (maximum of height AND value at heightMap at nx and ny, nx, ny) INTO min_heap  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN water_trapped  
+    END FUNCTION  
+END CLASS

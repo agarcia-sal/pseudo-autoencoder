@@ -1,0 +1,78 @@
+CLASS Solution  
+    FUNCTION maximumMinutes(grid)  
+        SET m TO the LENGTH OF grid  
+        SET n TO the LENGTH OF element at position zero of grid  
+        SET directions TO a list containing the pairs of values one AND zero, negative one AND zero, zero AND one, zero AND negative one  
+        
+        FUNCTION can_escape(wait)  
+            SET fire_times TO a two dimensional list with m rows AND n columns where every element is positive infinity  
+            SET queue TO a new empty double ended queue  
+            
+            FOR i FROM zero TO m MINUS one  
+                FOR j FROM zero TO n MINUS one  
+                    IF the element at position i of grid at position j EQUALS one  
+                        APPEND a triple containing i AND j AND zero TO queue  
+                        SET the element at position i of fire_times at position j TO zero  
+                    END IF  
+                END FOR  
+            END FOR  
+            
+            WHILE queue is not empty  
+                REMOVE the leftmost triple FROM queue AND ASSIGN the three values TO variables x AND y AND t  
+                FOR each pair dx AND dy IN directions  
+                    SET nx TO x PLUS dx  
+                    SET ny TO y PLUS dy  
+                    IF nx is GREATER THAN OR EQUAL TO zero AND nx is LESS THAN m AND ny is GREATER THAN OR EQUAL TO zero AND ny is LESS THAN n AND the element at position nx of grid at position ny EQUALS zero AND the element at position nx of fire_times at position ny EQUALS positive infinity  
+                        SET the element at position nx of fire_times at position ny TO t PLUS one  
+                        APPEND a triple containing nx AND ny AND t PLUS one TO queue  
+                    END IF  
+                END FOR  
+            END WHILE  
+            
+            SET queue TO a new double ended queue containing a triple of zero AND zero AND wait  
+            SET visited TO a new set containing the pair of zero AND zero  
+            
+            WHILE queue is not empty  
+                REMOVE the leftmost triple FROM queue AND ASSIGN the three values TO variables x AND y AND t  
+                FOR each pair dx AND dy IN directions  
+                    SET nx TO x PLUS dx  
+                    SET ny TO y PLUS dy  
+                    IF nx is GREATER THAN OR EQUAL TO zero AND nx is LESS THAN m AND ny is GREATER THAN OR EQUAL TO zero AND ny is LESS THAN n AND the pair nx AND ny is NOT IN visited AND the element at position nx of grid at position ny EQUALS zero  
+                        IF nx EQUALS m MINUS one AND ny EQUALS n MINUS one  
+                            IF the element at position nx of fire_times at position ny IS GREATER THAN OR EQUAL TO t PLUS one  
+                                RETURN True  
+                            ELSE  
+                                RETURN False  
+                            END IF  
+                        END IF  
+                        IF the element at position nx of fire_times at position ny IS GREATER THAN t PLUS one  
+                            ADD the pair nx AND ny TO visited  
+                            APPEND a triple containing nx AND ny AND t PLUS one TO queue  
+                        END IF  
+                    END IF  
+                END FOR  
+            END WHILE  
+            
+            RETURN False  
+        END FUNCTION  
+        
+        SET left TO zero  
+        SET right TO m MULTIPLIED BY n  
+        SET result TO negative one  
+        WHILE left IS LESS THAN OR EQUAL TO right  
+            SET mid TO left PLUS right DIVIDED BY two discarding any fraction  
+            IF can_escape WITH parameter mid  
+                SET result TO mid  
+                SET left TO mid PLUS one  
+            ELSE  
+                SET right TO mid MINUS one  
+            END IF  
+        END WHILE  
+        
+        IF result IS EQUAL TO m MULTIPLIED BY n  
+            RETURN one billion  
+        ELSE  
+            RETURN result  
+        END IF  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION maxVacationDays(flights WITH TYPE list of list of integers, days WITH TYPE list of list of integers) RETURNS integer  
+        SET number_of_cities TO the LENGTH OF flights  
+        SET number_of_weeks TO the LENGTH OF the FIRST element of days  
+        
+        SET dp_array TO a list of number_of_cities elements each SET TO negative one  
+        SET the element at position zero of dp_array TO zero  
+        
+        SET flight_graph TO an empty dictionary  
+        FOR each city_index FROM zero TO number_of_cities MINUS one  
+            SET the element at key city_index of flight_graph TO an empty list  
+        END FOR  
+        
+        FOR each departure_city FROM zero TO number_of_cities MINUS one  
+            FOR each destination_city FROM zero TO number_of_cities MINUS one  
+                IF the element at position destination_city of the element at position departure_city of flights EQUALS one  
+                    APPEND destination_city TO the list at key departure_city of flight_graph  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        FOR each current_week FROM zero TO number_of_weeks MINUS one  
+            SET new_dp_array TO a list of number_of_cities elements each SET TO negative one  
+            FOR each current_city FROM zero TO number_of_cities MINUS one  
+                IF the element at position current_city of dp_array EQUALS negative one  
+                    CONTINUE to the next iteration of the current_city loop  
+                END IF  
+                
+                SET the element at position current_city of new_dp_array TO the maximum value BETWEEN the element at position current_city of new_dp_array AND the element at position current_city of dp_array PLUS the element at position current_week of the element at position current_city of days  
+                
+                FOR each reachable_city IN the list at key current_city of flight_graph  
+                    SET the element at position reachable_city of new_dp_array TO the maximum value BETWEEN the element at position reachable_city of new_dp_array AND the element at position current_city of dp_array PLUS the element at position current_week of the element at position reachable_city of days  
+                END FOR  
+            END FOR  
+            
+            ASSIGN dp_array TO new_dp_array  
+        END FOR  
+        
+        RETURN the maximum value IN dp_array  
+    END FUNCTION  
+END CLASS

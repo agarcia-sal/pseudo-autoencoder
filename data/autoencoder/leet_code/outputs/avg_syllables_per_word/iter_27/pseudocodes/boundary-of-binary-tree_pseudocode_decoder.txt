@@ -1,0 +1,102 @@
+CLASS TreeNode  
+    FUNCTION __init__ with parameters val defaulting to zero left defaulting to none right defaulting to none  
+        SET the attribute val TO val  
+        SET the attribute left TO left  
+        SET the attribute right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node with parameter values as list  
+    IF values does not exist  
+        RETURN none  
+    END IF  
+    SET root TO new TreeNode with value as element at position zero of values  
+    SET i TO one  
+    SET queue TO new deque collection  
+    APPEND root TO queue  
+    WHILE the collection queue is not empty  
+        SET node TO first element removed from the left of queue  
+        IF i is less than the length of values AND element at position i of values is not none  
+            SET node.left TO new TreeNode with value as element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i is less than the length of values AND element at position i of values is not none  
+            SET node.right TO new TreeNode with value as element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree with parameters p and q  
+    IF p does not exist AND q does not exist  
+        RETURN True  
+    ELSE IF p does not exist OR q does not exist  
+        RETURN False  
+    ELSE IF attribute val of p NOT EQUALS attribute val of q  
+        RETURN False  
+    ELSE  
+        RETURN the logical AND of calling is_same_tree with attribute left of p and attribute left of q AND calling is_same_tree with attribute right of p and attribute right of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION boundaryOfBinaryTree with parameter root  
+        IF root does not exist  
+            RETURN an empty list  
+        END IF  
+        
+        FUNCTION is_leaf with parameter node  
+            RETURN node.left does not exist AND node.right does not exist  
+        END FUNCTION  
+        
+        SET left_boundary TO an empty list  
+        SET current TO attribute left of root  
+        WHILE current exists  
+            IF NOT is_leaf(current)  
+                APPEND attribute val of current TO left_boundary  
+            END IF  
+            IF attribute left of current exists  
+                SET current TO attribute left of current  
+            ELSE  
+                SET current TO attribute right of current  
+            END IF  
+        END WHILE  
+        
+        SET right_boundary TO an empty list  
+        SET current TO attribute right of root  
+        WHILE current exists  
+            IF NOT is_leaf(current)  
+                APPEND attribute val of current TO right_boundary  
+            END IF  
+            IF attribute right of current exists  
+                SET current TO attribute right of current  
+            ELSE  
+                SET current TO attribute left of current  
+            END IF  
+        END WHILE  
+        
+        SET leaves TO an empty list  
+        
+        FUNCTION collect_leaves with parameter node  
+            IF node does not exist  
+                RETURN  
+            END IF  
+            IF is_leaf(node)  
+                APPEND attribute val of node TO leaves  
+            END IF  
+            CALL collect_leaves with attribute left of node  
+            CALL collect_leaves with attribute right of node  
+        END FUNCTION  
+        
+        CALL collect_leaves with root  
+        
+        IF is_leaf(root)  
+            SET leaves TO an empty list  
+        END IF  
+        
+        RETURN a list formed by concatenating element attribute val of root PLUS all elements of left_boundary PLUS all elements of leaves PLUS all elements of right_boundary in reverse order  
+    END FUNCTION  
+END CLASS

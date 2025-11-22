@@ -1,0 +1,46 @@
+CLASS Solution
+    FUNCTION mostSimilar(n, roads, names, targetPath)
+        SET graph TO a default dictionary with list as default value type
+        FOR each pair of cities labeled u and v IN roads
+            APPEND city v TO the adjacency list of city u IN graph
+            APPEND city u TO the adjacency list of city v IN graph
+        END FOR
+
+        SET m TO the LENGTH OF targetPath
+
+        FUNCTION dp(i, j) WITH memoization
+            IF i EQUALS zero THEN
+                IF element at position j OF names NOT EQUALS element at position i OF targetPath THEN
+                    RETURN one, a list containing element j
+                ELSE
+                    RETURN zero, a list containing element j
+                END IF
+            END IF
+
+            SET min_cost TO positive infinity
+            SET min_path TO an empty list
+            FOR each city k IN adjacency list of city j IN graph
+                SET cost, path TO the result of dp with arguments i MINUS one and k
+                IF cost LESS THAN min_cost THEN
+                    SET min_cost TO cost
+                    SET min_path TO path
+                END IF
+            END FOR
+
+            SET current_cost TO min_cost PLUS (one IF element at position j OF names NOT EQUALS element at position i OF targetPath ELSE zero)
+            RETURN current_cost, concatenation of min_path WITH a list containing element j
+        END FUNCTION
+
+        SET min_cost TO positive infinity
+        SET min_path TO an empty list
+        FOR each integer j FROM zero TO n MINUS one INCLUSIVE
+            SET cost, path TO the result of dp WITH arguments m MINUS one and j
+            IF cost LESS THAN min_cost THEN
+                SET min_cost TO cost
+                SET min_path TO path
+            END IF
+        END FOR
+
+        RETURN min_path
+    END FUNCTION
+END CLASS

@@ -1,0 +1,44 @@
+CLASS Solution  
+    FUNCTION mostSimilar WITH PARAMETERS n roads names targetPath  
+        SET graph TO a new default dictionary of lists  
+        FOR each pair u and v IN roads  
+            APPEND v TO the list at key u in graph  
+            APPEND u TO the list at key v in graph  
+        END FOR  
+        SET m TO the length of targetPath  
+        FUNCTION dp WITH PARAMETERS i j  
+            IF i EQUALS zero THEN  
+                IF the element at position j of names NOT EQUALS the element at position i of targetPath THEN  
+                    RETURN one and a list containing j  
+                ELSE  
+                    RETURN zero and a list containing j  
+                END IF  
+            END IF  
+            SET min_cost TO positive infinity  
+            SET min_path TO an empty list  
+            FOR each k IN the list at key j of graph  
+                SET cost_and_path TO the result of calling dp with parameters i MINUS one and k  
+                SET cost TO the first element of cost_and_path  
+                SET path TO the second element of cost_and_path  
+                IF cost LESS THAN min_cost THEN  
+                    SET min_cost TO cost  
+                    SET min_path TO path  
+                END IF  
+            END FOR  
+            SET current_cost TO min_cost PLUS one IF the element at position j of names NOT EQUALS the element at position i of targetPath OTHERWISE zero  
+            RETURN current_cost and the concatenation of min_path with a list containing j  
+        END FUNCTION  
+        SET min_cost TO positive infinity  
+        SET min_path TO an empty list  
+        FOR each j FROM zero TO n MINUS one  
+            SET cost_and_path TO the result of calling dp with parameters m MINUS one and j  
+            SET cost TO the first element of cost_and_path  
+            SET path TO the second element of cost_and_path  
+            IF cost LESS THAN min_cost THEN  
+                SET min_cost TO cost  
+                SET min_path TO path  
+            END IF  
+        END FOR  
+        RETURN min_path  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,59 @@
+CLASS Solution  
+    FUNCTION smallestMissingValueSubtree(parents AS list of integers, nums AS list of integers) RETURNS list of integers  
+        IMPORT a mapping with default empty list for missing keys AS tree  
+        
+        SET n TO the LENGTH OF parents  
+        FOR each index FROM one TO n MINUS one  
+            APPEND index TO the list at key at position index of parents in tree  
+        END FOR  
+        
+        SET node_with_one TO negative one  
+        FOR each index FROM zero TO n MINUS one  
+            IF the element at position index of nums EQUALS one  
+                SET node_with_one TO index  
+                BREAK the loop  
+            END IF  
+        END FOR  
+        
+        IF node_with_one EQUALS negative one  
+            RETURN a list of one repeated n times  
+        END IF  
+        
+        SET result TO a list of one repeated n times  
+        
+        DEFINE FUNCTION dfs(node)  
+            ADD node TO the set visited  
+            SET genetic_values TO a new set containing the element at position node of nums  
+            FOR each child IN the list at key node in tree  
+                IF child NOT IN visited  
+                    CALL dfs with child AND MERGE the returned set INTO genetic_values  
+                END IF  
+            END FOR  
+            SET smallest_missing TO one  
+            WHILE smallest_missing IS IN genetic_values  
+                INCREMENT smallest_missing BY one  
+            END WHILE  
+            SET the element at position node of result TO smallest_missing  
+            RETURN genetic_values  
+        END FUNCTION  
+        
+        SET visited TO an empty set  
+        
+        SET path TO an empty list  
+        SET current TO node_with_one  
+        WHILE current NOT EQUAL TO negative one  
+            APPEND current TO path  
+            SET current TO the element at position current of parents  
+        END WHILE  
+        
+        SET path_set TO a set containing all elements of path  
+        FOR each node IN the elements of path IN REVERSED ORDER  
+            IF node IS IN visited  
+                CONTINUE to the next iteration  
+            END IF  
+            CALL dfs with node  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

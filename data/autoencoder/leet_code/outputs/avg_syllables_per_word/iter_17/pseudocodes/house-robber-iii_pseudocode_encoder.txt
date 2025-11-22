@@ -1,0 +1,59 @@
+CLASS TreeNode
+    FUNCTION __init__(val EQUALS zero, left EQUALS none, right EQUALS none)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(list_of_values)
+    IF list_of_values IS empty
+        RETURN none
+    END IF
+    SET root TO NEW TreeNode WITH element at position zero of list_of_values
+    SET index i TO one
+    SET queue TO NEW deque
+    CALL queue.APPEND WITH root
+    WHILE queue IS NOT empty
+        SET node TO queue.REMOVE element FROM front
+        IF index i IS LESS THAN the LENGTH OF list_of_values AND element at position i of list_of_values IS NOT none
+            SET node.left TO NEW TreeNode WITH element at position i of list_of_values
+            CALL queue.APPEND WITH node.left
+        END IF
+        INCREMENT index i BY one
+        IF index i IS LESS THAN the LENGTH OF list_of_values AND element at position i of list_of_values IS NOT none
+            SET node.right TO NEW TreeNode WITH element at position i of list_of_values
+            CALL queue.APPEND WITH node.right
+        END IF
+        INCREMENT index i BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(tree_node_p, tree_node_q)
+    IF tree_node_p IS none AND tree_node_q IS none
+        RETURN true
+    ELSE IF tree_node_p IS none OR tree_node_q IS none
+        RETURN false
+    ELSE IF tree_node_p.val IS NOT EQUALS TO tree_node_q.val
+        RETURN false
+    ELSE
+        RETURN is_same_tree(tree_node_p.left, tree_node_q.left) AND is_same_tree(tree_node_p.right, tree_node_q.right)
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION rob(root_node)
+        FUNCTION rob_from_node(current_node)
+            IF current_node IS none
+                RETURN zero, zero
+            END IF
+            SET left_robbed, left_not_robbed TO CALL rob_from_node WITH current_node.left
+            SET right_robbed, right_not_robbed TO CALL rob_from_node WITH current_node.right
+            SET rob_this_node TO current_node.val PLUS left_not_robbed PLUS right_not_robbed
+            SET not_rob_this_node TO the GREATER OF left_robbed AND left_not_robbed PLUS the GREATER OF right_robbed AND right_not_robbed
+            RETURN rob_this_node, not_rob_this_node
+        END FUNCTION
+        RETURN the GREATER OF THE TWO VALUES IN CALL rob_from_node WITH root_node
+    END FUNCTION
+END CLASS

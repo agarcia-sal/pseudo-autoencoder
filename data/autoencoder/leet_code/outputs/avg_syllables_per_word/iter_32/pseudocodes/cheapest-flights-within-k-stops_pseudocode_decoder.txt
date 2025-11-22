@@ -1,0 +1,36 @@
+CLASS Solution  
+    FUNCTION findCheapestPrice WITH PARAMETERS n flights src dst k  
+        SET graph TO an empty mapping from integers FROM zero TO the integer n MINUS one ASSOCIATED WITH empty lists  
+        FOR each flight IN flights  
+            DESTRUCTURE flight INTO u v w  
+            APPEND the pair of v and w TO the list at key u in graph  
+        END FOR  
+
+        SET min_heap TO a list containing the triple of zero MINUS one and src  
+        SET min_cost TO a mapping with key src ASSOCIATED WITH value MINUS one  
+
+        WHILE the LENGTH OF min_heap IS GREATER THAN zero  
+            REMOVE and RETURN the smallest element FROM min_heap AND DESTRUCTURE it INTO cost stops city  
+
+            IF city EQUALS dst  
+                RETURN cost  
+            END IF  
+
+            IF stops GREATER THAN OR EQUAL TO k  
+                CONTINUE to the next iteration of the WHILE loop  
+            END IF  
+
+            FOR each pair neighbor price IN the list at key city in graph  
+                SET next_cost TO cost PLUS price  
+                SET next_stops TO stops PLUS one  
+
+                IF neighbor NOT IN min_cost OR next_stops LESS THAN the value at key neighbor in min_cost OR next_cost LESS THAN the first element of the smallest triple in min_heap  
+                    SET the value at key neighbor in min_cost TO next_stops  
+                    INSERT the triple of next_cost next_stops neighbor INTO min_heap maintaining heap property  
+                END IF  
+            END FOR  
+        END WHILE  
+
+        RETURN MINUS one  
+    END FUNCTION  
+END CLASS

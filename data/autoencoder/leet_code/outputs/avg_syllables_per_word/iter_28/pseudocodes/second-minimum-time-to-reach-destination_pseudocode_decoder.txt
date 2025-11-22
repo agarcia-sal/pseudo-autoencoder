@@ -1,0 +1,43 @@
+CLASS Solution  
+    FUNCTION secondMinimum(n INTEGER, edges LIST OF LIST OF INTEGER, time INTEGER, change INTEGER) RETURNS INTEGER  
+        SET graph TO a list containing empty lists repeated n PLUS one times  
+        FOR each element u AND v IN edges  
+            APPEND v TO element at position u of graph  
+            APPEND u TO element at position v of graph  
+        END FOR  
+        
+        SET queue TO a double ended queue containing a tuple of number one current time zero AND count zero  
+        SET minTimes TO a list containing lists of two elements each set to infinity repeated n PLUS one times  
+        SET element at position one first element of minTimes TO zero  
+        
+        WHILE the queue is not empty  
+            REMOVE the leftmost element from queue AND DESTRUCTURE into current currentTime AND count  
+            
+            IF current EQUALS n AND count EQUALS one  
+                RETURN currentTime  
+            END IF  
+            
+            SET dividedTime TO currentTime DIVIDED BY change  
+            SET moduloCheck TO dividedTime MODULO two  
+            
+            IF moduloCheck EQUALS zero  
+                SET nextTime TO currentTime PLUS time  
+            ELSE  
+                SET nextTime TO (dividedTime PLUS one) MULTIPLIED BY change PLUS time  
+            END IF  
+            
+            FOR each neighbor IN element at position current of graph  
+                IF element at position neighbor first element of minTimes GREATER THAN nextTime  
+                    SET element at position neighbor second element of minTimes TO element at position neighbor first element of minTimes  
+                    SET element at position neighbor first element of minTimes TO nextTime  
+                    APPEND a tuple of neighbor nextTime AND zero TO queue  
+                ELSE IF element at position neighbor first element of minTimes LESS THAN nextTime AND nextTime LESS THAN element at position neighbor second element of minTimes  
+                    SET element at position neighbor second element of minTimes TO nextTime  
+                    APPEND a tuple of neighbor nextTime AND one TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

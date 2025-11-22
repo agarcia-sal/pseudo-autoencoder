@@ -1,0 +1,28 @@
+CLASS Solution  
+    FUNCTION minTransfers(transactions)  
+        SET balance TO empty mapping  
+        FOR each frm, to, amount IN transactions  
+            SET balance at frm TO balance at frm MINUS amount, defaulting to 0 if absent  
+            SET balance at to TO balance at to PLUS amount, defaulting to 0 if absent  
+        
+        SET balances TO list of net values from balance WHERE value IS NOT EQUAL TO 0  
+        
+        IF balances IS empty  
+            RETURN 0  
+        
+        FUNCTION settle(start, cnt)  
+            WHILE start LESS THAN length of balances AND balances at start EQUALS 0  
+                INCREMENT start BY 1  
+            IF start EQUALS length of balances  
+                RETURN cnt  
+            SET min_cnt TO infinite  
+            FOR i FROM start PLUS 1 TO length of balances MINUS 1  
+                IF balances at start MULTIPLIED BY balances at i IS LESS THAN 0  
+                    SET balances at i TO balances at i PLUS balances at start  
+                    SET min_cnt TO minimum of min_cnt AND settle(start PLUS 1, cnt PLUS 1)  
+                    SET balances at i TO balances at i MINUS balances at start  
+            RETURN min_cnt  
+        
+        RETURN settle(0, 0)  
+    END FUNCTION  
+END CLASS

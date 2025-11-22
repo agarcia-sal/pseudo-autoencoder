@@ -1,0 +1,11 @@
+def makeLargestSpecial(s):
+    def dfs(s):
+        count, start, specials = 0, 0, []
+        for i, c in enumerate(s):
+            count += 1 if c == '1' else -1
+            if count == 0:
+                specials.append('1' + dfs(s[start+1:i]) + '0')
+                start = i + 1
+        specials.sort(reverse=True)
+        return ''.join(specials)
+    return dfs(s)

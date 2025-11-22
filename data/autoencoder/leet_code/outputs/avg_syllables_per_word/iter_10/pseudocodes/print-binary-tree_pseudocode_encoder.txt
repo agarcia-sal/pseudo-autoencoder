@@ -1,0 +1,71 @@
+CLASS TreeNode  
+    FUNCTION __init__ with parameters val, left, right  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS
+
+FUNCTION tree_node with parameter values  
+    IF values EQUALS empty  
+        RETURN None  
+    END IF  
+    SET root TO new TreeNode with element at position zero of values  
+    SET i TO one  
+    SET queue TO empty deque  
+    APPEND root TO queue  
+    WHILE queue is not empty  
+        SET node TO first element of queue removed from queue  
+        IF i LESS THAN the length of values AND element at position i of values NOT EQUALS None  
+            SET node.left TO new TreeNode with element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN the length of values AND element at position i of values NOT EQUALS None  
+            SET node.right TO new TreeNode with element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION
+
+FUNCTION is_same_tree with parameters p, q  
+    IF p EQUALS None AND q EQUALS None  
+        RETURN True  
+    ELSE IF p EQUALS None OR q EQUALS None  
+        RETURN False  
+    ELSE IF value of p NOT EQUALS value of q  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree with parameters value of p.left, value of q.left AND is_same_tree with parameters value of p.right, value of q.right  
+    END IF  
+END FUNCTION
+
+CLASS Solution  
+    FUNCTION printTree with parameters root  
+        FUNCTION getHeight with parameter node  
+            IF node EQUALS None  
+                RETURN zero  
+            END IF  
+            RETURN one PLUS maximum of getHeight with parameter node.left AND getHeight with parameter node.right  
+        END FUNCTION  
+        
+        SET height TO getHeight with parameter root  
+        SET width TO two RAISED TO THE POWER OF height MINUS one  
+        SET res TO list containing height elements each being list containing width elements each being empty string  
+        
+        FUNCTION placeNode with parameters node, row, left, right  
+            IF node EQUALS None  
+                RETURN  
+            END IF  
+            SET mid TO integer division of sum of left and right BY two  
+            SET element at position mid of element at position row of res TO string representation of value of node  
+            CALL placeNode with parameters node.left, row PLUS one, left, mid  
+            CALL placeNode with parameters node.right, row PLUS one, mid, right  
+        END FUNCTION  
+        
+        CALL placeNode with parameters root, zero, zero, width  
+        RETURN res  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,66 @@
+CLASS UnionFind  
+    FUNCTION __init__(self n)  
+        SET self parent TO list of integers from zero TO n INCLUSIVE  
+        SET self rank TO list of zeros with length n PLUS one  
+        SET self count TO n  
+    END FUNCTION  
+
+    FUNCTION find(self u)  
+        IF element at position u of self parent NOT EQUALS u THEN  
+            SET element at position u of self parent TO call METHOD find of self WITH argument element at position u of self parent  
+        END IF  
+        RETURN element at position u of self parent  
+    END FUNCTION  
+
+    FUNCTION union(self u v)  
+        SET rootU TO call METHOD find of self WITH argument u  
+        SET rootV TO call METHOD find of self WITH argument v  
+        IF rootU NOT EQUALS rootV THEN  
+            IF element at position rootU of self rank GREATER THAN element at position rootV of self rank THEN  
+                SET element at position rootV of self parent TO rootU  
+            ELSE IF element at position rootU of self rank LESS THAN element at position rootV of self rank THEN  
+                SET element at position rootU of self parent TO rootV  
+            ELSE  
+                SET element at position rootV of self parent TO rootU  
+                INCREMENT element at position rootU of self rank BY one  
+            END IF  
+            DECREMENT self count BY one  
+            RETURN True  
+        END IF  
+        RETURN False  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION maxNumEdgesToRemove(self n edges)  
+        ASSIGN reference TO new UnionFind with parameter n TO uf_common  
+        ASSIGN reference TO new UnionFind with parameter n TO uf_alice  
+        ASSIGN reference TO new UnionFind with parameter n TO uf_bob  
+
+        SET used_edges TO zero  
+
+        FOR each t u v IN edges DO  
+            IF t EQUALS three THEN  
+                IF call METHOD union of uf_common WITH arguments u v RETURNS True THEN  
+                    call METHOD union of uf_alice WITH arguments u v  
+                    call METHOD union of uf_bob WITH arguments u v  
+                    INCREMENT used_edges BY one  
+                END IF  
+            END IF  
+        END FOR  
+
+        FOR each t u v IN edges DO  
+            IF t EQUALS one AND call METHOD union of uf_alice WITH arguments u v RETURNS True THEN  
+                INCREMENT used_edges BY one  
+            ELSE IF t EQUALS two AND call METHOD union of uf_bob WITH arguments u v RETURNS True THEN  
+                INCREMENT used_edges BY one  
+            END IF  
+        END FOR  
+
+        IF uf_alice count EQUALS one AND uf_bob count EQUALS one THEN  
+            RETURN LENGTH OF edges MINUS used_edges  
+        ELSE  
+            RETURN negative one  
+        END IF  
+    END FUNCTION  
+END CLASS

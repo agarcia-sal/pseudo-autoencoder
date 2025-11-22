@@ -1,0 +1,50 @@
+CLASS Solution  
+    FUNCTION minimumIncompatibility(nums, k)  
+        SET n TO the LENGTH OF nums  
+        SET subset_size TO n DIVIDED BY k  
+        FROM collections IMPORT Counter  
+        
+        IF any count GREATER THAN k FOR each count IN the VALUES OF Counter APPLIED TO nums THEN  
+            RETURN negative one  
+        END IF  
+        
+        SET subset_incompatibility TO an empty DICTIONARY  
+        FOR mask FROM zero TO TWO RAISED TO THE POWER OF n MINUS one  
+            SET bit_count TO the NUMBER OF ONES IN the BINARY REPRESENTATION OF mask  
+            IF bit_count EQUALS subset_size THEN  
+                SET elements TO an empty LIST  
+                FOR index FROM zero TO n MINUS one  
+                    IF the BITWISE AND OF mask AND TWO RAISED TO THE POWER OF index IS NOT zero THEN  
+                        APPEND the element at position index OF nums TO elements  
+                    END IF  
+                END FOR  
+                IF the NUMBER OF UNIQUE elements EQUALS subset_size THEN  
+                    SET incompatibility TO the MAXIMUM OF elements MINUS the MINIMUM OF elements  
+                    SET the value at key mask OF subset_incompatibility TO incompatibility  
+                END IF  
+            END IF  
+        END FOR  
+        
+        SET dp TO a LIST OF length TWO RAISED TO THE POWER OF n FILLED WITH positive infinity  
+        SET the element at position zero OF dp TO zero  
+        
+        FOR mask FROM zero TO TWO RAISED TO THE POWER OF n MINUS one  
+            SET bit_count TO the NUMBER OF ONES IN the BINARY REPRESENTATION OF mask  
+            IF the REMAINDER WHEN bit_count IS DIVIDED BY subset_size IS NOT zero THEN  
+                CONTINUE to the next iteration of the loop  
+            END IF  
+            FOR each subset_mask IN the KEYS OF subset_incompatibility  
+                IF the BITWISE AND OF mask AND subset_mask EQUALS subset_mask THEN  
+                    SET candidate TO the ELEMENT at position mask XOR subset_mask OF dp PLUS the VALUE at subset_mask OF subset_incompatibility  
+                    SET the ELEMENT at position mask OF dp TO the MINIMUM OF the CURRENT VALUE at position mask OF dp AND candidate  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        IF the ELEMENT at position TWO RAISED TO THE POWER OF n MINUS one OF dp IS not EQUAL TO positive infinity THEN  
+            RETURN the ELEMENT at position TWO RAISED TO THE POWER OF n MINUS one OF dp  
+        ELSE  
+            RETURN negative one  
+        END IF  
+    END FUNCTION  
+END CLASS

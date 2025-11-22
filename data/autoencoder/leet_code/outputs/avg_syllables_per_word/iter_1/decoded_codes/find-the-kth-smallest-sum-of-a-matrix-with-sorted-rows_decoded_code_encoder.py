@@ -1,0 +1,21 @@
+from heapq import heappush, heappop
+
+def kth_smallest_sum(mat, k):
+    m, n = len(mat), len(mat[0])
+    heap = [(sum(row[0] for row in mat), (0,) * m)]
+    visited = {heap[0][1]}
+
+    while k > 0:
+        s, idxs = heappop(heap)
+        k -= 1
+        if k == 0:
+            return s
+        for i in range(m):
+            if idxs[i] + 1 < n:
+                nxt = idxs[:i] + (idxs[i] + 1,) + idxs[i + 1:]
+                if nxt not in visited:
+                    visited.add(nxt)
+                    new_s = s - mat[i][idxs[i]] + mat[i][nxt[i]]
+                    heappush(heap, (new_s, nxt))
+
+    return -1

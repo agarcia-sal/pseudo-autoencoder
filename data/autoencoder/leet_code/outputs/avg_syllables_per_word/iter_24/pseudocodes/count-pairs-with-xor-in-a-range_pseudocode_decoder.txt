@@ -1,0 +1,68 @@
+CLASS TrieNode  
+    FUNCTION __init__ (self)  
+        SET children TO empty mapping  
+        SET count TO zero  
+    END FUNCTION  
+END CLASS
+
+CLASS Trie  
+    FUNCTION __init__ (self, bit_length)  
+        ASSIGN reference TO a new TrieNode and SET root TO reference  
+        SET bit_length TO bit_length  
+    END FUNCTION  
+
+    FUNCTION insert (self, num)  
+        ASSIGN reference TO self.root and SET node TO reference  
+        FOR i FROM self.bit_length DOWN TO zero  
+            SET bit TO the result of extracting the bit at position i from num  
+            IF bit NOT IN the keys of node.children THEN  
+                ASSIGN reference TO a new TrieNode and SET node.children at bit TO reference  
+            END IF  
+            ASSIGN reference TO node.children at bit and SET node TO reference  
+            INCREMENT node.count BY one  
+        END FOR  
+    END FUNCTION  
+
+    FUNCTION count_less_than (self, num, threshold)  
+        SET count TO zero  
+        ASSIGN reference TO self.root and SET node TO reference  
+        FOR i FROM self.bit_length DOWN TO zero  
+            IF node IS null THEN  
+                STOP LOOP  
+            END IF  
+            SET bit TO the result of extracting the bit at position i from num  
+            SET threshold_bit TO the result of extracting the bit at position i from threshold  
+            IF threshold_bit EQUALS one THEN  
+                IF bit IS a key in node.children THEN  
+                    INCREMENT count BY node.children at bit.count  
+                ELSE  
+                    INCREMENT count BY zero  
+                END IF  
+                IF the bitwise exclusive OR of bit and one IS a key in node.children THEN  
+                    ASSIGN reference TO node.children at the bitwise exclusive OR of bit and one and SET node TO reference  
+                ELSE  
+                    SET node TO null  
+                END IF  
+            ELSE  
+                IF bit IS a key in node.children THEN  
+                    ASSIGN reference TO node.children at bit and SET node TO reference  
+                ELSE  
+                    SET node TO null  
+                END IF  
+            END IF  
+        END FOR  
+        RETURN count  
+    END FUNCTION  
+END CLASS
+
+CLASS Solution  
+    FUNCTION countPairs (self, nums, low, high)  
+        ASSIGN reference TO a new Trie and SET trie TO reference  
+        SET nice_pairs TO zero  
+        FOR each num IN nums  
+            INCREMENT nice_pairs BY the result of trie.count_less_than with num and the sum of high PLUS one MINUS the result of trie.count_less_than with num and low  
+            CALL trie.insert with num  
+        END FOR  
+        RETURN nice_pairs  
+    END FUNCTION  
+END CLASS

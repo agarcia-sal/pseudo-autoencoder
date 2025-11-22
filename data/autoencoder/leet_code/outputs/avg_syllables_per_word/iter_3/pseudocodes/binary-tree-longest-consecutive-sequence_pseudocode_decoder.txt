@@ -1,0 +1,70 @@
+CLASS TreeNode
+    FUNCTION __init__(val = 0, left = None, right = None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values: list)
+    IF values IS EMPTY
+        RETURN None
+    END IF
+    SET root TO TreeNode(values[0])
+    SET i TO 1
+    SET queue TO EMPTY QUEUE
+    APPEND root TO queue
+    WHILE queue IS NOT EMPTY
+        SET node TO REMOVE FIRST ELEMENT FROM queue
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.left TO TreeNode(values[i])
+            APPEND node.left TO queue
+        END IF
+        INCREMENT i BY 1
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.right TO TreeNode(values[i])
+            APPEND node.right TO queue
+        END IF
+        INCREMENT i BY 1
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val IS NOT EQUAL TO q.val
+        RETURN False
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION longestConsecutive(root: Optional[TreeNode]) RETURNS int
+        IF root IS None
+            RETURN 0
+        END IF
+        
+        FUNCTION dfs(node, parent, current_length)
+            IF node IS None
+                RETURN current_length
+            END IF
+            
+            IF parent IS NOT None AND node.val IS EQUAL TO parent + 1
+                INCREMENT current_length BY 1
+            ELSE
+                SET current_length TO 1
+            END IF
+            
+            SET left_length TO dfs(node.left, node.val, current_length)
+            SET right_length TO dfs(node.right, node.val, current_length)
+            
+            RETURN MAXIMUM OF current_length, left_length, right_length
+        END FUNCTION
+        
+        RETURN dfs(root, None, 0)
+    END FUNCTION
+END CLASS

@@ -1,0 +1,56 @@
+CLASS Solution  
+    FUNCTION findRedundantDirectedConnection(edges AS List OF List OF integer) RETURNS List OF integer  
+        FUNCTION find(parent AS List OF integer, i AS integer) RETURNS integer  
+            IF element at position i of parent NOT EQUALS i THEN  
+                SET element at position i of parent TO find(parent FOR element at position i of parent)  
+            END IF  
+            RETURN element at position i of parent  
+        END FUNCTION  
+        
+        FUNCTION union(parent AS List OF integer, rank AS List OF integer, x AS integer, y AS integer) RETURNS boolean  
+            SET rootX TO find(parent AND x)  
+            SET rootY TO find(parent AND y)  
+            IF rootX NOT EQUALS rootY THEN  
+                IF element at position rootX of rank GREATER THAN element at position rootY of rank THEN  
+                    SET element at position rootY of parent TO rootX  
+                ELSE IF element at position rootX of rank LESS THAN element at position rootY of rank THEN  
+                    SET element at position rootX of parent TO rootY  
+                ELSE  
+                    SET element at position rootY of parent TO rootX  
+                    INCREMENT element at position rootX of rank BY one  
+                END IF  
+                RETURN true  
+            END IF  
+            RETURN false  
+        END FUNCTION  
+        
+        SET n TO the LENGTH OF edges  
+        SET parent TO list of integers starting from zero TO n inclusive  
+        SET rank TO list of zero repeated exactly n PLUS one times  
+        
+        SET candidate1 TO none  
+        SET candidate2 TO none  
+        SET last TO none  
+        
+        FOR each pair u AND v IN edges  
+            IF element at position v of parent NOT EQUALS v THEN  
+                SET candidate1 TO list containing element at position v of parent AND v  
+                SET candidate2 TO list containing u AND v  
+            ELSE  
+                IF union(parent AND rank AND u AND v) EQUALS false THEN  
+                    SET last TO list containing u AND v  
+                END IF  
+            END IF  
+        END FOR  
+        
+        IF candidate1 IS none THEN  
+            RETURN last  
+        END IF  
+        
+        IF last IS truthy THEN  
+            RETURN candidate1  
+        END IF  
+        
+        RETURN candidate2  
+    END FUNCTION  
+END CLASS

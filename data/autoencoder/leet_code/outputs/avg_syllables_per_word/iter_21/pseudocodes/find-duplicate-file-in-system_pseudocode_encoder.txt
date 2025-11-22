@@ -1,0 +1,28 @@
+CLASS Solution  
+    FUNCTION findDuplicate(paths)  
+        SET content_to_paths TO CALL defaultdict WITH PARAMETERS list  
+        
+        FOR each path IN paths  
+            SET parts TO CALL split ON path WITH PARAMETERS single space character  
+            SET directory TO element at position zero OF parts  
+            
+            FOR each file_info IN elements from position one TO end OF parts  
+                SET file_name_and_content TO CALL split ON file_info WITH PARAMETERS opening parenthesis character  
+                SET file_name TO element at position zero OF file_name_and_content  
+                SET content_with_closing TO element at position one OF file_name_and_content  
+                SET content TO substring from position zero TO length of content_with_closing MINUS one OF content_with_closing  
+                
+                CALL append ON element at key content OF content_to_paths WITH PARAMETERS concatenation of directory PLUS forward slash character PLUS file_name  
+            END FOR  
+        END FOR  
+        
+        SET result TO empty list  
+        FOR each paths_group IN element values OF content_to_paths  
+            IF length of paths_group GREATER THAN one  
+                CALL append ON result WITH PARAMETERS paths_group  
+            END IF  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

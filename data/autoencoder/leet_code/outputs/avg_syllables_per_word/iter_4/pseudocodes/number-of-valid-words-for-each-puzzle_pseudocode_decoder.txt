@@ -1,0 +1,31 @@
+CLASS Solution
+    FUNCTION findNumOfValidWords(words: List of String, puzzles: List of String) RETURNS List of Integer
+        FUNCTION to_mask(s: String) RETURNS Integer
+            SET mask TO 0
+            FOR each char IN s
+                SET mask TO mask OR (1 LEFT SHIFT (ASCII value of char MINUS ASCII value of 'a'))
+            RETURN mask
+        END FUNCTION
+        
+        SET word_count TO a mapping with default integer 0
+        FOR each word IN words
+            SET mask TO to_mask(word)
+            IF number of set bits in mask IS LESS THAN OR EQUAL TO 7
+                INCREMENT word_count[mask] BY 1
+        
+        SET result TO empty list
+        FOR each puzzle IN puzzles
+            SET first_char_mask TO 1 LEFT SHIFT (ASCII value of first character in puzzle MINUS ASCII value of 'a')
+            SET puzzle_mask TO to_mask(substring of puzzle from second character onward)
+            SET count TO word_count[first_char_mask]
+            
+            SET subset TO puzzle_mask
+            WHILE subset IS NOT 0
+                SET count TO count PLUS word_count[subset OR first_char_mask]
+                SET subset TO (subset MINUS 1) AND puzzle_mask
+            
+            APPEND count TO result
+        
+        RETURN result
+    END FUNCTION
+END CLASS

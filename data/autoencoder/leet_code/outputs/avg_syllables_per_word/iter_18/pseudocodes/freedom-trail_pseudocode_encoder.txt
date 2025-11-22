@@ -1,0 +1,30 @@
+CLASS Solution  
+    FUNCTION findRotateSteps WITH PARAMETERS ring key  
+        IMPORT defaultdict FROM collections  
+        IMPORT lru_cache FROM functools  
+          
+        SET char_positions TO a new defaultdict with list as default factory  
+        FOR each index_position and character_element IN ring indexed by position starting from zero  
+            APPEND index_position TO the list in char_positions with key character_element  
+        END FOR  
+          
+        SET n TO the LENGTH OF ring  
+          
+        FUNCTION dp WITH PARAMETERS i prev_pos WITH MEMOIZATION ENABLED  
+            IF i EQUALS the LENGTH OF key THEN  
+                RETURN zero  
+            END IF  
+              
+            SET min_steps TO a value representing infinity  
+            FOR each position_element IN the list in char_positions with key the character at position i of key  
+                SET clockwise_distance TO the result of the subtraction of prev_pos FROM position_element COMPUTED modulo n  
+                SET anticlockwise_distance TO the result of the subtraction of position_element FROM prev_pos COMPUTED modulo n  
+                SET steps TO the minimum of clockwise_distance AND anticlockwise_distance PLUS one PLUS the result of a recursive call to dp WITH PARAMETERS i incremented by one AND position_element  
+                SET min_steps TO the minimum of min_steps AND steps  
+            END FOR  
+              
+            RETURN min_steps  
+        END FUNCTION  
+          
+        RETURN the result of a call to dp WITH PARAMETERS zero AND zero  
+END CLASS

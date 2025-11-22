@@ -1,0 +1,72 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val, left, right  
+        SET val TO val  
+        SET left TO left  
+        SET right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO new TreeNode WITH val equal to element at position zero of values  
+    SET i TO one  
+    SET queue TO new empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO first element REMOVED FROM queue  
+        IF i LESS THAN LENGTH OF values AND element at position i of values IS NOT none  
+            SET node.left TO new TreeNode WITH val equal to element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN LENGTH OF values AND element at position i of values IS NOT none  
+            SET node.right TO new TreeNode WITH val equal to element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p, q  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF val of p NOT EQUALS val of q  
+        RETURN False  
+    ELSE  
+        RETURN result of is_same_tree WITH PARAMETERS left of p, left of q AND result of is_same_tree WITH PARAMETERS right of p, right of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION deleteNode WITH PARAMETERS self, root, key  
+        IF root IS none  
+            RETURN none  
+        END IF  
+        IF val of root GREATER THAN key  
+            SET left of root TO result of deleteNode WITH PARAMETERS self, left of root, key  
+            RETURN root  
+        END IF  
+        IF val of root LESS THAN key  
+            SET right of root TO result of deleteNode WITH PARAMETERS self, right of root, key  
+            RETURN root  
+        END IF  
+        IF left of root IS none  
+            RETURN right of root  
+        END IF  
+        IF right of root IS none  
+            RETURN left of root  
+        END IF  
+        SET node TO right of root  
+        WHILE left of node IS NOT none  
+            SET node TO left of node  
+        END WHILE  
+        SET left of node TO left of root  
+        SET root TO right of root  
+        RETURN root  
+    END FUNCTION  
+END CLASS

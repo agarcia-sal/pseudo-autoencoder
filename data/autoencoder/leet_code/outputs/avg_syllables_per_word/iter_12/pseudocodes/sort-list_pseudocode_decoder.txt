@@ -1,0 +1,77 @@
+CLASS ListNode  
+    FUNCTION __init__ WITH PARAMETERS val EQUALS zero, next EQUALS None  
+        SET the val OF self TO val  
+        SET the next OF self TO next  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION list_node WITH PARAMETERS values  
+    IF the LENGTH OF values EQUALS zero  
+        RETURN None  
+    END IF  
+    SET head TO a new ListNode INITIALIZED WITH the element at position zero OF values  
+    SET p TO head  
+    FOR each val IN the elements of values FROM position one TO the END  
+        SET node TO a new ListNode INITIALIZED WITH val  
+        SET the next OF p TO node  
+        SET p TO node  
+    END FOR  
+    RETURN head  
+END FUNCTION  
+
+FUNCTION is_same_list WITH PARAMETERS p1, p2  
+    IF p1 EQUALS None AND p2 EQUALS None  
+        RETURN True  
+    END IF  
+    IF p1 EQUALS None OR p2 EQUALS None  
+        RETURN False  
+    END IF  
+    RETURN (the val OF p1 EQUALS the val OF p2) AND is_same_list(the next OF p1, the next OF p2)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION sortList WITH PARAMETERS self, head  
+        IF head EQUALS None OR the next OF head EQUALS None  
+            RETURN head  
+        END IF  
+        
+        FUNCTION split WITH PARAMETERS head  
+            SET slow TO head  
+            SET fast TO the next OF head  
+            WHILE fast NOT EQUALS None AND the next OF fast NOT EQUALS None  
+                SET slow TO the next OF slow  
+                SET fast TO the next OF the next OF fast  
+            END WHILE  
+            SET mid TO the next OF slow  
+            SET the next OF slow TO None  
+            RETURN head, mid  
+        END FUNCTION  
+        
+        FUNCTION merge WITH PARAMETERS l1, l2  
+            SET dummy TO a new ListNode  
+            SET current TO dummy  
+            WHILE l1 NOT EQUALS None AND l2 NOT EQUALS None  
+                IF the val OF l1 LESS THAN the val OF l2  
+                    SET the next OF current TO l1  
+                    SET l1 TO the next OF l1  
+                ELSE  
+                    SET the next OF current TO l2  
+                    SET l2 TO the next OF l2  
+                END IF  
+                SET current TO the next OF current  
+            END WHILE  
+            IF l1 NOT EQUALS None  
+                SET the next OF current TO l1  
+            ELSE  
+                SET the next OF current TO l2  
+            END IF  
+            RETURN the next OF dummy  
+        END FUNCTION  
+        
+        SET left, right TO split(head)  
+        SET left TO self.sortList(left)  
+        SET right TO self.sortList(right)  
+        
+        RETURN merge(left, right)  
+    END FUNCTION  
+END CLASS

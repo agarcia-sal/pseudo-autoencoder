@@ -1,0 +1,21 @@
+from typing import List
+
+class Solution:
+    def isBipartite(self, graph: List[List[int]]) -> bool:
+        n = len(graph)
+        color = [0] * n  # 0: uncolored, 1 and -1: two colors
+
+        def dfs(node: int, c: int) -> bool:
+            color[node] = c
+            for neighbor in graph[node]:
+                if color[neighbor] == c:
+                    return False
+                if color[neighbor] == 0 and not dfs(neighbor, -c):
+                    return False
+            return True
+
+        for i in range(n):
+            if color[i] == 0:
+                if not dfs(i, 1):
+                    return False
+        return True

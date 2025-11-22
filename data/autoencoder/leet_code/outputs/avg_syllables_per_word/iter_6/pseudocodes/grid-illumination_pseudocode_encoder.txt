@@ -1,0 +1,38 @@
+CLASS Solution  
+    FUNCTION gridIllumination(n, lamps, queries)  
+        INITIALIZE row_count AS dictionary with default value zero  
+        INITIALIZE col_count AS dictionary with default value zero  
+        INITIALIZE diag_count AS dictionary with default value zero  
+        INITIALIZE anti_diag_count AS dictionary with default value zero  
+        INITIALIZE lamp_positions AS empty set  
+
+        FOR each pair r, c IN lamps  
+            IF pair r, c IS NOT IN lamp_positions  
+                ADD pair r, c TO lamp_positions  
+                INCREMENT row_count at r BY one  
+                INCREMENT col_count at c BY one  
+                INCREMENT diag_count at r MINUS c BY one  
+                INCREMENT anti_diag_count at r PLUS c BY one  
+
+        SET directions TO list of pairs (-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1), (1, -1), (1, 0), (1, 1)  
+        INITIALIZE result AS empty list  
+
+        FOR each pair r, c IN queries  
+            IF row_count at r GREATER THAN zero OR col_count at c GREATER THAN zero OR diag_count at r MINUS c GREATER THAN zero OR anti_diag_count at r PLUS c GREATER THAN zero  
+                APPEND one TO result  
+            ELSE  
+                APPEND zero TO result  
+            
+            FOR each pair dr, dc IN directions  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                IF pair nr, nc IS IN lamp_positions  
+                    REMOVE pair nr, nc FROM lamp_positions  
+                    DECREMENT row_count at nr BY one  
+                    DECREMENT col_count at nc BY one  
+                    DECREMENT diag_count at nr MINUS nc BY one  
+                    DECREMENT anti_diag_count at nr PLUS nc BY one  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

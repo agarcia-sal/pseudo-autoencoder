@@ -1,0 +1,66 @@
+CLASS UnionFind
+    FUNCTION __init__(self, n)
+        SET self.parent TO a list containing the sequence of whole numbers from zero TO n INCLUSIVE
+        SET self.rank TO a list containing zero repeated n PLUS one times
+        SET self.count TO n
+    END FUNCTION
+
+    FUNCTION find(self, u)
+        IF the element at position u OF self.parent DOES NOT EQUAL u
+            SET the element at position u OF self.parent TO the result of calling find WITH argument the element at position u OF self.parent
+        END IF
+        RETURN the element at position u OF self.parent
+    END FUNCTION
+
+    FUNCTION union(self, u, v)
+        SET rootU TO the result of calling find WITH argument u
+        SET rootV TO the result of calling find WITH argument v
+        IF rootU DOES NOT EQUAL rootV
+            IF the element at position rootU OF self.rank IS GREATER THAN the element at position rootV OF self.rank
+                SET the element at position rootV OF self.parent TO rootU
+            ELSE IF the element at position rootU OF self.rank IS LESS THAN the element at position rootV OF self.rank
+                SET the element at position rootU OF self.parent TO rootV
+            ELSE
+                SET the element at position rootV OF self.parent TO rootU
+                INCREMENT the element at position rootU OF self.rank BY one
+            END IF
+            DECREMENT self.count BY one
+            RETURN true
+        END IF
+        RETURN false
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION maxNumEdgesToRemove(self, n, edges)
+        ASSIGN reference TO a new UnionFind object constructed with argument n and name it uf_common
+        ASSIGN reference TO a new UnionFind object constructed with argument n and name it uf_alice
+        ASSIGN reference TO a new UnionFind object constructed with argument n and name it uf_bob
+
+        SET used_edges TO zero
+
+        FOR each element consisting of t, u, v IN edges
+            IF t EQUALS three
+                IF uf_common UNION u AND v returns true
+                    CALL uf_alice UNION u AND v
+                    CALL uf_bob UNION u AND v
+                    INCREMENT used_edges BY one
+                END IF
+            END IF
+        END FOR
+
+        FOR each element consisting of t, u, v IN edges
+            IF t EQUALS one AND uf_alice UNION u AND v returns true
+                INCREMENT used_edges BY one
+            ELSE IF t EQUALS two AND uf_bob UNION u AND v returns true
+                INCREMENT used_edges BY one
+            END IF
+        END FOR
+
+        IF uf_alice.count EQUALS one AND uf_bob.count EQUALS one
+            RETURN the LENGTH OF edges MINUS used_edges
+        ELSE
+            RETURN negative one
+        END IF
+    END FUNCTION
+END CLASS

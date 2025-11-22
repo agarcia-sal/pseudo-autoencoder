@@ -1,0 +1,50 @@
+CLASS Solution  
+    FUNCTION slidingPuzzle(board AS List OF List OF Integer) RETURNS Integer  
+        SET start TO tuple of tuples formed by each row in board  
+        SET target TO tuple of tuples formed by sequences of one two three and four five zero respectively  
+        
+        SET neighbors TO mapping of zero TO set of one and three  
+                               one TO set of zero and two and four  
+                               two TO set of one and five  
+                               three TO set of zero and four  
+                               four TO set of one and three and five  
+                               five TO set of two and four  
+        
+        FOR i FROM zero TO one  
+            FOR j FROM zero TO two  
+                IF element at position j of element at position i of start EQUALS zero THEN  
+                    SET zero_pos TO i MULTIPLIED BY three PLUS j  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET queue TO double ended queue initialized with tuple of start zero_pos and zero  
+        SET visited TO set initialized with start  
+        
+        WHILE the queue is not empty  
+            SET state and zero_pos and moves TO first element removed from the left of queue  
+            
+            IF state EQUALS target THEN  
+                RETURN moves  
+            END IF  
+            
+            FOR each neighbor IN set accessed by key zero_pos in neighbors  
+                SET new_state TO list formed by mapping each element of state to a list  
+                SET i TO integer division of zero_pos by three  
+                SET j TO remainder of zero_pos modulo three  
+                SET ni TO integer division of neighbor by three  
+                SET nj TO remainder of neighbor modulo three  
+                
+                SWAP element at position j of element at position i of new_state WITH element at position nj of element at position ni of new_state  
+                SET new_tuple_state TO tuple of tuples formed by each row in new_state  
+                
+                IF new_tuple_state NOT IN visited THEN  
+                    ADD new_tuple_state TO visited  
+                    APPEND tuple of new_tuple_state neighbor and moves incremented by one TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

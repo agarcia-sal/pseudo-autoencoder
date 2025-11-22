@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION dieSimulator(n, rollMax)  
+        SET MOD TO one billion PLUS seven  
+  
+        CALL initialize_dp WITH n, rollMax RETURNING dp  
+  
+        FOR j FROM zero TO five  
+            SET element at position one OF element at position j OF element at position one OF dp TO one  
+        END FOR  
+  
+        FOR i FROM two TO n  
+            FOR j FROM zero TO five  
+                FOR k FROM one TO element at position j OF rollMax  
+                    IF k GREATER THAN one  
+                        SET element at position k OF element at position j OF element at position i OF dp TO element at position k MINUS one OF element at position j OF element at position i MINUS one OF dp  
+                    ELSE  
+                        SET total_sum TO zero  
+                        FOR x FROM zero TO five  
+                            IF x NOT EQUALS j  
+                                FOR y FROM one TO element at position x OF rollMax  
+                                    INCREMENT total_sum BY element at position y OF element at position x OF element at position i MINUS one OF dp  
+                                END FOR  
+                            END IF  
+                        END FOR  
+                        SET element at position k OF element at position j OF element at position i OF dp TO total_sum MODULO MOD  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+  
+        SET final_sum TO zero  
+        FOR j FROM zero TO five  
+            FOR k FROM one TO element at position j OF rollMax  
+                INCREMENT final_sum BY element at position k OF element at position j OF element at position n OF dp  
+            END FOR  
+        END FOR  
+  
+        RETURN final_sum MODULO MOD  
+    END FUNCTION  
+  
+    FUNCTION initialize_dp(n, rollMax)  
+        SET max_roll TO maximum value IN rollMax  
+        SET dp TO a list of length n PLUS one, each element being a list of length six, each element being a list of length max_roll PLUS one filled with zero  
+        RETURN dp  
+    END FUNCTION  
+END CLASS

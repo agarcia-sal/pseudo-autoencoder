@@ -1,0 +1,36 @@
+CLASS Solution  
+    FUNCTION minStickers(list_of_stickers AND target_string) RETURNS integer  
+        SET list_of_sticker_counters TO a new list created by transforming each sticker in list_of_stickers INTO a mapping of character frequencies  
+        SORT list_of_sticker_counters IN ORDER BY the negative of the highest character frequency value in each mapping  
+        SET processing_queue TO a new double ended queue initialized with a pair consisting of the target_string and zero  
+        SET memoization_table TO a new mapping with a single entry mapping the target_string TO zero  
+        
+        WHILE processing_queue is not empty  
+            REMOVE the first pair from processing_queue and ASSIGN the first element TO current_target_string AND the second element TO number_of_stickers_used  
+            
+            FOR each sticker_counter IN list_of_sticker_counters  
+                IF the character at position one of current_target_string IS NOT PRESENT IN sticker_counter  
+                    CONTINUE to the next iteration of the loop  
+                END IF  
+                
+                SET remaining_characters_counter TO a new mapping created by counting characters in current_target_string  
+                FOR each character in sticker_counter  
+                    DECREMENT the count of this character in remaining_characters_counter BY the count in sticker_counter for this character  
+                END FOR  
+                
+                CONSTRUCT new_target_string by concatenating all characters in remaining_characters_counter sorted in ascending order and repeated according to their counts  
+                
+                IF new_target_string is empty  
+                    RETURN number_of_stickers_used PLUS one  
+                END IF  
+                
+                IF new_target_string is not a key in memoization_table  
+                    ADD new_target_string with value number_of_stickers_used PLUS one TO memoization_table  
+                    ADD the pair consisting of new_target_string and number_of_stickers_used PLUS one TO the end of processing_queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

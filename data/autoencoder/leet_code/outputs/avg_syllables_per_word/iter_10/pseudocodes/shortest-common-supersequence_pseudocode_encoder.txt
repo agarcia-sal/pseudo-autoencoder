@@ -1,0 +1,74 @@
+CLASS Solution  
+    FUNCTION shortestCommonSupersequence(str1, str2)  
+        SET m TO the LENGTH OF str1  
+        SET n TO the LENGTH OF str2  
+        
+        CALL create_dp_table WITH parameters m PLUS one, n PLUS one AND SET TO dp  
+        
+        FOR i FROM one TO m  
+            FOR j FROM one TO n  
+                IF character at position i MINUS one OF str1 EQUALS character at position j MINUS one OF str2  
+                    SET element at position i, j OF dp TO element at position i MINUS one, j MINUS one OF dp PLUS one  
+                ELSE  
+                    SET element at position i, j OF dp TO the GREATER OF element at position i MINUS one, j OF dp AND element at position i, j MINUS one OF dp  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET i TO m  
+        SET j TO n  
+        SET scs TO an empty list  
+        
+        WHILE i GREATER THAN zero AND j GREATER THAN zero  
+            IF character at position i MINUS one OF str1 EQUALS character at position j MINUS one OF str2  
+                APPEND character at position i MINUS one OF str1 TO scs  
+                DECREMENT i BY one  
+                DECREMENT j BY one  
+            ELSE IF element at position i MINUS one, j OF dp GREATER THAN element at position i, j MINUS one OF dp  
+                APPEND character at position i MINUS one OF str1 TO scs  
+                DECREMENT i BY one  
+            ELSE  
+                APPEND character at position j MINUS one OF str2 TO scs  
+                DECREMENT j BY one  
+            END IF  
+        END WHILE  
+        
+        WHILE i GREATER THAN zero  
+            APPEND character at position i MINUS one OF str1 TO scs  
+            DECREMENT i BY one  
+        END WHILE  
+        
+        WHILE j GREATER THAN zero  
+            APPEND character at position j MINUS one OF str2 TO scs  
+            DECREMENT j BY one  
+        END WHILE  
+        
+        CALL reverse_list WITH parameter scs  
+        
+        RETURN the JOINED STRING OF scs  
+    END FUNCTION  
+    
+    FUNCTION create_dp_table(rows, cols)  
+        SET table TO an empty list  
+        FOR each number FROM zero TO rows MINUS one  
+            SET row TO an empty list  
+            FOR each number FROM zero TO cols MINUS one  
+                APPEND zero TO row  
+            END FOR  
+            APPEND row TO table  
+        END FOR  
+        RETURN table  
+    END FUNCTION  
+    
+    FUNCTION reverse_list(lst)  
+        SET left TO zero  
+        SET right TO the LENGTH OF lst MINUS one  
+        WHILE left LESS THAN right  
+            SET temp TO element at position left OF lst  
+            SET element at position left OF lst TO element at position right OF lst  
+            SET element at position right OF lst TO temp  
+            INCREMENT left BY one  
+            DECREMENT right BY one  
+        END WHILE  
+    END FUNCTION  
+END CLASS

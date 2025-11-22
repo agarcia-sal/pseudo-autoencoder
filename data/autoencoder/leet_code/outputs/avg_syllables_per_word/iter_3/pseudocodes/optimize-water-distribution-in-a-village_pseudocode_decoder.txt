@@ -1,0 +1,26 @@
+CLASS Solution
+    FUNCTION minCostToSupplyWater(n, wells, pipes)
+        FOR i FROM 0 TO n - 1
+            APPEND [0, i + 1, wells[i]] TO pipes
+        SORT pipes BY cost (third element)
+        SET parent TO list FROM 0 TO n
+        FUNCTION find(x)
+            IF parent[x] IS NOT x
+                SET parent[x] TO find(parent[x])
+            RETURN parent[x]
+        END FUNCTION
+        FUNCTION union(x, y)
+            SET rootX TO find(x)
+            SET rootY TO find(y)
+            IF rootX IS NOT rootY
+                SET parent[rootX] TO rootY
+                RETURN True
+            RETURN False
+        END FUNCTION
+        SET min_cost TO 0
+        FOR EACH house1, house2, cost IN pipes
+            IF union(house1, house2)
+                INCREMENT min_cost BY cost
+        RETURN min_cost
+    END FUNCTION
+END CLASS

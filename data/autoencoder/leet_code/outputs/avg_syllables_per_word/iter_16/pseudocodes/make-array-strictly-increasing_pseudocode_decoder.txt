@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION makeArrayIncreasing(arr1 AS List OF Integer, arr2 AS List OF Integer) RETURNS Integer  
+        PERFORM arr2 TO BE SORTED IN ASCENDING ORDER  
+        
+        SET dp TO A DICTIONARY WITH A SINGLE ENTRY WHERE KEY IS MINUS ONE AND VALUE IS ZERO  
+        
+        FOR each number IN arr1  
+            SET new_dp TO AN EMPTY DICTIONARY  
+            FOR each last_number AND operations IN dp  
+                IF number IS GREATER THAN last_number THEN  
+                    IF new_dp CONTAINS KEY number THEN  
+                        SET current_min TO VALUE AT KEY number IN new_dp  
+                        SET new_dp AT KEY number TO THE MINIMUM OF current_min AND operations  
+                    ELSE  
+                        SET new_dp AT KEY number TO operations  
+                    END IF  
+                END IF  
+                
+                SET index TO THE POSITION AFTER THE RIGHTMOST POSITION WHERE last_number WOULD BE INSERTED IN arr2 TO KEEP arr2 SORTED  
+                IF index IS LESS THAN THE LENGTH OF arr2 THEN  
+                    SET replacement_number TO ELEMENT AT POSITION index OF arr2  
+                    IF new_dp CONTAINS KEY replacement_number THEN  
+                        SET current_min TO VALUE AT KEY replacement_number IN new_dp  
+                        SET new_dp AT KEY replacement_number TO THE MINIMUM OF current_min AND operations PLUS ONE  
+                    ELSE  
+                        SET new_dp AT KEY replacement_number TO operations PLUS ONE  
+                    END IF  
+                END IF  
+            END FOR  
+            
+            IF new_dp IS EMPTY THEN  
+                RETURN MINUS ONE  
+            END IF  
+            
+            SET dp TO new_dp  
+        END FOR  
+        
+        RETURN THE MINIMUM VALUE AMONG ALL VALUES IN dp  
+    END FUNCTION  
+END CLASS

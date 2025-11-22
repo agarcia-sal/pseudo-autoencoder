@@ -1,0 +1,50 @@
+CLASS Solution  
+    FUNCTION openLock(deadends AS List OF string, target AS string) RETURNS integer  
+        SET deadends_set TO an empty set  
+        FOR each element IN deadends  
+            ADD element TO deadends_set  
+        END FOR  
+
+        IF the initial state of zero zero zero zero IS IN deadends_set  
+            RETURN negative one  
+        END IF  
+
+        IF target EQUALS the initial state of zero zero zero zero  
+            RETURN zero  
+        END IF  
+
+        SET queue TO an empty double ended queue  
+        APPEND a pair of the initial state of zero zero zero zero and zero TO queue  
+
+        SET visited TO an empty set  
+        ADD the initial state of zero zero zero zero TO visited  
+
+        FUNCTION neighbors(state AS string) RETURNS List OF string  
+            SET result TO an empty list  
+            FOR index FROM zero TO three  
+                SET digit TO the integer conversion of the element at position index of state  
+                FOR each move IN the list consisting of negative one and one  
+                    SET new_digit TO the remainder of the sum of digit and move DIVIDED BY ten  
+                    SET new_state TO the concatenation of the substring from position zero TO index minus one of state AND the string conversion of new_digit AND the substring from position index plus one TO the end of state  
+                    APPEND new_state TO result  
+                END FOR  
+            END FOR  
+            RETURN result  
+        END FUNCTION  
+
+        WHILE queue IS NOT empty  
+            REMOVE the element at position zero FROM queue AND ASSIGN TO current_state and steps  
+            FOR each neighbor IN neighbors(current_state)  
+                IF neighbor IS NOT IN visited AND neighbor IS NOT IN deadends_set  
+                    IF neighbor EQUALS target  
+                        RETURN steps PLUS one  
+                    END IF  
+                    ADD neighbor TO visited  
+                    APPEND a pair of neighbor and steps PLUS one TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

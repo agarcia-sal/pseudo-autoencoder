@@ -1,0 +1,56 @@
+CLASS TreeNode
+    FUNCTION __init__(val = 0, left = None, right = None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values : list)
+    IF values IS EMPTY
+        RETURN None
+    SET root TO NEW TreeNode(values[0])
+    SET i TO 1
+    SET queue TO NEW deque
+    APPEND root TO queue
+    WHILE queue IS NOT EMPTY
+        SET node TO POP LEFT FROM queue
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.left TO NEW TreeNode(values[i])
+            APPEND node.left TO queue
+        INCREMENT i BY 1
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.right TO NEW TreeNode(values[i])
+            APPEND node.right TO queue
+        INCREMENT i BY 1
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val NOT EQUAL q.val
+        RETURN False
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+END FUNCTION
+
+CLASS Solution
+    FUNCTION countUnivalSubtrees(root : Optional[TreeNode]) RETURNS int
+        FUNCTION helper(node)
+            IF node IS None
+                RETURN True, 0
+            SET is_left_unival, left_count TO helper(node.left)
+            SET is_right_unival, right_count TO helper(node.right)
+            IF is_left_unival AND is_right_unival
+                IF (node.left IS None OR node.left.val EQUALS node.val) AND (node.right IS None OR node.right.val EQUALS node.val)
+                    RETURN True, left_count + right_count + 1
+            RETURN False, left_count + right_count
+        END FUNCTION
+
+        SET _, count TO helper(root)
+        RETURN count
+    END FUNCTION
+END CLASS

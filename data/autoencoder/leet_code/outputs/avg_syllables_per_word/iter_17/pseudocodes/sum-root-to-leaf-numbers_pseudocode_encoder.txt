@@ -1,0 +1,61 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS None, right EQUALS None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values)
+    IF values IS EQUAL TO None OR the LENGTH OF values IS EQUAL TO zero
+        RETURN None
+    END IF
+    SET root TO CALL TreeNode WITH the element at position zero of values
+    SET i TO one
+    SET queue TO CALL deque WITH no parameters
+    CALL APPEND root TO queue
+    WHILE queue IS NOT empty
+        SET node TO CALL popleft FROM queue
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT None
+            SET node.left TO CALL TreeNode WITH the element at position i of values
+            CALL APPEND node.left TO queue
+        END IF
+        INCREMENT i BY one
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT None
+            SET node.right TO CALL TreeNode WITH the element at position i of values
+            CALL APPEND node.right TO queue
+        END IF
+        INCREMENT i BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF the value property of p IS NOT EQUAL TO the value property of q
+        RETURN False
+    ELSE
+        RETURN CALL is_same_tree WITH the left property of p AND the left property of q AND CALL is_same_tree WITH the right property of p AND the right property of q
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION sumNumbers(self, root)
+        FUNCTION dfs(node, current_number)
+            IF node IS None
+                RETURN zero
+            END IF
+            SET current_number TO current_number MULTIPLIED BY ten PLUS the value property of node
+            IF the left property of node IS None AND the right property of node IS None
+                RETURN current_number
+            END IF
+            SET left_sum TO CALL dfs WITH the left property of node AND current_number
+            SET right_sum TO CALL dfs WITH the right property of node AND current_number
+            RETURN left_sum PLUS right_sum
+        END FUNCTION
+        RETURN CALL dfs WITH root AND zero
+    END FUNCTION
+END CLASS

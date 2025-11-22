@@ -1,0 +1,51 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS 0, left EQUALS None, right EQUALS None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET root TO NEW TreeNode WITH val EQUALS values AT index 0  
+    SET i TO 1  
+    SET queue TO new deque  
+    CALL queue APPEND WITH root  
+    WHILE queue IS NOT EMPTY  
+        SET node TO CALL queue POP LEFT  
+        IF i LESS THAN LENGTH OF values AND values AT index i IS NOT None  
+            SET node.left TO NEW TreeNode WITH val EQUALS values AT index i  
+            CALL queue APPEND WITH node.left  
+        INCREMENT i BY 1  
+        IF i LESS THAN LENGTH OF values AND values AT index i IS NOT None  
+            SET node.right TO NEW TreeNode WITH val EQUALS values AT index i  
+            CALL queue APPEND WITH node.right  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN CALL is_same_tree WITH p.left AND q.left AND CALL is_same_tree WITH p.right AND q.right  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION pruneTree(self, root)  
+        IF root IS None  
+            RETURN None  
+        SET root.left TO CALL self.pruneTree WITH root.left  
+        SET root.right TO CALL self.pruneTree WITH root.right  
+        IF root.val EQUALS 0 AND root.left IS None AND root.right IS None  
+            RETURN None  
+        RETURN root  
+    END FUNCTION  
+END CLASS

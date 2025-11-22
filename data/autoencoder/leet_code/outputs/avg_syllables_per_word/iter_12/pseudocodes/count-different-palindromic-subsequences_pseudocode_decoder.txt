@@ -1,0 +1,68 @@
+CLASS Solution  
+    FUNCTION countPalindromicSubsequences(s)  
+        SET MOD TO one billion PLUS seven  
+        SET n TO the LENGTH OF s  
+        
+        CALL initialize_next_occurrence WITH n RETURNING next_occurrence  
+        CALL initialize_prev_occurrence WITH n RETURNING prev_occurrence  
+        
+        FOR c FROM zero TO three  
+            SET char TO the character REPRESENTED BY the ORDINAL OF 'a' PLUS c  
+            SET last TO minus one  
+            
+            FOR i FROM zero TO n MINUS one  
+                IF the element at position i of s EQUALS char THEN  
+                    SET last TO i  
+                END IF  
+                SET the element at position i of the list at position c of prev_occurrence TO last  
+            END FOR  
+            
+            SET last TO minus one  
+            FOR i FROM n MINUS one TO zero STEP minus one  
+                IF the element at position i of s EQUALS char THEN  
+                    SET last TO i  
+                END IF  
+                SET the element at position i of the list at position c of next_occurrence TO last  
+            END FOR  
+        END FOR  
+        
+        CALL initialize_dp WITH n RETURNING dp  
+        
+        FOR i FROM zero TO n MINUS one  
+            SET the element at position i and i of dp TO one  
+        END FOR  
+        
+        FOR length FROM two TO n  
+            FOR i FROM zero TO n MINUS length  
+                SET j TO i PLUS length MINUS one  
+                FOR c FROM zero TO three  
+                    SET char TO the character REPRESENTED BY the ORDINAL OF 'a' PLUS c  
+                    SET left TO the element at position i of the list at position c of next_occurrence  
+                    SET right TO the element at position j of the list at position c of prev_occurrence  
+                    
+                    IF left GREATER THAN j OR right LESS THAN i THEN  
+                        CONTINUE TO next iteration  
+                    ELSE IF left EQUALS right THEN  
+                        SET dp at position i and j TO dp at position i and j PLUS one MODULO MOD  
+                    ELSE  
+                        SET dp at position i and j TO dp at position i and j PLUS the element at position left PLUS one and right MINUS one of dp PLUS two MODULO MOD  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+        
+        RETURN the element at position zero and n MINUS one of dp  
+    END FUNCTION  
+    
+    FUNCTION initialize_next_occurrence WITH n  
+        RETURN a list containing four lists each filled with minus one repeated n times  
+    END FUNCTION  
+    
+    FUNCTION initialize_prev_occurrence WITH n  
+        RETURN a list containing four lists each filled with minus one repeated n times  
+    END FUNCTION  
+    
+    FUNCTION initialize_dp WITH n  
+        RETURN a list containing n lists each filled with zero repeated n times  
+    END FUNCTION  
+END CLASS

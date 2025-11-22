@@ -1,0 +1,14 @@
+def reorderList(head):
+    if not head or not head.next:
+        return
+    slow, fast = head, head
+    while fast and fast.next:
+        slow, fast = slow.next, fast.next.next
+    prev, curr = None, slow
+    while curr:
+        next_temp, curr.next, prev, curr = curr.next, prev, curr, next_temp
+    first, second = head, prev
+    while second.next:
+        temp1, temp2 = first.next, second.next
+        first.next, second.next = second, temp1
+        first, second = temp1, temp2

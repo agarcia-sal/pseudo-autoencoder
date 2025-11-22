@@ -1,0 +1,47 @@
+CLASS Solution
+    FUNCTION maxSumOfThreeSubarrays(list_of_numbers, subarray_length)
+        SET total_numbers TO the LENGTH OF list_of_numbers
+        CREATE list_of_subarray_sums WITH zeroes OF LENGTH total_numbers MINUS subarray_length PLUS one
+        SET current_sum TO THE SUM OF the FIRST subarray_length ELEMENTS OF list_of_numbers
+        SET element at position zero OF list_of_subarray_sums TO current_sum
+
+        FOR index FROM one TO total_numbers MINUS subarray_length
+            INCREMENT current_sum BY element at position index PLUS subarray_length MINUS one OF list_of_numbers MINUS element at position index MINUS one OF list_of_numbers
+            SET element at position index OF list_of_subarray_sums TO current_sum
+        END FOR
+
+        CREATE left_max_indices WITH zeroes OF LENGTH total_numbers MINUS subarray_length PLUS one
+        CREATE right_max_indices FILLED WITH total_numbers MINUS subarray_length OF LENGTH total_numbers MINUS subarray_length PLUS one
+
+        SET max_sum_index TO zero
+        FOR index FROM zero TO total_numbers MINUS subarray_length
+            IF element at position index OF list_of_subarray_sums GREATER THAN element at position max_sum_index OF list_of_subarray_sums
+                SET max_sum_index TO index
+            END IF
+            SET element at position index OF left_max_indices TO max_sum_index
+        END FOR
+
+        SET max_sum_index TO total_numbers MINUS subarray_length
+        FOR index FROM total_numbers MINUS subarray_length DOWN TO zero
+            IF element at position index OF list_of_subarray_sums GREATER THAN OR EQUAL TO element at position max_sum_index OF list_of_subarray_sums
+                SET max_sum_index TO index
+            END IF
+            SET element at position index OF right_max_indices TO max_sum_index
+        END FOR
+
+        SET max_total_sum TO zero
+        CREATE result_indices WITH zeroes AT three POSITIONS
+
+        FOR middle_index FROM subarray_length TO total_numbers MINUS two TIMES subarray_length
+            SET left_index TO element at position middle_index MINUS subarray_length OF left_max_indices
+            SET right_index TO element at position middle_index PLUS subarray_length OF right_max_indices
+            SET total_sum TO element at position left_index OF list_of_subarray_sums PLUS element at position middle_index OF list_of_subarray_sums PLUS element at position right_index OF list_of_subarray_sums
+            IF total_sum GREATER THAN max_total_sum
+                SET max_total_sum TO total_sum
+                SET result_indices TO list containing left_index, middle_index, right_index
+            END IF
+        END FOR
+
+        RETURN result_indices
+    END FUNCTION
+END CLASS

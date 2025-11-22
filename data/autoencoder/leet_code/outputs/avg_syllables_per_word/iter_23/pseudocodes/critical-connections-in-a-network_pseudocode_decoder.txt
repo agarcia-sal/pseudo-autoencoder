@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION criticalConnections(n, connections)  
+        FUNCTION dfs(node, parent, disc, low, time, graph, critical)  
+            SET element at position node of disc TO element at position zero of time  
+            SET element at position node of low TO element at position zero of time  
+            INCREMENT element at position zero of time BY one  
+            
+            FOR each neighbor IN element at position node of graph  
+                IF element at position neighbor of disc EQUALS minus one THEN  
+                    CALL dfs WITH neighbor, node, disc, low, time, graph, critical  
+                    SET element at position node of low TO the minimum BETWEEN element at position node of low AND element at position neighbor of low  
+                    IF element at position neighbor of low GREATER THAN element at position node of disc THEN  
+                        APPEND a list containing node and neighbor TO critical  
+                    END IF  
+                ELSE IF neighbor NOT EQUALS parent THEN  
+                    SET element at position node of low TO the minimum BETWEEN element at position node of low AND element at position neighbor of disc  
+                END IF  
+            END FOR  
+        END FUNCTION  
+        
+        SET graph TO an empty list repeated n times each containing an empty list  
+        FOR each pair u and v IN connections  
+            APPEND v TO element at position u of graph  
+            APPEND u TO element at position v of graph  
+        END FOR  
+        
+        SET disc TO a list of minus one repeated n times  
+        SET low TO a list of minus one repeated n times  
+        SET time TO a list containing zero as its only element  
+        
+        SET critical TO an empty list  
+        
+        FOR each node FROM zero TO n minus one  
+            IF element at position node of disc EQUALS minus one THEN  
+                CALL dfs WITH node, minus one, disc, low, time, graph, critical  
+            END IF  
+        END FOR  
+        
+        RETURN critical  
+    END FUNCTION  
+END CLASS

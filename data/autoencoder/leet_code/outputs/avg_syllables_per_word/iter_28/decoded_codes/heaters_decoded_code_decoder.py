@@ -1,0 +1,16 @@
+from typing import List
+
+class Solution:
+    def findRadius(self, houses: List[int], heaters: List[int]) -> int:
+        houses.sort()
+        heaters.sort()
+        min_radius = 0
+        j = 0
+        n = len(heaters)
+        for house in houses:
+            while j < n - 1 and abs(heaters[j] - house) >= abs(heaters[j + 1] - house):
+                j += 1
+            distance = abs(heaters[j] - house)
+            if distance > min_radius:
+                min_radius = distance
+        return min_radius

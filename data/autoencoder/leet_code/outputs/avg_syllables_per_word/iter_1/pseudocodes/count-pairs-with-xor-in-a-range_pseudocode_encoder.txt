@@ -1,0 +1,39 @@
+```
+define TrieNode:
+  children = map bit → TrieNode
+  count = 0
+
+define Trie(bit_len=15):
+  root = TrieNode()
+
+  insert(num):
+    node = root
+    for i from bit_len down to 0:
+      b = (num >> i) & 1
+      if b not in node.children:
+        node.children[b] = TrieNode()
+      node = node.children[b]
+      node.count += 1
+
+  count_less_than(num, threshold):
+    c = 0
+    node = root
+    for i from bit_len down to 0:
+      if node is None: break
+      b = (num >> i) & 1
+      tb = (threshold >> i) & 1
+      if tb == 1:
+        c += node.children.get(b, TrieNode()).count
+        node = node.children.get(b ^ 1)
+      else:
+        node = node.children.get(b)
+    return c
+
+define countPairs(nums, low, high):
+  trie = Trie()
+  pairs = 0
+  for n in nums:
+    pairs += trie.count_less_than(n, high + 1) - trie.count_less_than(n, low)
+    trie.insert(n)
+  return pairs
+```

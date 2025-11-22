@@ -1,0 +1,47 @@
+CLASS Solution
+    FUNCTION solveEquation(equation)
+        FUNCTION parse_side(side)
+            SET tokens TO side WITH every PLUS replaced by separator PLUS and every MINUS replaced by separator MINUS then SPLIT by separator
+            SET x_count TO zero
+            SET num_sum TO zero
+            FOR each token IN tokens
+                IF token IS empty THEN
+                    CONTINUE
+                END IF
+                IF token CONTAINS character x THEN
+                    IF token EQUALS character x OR token EQUALS PLUS character x THEN
+                        INCREMENT x_count BY one
+                    ELSE IF token EQUALS MINUS character x THEN
+                        DECREMENT x_count BY one
+                    ELSE
+                        SET number_string TO token WITH character x REMOVED
+                        SET number_value TO the INTEGER VALUE OF number_string
+                        INCREMENT x_count BY number_value
+                    END IF
+                ELSE
+                    SET number_value TO the INTEGER VALUE OF token
+                    INCREMENT num_sum BY number_value
+                END IF
+            END FOR
+            RETURN x_count, num_sum
+        END FUNCTION
+
+        SET left_side, right_side TO the LEFT PART and RIGHT PART of equation SPLIT by character equals
+        SET left_x, left_num TO parse_side APPLIED TO left_side
+        SET right_x, right_num TO parse_side APPLIED TO right_side
+
+        SET total_x TO left_x MINUS right_x
+        SET total_num TO right_num MINUS left_num
+
+        IF total_x EQUALS zero THEN
+            IF total_num EQUALS zero THEN
+                RETURN the string Infinite solutions
+            ELSE
+                RETURN the string No solution
+            END IF
+        ELSE
+            SET quotient TO total_num DIVIDED BY total_x AS INTEGER DIVISION
+            RETURN the string x EQUALS concatenated with quotient AS STRING
+        END IF
+    END FUNCTION
+END CLASS

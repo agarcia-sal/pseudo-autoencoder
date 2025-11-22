@@ -1,0 +1,47 @@
+CLASS Solution  
+    FUNCTION closestNode(n, edges, query)  
+        SET graph TO a mapping from each key to an empty list  
+        FOR each element u and element v IN edges  
+            APPEND element v TO the list at key u in graph  
+            APPEND element u TO the list at key v in graph  
+        END FOR  
+        
+        FUNCTION find_path(start, end)  
+            SET queue TO a new double ended queue containing the tuple of start and a list containing start  
+            SET visited TO a set containing start  
+            WHILE queue is not empty  
+                REMOVE the first element from queue and ASSIGN to node and path  
+                IF node EQUALS end THEN  
+                    RETURN path  
+                END IF  
+                FOR each neighbor IN the list at key node in graph  
+                    IF neighbor is not in visited THEN  
+                        ADD neighbor to visited  
+                        APPEND the tuple of neighbor and the concatenation of path with list containing neighbor TO queue  
+                    END IF  
+                END FOR  
+            END WHILE  
+        END FUNCTION  
+        
+        FUNCTION closest_node_on_path(path, node)  
+            SET min_distance TO positive infinity  
+            SET closest_node TO null  
+            FOR each element p IN path  
+                SET distance TO the length of find_path with arguments p and node MINUS one  
+                IF distance LESS THAN min_distance THEN  
+                    SET min_distance TO distance  
+                    SET closest_node TO p  
+                END IF  
+            END FOR  
+            RETURN closest_node  
+        END FUNCTION  
+        
+        SET answer TO an empty list  
+        FOR each element start and element end and element node IN query  
+            SET path TO find_path with arguments start and end  
+            APPEND closest_node_on_path with arguments path and node TO answer  
+        END FOR  
+        
+        RETURN answer  
+    END FUNCTION  
+END CLASS

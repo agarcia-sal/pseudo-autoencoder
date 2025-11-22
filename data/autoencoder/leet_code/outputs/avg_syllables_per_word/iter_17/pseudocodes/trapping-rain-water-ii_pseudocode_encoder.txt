@@ -1,0 +1,63 @@
+CLASS Solution
+    FUNCTION trapRainWater(heightMap)
+        IF heightMap IS empty OR element at position zero of heightMap IS empty
+            RETURN zero
+        END IF
+
+        SET m TO the LENGTH OF heightMap
+        SET n TO the LENGTH OF element at position zero of heightMap
+
+        SET visited TO CALL initialize_visited WITH parameters m AND n
+        SET min_heap TO an empty list
+
+        FOR index i FROM zero TO m MINUS one
+            CALL push_to_heap WITH parameters min_heap, element at position i of heightMap AT position zero, i, zero
+            CALL push_to_heap WITH parameters min_heap, element at position i of heightMap AT position n MINUS one, i, n MINUS one
+            SET element at position i AT position zero OF visited TO True
+            SET element at position i AT position n MINUS one OF visited TO True
+        END FOR
+
+        FOR index j FROM zero TO n MINUS one
+            CALL push_to_heap WITH parameters min_heap, element at position zero of heightMap AT position j, zero, j
+            CALL push_to_heap WITH parameters min_heap, element at position m MINUS one of heightMap AT position j, m MINUS one, j
+            SET element at position zero AT position j OF visited TO True
+            SET element at position m MINUS one AT position j OF visited TO True
+        END FOR
+
+        SET directions TO CALL define_directions WITH no parameters
+        SET water_trapped TO zero
+
+        WHILE min_heap IS NOT empty
+            SET height, x, y TO CALL pop_from_heap WITH parameter min_heap
+
+            FOR each direction dx, dy IN directions
+                SET nx TO x PLUS dx
+                SET ny TO y PLUS dy
+
+                IF nx IS GREATER THAN OR EQUAL TO zero AND nx IS LESS THAN m AND ny IS GREATER THAN OR EQUAL TO zero AND ny IS LESS THAN n AND element at position nx AT position ny OF visited IS False
+                    SET element at position nx AT position ny OF visited TO True
+                    INCREMENT water_trapped BY the MAXIMUM OF zero AND height MINUS element at position nx AT position ny OF heightMap
+                    CALL push_to_heap WITH parameters min_heap, the MAXIMUM OF height AND element at position nx AT position ny OF heightMap, nx, ny
+                END IF
+            END FOR
+        END WHILE
+
+        RETURN water_trapped
+    END FUNCTION
+
+    FUNCTION initialize_visited(m, n)
+        // Auxiliary FUNCTION to create a two-dimensional list of False with m rows and n columns
+    END FUNCTION
+
+    FUNCTION push_to_heap(heap, height, x, y)
+        // Auxiliary FUNCTION to push a tuple of height, x, y onto the heap
+    END FUNCTION
+
+    FUNCTION pop_from_heap(heap)
+        // Auxiliary FUNCTION to pop the smallest element from the heap and return height, x, y
+    END FUNCTION
+
+    FUNCTION define_directions()
+        // Auxiliary FUNCTION to return a list containing tuples of minus one zero, one zero, zero minus one, zero one
+    END FUNCTION
+END CLASS

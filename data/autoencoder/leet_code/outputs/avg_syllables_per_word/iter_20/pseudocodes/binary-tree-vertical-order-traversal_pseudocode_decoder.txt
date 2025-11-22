@@ -1,0 +1,66 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO a new TreeNode initialized with the element at position zero of values  
+    SET i TO one  
+    SET queue TO a new double ended queue  
+    APPEND root TO queue  
+    WHILE queue holds elements  
+        SET node TO the element removed from the left end of queue  
+        IF i IS LESS THAN the length of values AND the element at position i of values IS NOT none  
+            SET node.left TO a new TreeNode initialized with the element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the length of values AND the element at position i of values IS NOT none  
+            SET node.right TO a new TreeNode initialized with the element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF the value attribute of p IS NOT EQUALS the value attribute of q  
+        RETURN False  
+    ELSE  
+        RETURN the logical AND of calling is_same_tree with the left child of p and the left child of q AND calling is_same_tree with the right child of p and the right child of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION verticalOrder(self, root)  
+        IF root IS none  
+            RETURN an empty list  
+        END IF  
+        SET column_table TO a new default dictionary with list as default factory  
+        SET queue TO a new double ended queue initialized with a pair of root and zero as the column index  
+        SET min_column TO zero  
+        SET max_column TO zero  
+        WHILE queue holds elements  
+            SET node, column_index TO the pair removed from the left end of queue  
+            IF node IS NOT none  
+                APPEND the value attribute of node TO the list at key column_index in column_table  
+                SET min_column TO the smaller of min_column and column_index  
+                SET max_column TO the larger of max_column and column_index  
+                APPEND the pair of the left child of node and column_index MINUS one TO queue  
+                APPEND the pair of the right child of node and column_index PLUS one TO queue  
+            END IF  
+        END WHILE  
+        RETURN a list of the values in column_table at each key from min_column TO max_column inclusive  
+    END FUNCTION  
+END CLASS

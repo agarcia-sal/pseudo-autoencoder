@@ -1,0 +1,75 @@
+CLASS ListNode
+    FUNCTION __init__(self, val EQUALS zero, next EQUALS None)
+        SET self.val TO val
+        SET self.next TO next
+    END FUNCTION
+END CLASS
+
+FUNCTION list_node(values)
+    IF values IS empty
+        RETURN None
+    END IF
+    SET head TO CALL ListNode WITH element at position zero of values
+    SET p TO head
+    FOR each val IN the SUBLIST OF values FROM position one TO the END
+        SET node TO CALL ListNode WITH val
+        SET p.next TO node
+        SET p TO node
+    END FOR
+    RETURN head
+END FUNCTION
+
+FUNCTION is_same_list(p1, p2)
+    IF p1 IS None AND p2 IS None
+        RETURN True
+    END IF
+    IF p1 IS None OR p2 IS None
+        RETURN False
+    END IF
+    RETURN p1.val EQUALS p2.val AND CALL is_same_list WITH p1.next AND p2.next
+END FUNCTION
+
+CLASS Solution
+    FUNCTION addTwoNumbers(l1, l2)
+        FUNCTION pushIntoStack(node)
+            SET stack TO empty list
+            WHILE node IS NOT None
+                APPEND node.val TO stack
+                SET node TO node.next
+            END WHILE
+            RETURN stack
+        END FUNCTION
+
+        SET stack1 TO CALL pushIntoStack WITH l1
+        SET stack2 TO CALL pushIntoStack WITH l2
+
+        SET carry TO zero
+        SET result TO None
+
+        WHILE the LENGTH OF stack1 IS GREATER THAN zero OR the LENGTH OF stack2 IS GREATER THAN zero OR carry IS NOT zero
+            IF the LENGTH OF stack1 IS GREATER THAN zero
+                SET val1 TO the LAST element OF stack1
+                REMOVE the LAST element FROM stack1
+            ELSE
+                SET val1 TO zero
+            END IF
+
+            IF the LENGTH OF stack2 IS GREATER THAN zero
+                SET val2 TO the LAST element OF stack2
+                REMOVE the LAST element FROM stack2
+            ELSE
+                SET val2 TO zero
+            END IF
+
+            SET total TO val1 PLUS val2 PLUS carry
+            SET carry TO total DIVIDED BY ten
+            SET digit TO total MODULO ten
+
+            SET new_node TO CALL ListNode WITH digit
+            SET new_node.next TO result
+            SET result TO new_node
+        END WHILE
+
+        RETURN result
+    END FUNCTION
+END CLASS

@@ -1,0 +1,69 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS None, right EQUALS None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(list_of_values)
+    IF list_of_values IS empty
+        RETURN None
+    END IF
+    SET root TO CALL TreeNode WITH element at position zero of list_of_values
+    SET index TO one
+    SET queue TO CALL deque WITH no parameters
+    CALL APPEND root TO queue
+    WHILE queue IS NOT empty
+        SET node TO CALL popleft FROM queue
+        IF index LESS THAN the LENGTH OF list_of_values AND element at position index of list_of_values IS NOT None
+            SET node.left TO CALL TreeNode WITH element at position index of list_of_values
+            CALL APPEND node.left TO queue
+        END IF
+        INCREMENT index BY one
+        IF index LESS THAN the LENGTH OF list_of_values AND element at position index of list_of_values IS NOT None
+            SET node.right TO CALL TreeNode WITH element at position index of list_of_values
+            CALL APPEND node.right TO queue
+        END IF
+        INCREMENT index BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val IS NOT EQUAL TO q.val
+        RETURN False
+    ELSE
+        RETURN the LOGICAL AND of CALL is_same_tree WITH p.left AND q.left AND CALL is_same_tree WITH p.right AND q.right
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION levelOrder(self, root)
+        IF root IS None
+            RETURN an empty list
+        END IF
+        SET result TO an empty list
+        SET queue TO CALL deque WITH a list containing root
+        WHILE queue IS NOT empty
+            SET level_size TO the LENGTH OF queue
+            SET current_level TO an empty list
+            FOR each number FROM zero TO level_size MINUS one
+                SET node TO CALL popleft FROM queue
+                CALL APPEND node.val TO current_level
+                IF node.left IS NOT None
+                    CALL APPEND node.left TO queue
+                END IF
+                IF node.right IS NOT None
+                    CALL APPEND node.right TO queue
+                END IF
+            END FOR
+            CALL APPEND current_level TO result
+        END WHILE
+        RETURN result
+    END FUNCTION
+END CLASS

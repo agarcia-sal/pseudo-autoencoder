@@ -1,0 +1,51 @@
+CLASS Solution  
+    FUNCTION wordsAbbreviation(words)  
+        FUNCTION abbreviate(word, prefix_length)  
+            IF the LENGTH OF word MINUS prefix_length IS LESS THAN OR EQUAL TO two  
+                RETURN word  
+            END IF  
+            RETURN the SUBSTRING of word FROM position zero TO position prefix_length MINUS one CONCATENATED WITH the LENGTH OF word MINUS prefix_length MINUS one CONVERTED TO STRING CONCATENATED WITH the LAST CHARACTER of word  
+        END FUNCTION  
+
+        FUNCTION get_unique_abbreviations(words_with_indices, prefix_length)  
+            SET abbs TO a NEW defaultdict of list  
+            FOR each pair OF index AND word IN words_with_indices  
+                APPEND tuple of index AND word TO the LIST at key abbreviate(word, prefix_length) IN abbs  
+            END FOR  
+            RETURN abbs  
+        END FUNCTION  
+
+        SET n TO the LENGTH OF words  
+        SET ans TO a LIST OF empty STRINGS WITH LENGTH n  
+        SET words_with_indices TO a LIST OF tuples of index AND word FOR each index AND word FROM ENUMERATE over words  
+
+        SET abbs TO get_unique_abbreviations(words_with_indices, one)  
+
+        FOR each abb AND group IN the ITEMS OF abbs  
+            IF the LENGTH OF group EQUALS one  
+                SET index AND word TO the FIRST tuple IN group  
+                SET element at position index OF ans TO abb  
+            ELSE  
+                SET new_group TO an EMPTY LIST  
+                FOR each index AND word IN group  
+                    APPEND tuple of index AND word TO new_group  
+                END FOR  
+                SET prefix_length TO two  
+                WHILE the LENGTH OF new_group IS GREATER THAN zero  
+                    SET new_abbs TO get_unique_abbreviations(new_group, prefix_length)  
+                    SET new_group TO an EMPTY LIST  
+                    FOR each new_abb AND new_group_items IN the ITEMS OF new_abbs  
+                        IF the LENGTH OF new_group_items EQUALS one  
+                            SET index AND word TO the FIRST tuple IN new_group_items  
+                            SET element at position index OF ans TO new_abb  
+                        ELSE  
+                            EXTEND new_group BY new_group_items  
+                        END IF  
+                    END FOR  
+                    INCREMENT prefix_length BY one  
+                END WHILE  
+            END IF  
+        END FOR  
+        RETURN ans  
+    END FUNCTION  
+END CLASS

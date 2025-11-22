@@ -1,0 +1,49 @@
+CLASS Solution  
+    FUNCTION minFlips(self, mat)  
+        FUNCTION flip(matrix, x, y)  
+            SET directions TO list of coordinate pairs: negative one zero, one zero, zero negative one, zero one, zero zero  
+            FOR each dx, dy IN directions  
+                SET nx TO x PLUS dx  
+                SET ny TO y PLUS dy  
+                IF nx GREATER THAN OR EQUAL TO zero AND nx LESS THAN m AND ny GREATER THAN OR EQUAL TO zero AND ny LESS THAN n THEN  
+                    SET matrix at position nx, ny TO one MINUS matrix at position nx, ny  
+                END IF  
+            END FOR  
+        END FUNCTION  
+
+        FUNCTION matrix_to_tuple(matrix)  
+            RETURN tuple consisting of tuples for each row in matrix  
+        END FUNCTION  
+
+        SET m TO length of mat  
+        SET n TO length of first row in mat  
+        SET target TO tuple consisting of tuples filled with zero for n times repeated m times  
+        SET initial_state TO matrix_to_tuple(mat)  
+        SET queue TO list containing tuple of initial_state and zero  
+        SET visited TO empty set  
+        ADD initial_state TO visited  
+
+        WHILE queue is not empty  
+            REMOVE first element from queue and unpack into current_state and steps  
+            IF current_state EQUALS target THEN  
+                RETURN steps  
+            END IF  
+
+            SET current_matrix TO list of lists converted from current_state rows  
+
+            FOR i FROM zero TO m MINUS one  
+                FOR j FROM zero TO n MINUS one  
+                    SET next_matrix TO deep copy of current_matrix  
+                    CALL flip with next_matrix, i, j  
+                    SET next_state TO matrix_to_tuple(next_matrix)  
+                    IF next_state NOT IN visited THEN  
+                        ADD next_state TO visited  
+                        APPEND tuple of next_state and steps PLUS one TO queue  
+                    END IF  
+                END FOR  
+            END FOR  
+        END WHILE  
+
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION minDistance WITH PARAMETERS houses AS list of integers AND k AS integer  
+        SORT houses IN ASCENDING ORDER  
+        SET n TO the LENGTH OF houses  
+        
+        CALL FUNCTION prepareCostMatrix WITH PARAMETERS houses AND n  
+        SET cost TO THE RESULT OF prepareCostMatrix
+        
+        CALL FUNCTION prepareDPTable WITH PARAMETERS n AND k  
+        SET dp TO THE RESULT OF prepareDPTable
+        
+        FOR each i FROM one TO n  
+            FOR each j FROM one TO k  
+                FOR each p FROM zero TO i MINUS one  
+                    SET candidate_distance TO the value at position p AND j MINUS one of dp PLUS the value at position p AND i MINUS one of cost  
+                    IF the value at position i AND j of dp IS GREATER THAN candidate_distance  
+                        SET the value at position i AND j of dp TO candidate_distance  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+        
+        RETURN the value at position n AND k of dp  
+    END FUNCTION  
+    
+    FUNCTION prepareCostMatrix WITH PARAMETERS houses AS list of integers AND n AS integer  
+        INITIALIZE cost AS two dimensional collection of zeros WITH dimensions n BY n  
+        FOR each i FROM n MINUS one DOWN TO zero  
+            FOR each j FROM i PLUS one TO n MINUS one  
+                SET cost at position i AND j TO the value at position i PLUS one AND j MINUS one of cost PLUS the element at position j of houses MINUS the element at position i of houses  
+            END FOR  
+        END FOR  
+        RETURN cost  
+    END FUNCTION  
+    
+    FUNCTION prepareDPTable WITH PARAMETERS n AS integer AND k AS integer  
+        INITIALIZE dp AS two dimensional collection FILLED WITH infinity WITH dimensions n PLUS one BY k PLUS one  
+        SET the value at position zero AND zero of dp TO zero  
+        RETURN dp  
+    END FUNCTION  
+END CLASS

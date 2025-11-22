@@ -1,0 +1,63 @@
+CLASS Solution  
+    FUNCTION sequenceReconstruction(nums, sequences)  
+        SET n TO the LENGTH OF nums  
+        CALL initializeGraph WITH PARAMETER n RETURNING graph AND indegree  
+        
+        FOR each sequence IN sequences  
+            FOR index FROM zero TO the LENGTH OF sequence MINUS one MINUS one  
+                SET u TO element at position index OF sequence  
+                SET v TO element at position index PLUS one OF sequence  
+                CALL appendNeighbor TO ADD v TO graph FOR u  
+                INCREMENT indegree AT position v BY one  
+            END FOR  
+        END FOR  
+        
+        SET queue TO CALL initializeQueue WITH PARAMETER indegree FROM position one TO n PLUS one  
+        
+        IF the LENGTH OF queue NOT EQUALS one  
+            RETURN false  
+        END IF  
+        
+        SET index TO zero  
+        WHILE the LENGTH OF queue GREATER THAN zero  
+            IF the LENGTH OF queue NOT EQUALS one  
+                RETURN false  
+            END IF  
+            
+            SET node TO the FIRST element REMOVED FROM queue  
+            IF node NOT EQUALS element at position index OF nums  
+                RETURN false  
+            END IF  
+            INCREMENT index BY one  
+            
+            FOR each neighbor IN graph AT key node  
+                DECREMENT indegree AT position neighbor BY one  
+                IF indegree AT position neighbor EQUALS zero  
+                    ADD neighbor TO the END OF queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN index EQUALS n  
+    END FUNCTION  
+    
+    FUNCTION initializeGraph(n)  
+        SET graph TO an empty mapping with default value as an empty list  
+        SET indegree TO a list of zero VALUES OF length n PLUS one  
+        RETURN graph AND indegree  
+    END FUNCTION  
+    
+    FUNCTION appendNeighbor(graph, u, v)  
+        ADD v TO the list AT key u OF graph  
+    END FUNCTION  
+    
+    FUNCTION initializeQueue(indegree)  
+        SET queue TO an empty double-ended queue  
+        FOR index FROM one TO the LENGTH OF indegree MINUS one  
+            IF indegree AT position index EQUALS zero  
+                ADD index TO the END OF queue  
+            END IF  
+        END FOR  
+        RETURN queue  
+    END FUNCTION  
+END CLASS

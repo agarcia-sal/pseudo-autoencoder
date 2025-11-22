@@ -1,0 +1,35 @@
+CLASS Solution  
+    FUNCTION maximumScore(scores, edges)  
+        CALL create_graph_with_scores WITH PARAMETERS scores, edges RETURNING graph  
+        CALL prune_graph_neighbors WITH PARAMETERS graph  
+        SET max_score TO negative one  
+        FOR each u, v IN edges  
+            FOR each score1, x IN element at position u OF graph  
+                FOR each score2, y IN element at position v OF graph  
+                    IF the NUMBER OF DISTINCT ELEMENTS IN the set containing x, y, u, and v EQUALS four  
+                        SET candidate_score TO score1 PLUS score2 PLUS element at position u OF scores PLUS element at position v OF scores  
+                        IF candidate_score GREATER THAN max_score  
+                            SET max_score TO candidate_score  
+                        END IF  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+        RETURN max_score  
+    END FUNCTION  
+
+    FUNCTION create_graph_with_scores(scores, edges)  
+        CREATE an empty mapping graph from integers to lists  
+        FOR each pair u, v IN edges  
+            APPEND the tuple containing element at position v OF scores AND v TO element at position u OF graph  
+            APPEND the tuple containing element at position u OF scores AND u TO element at position v OF graph  
+        END FOR  
+        RETURN graph  
+    END FUNCTION  
+
+    FUNCTION prune_graph_neighbors(graph)  
+        FOR each node IN keys OF graph  
+            SET element at position node OF graph TO the list containing the three highest tuples BY the first element IN element at position node OF graph  
+        END FOR  
+    END FUNCTION  
+END CLASS

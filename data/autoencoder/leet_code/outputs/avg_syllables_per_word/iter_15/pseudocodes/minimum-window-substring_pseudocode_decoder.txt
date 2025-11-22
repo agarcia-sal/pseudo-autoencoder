@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION minWindow(s AS string, t AS string) RETURNS string  
+        CREATE t_count AS a COUNTER representing the frequency of each character in t  
+        SET required TO the NUMBER OF UNIQUE characters in t_count  
+        SET left TO zero  
+        SET right TO zero  
+        SET formed TO zero representing the number of unique characters in t satisfied in current window  
+        CREATE window_counts AS an empty COUNTER for characters in the current window  
+        SET min_length TO positive infinity  
+        SET min_start TO zero  
+        
+        WHILE right IS LESS THAN the LENGTH OF s  
+            SET current_character TO the character at position right of s  
+            INCREMENT the count of current_character in window_counts BY one  
+            
+            IF current_character EXISTS IN t_count AND the count of current_character in window_counts EQUALS the count of current_character in t_count  
+                INCREMENT formed BY one  
+            END IF  
+            
+            WHILE left IS LESS THAN OR EQUAL TO right AND formed EQUALS required  
+                SET char_at_left TO the character at position left of s  
+                
+                IF the difference of right MINUS left PLUS one IS LESS THAN min_length  
+                    SET min_length TO right MINUS left PLUS one  
+                    SET min_start TO left  
+                END IF  
+                
+                DECREMENT the count of char_at_left in window_counts BY one  
+                
+                IF char_at_left EXISTS IN t_count AND the count of char_at_left in window_counts IS LESS THAN the count of char_at_left in t_count  
+                    DECREMENT formed BY one  
+                END IF  
+                
+                INCREMENT left BY one  
+            END WHILE  
+            
+            INCREMENT right BY one  
+        END WHILE  
+        
+        IF min_length EQUALS positive infinity  
+            RETURN an empty string  
+        ELSE  
+            RETURN the substring from position min_start TO min_start PLUS min_length MINUS one of s  
+        END IF  
+    END FUNCTION  
+END CLASS

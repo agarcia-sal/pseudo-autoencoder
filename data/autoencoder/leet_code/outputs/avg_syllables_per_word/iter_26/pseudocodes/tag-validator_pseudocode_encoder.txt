@@ -1,0 +1,43 @@
+CLASS Solution
+    FUNCTION isValid(parameter code AS string) RETURNS boolean
+        IMPORT the module for regular expressions
+
+        SET the pattern for CDATA TO the natural language description of the character sequence left angle bracket followed by exclamation mark followed by left square bracket followed by capital letters C D A T A followed by left square bracket followed by any sequence of characters followed by right square bracket followed by right square bracket followed by right angle bracket
+
+        SET the parameter code TO the result of replacing all occurrences matching the CDATA pattern in code with an empty sequence
+
+        SET an empty list named stack
+
+        SET index i TO zero
+
+        WHILE index i LESS THAN the LENGTH OF the parameter code HOLDS
+            IF the element at position i OF code EQUALS the character left angle bracket
+                SET index j TO the result of finding the position of character right angle bracket in code STARTING FROM position i plus one
+                IF index j EQUALS negative one
+                    RETURN false AS there is no matching closing right angle bracket
+
+                SET the variable tag_content TO the substring FROM position i plus one TO position j minus one OF code
+
+                IF tag_content IS empty
+                    RETURN false AS the tag is empty
+
+                IF the element at position zero OF tag_content EQUALS the character forward slash
+                    SET the variable tag_name TO the substring FROM position one TO the end OF tag_content
+                    IF stack IS empty OR the last element OF stack NOT EQUALS tag_name
+                        RETURN false AS there is a mismatched or unbalanced closing tag
+                    REMOVE the last element FROM stack
+                ELSE IF the element at position zero OF tag_content EQUALS the character exclamation mark
+                    RETURN false AS a CDATA section remains after removal
+                ELSE
+                    IF the LENGTH OF tag_content LESS THAN one OR GREATER THAN nine OR the tag_content IS NOT composed ONLY OF uppercase letters
+                        RETURN false AS the opening tag name is invalid
+                    APPEND tag_content TO stack
+
+                SET index i TO index j plus one
+            ELSE
+                INCREMENT index i BY one
+        END WHILE
+
+        RETURN true IF stack IS empty AND the COUNT OF matches FROM the regular expression pattern left angle bracket followed by one or more uppercase letters followed by right angle bracket followed by any sequence of characters followed by left angle bracket followed by forward slash followed by one or more uppercase letters followed by right angle bracket IN code IS GREATER THAN zero OTHERWISE RETURN false
+    END FUNCTION
+END CLASS

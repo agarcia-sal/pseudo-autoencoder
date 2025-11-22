@@ -1,0 +1,59 @@
+CLASS UnionFind  
+    FUNCTION __init__(size)  
+        SET root TO list of integers from 0 to size MINUS 1  
+        SET rank TO list of size elements each initialized to 1  
+    END FUNCTION  
+
+    FUNCTION find(x)  
+        IF root at position x IS EQUAL TO x  
+            RETURN x  
+        SET root at position x TO find(root at position x)  
+        RETURN root at position x  
+    END FUNCTION  
+
+    FUNCTION union(x, y)  
+        SET rootX TO find(x)  
+        SET rootY TO find(y)  
+        IF rootX IS NOT EQUAL TO rootY  
+            IF rank at rootX GREATER THAN rank at rootY  
+                SET root at rootY TO rootX  
+            ELSE IF rank at rootX LESS THAN rank at rootY  
+                SET root at rootX TO rootY  
+            ELSE  
+                SET root at rootY TO rootX  
+                INCREMENT rank at rootX BY 1  
+            END IF  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION accountsMerge(accounts)  
+        SET email_to_id TO empty dictionary  
+        SET uf TO new UnionFind initialized with size LENGTH OF accounts  
+
+        FOR each index i AND account starting with name and followed by emails IN accounts  
+            FOR each email IN emails  
+                IF email NOT IN email_to_id  
+                    SET email_to_id at email TO i  
+                ELSE  
+                    CALL uf.union(i, email_to_id at email)  
+                END IF  
+            END FOR  
+        END FOR  
+
+        SET merged_emails TO a dictionary with default list  
+        FOR each email AND account_id IN email_to_id items  
+            SET root_id TO uf.find(account_id)  
+            APPEND email TO merged_emails at root_id  
+        END FOR  
+
+        SET result TO empty list  
+        FOR each account_id AND emails IN merged_emails items  
+            SET name TO accounts at account_id at position 0  
+            APPEND list consisting of name FOLLOWED BY emails sorted alphabetically TO result  
+        END FOR  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

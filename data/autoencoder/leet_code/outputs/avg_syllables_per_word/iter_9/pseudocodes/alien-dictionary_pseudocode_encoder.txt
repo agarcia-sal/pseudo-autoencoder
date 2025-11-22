@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION alienOrder(self, words)  
+        SET graph TO a mapping from character TO a set of characters with default empty set  
+        SET indegree TO a mapping from character TO integer with default zero  
+          
+        SET all_chars TO the set of all characters found by concatenating all words in words  
+          
+        FOR index FROM zero TO length of words MINUS one  
+            SET word1 TO words at index  
+            SET word2 TO words at index PLUS one  
+            SET min_length TO the minimum of length of word1 AND length of word2  
+            SET found TO false  
+            FOR position FROM zero TO min_length MINUS one  
+                IF character at position in word1 NOT EQUALS character at position in word2 THEN  
+                    IF character at position in word2 NOT IN graph at character at position in word1 THEN  
+                        ADD character at position in word2 TO graph at character at position in word1  
+                        INCREMENT indegree at character at position in word2 BY one  
+                    END IF  
+                    SET found TO true  
+                    BREAK the inner loop  
+                END IF  
+            END FOR  
+            IF found IS false AND length of word1 GREATER THAN length of word2 THEN  
+                RETURN empty string  
+            END IF  
+        END FOR  
+          
+        SET queue TO a deque of characters from all_chars WHERE indegree at character EQUALS zero  
+        SET result TO an empty list  
+          
+        WHILE queue IS NOT empty DO  
+            REMOVE first character FROM queue AND SET TO char  
+            APPEND char TO result  
+            FOR each neighbor IN graph at char  
+                DECREMENT indegree at neighbor BY one  
+                IF indegree at neighbor EQUALS zero THEN  
+                    APPEND neighbor TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+          
+        IF length of result NOT EQUALS length of all_chars THEN  
+            RETURN empty string  
+        END IF  
+          
+        RETURN concatenation of all characters in result  
+    END FUNCTION  
+END CLASS

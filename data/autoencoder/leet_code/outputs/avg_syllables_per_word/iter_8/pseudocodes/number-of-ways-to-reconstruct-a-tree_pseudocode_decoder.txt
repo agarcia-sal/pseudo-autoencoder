@@ -1,0 +1,38 @@
+CLASS Solution  
+    FUNCTION checkWays(pairs)  
+        CREATE graph AS mapping with default empty set  
+        FOR each x, y IN pairs  
+            ADD y TO graph[x]  
+            ADD x TO graph[y]  
+        
+        SET max_degree TO node in graph with the greatest number of connections  
+        SET n TO number of nodes in graph  
+        
+        IF number of connections of max_degree IS NOT n MINUS 1  
+            RETURN 0  
+        
+        FUNCTION can_be_parent(u, v)  
+            FOR each neighbor IN graph[v]  
+                IF neighbor IS NOT IN graph[u] AND neighbor IS NOT u  
+                    RETURN false  
+            RETURN true  
+        END FUNCTION  
+        
+        SET ways TO 1  
+        
+        FOR each u IN graph  
+            IF u IS max_degree  
+                CONTINUE to next u  
+            SET parent TO none  
+            FOR each v IN graph[u]  
+                IF v IS IN graph AND number of connections of v IS GREATER THAN OR EQUAL TO number of connections of u AND can_be_parent(v, u) IS true  
+                    IF parent IS none OR number of connections of v IS LESS THAN number of connections of parent  
+                        SET parent TO v  
+            IF parent IS none  
+                RETURN 0  
+            IF number of connections of parent IS EQUAL TO number of connections of u  
+                SET ways TO 2  
+        
+        RETURN ways  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,25 @@
+def findMedianSortedArrays(nums1, nums2):
+    if len(nums1) > len(nums2):
+        nums1, nums2 = nums2, nums1
+    x, y = len(nums1), len(nums2)
+    low, high = 0, x
+
+    import math
+    while low <= high:
+        px = (low + high) // 2
+        py = (x + y + 1) // 2 - px
+
+        maxLx = -math.inf if px == 0 else nums1[px - 1]
+        minRx = math.inf if px == x else nums1[px]
+        maxLy = -math.inf if py == 0 else nums2[py - 1]
+        minRy = math.inf if py == y else nums2[py]
+
+        if maxLx <= minRy and maxLy <= minRx:
+            if (x + y) % 2 == 0:
+                return (max(maxLx, maxLy) + min(minRx, minRy)) / 2
+            else:
+                return max(maxLx, maxLy)
+        elif maxLx > minRy:
+            high = px - 1
+        else:
+            low = px + 1

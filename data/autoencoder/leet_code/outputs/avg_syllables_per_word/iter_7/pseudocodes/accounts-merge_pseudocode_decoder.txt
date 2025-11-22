@@ -1,0 +1,52 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.root TO list of integers from 0 up to size minus 1  
+        SET self.rank TO list of 1 repeated size times  
+    END FUNCTION  
+
+    FUNCTION find(self, x)  
+        IF self.root at position x EQUALS x  
+            RETURN x  
+        SET self.root at position x TO self.find(self.root at position x)  
+        RETURN self.root at position x  
+    END FUNCTION  
+
+    FUNCTION union(self, x, y)  
+        SET rootX TO self.find(x)  
+        SET rootY TO self.find(y)  
+        IF rootX is not equal to rootY  
+            IF self.rank at rootX GREATER THAN self.rank at rootY  
+                SET self.root at rootY TO rootX  
+            ELSE IF self.rank at rootX LESS THAN self.rank at rootY  
+                SET self.root at rootX TO rootY  
+            ELSE  
+                SET self.root at rootY TO rootX  
+                INCREMENT self.rank at rootX BY 1  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION accountsMerge(self, accounts)  
+        SET email_to_id TO empty dictionary  
+        SET uf TO new UnionFind with size equal to length of accounts  
+
+        FOR each index i and tuple containing ignore_name and emails unpacked from accounts at position i  
+            FOR each email IN emails  
+                IF email not in email_to_id  
+                    SET email_to_id at key email TO i  
+                ELSE  
+                    CALL uf.union with arguments i and email_to_id at key email  
+        
+        SET merged_emails TO empty dictionary with default value empty list  
+        FOR each email and account_id IN email_to_id items  
+            SET root_id TO uf.find(account_id)  
+            APPEND email TO merged_emails at key root_id  
+        
+        SET result TO empty list  
+        FOR each account_id and emails IN merged_emails items  
+            SET name TO accounts at account_id position 0  
+            APPEND list containing name concatenated with sorted emails TO result  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

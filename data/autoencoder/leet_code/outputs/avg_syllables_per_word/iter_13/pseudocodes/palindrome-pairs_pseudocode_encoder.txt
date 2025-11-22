@@ -1,0 +1,56 @@
+CLASS Solution  
+    FUNCTION palindromePairs(words)  
+        FUNCTION is_palindrome(s)  
+            RETURN s EQUALS the REVERSE of s  
+        END FUNCTION  
+        
+        SET word_dict TO FUNCTION create_dictionary_mapping_words_to_indices(words)  
+        SET result TO empty list  
+        
+        FOR each index_and_word_pair IN enumeration_of(words)  
+            SET i TO the POSITION part of index_and_word_pair  
+            SET word TO the WORD part of index_and_word_pair  
+            
+            IF word EQUALS empty string  
+                CONTINUE to the next iteration  
+            END IF  
+            
+            IF empty string EXISTS AS a KEY IN word_dict AND is_palindrome(word) HOLDS  
+                APPEND list containing i AND the INDEX of empty string in word_dict TO result  
+                APPEND list containing the INDEX of empty string in word_dict AND i TO result  
+            END IF  
+            
+            SET reversed_word TO the REVERSE of word  
+            IF reversed_word EXISTS AS a KEY IN word_dict AND the VALUE OF reversed_word IN word_dict NOT EQUALS i  
+                APPEND list containing i AND the VALUE OF reversed_word IN word_dict TO result  
+            END IF  
+            
+            FOR j FROM one TO the LENGTH OF word MINUS one  
+                SET prefix TO the SUBSTRING from position zero TO j MINUS one of word  
+                SET suffix TO the SUBSTRING from position j TO the END OF word  
+                SET reversed_prefix TO the REVERSE of prefix  
+                SET reversed_suffix TO the REVERSE of suffix  
+                
+                IF is_palindrome(suffix) HOLDS AND reversed_prefix EXISTS AS a KEY IN word_dict  
+                    APPEND list containing i AND the VALUE OF reversed_prefix IN word_dict TO result  
+                END IF  
+                
+                IF is_palindrome(prefix) HOLDS AND reversed_suffix EXISTS AS a KEY IN word_dict  
+                    APPEND list containing the VALUE OF reversed_suffix IN word_dict AND i TO result  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+  
+    FUNCTION create_dictionary_mapping_words_to_indices(words)  
+        SET dictionary TO empty dictionary  
+        SET index TO zero  
+        FOR each word IN words  
+            SET the VALUE OF word IN dictionary TO index  
+            INCREMENT index BY one  
+        END FOR  
+        RETURN dictionary  
+    END FUNCTION  
+END CLASS

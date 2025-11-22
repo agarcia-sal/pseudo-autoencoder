@@ -1,0 +1,50 @@
+CLASS Solution
+    FUNCTION minCut(parameter s AS string)
+        SET n TO the LENGTH OF s
+        IF n LESS THAN OR EQUAL TO one
+            RETURN zero
+        END IF
+
+        # Create a table to store whether a substring is a palindrome
+        SET is_palindrome TO a LIST OF LISTS OF False OF SIZE n BY n
+
+        # Every single character is a palindrome
+        FOR index i FROM zero TO n MINUS one INCLUSIVE
+            SET the element at position i OF the element at position i OF is_palindrome TO True
+        END FOR
+
+        # Fill the table for substrings of length two to n
+        FOR length FROM two TO n INCLUSIVE
+            FOR start FROM zero TO n MINUS length INCLUSIVE
+                SET end TO start PLUS length MINUS one
+                IF length EQUALS two
+                    SET the element at position end OF the element at position start OF is_palindrome TO
+                        WHETHER the element at position start OF s EQUALS the element at position end OF s
+                ELSE
+                    SET the element at position end OF the element at position start OF is_palindrome TO
+                        WHETHER the element at position start OF s EQUALS the element at position end OF s AND
+                        the element at position end MINUS one OF the element at position start PLUS one OF is_palindrome
+                END IF
+            END FOR
+        END FOR
+
+        # Create a table to store the minimum cuts needed for each substring
+        SET min_cuts TO a LIST OF zero OF SIZE n
+
+        FOR index i FROM zero TO n MINUS one INCLUSIVE
+            IF the element at position i OF the element at position zero OF is_palindrome
+                SET the element at position i OF min_cuts TO zero
+            ELSE
+                SET the element at position i OF min_cuts TO positive infinity
+                FOR index j FROM one TO i INCLUSIVE
+                    IF the element at position i OF the element at position j OF is_palindrome AND
+                       the element at position j MINUS one OF min_cuts PLUS one LESS THAN the element at position i OF min_cuts
+                        SET the element at position i OF min_cuts TO the element at position j MINUS one OF min_cuts PLUS one
+                    END IF
+                END FOR
+            END IF
+        END FOR
+
+        RETURN the element at position n MINUS one OF min_cuts
+    END FUNCTION
+END CLASS

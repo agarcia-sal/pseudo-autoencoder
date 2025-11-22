@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION mostSimilar(n, roads, names, targetPath)  
+        SET graph TO a new mapping from keys to empty lists  
+        FOR each pair u, v IN roads  
+            APPEND element v TO the list at graph indexed by u  
+            APPEND element u TO the list at graph indexed by v  
+        END FOR  
+  
+        SET m TO the LENGTH OF targetPath  
+  
+        FUNCTION dp(i, j)  
+            IF i EQUALS zero THEN  
+                IF element j of names NOT EQUALS element i of targetPath THEN  
+                    RETURN one AND a list containing element j  
+                ELSE  
+                    RETURN zero AND a list containing element j  
+                END IF  
+            END IF  
+  
+            SET min_cost TO infinity  
+            SET min_path TO an empty list  
+            FOR each element k IN the list at graph indexed by j  
+                SET cost, path TO the result of calling dp with arguments i MINUS one AND k  
+                IF cost LESS THAN min_cost THEN  
+                    SET min_cost TO cost  
+                    SET min_path TO path  
+                END IF  
+            END FOR  
+  
+            SET current_cost TO min_cost PLUS one IF element j of names NOT EQUALS element i of targetPath OTHERWISE min_cost  
+            RETURN current_cost AND the concatenation of min_path followed by element j  
+        END FUNCTION  
+  
+        SET min_cost TO infinity  
+        SET min_path TO an empty list  
+        FOR each j FROM zero TO n MINUS one  
+            SET cost, path TO the result of calling dp with arguments m MINUS one AND j  
+            IF cost LESS THAN min_cost THEN  
+                SET min_cost TO cost  
+                SET min_path TO path  
+            END IF  
+        END FOR  
+  
+        RETURN min_path  
+    END FUNCTION  
+END CLASS

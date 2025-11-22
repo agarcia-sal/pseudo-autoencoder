@@ -1,0 +1,108 @@
+CLASS ListNode
+    FUNCTION __init__(val EQUALS zero, next EQUALS None)
+        SET self.val TO val
+        SET self.next TO next
+    END FUNCTION
+END CLASS
+
+FUNCTION list_node(list_of_values)
+    IF list_of_values IS EMPTY
+        RETURN None
+    END IF
+    SET head TO A NEW ListNode WITH THE element at position zero OF list_of_values
+    SET p TO head
+    FOR each value IN THE SUBLIST OF list_of_values FROM position one TO THE END
+        SET node TO A NEW ListNode WITH value
+        SET p.next TO node
+        SET p TO node
+    END FOR
+    RETURN head
+END FUNCTION
+
+FUNCTION is_same_list(p1, p2)
+    IF p1 IS None AND p2 IS None
+        RETURN True
+    END IF
+    IF p1 IS None OR p2 IS None
+        RETURN False
+    END IF
+    RETURN THE BOOLEAN RESULT OF THE COMPARISON THAT THE val FIELD OF p1 EQUALS THE val FIELD OF p2 AND THE RECURSIVE CALL TO is_same_list WITH THE next FIELD OF p1 AND THE next FIELD OF p2
+END FUNCTION
+
+CLASS TreeNode
+    FUNCTION __init__(val EQUALS zero, left EQUALS None, right EQUALS None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(list_of_values)
+    IF list_of_values IS EMPTY
+        RETURN None
+    END IF
+    SET root TO A NEW TreeNode WITH THE element at position zero OF list_of_values
+    SET i TO one
+    SET queue TO A NEW DOUBLE ENDED QUEUE
+    APPEND root TO queue
+    WHILE queue HOLDS ANY ELEMENTS
+        REMOVE THE ELEMENT FROM THE FRONT OF queue AND ASSIGN IT TO node
+        IF i IS LESS THAN OR EQUAL TO THE LENGTH OF list_of_values MINUS one AND THE element at position i OF list_of_values IS NOT None
+            SET node.left TO A NEW TreeNode WITH THE element at position i OF list_of_values
+            APPEND node.left TO queue
+        END IF
+        INCREMENT i BY one
+        IF i IS LESS THAN OR EQUAL TO THE LENGTH OF list_of_values MINUS one AND THE element at position i OF list_of_values IS NOT None
+            SET node.right TO A NEW TreeNode WITH THE element at position i OF list_of_values
+            APPEND node.right TO queue
+        END IF
+        INCREMENT i BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF THE val FIELD OF p IS NOT EQUALS TO THE val FIELD OF q
+        RETURN False
+    ELSE
+        RETURN THE BOOLEAN RESULT OF THE RECURSIVE CALL TO is_same_tree WITH THE left FIELD OF p AND THE left FIELD OF q AND THE LOGICAL AND WITH THE RECURSIVE CALL TO is_same_tree WITH THE right FIELD OF p AND THE right FIELD OF q
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION str2tree(s)
+        FUNCTION parse_tree(index)
+            IF index IS GREATER THAN OR EQUAL TO THE LENGTH OF s
+                RETURN None AND index
+            END IF
+
+            SET start TO index
+            WHILE index IS LESS THAN THE LENGTH OF s AND THE ELEMENT AT POSITION index OF s IS A DIGIT OR THE ELEMENT AT POSITION index OF s IS A HYPHEN
+                INCREMENT index BY one
+            END WHILE
+
+            SET node TO A NEW TreeNode WITH THE INTEGER VALUE REPRESENTED BY THE SUBSTRING FROM position start TO position index MINUS one OF s
+            
+            IF index IS LESS THAN THE LENGTH OF s AND THE ELEMENT AT POSITION index OF s IS AN OPENING PARENTHESIS
+                SET node.left AND index TO THE RESULT OF parse_tree WITH THE ARGUMENT index PLUS one
+            END IF
+
+            IF index IS LESS THAN THE LENGTH OF s AND THE ELEMENT AT POSITION index OF s IS AN OPENING PARENTHESIS
+                SET node.right AND index TO THE RESULT OF parse_tree WITH THE ARGUMENT index PLUS one
+            END IF
+
+            IF index IS LESS THAN THE LENGTH OF s AND THE ELEMENT AT POSITION index OF s IS A CLOSING PARENTHESIS
+                INCREMENT index BY one
+            END IF
+
+            RETURN node AND index
+        END FUNCTION
+
+        SET root AND discard TO THE RESULT OF parse_tree WITH THE ARGUMENT zero
+        RETURN root
+    END FUNCTION
+END CLASS

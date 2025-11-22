@@ -1,0 +1,71 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        DEFINE root AS empty list  
+        FOR each number i FROM zero TO size MINUS one  
+            APPEND i TO root  
+        END FOR  
+        DEFINE rank AS empty list  
+        FOR each number FROM zero TO size MINUS one  
+            APPEND one TO rank  
+        END FOR  
+        SET self.root TO root  
+        SET self.rank TO rank  
+    END FUNCTION  
+
+    FUNCTION find(self, x)  
+        IF element at position x OF self.root IS EQUAL TO x THEN  
+            RETURN x  
+        END IF  
+        SET element at position x OF self.root TO self.find(element at position x OF self.root)  
+        RETURN element at position x OF self.root  
+    END FUNCTION  
+
+    FUNCTION union(self, x, y)  
+        SET rootX TO self.find(x)  
+        SET rootY TO self.find(y)  
+        IF rootX IS NOT EQUAL TO rootY THEN  
+            IF element at position rootX OF self.rank IS GREATER THAN element at position rootY OF self.rank THEN  
+                SET element at position rootY OF self.root TO rootX  
+            ELSE IF element at position rootX OF self.rank IS LESS THAN element at position rootY OF self.rank THEN  
+                SET element at position rootX OF self.root TO rootY  
+            ELSE  
+                SET element at position rootY OF self.root TO rootX  
+                INCREMENT element at position rootX OF self.rank BY one  
+            END IF  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION accountsMerge(self, accounts)  
+        DEFINE email_to_id AS empty dictionary  
+        SET uf TO new UnionFind with size equal TO the LENGTH OF accounts  
+          
+        FOR index i FROM zero TO the LENGTH OF accounts MINUS one  
+            SET current_account TO element at position i OF accounts  
+            DEFINE emails AS all elements of current_account FROM position one TO the END  
+            FOR each email IN emails  
+                IF email IS NOT IN email_to_id THEN  
+                    SET element at key email OF email_to_id TO i  
+                ELSE  
+                    CALL uf.union(i, element at key email OF email_to_id)  
+                END IF  
+            END FOR  
+        END FOR  
+          
+        DEFINE merged_emails AS empty dictionary with default value as empty list  
+        FOR each email, account_id IN email_to_id  
+            SET root_id TO uf.find(account_id)  
+            APPEND email TO element at key root_id OF merged_emails  
+        END FOR  
+          
+        DEFINE result AS empty list  
+        FOR each account_id, emails IN merged_emails  
+            SET name TO element at position zero OF element at position account_id OF accounts  
+            SET sorted_emails TO emails sorted in ascending natural language order  
+            APPEND a new list consisting of name followed by all elements of sorted_emails TO result  
+        END FOR  
+          
+        RETURN result  
+    END FUNCTION  
+END CLASS

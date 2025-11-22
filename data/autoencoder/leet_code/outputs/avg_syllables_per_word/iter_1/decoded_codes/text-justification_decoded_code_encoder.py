@@ -1,0 +1,20 @@
+def fullJustify(words, maxWidth):
+    def justify_line(line, letters, last):
+        if len(line) == 1 or last:
+            return " ".join(line) + " " * (maxWidth - letters - len(line) + 1)
+        total_spaces = maxWidth - letters
+        gaps = len(line) - 1
+        space, extra = divmod(total_spaces, gaps)
+        for i in range(gaps):
+            line[i] += " " * (space + (i < extra))
+        return "".join(line)
+
+    res, line, letters = [], [], 0
+    for w in words:
+        if letters + len(w) + len(line) > maxWidth:
+            res.append(justify_line(line, letters, False))
+            line, letters = [], 0
+        line.append(w)
+        letters += len(w)
+    res.append(justify_line(line, letters, True))
+    return res

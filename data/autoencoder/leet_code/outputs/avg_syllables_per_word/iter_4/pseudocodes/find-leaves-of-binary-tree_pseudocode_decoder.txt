@@ -1,0 +1,57 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val = 0, left = None, right = None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values: list)
+    IF values IS empty
+        RETURN None
+    SET root TO TreeNode(values[0])
+    SET i TO 1
+    SET queue TO a new deque
+    APPEND root TO queue
+    WHILE queue IS NOT empty
+        SET node TO queue.popleft()
+        IF i IS LESS THAN LENGTH OF values AND values[i] IS NOT None
+            SET node.left TO TreeNode(values[i])
+            APPEND node.left TO queue
+        INCREMENT i BY 1
+        IF i IS LESS THAN LENGTH OF values AND values[i] IS NOT None
+            SET node.right TO TreeNode(values[i])
+            APPEND node.right TO queue
+        INCREMENT i BY 1
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val IS NOT EQUAL TO q.val
+        RETURN False
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+END FUNCTION
+
+CLASS Solution
+    FUNCTION findLeaves(self, root: Optional[TreeNode]) RETURNS List of List of integers
+        FUNCTION collectLeaves(node)
+            IF node IS None
+                RETURN -1
+            SET left_height TO collectLeaves(node.left)
+            SET right_height TO collectLeaves(node.right)
+            SET current_height TO MAXIMUM OF left_height AND right_height PLUS 1
+            IF current_height IS GREATER THAN OR EQUAL TO LENGTH OF result
+                APPEND an empty list TO result
+            APPEND node.val TO result[current_height]
+            RETURN current_height
+        END FUNCTION
+        SET result TO an empty list
+        CALL collectLeaves(root)
+        RETURN result
+    END FUNCTION
+END CLASS

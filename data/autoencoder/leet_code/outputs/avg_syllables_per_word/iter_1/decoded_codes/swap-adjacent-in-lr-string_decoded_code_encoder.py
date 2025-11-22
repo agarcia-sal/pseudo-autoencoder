@@ -1,0 +1,12 @@
+def filter_nonX(s):
+    return [(c, i) for i, c in enumerate(s) if c != 'X']
+
+def canTransform(start, end):
+    sf = filter_nonX(start)
+    ef = filter_nonX(end)
+    if len(sf) != len(ef):
+        return False
+    for (c1, i1), (c2, i2) in zip(sf, ef):
+        if c1 != c2 or (c1 == 'L' and i1 < i2) or (c1 == 'R' and i1 > i2):
+            return False
+    return True

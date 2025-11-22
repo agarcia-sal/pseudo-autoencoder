@@ -1,0 +1,44 @@
+CLASS Solution  
+    FUNCTION criticalConnections(n, connections)  
+        FUNCTION dfs(node, parent, disc, low, time, graph, critical)  
+            SET element at position node of disc TO element at position zero of time  
+            SET element at position node of low TO element at position zero of time  
+            INCREMENT element at position zero of time BY one  
+            
+            FOR each neighbor IN element at position node of graph  
+                IF element at position neighbor of disc EQUALS minus one  
+                    CALL dfs WITH neighbor, node, disc, low, time, graph, critical  
+                    SET element at position node of low TO the minimum VALUE BETWEEN element at position node of low AND element at position neighbor of low  
+                    IF element at position neighbor of low GREATER THAN element at position node of disc  
+                        APPEND list containing node AND neighbor TO critical  
+                    END IF  
+                ELSE IF neighbor NOT EQUALS parent  
+                    SET element at position node of low TO the minimum VALUE BETWEEN element at position node of low AND element at position neighbor of disc  
+                END IF  
+            END FOR  
+        END FUNCTION  
+        
+        SET graph TO an empty list repeated n TIMES  
+        FOR index FROM zero TO n MINUS one  
+            APPEND an empty list TO graph  
+        END FOR  
+        FOR each pair u, v IN connections  
+            APPEND v TO element at position u of graph  
+            APPEND u TO element at position v of graph  
+        END FOR  
+        
+        SET disc TO list of minus one repeated n TIMES  
+        SET low TO list of minus one repeated n TIMES  
+        SET time TO list containing zero  
+        
+        SET critical TO an empty list  
+        
+        FOR node FROM zero TO n MINUS one  
+            IF element at position node of disc EQUALS minus one  
+                CALL dfs WITH node, minus one, disc, low, time, graph, critical  
+            END IF  
+        END FOR  
+        
+        RETURN critical  
+    END FUNCTION  
+END CLASS

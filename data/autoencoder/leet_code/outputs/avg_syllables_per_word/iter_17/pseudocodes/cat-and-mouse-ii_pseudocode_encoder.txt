@@ -1,0 +1,139 @@
+CLASS Solution
+    FUNCTION canMouseWin(grid, catJump, mouseJump)
+        SET number_of_rows TO the LENGTH OF grid
+        SET number_of_columns TO the LENGTH OF element at position zero of grid
+        SET cat_start_position TO zero
+        SET mouse_start_position TO zero
+        SET food_position TO zero
+        SET directions TO the tuple of values negative one zero one zero negative one
+        
+        CALL initializeGraph WITH parameter number_of_rows MULTIPLIED BY number_of_columns AND ASSIGN TO g_mouse
+        CALL initializeGraph WITH parameter number_of_rows MULTIPLIED BY number_of_columns AND ASSIGN TO g_cat
+        
+        FOR each row_index AND row IN enumeration of grid
+            FOR each column_index AND character IN enumeration of row
+                IF character EQUALS character representing hash symbol
+                    CONTINUE TO next iteration
+                END IF
+                SET vertex TO row_index MULTIPLIED BY number_of_columns PLUS column_index
+                IF character EQUALS character representing capital C
+                    SET cat_start_position TO vertex
+                ELSE IF character EQUALS character representing capital M
+                    SET mouse_start_position TO vertex
+                ELSE IF character EQUALS character representing capital F
+                    SET food_position TO vertex
+                END IF
+                
+                FOR each pair_of_direction IN PAIRWISE of directions
+                    SET a TO element at position zero of pair_of_direction
+                    SET b TO element at position one of pair_of_direction
+                    FOR k FROM zero TO mouseJump INCLUSIVE
+                        SET x TO row_index PLUS k MULTIPLIED BY a
+                        SET y TO column_index PLUS k MULTIPLIED BY b
+                        IF x LESS THAN zero OR x GREATER THAN OR EQUAL TO number_of_rows OR y LESS THAN zero OR y GREATER THAN OR EQUAL TO number_of_columns OR element at position x of grid AT position y EQUALS character representing hash symbol
+                            BREAK the loop
+                        END IF
+                        APPEND x MULTIPLIED BY number_of_columns PLUS y TO element at position vertex of g_mouse
+                    END FOR
+                    
+                    FOR k FROM zero TO catJump INCLUSIVE
+                        SET x TO row_index PLUS k MULTIPLIED BY a
+                        SET y TO column_index PLUS k MULTIPLIED BY b
+                        IF x LESS THAN zero OR x GREATER THAN OR EQUAL TO number_of_rows OR y LESS THAN zero OR y GREATER THAN OR EQUAL TO number_of_columns OR element at position x of grid AT position y EQUALS character representing hash symbol
+                            BREAK the loop
+                        END IF
+                        APPEND x MULTIPLIED BY number_of_columns PLUS y TO element at position vertex of g_cat
+                    END FOR
+                END FOR
+            END FOR
+        END FOR
+        
+        SET result TO CALL self.calc WITH parameters g_mouse g_cat mouse_start_position cat_start_position food_position
+        RETURN result EQUALS one
+    END FUNCTION
+    
+    FUNCTION calc(g_mouse, g_cat, mouse_start, cat_start, hole)
+        FUNCTION get_prev_states(state)
+            SET mouse_position TO element at position zero of state
+            SET cat_position TO element at position one of state
+            SET turn TO element at position two of state
+            SET previous_turn TO turn XOR one
+            SET previous_states_list TO empty list
+            
+            IF previous_turn EQUALS one
+                FOR each previous_cat_position IN element at position cat_position of g_cat
+                    IF element at index mouse_position of ans AT index previous_cat_position AT index one EQUALS zero
+                        APPEND tuple of mouse_position previous_cat_position previous_turn TO previous_states_list
+                    END IF
+                END FOR
+            ELSE
+                FOR each previous_mouse_position IN element at position mouse_position of g_mouse
+                    IF element at index previous_mouse_position of ans AT index cat_position AT index zero EQUALS zero
+                        APPEND tuple of previous_mouse_position cat_position zero TO previous_states_list
+                    END IF
+                END FOR
+            END IF
+            
+            RETURN previous_states_list
+        END FUNCTION
+        
+        SET number_of_positions TO the LENGTH OF g_mouse
+        CALL initializeThreeDimensionalList WITH parameters number_of_positions number_of_positions AND ASSIGN TO degree WITH each element initialized to a list of two zeros
+        
+        FOR i FROM zero TO number_of_positions MINUS one
+            FOR j FROM zero TO number_of_positions MINUS one
+                SET element at position zero of element at index j of element at index i of degree TO the LENGTH OF element at index i of g_mouse
+                SET element at position one of element at index j of element at index i of degree TO the LENGTH OF element at index j of g_cat
+            END FOR
+        END FOR
+        
+        CALL initializeThreeDimensionalList WITH parameters number_of_positions number_of_positions AND ASSIGN TO ans WITH each element initialized to a list of two zeros
+        
+        CALL initializeDeque AND ASSIGN TO queue
+        
+        FOR i FROM zero TO number_of_positions MINUS one
+            SET element at position one of element at index i of element at index hole of ans TO one
+            SET element at position zero of element at index hole of element at index i of ans TO two
+            SET element at position one of element at index i of element at index i of ans TO two
+            SET element at position zero of element at index i of element at index i of ans TO two
+            CALL append tuple of hole i one TO queue
+            CALL append tuple of i hole zero TO queue
+            CALL append tuple of i i zero TO queue
+            CALL append tuple of i i one TO queue
+        END FOR
+        
+        WHILE queue IS NOT empty
+            SET state TO result of calling popleft ON queue
+            SET current_turn_result TO element at index two of element at index one of element at index zero of state IN ans
+            FOR each previous_state IN CALL get_prev_states WITH parameter state
+                SET previous_mouse TO element at position zero of previous_state
+                SET previous_cat TO element at position one of previous_state
+                SET previous_turn TO element at position two of previous_state
+                IF previous_turn EQUALS current_turn_result MINUS one
+                    SET element at index previous_turn of element at index previous_cat of element at index previous_mouse of ans TO current_turn_result
+                    CALL append previous_state TO queue
+                ELSE
+                    DECREMENT element at index previous_turn of element at index previous_cat of element at index previous_mouse of degree BY one
+                    IF element at index previous_turn of element at index previous_cat of element at index previous_mouse of degree EQUALS zero
+                        SET element at index previous_turn of element at index previous_cat of element at index previous_mouse of ans TO current_turn_result
+                        CALL append previous_state TO queue
+                    END IF
+                END IF
+            END FOR
+        END WHILE
+        
+        RETURN element at index zero of element at index cat_start of element at index mouse_start of ans
+    END FUNCTION
+    
+    FUNCTION initializeGraph(size)
+        RETURN list OF empty lists REPEATED size TIMES
+    END FUNCTION
+    
+    FUNCTION initializeThreeDimensionalList(dim1_size, dim2_size)
+        RETURN list REPEATED dim1_size TIMES WHERE each element IS list REPEATED dim2_size TIMES WHERE each element IS list WITH two zeros
+    END FUNCTION
+    
+    FUNCTION initializeDeque()
+        RETURN new empty deque object
+    END FUNCTION
+END CLASS

@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION totalStrength(strength)  
+        SET MOD TO 10 RAISED TO THE POWER OF 9 PLUS 7  
+        SET n TO LENGTH OF strength  
+        
+        INITIALIZE prefix AS LIST OF ZEROS OF LENGTH n PLUS 1  
+        FOR i FROM 0 TO n MINUS 1  
+            SET prefix AT i PLUS 1 TO (prefix AT i PLUS strength AT i) MODULO MOD  
+        
+        INITIALIZE prefix_prefix AS LIST OF ZEROS OF LENGTH n PLUS 2  
+        FOR i FROM 0 TO n  
+            SET prefix_prefix AT i PLUS 1 TO (prefix_prefix AT i PLUS prefix AT i) MODULO MOD  
+        
+        INITIALIZE prev_smaller AS LIST FILLED WITH NEGATIVE 1 OF LENGTH n  
+        INITIALIZE next_smaller_or_equal AS LIST FILLED WITH n OF LENGTH n  
+        
+        INITIALIZE stack AS EMPTY LIST  
+        FOR i FROM 0 TO n MINUS 1  
+            WHILE stack IS NOT EMPTY AND strength AT LAST ELEMENT OF stack IS GREATER THAN OR EQUAL TO strength AT i  
+                REMOVE LAST ELEMENT FROM stack  
+            IF stack IS NOT EMPTY  
+                SET prev_smaller AT i TO LAST ELEMENT OF stack  
+            APPEND i TO stack  
+        
+        CLEAR stack  
+        FOR i FROM n MINUS 1 DOWN TO 0  
+            WHILE stack IS NOT EMPTY AND strength AT LAST ELEMENT OF stack IS GREATER THAN strength AT i  
+                REMOVE LAST ELEMENT FROM stack  
+            IF stack IS NOT EMPTY  
+                SET next_smaller_or_equal AT i TO LAST ELEMENT OF stack  
+            APPEND i TO stack  
+        
+        SET total_strength TO 0  
+        FOR i FROM 0 TO n MINUS 1  
+            SET left TO prev_smaller AT i PLUS 1  
+            SET right TO next_smaller_or_equal AT i  
+            
+            SET sum_left TO (i MINUS left PLUS 1) MULTIPLIED BY (prefix_prefix AT right PLUS 1 MINUS prefix_prefix AT i PLUS 1) MODULO MOD  
+            SET sum_right TO (right MINUS i) MULTIPLIED BY (prefix_prefix AT i PLUS 1 MINUS prefix_prefix AT left) MODULO MOD  
+            
+            SET contribution TO strength AT i MULTIPLIED BY (sum_left MINUS sum_right) MODULO MOD  
+            SET total_strength TO (total_strength PLUS contribution) MODULO MOD  
+        
+        RETURN total_strength  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,35 @@
+class Solution:
+    def maximizeXor(self, nums, queries):
+        nums.sort()
+        sorted_queries = sorted(enumerate(queries), key=lambda x: x[1][1])
+        result = [-1] * len(queries)
+        trie = {}
+        num_index = 0
+
+        for q_idx, (x, m) in sorted_queries:
+            while num_index < len(nums) and nums[num_index] <= m:
+                node = trie
+                for i in range(31, -1, -1):
+                    bit = (nums[num_index] >> i) & 1
+                    if bit not in node:
+                        node[bit] = {}
+                    node = node[bit]
+                num_index += 1
+
+            if not trie:
+                continue
+
+            node = trie
+            max_xor = 0
+            for i in range(31, -1, -1):
+                bit = (x >> i) & 1
+                toggle_bit = 1 - bit
+                if toggle_bit in node:
+                    max_xor |= (1 << i)
+                    node = node[toggle_bit]
+                else:
+                    node = node.get(bit, node)
+
+            result[q_idx] = max_xor
+
+        return result

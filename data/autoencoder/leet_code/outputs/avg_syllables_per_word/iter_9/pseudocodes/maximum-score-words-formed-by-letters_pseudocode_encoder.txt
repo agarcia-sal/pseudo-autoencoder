@@ -1,0 +1,56 @@
+CLASS Solution  
+    FUNCTION maxScoreWords(self, words, letters, score)  
+        FUNCTION word_score(word, score_map)  
+            SET total_score TO zero  
+            FOR each character IN word  
+                INCREMENT total_score BY score_map at character  
+            END FOR  
+            RETURN total_score  
+        END FUNCTION  
+      
+        FUNCTION can_form(word, letter_count)  
+            SET word_count TO count occurrences of each character in word  
+            FOR each character, count IN word_count  
+                IF letter_count at character LESS THAN count THEN  
+                    RETURN False  
+                END IF  
+            END FOR  
+            RETURN True  
+        END FUNCTION  
+      
+        FUNCTION update_letter_count(letter_count, word, add)  
+            FOR each character IN word  
+                IF add IS True THEN  
+                    INCREMENT letter_count at character BY one  
+                ELSE  
+                    DECREMENT letter_count at character BY one  
+                END IF  
+            END FOR  
+        END FUNCTION  
+      
+        FUNCTION backtrack(index, current_score, letter_count)  
+            IF index EQUALS length of words THEN  
+                RETURN current_score  
+            END IF  
+          
+            SET max_score TO current_score  
+            FOR i FROM index TO length of words MINUS one  
+                IF can_form(words at i, letter_count) THEN  
+                    CALL update_letter_count(letter_count, words at i, add EQUALS False)  
+                    SET candidate_score TO backtrack(i PLUS one, current_score PLUS word_score(words at i, score_map), letter_count)  
+                    IF candidate_score GREATER THAN max_score THEN  
+                        SET max_score TO candidate_score  
+                    END IF  
+                    CALL update_letter_count(letter_count, words at i, add EQUALS True)  
+                END IF  
+            END FOR  
+          
+            RETURN max_score  
+        END FUNCTION  
+      
+        SET score_map TO mapping from characters from 'a' to 'z' TO corresponding score elements  
+        SET letter_count TO count occurrences of each character in letters  
+      
+        RETURN backtrack(zero, zero, letter_count)  
+    END FUNCTION  
+END CLASS

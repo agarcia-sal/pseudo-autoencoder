@@ -1,0 +1,68 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, n)  
+        SET self.parent TO list of numbers from zero TO n MINUS one  
+        SET self.rank TO list of zeroes of length n  
+    END FUNCTION  
+  
+    FUNCTION find(self, x)  
+        IF element at position x of self.parent NOT EQUALS x  
+            SET element at position x of self.parent TO self.find(element at position x of self.parent)  
+        END IF  
+        RETURN element at position x of self.parent  
+    END FUNCTION  
+  
+    FUNCTION union(self, x, y)  
+        SET rootX TO self.find(x)  
+        SET rootY TO self.find(y)  
+        IF rootX NOT EQUALS rootY  
+            IF element at position rootX of self.rank GREATER THAN element at position rootY of self.rank  
+                SET element at position rootY of self.parent TO rootX  
+            ELSE IF element at position rootX of self.rank LESS THAN element at position rootY of self.rank  
+                SET element at position rootX of self.parent TO rootY  
+            ELSE  
+                SET element at position rootY of self.parent TO rootX  
+                INCREMENT element at position rootX of self.rank BY one  
+            END IF  
+        END IF  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION latestDayToCross(self, row, col, cells)  
+        SET grid TO list containing row elements each being list containing col elements all set to one  
+        SET uf TO new UnionFind initialized with row MULTIPLIED BY col PLUS two  
+        SET TOP TO row MULTIPLIED BY col  
+        SET BOTTOM TO row MULTIPLIED BY col PLUS one  
+        SET directions TO list containing tuple of minus one and zero, tuple of one and zero, tuple of zero and minus one, tuple of zero and one  
+        
+        FOR day FROM length of cells MINUS one TO zero STEP minus one  
+            SET r TO first element of element at position day of cells  
+            SET c TO second element of element at position day of cells  
+            DECREMENT r BY one  
+            DECREMENT c BY one  
+            SET element at position r of grid TO list where element at position c is zero and others unchanged  
+            
+            FOR each pair dr, dc IN directions  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                IF nr GREATER THAN OR EQUAL TO zero AND nr LESS THAN row AND nc GREATER THAN OR EQUAL TO zero AND nc LESS THAN col AND element at position nr of grid at position nc EQUALS zero  
+                    CALL uf.union with arguments r MULTIPLIED BY col PLUS c, nr MULTIPLIED BY col PLUS nc  
+                END IF  
+            END FOR  
+            
+            IF r EQUALS zero  
+                CALL uf.union with arguments r MULTIPLIED BY col PLUS c, TOP  
+            END IF  
+            
+            IF r EQUALS row MINUS one  
+                CALL uf.union with arguments r MULTIPLIED BY col PLUS c, BOTTOM  
+            END IF  
+            
+            IF uf.find(TOP) EQUALS uf.find(BOTTOM)  
+                RETURN day  
+            END IF  
+        END FOR  
+        
+        RETURN zero  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,35 @@
+CLASS Solution  
+    FUNCTION largestSumOfAverages(nums AS list of integers, k AS integer) RETURNS floating point  
+        SET n TO the LENGTH OF nums  
+        SET prefix_sum TO a list of zeros with LENGTH OF n PLUS one  
+        FOR index FROM zero TO n MINUS one  
+            SET element at position index PLUS one of prefix_sum TO the element at position index of prefix_sum PLUS the element at position index of nums  
+        END FOR  
+  
+        FUNCTION average(i AS integer, j AS integer) RETURNS floating point  
+            SET numerator TO the element at position j PLUS one of prefix_sum MINUS the element at position i of prefix_sum  
+            SET denominator TO j MINUS i PLUS one  
+            RETURN numerator DIVIDED BY denominator  
+        END FUNCTION  
+  
+        SET dp TO a list with LENGTH OF n PLUS one where each element is a list of zeros with LENGTH OF k PLUS one  
+  
+        FOR i FROM zero TO n MINUS one  
+            SET the element at position one of the element at position i of dp TO the CALL OF average WITH parameters i AND n MINUS one  
+        END FOR  
+  
+        FOR i FROM the integer n MINUS one DOWN TO zero DO  
+            FOR partitions FROM two TO k  
+                FOR j FROM i PLUS one TO n MINUS one  
+                    SET current_value TO the element at position partitions of the element at position i of dp  
+                    SET candidate_value TO the element at position partitions MINUS one of the element at position j of dp PLUS the CALL OF average WITH parameters i AND j MINUS one  
+                    IF candidate_value GREATER THAN current_value THEN  
+                        SET the element at position partitions of the element at position i of dp TO candidate_value  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+  
+        RETURN the element at position k of the element at position zero of dp  
+    END FUNCTION  
+END CLASS

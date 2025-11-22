@@ -1,0 +1,48 @@
+CLASS Solution
+    FUNCTION closestNode(n, edges, query)
+        CALL initialize_graph_with_default_list
+        FOR each element u and element v IN edges
+            APPEND element v TO list at key u IN graph
+            APPEND element u TO list at key v IN graph
+        END FOR
+
+        FUNCTION find_path(start, end)
+            CALL initialize_double_ended_queue WITH tuple of start and list containing start
+            SET visited_set TO set containing start
+
+            WHILE queue holds elements
+                SET current_node AND current_path TO leftmost element of queue and remove it
+                IF current_node EQUALS end
+                    RETURN current_path
+                END IF
+                FOR each neighbor IN list at key current_node IN graph
+                    IF neighbor IS NOT IN visited_set
+                        ADD neighbor TO visited_set
+                        APPEND tuple of neighbor and concatenation of current_path and list containing neighbor TO queue
+                    END IF
+                END FOR
+            END WHILE
+        END FUNCTION
+
+        FUNCTION closest_node_on_path(path, node)
+            SET minimum_distance TO positive_infinity
+            SET closest_node TO no_value
+            FOR each element p IN path
+                SET distance TO the LENGTH OF find_path CALLED WITH p AND node MINUS one
+                IF distance LESS THAN minimum_distance
+                    SET minimum_distance TO distance
+                    SET closest_node TO p
+                END IF
+            END FOR
+            RETURN closest_node
+        END FUNCTION
+
+        SET answer_list TO empty list
+        FOR each element start, element end, element node IN query
+            SET current_path TO find_path CALLED WITH start AND end
+            APPEND closest_node_on_path CALLED WITH current_path AND node TO answer_list
+        END FOR
+
+        RETURN answer_list
+    END FUNCTION
+END CLASS

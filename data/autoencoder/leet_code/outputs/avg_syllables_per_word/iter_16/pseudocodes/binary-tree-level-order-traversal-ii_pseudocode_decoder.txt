@@ -1,0 +1,69 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val EQUALS zero left EQUALS none right EQUALS none  
+        SET self dot val TO val  
+        SET self dot left TO left  
+        SET self dot right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values AS list  
+    IF the LIST values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO A NEW TreeNode INITIALIZED WITH the ELEMENT at position zero OF values  
+    SET i TO one  
+    SET queue TO AN EMPTY DEQUE  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO THE ELEMENT REMOVED FROM FRONT OF queue  
+        IF i IS LESS THAN THE LENGTH OF values AND THE ELEMENT at position i OF values IS NOT none  
+            SET node dot left TO A NEW TreeNode INITIALIZED WITH THE ELEMENT at position i OF values  
+            APPEND node dot left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN THE LENGTH OF values AND THE ELEMENT at position i OF values IS NOT none  
+            SET node dot right TO A NEW TreeNode INITIALIZED WITH THE ELEMENT at position i OF values  
+            APPEND node dot right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF p dot val IS NOT EQUAL TO q dot val  
+        RETURN False  
+    ELSE  
+        RETURN THE RESULT OF is_same_tree WITH PARAMETERS p dot left q AND is_same_tree WITH PARAMETERS p dot right q dot right WITH LOGICAL AND BETWEEN THEM  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION levelOrderBottom WITH PARAMETERS self root AS Optional TreeNode  
+        IF root IS none  
+            RETURN AN EMPTY LIST  
+        END IF  
+        SET result TO AN EMPTY LIST  
+        SET queue TO A DEQUE INITIALIZED WITH root AS ITS INITIAL ELEMENT  
+        WHILE queue IS NOT empty  
+            SET level_size TO THE LENGTH OF queue  
+            SET current_level TO AN EMPTY LIST  
+            FOR each COUNTER FROM zero TO level_size MINUS one  
+                SET node TO THE ELEMENT REMOVED FROM FRONT OF queue  
+                APPEND node dot val TO current_level  
+                IF node dot left IS NOT none  
+                    APPEND node dot left TO queue  
+                END IF  
+                IF node dot right IS NOT none  
+                    APPEND node dot right TO queue  
+                END IF  
+            END FOR  
+            APPEND current_level TO result  
+        END WHILE  
+        RETURN THE REVERSED LIST OF result  
+    END FUNCTION  
+END CLASS

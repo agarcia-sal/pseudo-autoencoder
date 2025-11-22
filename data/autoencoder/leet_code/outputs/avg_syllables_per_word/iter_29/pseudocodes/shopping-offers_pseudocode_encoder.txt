@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION shoppingOffers(price, special, needs)  
+        SET filtered_special TO an empty list  
+        FOR each offer IN special  
+            SET sum_offer_without_last TO the sum of elements at all positions BEFORE the last position in offer  
+            SET sum_price_needs TO zero  
+            FOR each pair of corresponding elements p and n FROM price and the elements at all positions BEFORE the last position in offer  
+                INCREMENT sum_price_needs BY p MULTIPLIED BY n  
+            END FOR  
+            IF sum_offer_without_last GREATER THAN zero AND the last element of offer LESS THAN sum_price_needs  
+                APPEND offer TO filtered_special  
+            END IF  
+        END FOR  
+        SET special TO filtered_special  
+          
+        FUNCTION dfs(needs_tuple)  
+            SET min_cost TO zero  
+            FOR each pair of corresponding elements p and n FROM price and needs_tuple  
+                INCREMENT min_cost BY p MULTIPLIED BY n  
+            END FOR  
+              
+            FOR each offer IN special  
+                SET new_needs TO an empty list  
+                FOR each pair of corresponding elements n and o FROM needs_tuple and the elements at all positions BEFORE the last position in offer  
+                    APPEND n MINUS o TO new_needs  
+                END FOR  
+                  
+                IF all elements in new_needs ARE GREATER THAN OR EQUAL TO zero  
+                    SET cost_with_offer TO the last element of offer PLUS dfs(new_needs converted to tuple)  
+                    IF cost_with_offer LESS THAN min_cost  
+                        SET min_cost TO cost_with_offer  
+                    END IF  
+                END IF  
+            END FOR  
+              
+            RETURN min_cost  
+        END FUNCTION  
+          
+        RETURN dfs(needs converted to tuple)  
+    END FUNCTION  
+END CLASS

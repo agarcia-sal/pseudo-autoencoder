@@ -1,0 +1,62 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.parent TO list of integers from 0 TO size MINUS 1  
+        SET self.rank TO list of 1 repeated size times  
+    END FUNCTION  
+  
+    FUNCTION find(self, p)  
+        IF self.parent at index p IS NOT p THEN  
+            SET self.parent at index p TO self.find(self.parent at index p)  
+        END IF  
+        RETURN self.parent at index p  
+    END FUNCTION  
+  
+    FUNCTION union(self, p, q)  
+        SET rootP TO self.find(p)  
+        SET rootQ TO self.find(q)  
+        IF rootP EQUALS rootQ THEN  
+            RETURN False  
+        END IF  
+        IF self.rank at index rootP GREATER THAN self.rank at index rootQ THEN  
+            SET self.parent at index rootQ TO rootP  
+        ELSE IF self.rank at index rootP LESS THAN self.rank at index rootQ THEN  
+            SET self.parent at index rootP TO rootQ  
+        ELSE  
+            SET self.parent at index rootQ TO rootP  
+            INCREMENT self.rank at index rootP BY 1  
+        END IF  
+        RETURN True  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION distanceLimitedPathsExist(self, n, edgeList, queries)  
+        SORT edgeList BY the third element of each edge in ascending order  
+  
+        SET indexedQueries TO an empty list  
+        FOR each index i AND query (p, q, limit) IN queries WITH indices  
+            APPEND tuple (limit, p, q, i) TO indexedQueries  
+        END FOR  
+        SORT indexedQueries BY the first element (limit) in ascending order  
+  
+        SET uf TO a new UnionFind initialized with n  
+  
+        SET edgeIndex TO 0  
+        SET numEdges TO LENGTH OF edgeList  
+        SET results TO list of False repeated LENGTH OF queries times  
+  
+        FOR each tuple (limit, p, q, originalIndex) IN indexedQueries  
+            WHILE edgeIndex LESS THAN numEdges AND the third element of edgeList at edgeIndex LESS THAN limit  
+                SET u TO first element of edgeList at edgeIndex  
+                SET v TO second element of edgeList at edgeIndex  
+                CALL uf.union(u, v)  
+                INCREMENT edgeIndex BY 1  
+            END WHILE  
+            IF uf.find(p) EQUALS uf.find(q) THEN  
+                SET results at originalIndex TO True  
+            END IF  
+        END FOR  
+  
+        RETURN results  
+    END FUNCTION  
+END CLASS

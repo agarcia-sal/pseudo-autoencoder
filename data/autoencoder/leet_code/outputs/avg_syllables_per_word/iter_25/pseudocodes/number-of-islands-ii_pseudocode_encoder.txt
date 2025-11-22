@@ -1,0 +1,64 @@
+CLASS UnionFind  
+    FUNCTION __init__ with parameter self  
+        SET the parent attribute of self TO an empty dictionary  
+        SET the count attribute of self TO zero  
+    END FUNCTION  
+
+    FUNCTION make_set with parameters self and x  
+        IF x is not contained in the keys of the parent attribute of self THEN  
+            ASSIGN x TO be the value associated with key x in the parent attribute of self  
+            INCREMENT the count attribute of self BY one  
+        END IF  
+    END FUNCTION  
+
+    FUNCTION find with parameters self and x  
+        IF the value associated with key x in the parent attribute of self is not equal to x THEN  
+            SET the value associated with key x in the parent attribute of self TO the result of calling the find function of self with argument the value associated with key x in the parent attribute of self  
+        END IF  
+        RETURN the value associated with key x in the parent attribute of self  
+    END FUNCTION  
+
+    FUNCTION union with parameters self x and y  
+        SET rootX TO the result of calling the find function of self with argument x  
+        SET rootY TO the result of calling the find function of self with argument y  
+        IF rootX is not equal to rootY THEN  
+            ASSIGN the value associated with key rootY to be the value associated with key rootX in the parent attribute of self  
+            DECREMENT the count attribute of self BY one  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION numIslands2 with parameters self m n and positions  
+        FUNCTION is_valid with parameters x and y  
+            RETURN the predicate that zero is less than or equal to x AND x is less than m AND zero is less than or equal to y AND y is less than n  
+        END FUNCTION  
+
+        ASSIGN directions TO the list containing the pairs one zero MINUS one zero zero one zero MINUS one  
+        ASSIGN uf TO a new instance of the class UnionFind  
+        ASSIGN grid TO a list containing m elements each being a list of n elements each being zero  
+        ASSIGN result TO an empty list  
+
+        FOR each element composed of r and c in positions DO  
+            IF the element at position c of the element at position r of grid is equal to one THEN  
+                APPEND the count attribute of uf TO result  
+                CONTINUE to the next iteration of the loop  
+            END IF  
+
+            SET the element at position c of the element at position r of grid TO one  
+            CALL the make_set function of uf with argument the pair composed of r and c  
+
+            FOR each element composed of dr and dc in directions DO  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                IF calling the is_valid function with arguments nr and nc yields true AND the element at position nc of the element at position nr of grid is equal to one THEN  
+                    CALL the union function of uf with arguments the pair composed of r and c and the pair composed of nr and nc  
+                END IF  
+            END FOR  
+
+            APPEND the count attribute of uf TO result  
+        END FOR  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

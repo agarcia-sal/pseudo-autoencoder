@@ -1,0 +1,90 @@
+CLASS Solution  
+    FUNCTION isSolvable(words, result)  
+        SET unique_chars TO the set of all characters in all elements of words combined PLUS all characters in result  
+        IF the number of elements in unique_chars GREATER THAN ten  
+            RETURN false  
+        END IF  
+        
+        SET non_zero_chars TO the set of the first character of each element in words that has length GREATER THAN one  
+        IF the length of result GREATER THAN one  
+            ADD the first character of result TO non_zero_chars  
+        END IF  
+        
+        INITIALIZE empty dictionary char_to_digit  
+        INITIALIZE empty dictionary digit_to_char  
+        
+        FUNCTION can_assign(character, digit)  
+            RETURN character NOT IN char_to_digit AND (digit NOT IN digit_to_char OR the value of digit_to_char at digit EQUALS character)  
+        END FUNCTION  
+        
+        FUNCTION assign(character, digit)  
+            SET the value of char_to_digit at character TO digit  
+            SET the value of digit_to_char at digit TO character  
+        END FUNCTION  
+        
+        FUNCTION unassign(character, digit)  
+            REMOVE the entry for character FROM char_to_digit  
+            REMOVE the entry for digit FROM digit_to_char  
+        END FUNCTION  
+        
+        FUNCTION word_value(word)  
+            SET total_sum TO zero  
+            FOR each index and character IN the enumeration of the reverse of word  
+                INCREMENT total_sum BY the value of char_to_digit at character MULTIPLIED BY ten RAISED TO the power of index  
+            END FOR  
+            RETURN total_sum  
+        END FUNCTION  
+        
+        FUNCTION backtrack(index, col, sum_col)  
+            IF col GREATER THAN OR EQUAL TO the maximum length among all elements in words AND col GREATER THAN OR EQUAL TO the length of result  
+                RETURN sum_col EQUALS zero  
+            END IF  
+            
+            IF index EQUALS the number of elements in words  
+                IF col LESS THAN the length of result  
+                    SET digit TO the character at the position length of result MINUS one MINUS col of result  
+                    IF digit IN char_to_digit  
+                        IF the value of char_to_digit at digit EQUALS the remainder of sum_col DIVIDED BY ten  
+                            RETURN backtrack zero col PLUS one the integer division of sum_col by ten  
+                        ELSE  
+                            RETURN false  
+                        END IF  
+                    ELSE IF can_assign with digit and the remainder of sum_col DIVIDED BY ten IS true AND (the remainder of sum_col DIVIDED BY ten NOT EQUALS zero OR digit NOT IN non_zero_chars)  
+                        assign digit the remainder of sum_col DIVIDED BY ten  
+                        IF backtrack zero col PLUS one the integer division of sum_col by ten RETURNS true  
+                            RETURN true  
+                        END IF  
+                        unassign digit the remainder of sum_col DIVIDED BY ten  
+                    END IF  
+                ELSE  
+                    RETURN sum_col EQUALS zero  
+                END IF  
+                RETURN false  
+            END IF  
+            
+            SET word TO the element at position index of words  
+            IF col GREATER THAN OR EQUAL TO the length of word  
+                RETURN backtrack index PLUS one col sum_col  
+            END IF  
+            
+            SET char TO the character at the position length of word MINUS one MINUS col of word  
+            IF char IN char_to_digit  
+                RETURN backtrack index PLUS one col sum_col PLUS the value of char_to_digit at char  
+            END IF  
+            
+            FOR digit FROM zero TO nine  
+                IF can_assign char digit AND (digit NOT EQUALS zero OR char NOT IN non_zero_chars)  
+                    assign char digit  
+                    IF backtrack index PLUS one col sum_col PLUS digit RETURNS true  
+                        RETURN true  
+                    END IF  
+                    unassign char digit  
+                END IF  
+            END FOR  
+            
+            RETURN false  
+        END FUNCTION  
+        
+        RETURN backtrack zero zero zero  
+    END FUNCTION  
+END CLASS

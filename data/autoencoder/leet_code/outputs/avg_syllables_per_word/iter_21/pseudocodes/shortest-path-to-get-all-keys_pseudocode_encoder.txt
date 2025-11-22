@@ -1,0 +1,62 @@
+CLASS Solution  
+    FUNCTION shortestPathAllKeys(grid)  
+        SET directions TO a list containing elements each representing movement as delta row zero delta column one, delta row zero delta column minus one, delta row one delta column zero, and delta row minus one delta column zero  
+        SET m TO the LENGTH OF grid  
+        SET n TO the LENGTH OF element at position zero OF grid  
+        SET start TO no value  
+        SET num_keys TO zero  
+        
+        FOR i FROM zero TO m MINUS one  
+            FOR j FROM zero TO n MINUS one  
+                IF element at position i OF grid EQUALS the character at symbol at sign  
+                    SET start TO a tuple containing i and j  
+                ELSE IF element at position j OF element at position i OF grid IS a lowercase letter  
+                    INCREMENT num_keys BY one  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        CALL deque WITH PARAMETERS a list containing a tuple of element at position zero of start, element at position one of start, zero, and zero ASSIGN TO queue  
+        CALL set WITH PARAMETERS a tuple of element at position zero of start, element at position one of start, and zero ASSIGN TO visited  
+        
+        WHILE queue HOLDS  
+            CALL popleft ON queue ASSIGN TO variables x, y, keys, and steps  
+            
+            FOR each element dx, dy IN directions  
+                SET nx TO x PLUS dx  
+                SET ny TO y PLUS dy  
+                
+                IF nx IS GREATER THAN OR EQUAL TO zero AND nx IS LESS THAN m AND ny IS GREATER THAN OR EQUAL TO zero AND ny IS LESS THAN n  
+                    SET cell TO element at position ny OF element at position nx OF grid  
+                    
+                    IF cell EQUALS the character number sign  
+                        CONTINUE TO next iteration of FOR loop  
+                    END IF  
+                    
+                    IF cell IS an uppercase letter  
+                        SET key_needed TO the result of one SHIFTED LEFT BY the ordinal value of lowercase equivalent of cell MINUS the ordinal value of character a  
+                        IF logical AND of keys and key_needed EQUALS zero  
+                            CONTINUE TO next iteration of FOR loop  
+                        END IF  
+                    END IF  
+                    
+                    IF cell IS a lowercase letter  
+                        SET new_keys TO logical OR of keys and the result of one SHIFTED LEFT BY the ordinal value of cell MINUS the ordinal value of character a  
+                        IF new_keys EQUALS the result of one SHIFTED LEFT BY num_keys MINUS one  
+                            RETURN steps PLUS one  
+                        END IF  
+                    ELSE  
+                        SET new_keys TO keys  
+                    END IF  
+                    
+                    IF tuple of nx, ny, and new_keys NOT IN visited  
+                        ADD tuple of nx, ny, and new_keys TO visited  
+                        APPEND tuple of nx, ny, new_keys, and steps PLUS one TO queue  
+                    END IF  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN minus one  
+    END FUNCTION  
+END CLASS

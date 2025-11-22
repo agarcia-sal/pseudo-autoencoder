@@ -1,0 +1,66 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, n)  
+        SET self.parent TO list of integers from 0 TO n  
+        SET self.rank TO list of zeros with length n plus 1  
+        SET self.count TO n  
+    END FUNCTION  
+
+    FUNCTION find(self, u)  
+        IF self.parent at u IS NOT u THEN  
+            SET self.parent at u TO self.find(self.parent at u)  
+        END IF  
+        RETURN self.parent at u  
+    END FUNCTION  
+
+    FUNCTION union(self, u, v)  
+        SET rootU TO self.find(u)  
+        SET rootV TO self.find(v)  
+        IF rootU IS NOT EQUAL TO rootV THEN  
+            IF self.rank at rootU GREATER THAN self.rank at rootV THEN  
+                SET self.parent at rootV TO rootU  
+            ELSE IF self.rank at rootU LESS THAN self.rank at rootV THEN  
+                SET self.parent at rootU TO rootV  
+            ELSE  
+                SET self.parent at rootV TO rootU  
+                INCREMENT self.rank at rootU BY 1  
+            END IF  
+            DECREMENT self.count BY 1  
+            RETURN True  
+        END IF  
+        RETURN False  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION maxNumEdgesToRemove(self, n, edges)  
+        SET uf_common TO new UnionFind with n  
+        SET uf_alice TO new UnionFind with n  
+        SET uf_bob TO new UnionFind with n  
+
+        SET used_edges TO 0  
+
+        FOR each t, u, v IN edges  
+            IF t EQUALS 3 THEN  
+                IF uf_common.union(u, v) IS True THEN  
+                    uf_alice.union(u, v)  
+                    uf_bob.union(u, v)  
+                    INCREMENT used_edges BY 1  
+                END IF  
+            END IF  
+        END FOR  
+
+        FOR each t, u, v IN edges  
+            IF t EQUALS 1 AND uf_alice.union(u, v) IS True THEN  
+                INCREMENT used_edges BY 1  
+            ELSE IF t EQUALS 2 AND uf_bob.union(u, v) IS True THEN  
+                INCREMENT used_edges BY 1  
+            END IF  
+        END FOR  
+
+        IF uf_alice.count EQUALS 1 AND uf_bob.count EQUALS 1 THEN  
+            RETURN LENGTH OF edges MINUS used_edges  
+        ELSE  
+            RETURN -1  
+        END IF  
+    END FUNCTION  
+END CLASS

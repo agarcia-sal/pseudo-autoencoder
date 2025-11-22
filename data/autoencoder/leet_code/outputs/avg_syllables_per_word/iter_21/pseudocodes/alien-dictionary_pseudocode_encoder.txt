@@ -1,0 +1,50 @@
+CLASS Solution  
+    FUNCTION alienOrder(words)  
+        SET graph TO the result of calling defaultdict with PARAMETERS set  
+        SET indegree TO the result of calling defaultdict with PARAMETERS integer  
+        SET all_chars TO the set of all characters obtained by concatenating all elements IN words  
+        
+        FOR index FROM zero TO the LENGTH OF words MINUS one MINUS one  
+            SET word1 TO the element at position index OF words  
+            SET word2 TO the element at position index PLUS one OF words  
+            SET min_length TO the minimum OF the LENGTH OF word1 AND the LENGTH OF word2  
+            SET found TO false  
+            
+            FOR position FROM zero TO min_length MINUS one  
+                IF the character at position position OF word1 NOT EQUALS the character at position position OF word2  
+                    IF the character at position position OF word2 NOT IN the set graph AT key the character at position position OF word1  
+                        CALL the method add ON the set graph AT key the character at position position OF word1 WITH PARAMETERS the character at position position OF word2  
+                        INCREMENT the value at key the character at position position OF word2 IN indegree BY one  
+                    END IF  
+                    SET found TO true  
+                    BREAK the current loop  
+                END IF  
+            END FOR  
+            
+            IF found EQUALS false AND the LENGTH OF word1 GREATER THAN the LENGTH OF word2  
+                RETURN an empty string  
+            END IF  
+        END FOR  
+        
+        SET queue TO the result of calling deque WITH PARAMETERS the list of characters IN all_chars WHERE the value at key character IN indegree EQUALS zero  
+        SET result TO an empty list  
+        
+        WHILE queue HOLDS  
+            SET char TO the result of calling popleft ON queue  
+            APPEND char TO result  
+            
+            FOR each neighbor IN the set graph AT key char  
+                DECREMENT the value at key neighbor IN indegree BY one  
+                IF the value at key neighbor IN indegree EQUALS zero  
+                    CALL the method append ON queue WITH PARAMETERS neighbor  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        IF the LENGTH OF result NOT EQUALS the LENGTH OF all_chars  
+            RETURN an empty string  
+        END IF  
+        
+        RETURN the concatenation of all elements IN result AS a single string  
+    END FUNCTION  
+END CLASS

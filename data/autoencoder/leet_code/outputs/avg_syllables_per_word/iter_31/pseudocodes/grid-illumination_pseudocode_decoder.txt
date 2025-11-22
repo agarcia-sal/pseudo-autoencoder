@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION gridIllumination(n PARAMETER lamps PARAMETER queries PARAMETER)  
+        SET row_count TO a new mapping from integer to integer with default value zero  
+        SET col_count TO a new mapping from integer to integer with default value zero  
+        SET diag_count TO a new mapping from integer to integer with default value zero  
+        SET anti_diag_count TO a new mapping from integer to integer with default value zero  
+        
+        SET lamp_positions TO a new set of positions  
+        
+        FOR each position pair r c IN lamps  
+            IF the position pair r c is not contained in lamp_positions  
+                ADD the position pair r c TO lamp_positions  
+                INCREMENT the count at key r in row_count BY one  
+                INCREMENT the count at key c in col_count BY one  
+                INCREMENT the count at key the difference between r and c in diag_count BY one  
+                INCREMENT the count at key the sum of r and c in anti_diag_count BY one  
+            END IF  
+        END FOR  
+        
+        SET directions TO the list containing the position pairs negative one negative one negative one zero negative one one zero negative one zero zero zero zero one one negative one one zero one one  
+        
+        SET result TO a new empty list  
+        
+        FOR each position pair r c IN queries  
+            IF the count at key r in row_count is greater than zero OR the count at key c in col_count is greater than zero OR the count at key the difference between r and c in diag_count is greater than zero OR the count at key the sum of r and c in anti_diag_count is greater than zero  
+                APPEND the integer one TO result  
+            ELSE  
+                APPEND the integer zero TO result  
+            END IF  
+            
+            FOR each position pair dr dc IN directions  
+                SET nr TO the sum of r and dr  
+                SET nc TO the sum of c and dc  
+                IF the position pair nr nc is contained in lamp_positions  
+                    REMOVE the position pair nr nc FROM lamp_positions  
+                    DECREMENT the count at key nr in row_count BY one  
+                    DECREMENT the count at key nc in col_count BY one  
+                    DECREMENT the count at key the difference between nr and nc in diag_count BY one  
+                    DECREMENT the count at key the sum of nr and nc in anti_diag_count BY one  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

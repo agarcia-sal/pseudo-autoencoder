@@ -1,0 +1,75 @@
+CLASS UnionFind  
+    FUNCTION __init__ WITH parameter size  
+        SET parent TO the list of integers FROM zero TO size MINUS one  
+        SET rank TO the list of the integer one REPEATED size times  
+        SET size TO the list of the integer one REPEATED size times  
+    END FUNCTION  
+
+    FUNCTION find WITH parameter u  
+        IF element at position u of parent IS NOT EQUAL TO u THEN  
+            SET element at position u of parent TO the result of calling find WITH element at position u of parent  
+        END IF  
+        RETURN element at position u of parent  
+    END FUNCTION  
+
+    FUNCTION union WITH parameters u AND v  
+        SET rootU TO the result of calling find WITH u  
+        SET rootV TO the result of calling find WITH v  
+        IF rootU IS NOT EQUAL TO rootV THEN  
+            IF element at position rootU of rank IS GREATER THAN element at position rootV of rank THEN  
+                SET element at position rootV of parent TO rootU  
+                INCREMENT element at position rootU of size BY element at position rootV of size  
+            ELSE IF element at position rootU of rank IS LESS THAN element at position rootV of rank THEN  
+                SET element at position rootU of parent TO rootV  
+                INCREMENT element at position rootV of size BY element at position rootU of size  
+            ELSE  
+                SET element at position rootV of parent TO rootU  
+                INCREMENT element at position rootU of rank BY one  
+                INCREMENT element at position rootU of size BY element at position rootV of size  
+            END IF  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION largestComponentSize WITH parameter nums  
+        SET max_num TO the maximum value in nums  
+        SET uf TO a new UnionFind object initialized WITH max_num PLUS one  
+        SET prime_to_index TO an empty dictionary  
+        FOR each num IN nums  
+            FOR each prime IN the result of calling prime_factors WITH num  
+                IF prime IS IN prime_to_index THEN  
+                    CALL union of uf WITH element at position prime of prime_to_index AND num  
+                ELSE  
+                    SET element at position prime of prime_to_index TO num  
+                END IF  
+            END FOR  
+        END FOR  
+        SET max_component_size TO zero  
+        FOR each num IN nums  
+            SET root TO the result of calling find of uf WITH num  
+            IF element at position root of uf size IS GREATER THAN max_component_size THEN  
+                SET max_component_size TO element at position root of uf size  
+            END IF  
+        END FOR  
+        RETURN max_component_size  
+    END FUNCTION  
+
+    FUNCTION prime_factors WITH parameter n  
+        SET factors TO an empty set  
+        WHILE n MODULO two EQUALS zero DO  
+            ADD two TO factors  
+            SET n TO n DIVIDED BY two  
+        END WHILE  
+        FOR i FROM three TO the integer part of the square root of n PLUS one IN STEPS OF two  
+            WHILE n MODULO i EQUALS zero DO  
+                ADD i TO factors  
+                SET n TO n DIVIDED BY i  
+            END WHILE  
+        END FOR  
+        IF n IS GREATER THAN two THEN  
+            ADD n TO factors  
+        END IF  
+        RETURN factors  
+    END FUNCTION  
+END CLASS

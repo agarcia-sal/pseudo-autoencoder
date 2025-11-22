@@ -1,0 +1,48 @@
+CLASS Solution
+    FUNCTION expressiveWords(s, words)
+        FUNCTION compress(word)
+            IF word IS empty
+                RETURN empty list
+            END IF
+            SET count TO one
+            SET compressed TO empty list
+            FOR i FROM one TO the LENGTH OF word MINUS one
+                IF element at position i of word EQUALS element at position i MINUS one of word
+                    INCREMENT count BY one
+                ELSE
+                    APPEND tuple of element at position i MINUS one of word AND count TO compressed
+                    SET count TO one
+                END IF
+            END FOR
+            APPEND tuple of element at position the LENGTH OF word MINUS one of word AND count TO compressed
+            RETURN compressed
+        END FUNCTION
+
+        FUNCTION is_stretchy(s_compressed, word_compressed)
+            IF the LENGTH OF s_compressed NOT EQUALS the LENGTH OF word_compressed
+                RETURN false
+            END IF
+            FOR each paired tuple (sc, sc_count), (wc, wc_count) IN s_compressed AND word_compressed
+                IF sc NOT EQUALS wc
+                    RETURN false
+                END IF
+                IF sc_count NOT EQUALS wc_count AND (sc_count LESS THAN three OR sc_count LESS THAN wc_count)
+                    RETURN false
+                END IF
+            END FOR
+            RETURN true
+        END FUNCTION
+
+        SET s_compressed TO CALL compress WITH parameter s
+        SET stretchy_count TO zero
+
+        FOR each word IN words
+            SET word_compressed TO CALL compress WITH parameter word
+            IF CALL is_stretchy WITH parameters s_compressed AND word_compressed
+                INCREMENT stretchy_count BY one
+            END IF
+        END FOR
+
+        RETURN stretchy_count
+    END FUNCTION
+END CLASS

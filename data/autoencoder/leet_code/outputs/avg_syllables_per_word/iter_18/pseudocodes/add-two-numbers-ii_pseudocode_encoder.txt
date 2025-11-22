@@ -1,0 +1,75 @@
+CLASS ListNode  
+    FUNCTION __init__ WITH PARAMETERS val EQUALS zero AND next EQUALS none  
+        SET the val ATTRIBUTE OF self TO val  
+        SET the next ATTRIBUTE OF self TO next  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION list_node WITH PARAMETER values OF TYPE list  
+    IF values IS EMPTY  
+        RETURN none  
+    END IF  
+    SET head TO A NEW ListNode INITIALIZED WITH value AT POSITION zero OF values  
+    SET p TO head  
+    FOR each val IN elements of values STARTING FROM position one TO THE END  
+        SET node TO A NEW ListNode INITIALIZED WITH val  
+        SET next ATTRIBUTE OF p TO node  
+        SET p TO node  
+    END FOR  
+    RETURN head  
+END FUNCTION  
+
+FUNCTION is_same_list WITH PARAMETERS p1 AND p2  
+    IF p1 EQUALS none AND p2 EQUALS none  
+        RETURN true  
+    END IF  
+    IF p1 IS NONE OR p2 IS NONE  
+        RETURN false  
+    END IF  
+    RETURN (val ATTRIBUTE OF p1 EQUALS val ATTRIBUTE OF p2) AND CALL is_same_list WITH PARAMETERS (next ATTRIBUTE OF p1, next ATTRIBUTE OF p2)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION addTwoNumbers WITH PARAMETERS l1 OF TYPE optional ListNode AND l2 OF TYPE optional ListNode RETURNING optional ListNode  
+        
+        FUNCTION pushIntoStack WITH PARAMETER node  
+            SET stack TO AN EMPTY LIST  
+            WHILE node IS NOT none  
+                APPEND val ATTRIBUTE OF node TO stack  
+                SET node TO next ATTRIBUTE OF node  
+            END WHILE  
+            RETURN stack  
+        END FUNCTION  
+        
+        SET stack1 TO RESULT OF pushIntoStack WITH PARAMETER l1  
+        SET stack2 TO RESULT OF pushIntoStack WITH PARAMETER l2  
+        
+        SET carry TO zero  
+        SET result TO none  
+        
+        WHILE stack1 IS NOT EMPTY OR stack2 IS NOT EMPTY OR carry DOES NOT EQUAL zero  
+            IF stack1 IS NOT EMPTY  
+                SET val1 TO ELEMENT AT LAST POSITION OF stack1  
+                REMOVE ELEMENT AT LAST POSITION FROM stack1  
+            ELSE  
+                SET val1 TO zero  
+            END IF  
+            IF stack2 IS NOT EMPTY  
+                SET val2 TO ELEMENT AT LAST POSITION OF stack2  
+                REMOVE ELEMENT AT LAST POSITION FROM stack2  
+            ELSE  
+                SET val2 TO zero  
+            END IF  
+            
+            SET total TO val1 PLUS val2 PLUS carry  
+            SET carry TO total DIVIDED BY ten USING INTEGER DIVISION  
+            SET digit TO total MODULO ten  
+            
+            SET new_node TO A NEW ListNode INITIALIZED WITH digit  
+            SET next ATTRIBUTE OF new_node TO result  
+            SET result TO new_node  
+        END WHILE  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

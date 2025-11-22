@@ -1,0 +1,42 @@
+CLASS Solution  
+    FUNCTION connectTwoGroups(cost)  
+        SET size1 TO the LENGTH OF cost  
+        SET size2 TO the LENGTH OF element at position zero of cost  
+        
+        CALL initializeDPTable WITH size1 AND size2 AND SET dp TO the RESULT  
+        SET element at position zero of element at position zero of dp TO zero  
+        
+        FOR i FROM zero TO size1 MINUS one  
+            FOR mask FROM zero TO two RAISED TO size2 MINUS one  
+                
+                FOR j FROM zero TO size2 MINUS one  
+                    SET combined_mask TO mask OR bitwise operation of one SHIFTED LEFT BY j  
+                    SET candidate_cost TO element at position i of element at position mask of cost PLUS element at position i of element at position mask of dp  
+                    SET current_cost TO element at position i PLUS one of element at position combined_mask of dp  
+                    IF candidate_cost LESS THAN current_cost  
+                        SET element at position i PLUS one of element at position combined_mask of dp TO candidate_cost  
+                    END IF  
+                END FOR  
+                
+                FOR j FROM zero TO size2 MINUS one  
+                    IF bitwise AND of mask AND bitwise operation of one SHIFTED LEFT BY j IS NOT zero  
+                        SET candidate_cost TO element at position i PLUS one of element at position bitwise XOR of mask AND bitwise operation of one SHIFTED LEFT BY j of dp PLUS element at position i OF element at position j OF cost  
+                        SET current_cost TO element at position i PLUS one of element at position mask of dp  
+                        IF candidate_cost LESS THAN current_cost  
+                            SET element at position i PLUS one of element at position mask of dp TO candidate_cost  
+                        END IF  
+                    END IF  
+                END FOR  
+                
+            END FOR  
+        END FOR  
+        
+        SET full_mask TO two RAISED TO size2 MINUS one  
+        RETURN element at position size1 of element at position full_mask of dp  
+    END FUNCTION  
+    
+    FUNCTION initializeDPTable(size1, size2)  
+        CREATE a two dimensional list dp WITH size size1 PLUS one BY two RAISED TO size2 FILLED WITH infinity VALUES  
+        RETURN dp  
+    END FUNCTION  
+END CLASS

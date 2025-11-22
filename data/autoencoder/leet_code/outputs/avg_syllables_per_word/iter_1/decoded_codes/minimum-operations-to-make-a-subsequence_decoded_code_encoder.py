@@ -1,0 +1,14 @@
+from bisect import bisect_left
+
+def min_operations(arr, target):
+    map = {v: i for i, v in enumerate(target)}
+    transformed = [map[v] for v in arr if v in map]
+    lis = []
+    for num in transformed:
+        pos = bisect_left(lis, num)
+        if pos == len(lis):
+            lis.append(num)
+        else:
+            lis[pos] = num
+    lcs_len = len(lis)
+    return len(target) - lcs_len

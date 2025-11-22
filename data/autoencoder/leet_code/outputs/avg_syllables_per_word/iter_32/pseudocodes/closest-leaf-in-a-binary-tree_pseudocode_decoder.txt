@@ -1,0 +1,88 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN None  
+    END IF  
+    SET root TO a new TreeNode with value equal to element at position one of values and left equal to None and right equal to None  
+    SET i TO one  
+    CREATE an empty double ended queue named queue  
+    APPEND root TO queue  
+    WHILE queue is not empty  
+        SET node TO the element removed from the front of queue  
+        IF i is less than the LENGTH OF values AND element at position i of values IS NOT None  
+            SET node.left TO a new TreeNode with value equal to element at position i of values and left equal to None and right equal to None  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i is less than the LENGTH OF values AND element at position i of values IS NOT None  
+            SET node.right TO a new TreeNode with value equal to element at position i of values and left equal to None and right equal to None  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION findClosestLeaf(self, root, k)  
+        IF root.left IS None AND root.right IS None  
+            RETURN root.val  
+        END IF  
+
+        CREATE an empty map named graph that maps from values to lists of values  
+
+        FUNCTION dfs(node, parent)  
+            IF parent IS NOT None  
+                APPEND parent.val TO graph at the position corresponding to node.val  
+                APPEND node.val TO graph at the position corresponding to parent.val  
+            END IF  
+            IF node.left IS NOT None  
+                CALL dfs with node.left and node as arguments  
+            END IF  
+            IF node.right IS NOT None  
+                CALL dfs with node.right and node as arguments  
+            END IF  
+        END FUNCTION  
+
+        CALL dfs with root and None as arguments  
+
+        CREATE a double ended queue named queue initialized with element k  
+        CREATE an empty set named visited  
+
+        WHILE queue is not empty  
+            SET current TO the element removed from the front of queue  
+            ADD current TO visited  
+
+            IF the LENGTH OF graph at the position corresponding to current EQUALS one AND current NOT EQUALS root.val  
+                RETURN current  
+            END IF  
+
+            FOR each neighbor IN graph at the position corresponding to current  
+                IF neighbor IS NOT IN visited  
+                    APPEND neighbor TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+
+        RETURN minus one  
+    END FUNCTION  
+END CLASS  

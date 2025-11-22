@@ -1,0 +1,50 @@
+CLASS Solution
+    FUNCTION outerTrees(trees: List of List of int) RETURNS List of float
+        FUNCTION dist_sq(p1, p2)
+            RETURN (p1[0] MINUS p2[0]) SQUARED PLUS (p1[1] MINUS p2[1]) SQUARED
+        END FUNCTION
+
+        FUNCTION circumcenter(p1, p2, p3)
+            SET ax TO p1[0]
+            SET ay TO p1[1]
+            SET bx TO p2[0]
+            SET by TO p2[1]
+            SET cx TO p3[0]
+            SET cy TO p3[1]
+
+            SET d TO 2 TIMES (ax TIMES (by MINUS cy) PLUS bx TIMES (cy MINUS ay) PLUS cx TIMES (ay MINUS by))
+            SET ux TO (((ax SQUARED PLUS ay SQUARED) TIMES (by MINUS cy)) PLUS ((bx SQUARED PLUS by SQUARED) TIMES (cy MINUS ay)) PLUS ((cx SQUARED PLUS cy SQUARED) TIMES (ay MINUS by))) DIVIDED BY d
+            SET uy TO (((ax SQUARED PLUS ay SQUARED) TIMES (cx MINUS bx)) PLUS ((bx SQUARED PLUS by SQUARED) TIMES (ax MINUS cx)) PLUS ((cx SQUARED PLUS cy SQUARED) TIMES (bx MINUS ax))) DIVIDED BY d
+            RETURN [ux, uy], SQUARE ROOT OF ((ux MINUS ax) SQUARED PLUS (uy MINUS ay) SQUARED)
+        END FUNCTION
+
+        FUNCTION welzl(points, boundary, n)
+            IF n EQUALS 0 OR LENGTH OF boundary EQUALS 3 THEN
+                IF LENGTH OF boundary EQUALS 0 THEN
+                    RETURN [0, 0], 0
+                ELSE IF LENGTH OF boundary EQUALS 1 THEN
+                    RETURN boundary[0], 0
+                ELSE IF LENGTH OF boundary EQUALS 2 THEN
+                    SET center TO [(boundary[0][0] PLUS boundary[1][0]) DIVIDED BY 2, (boundary[0][1] PLUS boundary[1][1]) DIVIDED BY 2]
+                    SET radius TO SQUARE ROOT OF dist_sq(boundary[0], boundary[1]) DIVIDED BY 2
+                    RETURN center, radius
+                ELSE
+                    RETURN circumcenter(boundary[0], boundary[1], boundary[2])
+                END IF
+            END IF
+
+            SET p TO points AT INDEX n MINUS 1
+            SET center, radius TO welzl(points, boundary, n MINUS 1)
+
+            IF dist_sq(center, p) LESS THAN OR EQUAL TO radius SQUARED THEN
+                RETURN center, radius
+            END IF
+            
+            RETURN welzl(points, boundary PLUS [p], n MINUS 1)
+        END FUNCTION
+
+        CALL random.shuffle ON trees
+        SET center, radius TO welzl(trees, EMPTY LIST, LENGTH OF trees)
+        RETURN [center[0], center[1], radius]
+    END FUNCTION
+END CLASS

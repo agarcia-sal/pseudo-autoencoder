@@ -1,0 +1,67 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, n)  
+        SET self.parent TO list of integers from 0 to n minus 1  
+        SET self.rank TO list of zeros with length n  
+    END FUNCTION  
+  
+    FUNCTION find(self, x)  
+        IF self.parent at index x IS NOT EQUAL TO x THEN  
+            SET self.parent at index x TO self.find(self.parent at index x)  
+        END IF  
+        RETURN self.parent at index x  
+    END FUNCTION  
+  
+    FUNCTION union(self, x, y)  
+        SET rootX TO self.find(x)  
+        SET rootY TO self.find(y)  
+        IF rootX IS NOT EQUAL TO rootY THEN  
+            IF self.rank at rootX IS GREATER THAN self.rank at rootY THEN  
+                SET self.parent at rootY TO rootX  
+            ELSE IF self.rank at rootX IS LESS THAN self.rank at rootY THEN  
+                SET self.parent at rootX TO rootY  
+            ELSE  
+                SET self.parent at rootY TO rootX  
+                INCREMENT self.rank at rootX BY 1  
+            END IF  
+        END IF  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION latestDayToCross(self, row, col, cells)  
+        SET grid TO list containing row elements each being a list of col elements set to 1  
+        SET uf TO new UnionFind with row TIMES col PLUS 2  
+        SET TOP TO row TIMES col  
+        SET BOTTOM TO row TIMES col PLUS 1  
+        SET directions TO list of tuples: (-1, 0), (1, 0), (0, -1), (0, 1)  
+  
+        FOR day FROM LENGTH OF cells MINUS 1 DOWN TO 0 STEP -1 DO  
+            SET r, c TO cells at index day  
+            DECREMENT r BY 1  
+            DECREMENT c BY 1  
+            SET grid at index r at index c TO 0  
+  
+            FOR each dr, dc IN directions DO  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                IF nr GREATER THAN OR EQUAL TO 0 AND nr LESS THAN row AND nc GREATER THAN OR EQUAL TO 0 AND nc LESS THAN col AND grid at nr at nc EQUAL TO 0 THEN  
+                    CALL uf.union WITH arguments r TIMES col PLUS c, nr TIMES col PLUS nc  
+                END IF  
+            END FOR  
+  
+            IF r EQUAL TO 0 THEN  
+                CALL uf.union WITH arguments r TIMES col PLUS c, TOP  
+            END IF  
+  
+            IF r EQUAL TO row MINUS 1 THEN  
+                CALL uf.union WITH arguments r TIMES col PLUS c, BOTTOM  
+            END IF  
+  
+            IF uf.find(TOP) EQUALS uf.find(BOTTOM) THEN  
+                RETURN day  
+            END IF  
+        END FOR  
+  
+        RETURN 0  
+    END FUNCTION  
+END CLASS

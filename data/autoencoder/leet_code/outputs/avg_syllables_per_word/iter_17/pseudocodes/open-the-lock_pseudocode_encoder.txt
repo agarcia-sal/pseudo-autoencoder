@@ -1,0 +1,40 @@
+CLASS Solution
+    FUNCTION openLock(deadends, target)
+        SET deadends_set TO A SET CONTAINING all elements of deadends
+        IF the STRING zero zero zero zero IS IN deadends_set
+            RETURN negative one
+        END IF
+        IF target EQUALS the STRING zero zero zero zero
+            RETURN zero
+        END IF
+        SET queue TO A DEQUE CONTAINING THE TUPLE OF the STRING zero zero zero zero AND zero
+        SET visited TO A SET CONTAINING the STRING zero zero zero zero
+        FUNCTION neighbors(state)
+            SET result TO an EMPTY LIST
+            FOR i FROM zero TO three
+                SET digit TO the INTEGER VALUE OF element at position i of state
+                FOR move IN a LIST containing negative one AND one
+                    SET new_digit TO the REMAINDER OF digit PLUS move DIVIDED BY ten
+                    SET new_state TO THE CONCATENATION OF substring FROM position zero TO i minus one of state WITH THE STRING REPRESENTATION OF new_digit WITH substring FROM position i plus one TO end of state
+                    APPEND new_state TO result
+                END FOR
+            END FOR
+            RETURN result
+        END FUNCTION
+        WHILE queue IS NOT EMPTY
+            SET current_tuple TO the RESULT OF REMOVING THE FIRST ELEMENT FROM queue
+            SET current_state TO element at position zero of current_tuple
+            SET steps TO element at position one of current_tuple
+            FOR neighbor IN CALL neighbors WITH current_state
+                IF neighbor IS NOT IN visited AND neighbor IS NOT IN deadends_set
+                    IF neighbor EQUALS target
+                        RETURN steps PLUS one
+                    END IF
+                    ADD neighbor TO visited
+                    ADD THE TUPLE OF neighbor AND steps PLUS one TO queue
+                END IF
+            END FOR
+        END WHILE
+        RETURN negative one
+    END FUNCTION
+END CLASS

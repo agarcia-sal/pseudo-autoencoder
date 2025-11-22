@@ -1,0 +1,86 @@
+CLASS TrieNode  
+    FUNCTION __init__(self)  
+        SET self.children TO an empty mapping that creates new TrieNode when a new key is accessed  
+        SET self.count TO zero  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION maxGeneticDifference(self, parents, queries)  
+        SET tree TO a mapping from integer to list of integers with default value as empty list  
+        FOR index FROM zero TO the LENGTH OF parents MINUS one  
+            SET parent TO element at position index of parents  
+            IF parent NOT EQUALS minus one THEN  
+                APPEND index TO the list at key parent in tree  
+            END IF  
+        END FOR  
+
+        SET node_queries TO a mapping from integer to list of integers with default value as empty list  
+        FOR each pair node AND val IN queries  
+            APPEND val TO the list at key node in node_queries  
+        END FOR  
+
+        SET root TO a new TrieNode instance  
+
+        SET result TO a list of zeros with the length EQUAL TO the LENGTH OF queries  
+
+        FUNCTION dfs(node)  
+            CALL insert(trie_root EQUALS root, value EQUALS node)  
+
+            FOR each val IN the list at key node in node_queries  
+                SET result at position query_idx AT key pair node AND val TO the result of calling max_xor(trie_root EQUALS root, value EQUALS val)  
+            END FOR  
+
+            FOR each child IN the list at key node in tree  
+                CALL dfs(child)  
+            END FOR  
+
+            CALL erase(trie_root EQUALS root, value EQUALS node)  
+        END FUNCTION  
+
+        FUNCTION insert(trie_root, value)  
+            SET node TO trie_root  
+            FOR i FROM seventeen DOWN TO zero  
+                SET bit TO the result of value DIVIDED BY two RAISED TO THE POWER OF i MODULO two  
+                SET node TO the child at key bit of node.children  
+                INCREMENT node.count BY one  
+            END FOR  
+        END FUNCTION  
+
+        FUNCTION erase(trie_root, value)  
+            SET node TO trie_root  
+            FOR i FROM seventeen DOWN TO zero  
+                SET bit TO the result of value DIVIDED BY two RAISED TO THE POWER OF i MODULO two  
+                SET node TO the child at key bit of node.children  
+                DECREMENT node.count BY one  
+            END FOR  
+        END FUNCTION  
+
+        FUNCTION max_xor(trie_root, value)  
+            SET node TO trie_root  
+            SET max_xor_val TO zero  
+            FOR i FROM seventeen DOWN TO zero  
+                SET bit TO the result of value DIVIDED BY two RAISED TO THE POWER OF i MODULO two  
+                SET toggled_bit TO one MINUS bit  
+                IF toggled_bit IS IN node.children AND the count of node.children at key toggled_bit IS GREATER THAN zero THEN  
+                    SET max_xor_val TO max_xor_val PLUS two RAISED TO THE POWER OF i  
+                    SET node TO the child at key toggled_bit of node.children  
+                ELSE  
+                    SET node TO the child at key bit of node.children  
+                END IF  
+            END FOR  
+            RETURN max_xor_val  
+        END FUNCTION  
+
+        SET query_idx TO a mapping FROM each pair node AND val in queries TO their corresponding index  
+
+        FOR i FROM zero TO the LENGTH OF parents MINUS one  
+            IF element at position i of parents EQUALS minus one THEN  
+                CALL dfs(i)  
+                BREAK  
+            END IF  
+        END FOR  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS  

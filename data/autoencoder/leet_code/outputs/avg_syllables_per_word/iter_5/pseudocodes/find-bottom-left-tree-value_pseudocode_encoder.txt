@@ -1,0 +1,59 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val = 0, left = None, right = None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY THEN  
+        RETURN None  
+    SET root TO TreeNode WITH val AS values AT INDEX 0  
+    SET i TO 1  
+    INITIALIZE queue AS empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO DEQUEUE from queue  
+        IF i LESS THAN LENGTH OF values AND values AT INDEX i IS NOT None THEN  
+            SET node.left TO TreeNode WITH val AS values AT INDEX i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i LESS THAN LENGTH OF values AND values AT INDEX i IS NOT None THEN  
+            SET node.right TO TreeNode WITH val AS values AT INDEX i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None THEN  
+        RETURN True  
+    ELSE IF p IS None OR q IS None THEN  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val THEN  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+END FUNCTION
+
+CLASS Solution  
+    FUNCTION findBottomLeftValue(self, root)  
+        INITIALIZE queue AS deque WITH root  
+        SET leftmost_value TO None  
+        WHILE queue IS NOT EMPTY  
+            SET level_size TO LENGTH OF queue  
+            FOR i FROM 0 TO level_size MINUS 1  
+                SET node TO DEQUEUE from queue  
+                IF i EQUALS 0 THEN  
+                    SET leftmost_value TO node.val  
+                IF node.left IS NOT None THEN  
+                    APPEND node.left TO queue  
+                IF node.right IS NOT None THEN  
+                    APPEND node.right TO queue  
+            END FOR  
+        END WHILE  
+        RETURN leftmost_value  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,38 @@
+CLASS Solution  
+    FUNCTION findCheapestPrice(n AS integer, flights AS list of list of integer, src AS integer, dst AS integer, k AS integer) RETURNS integer  
+        SET graph TO an empty dictionary mapping each integer from zero TO n MINUS one TO an empty list  
+        FOR each flight IN flights  
+            LET u BE the element at position zero of flight  
+            LET v BE the element at position one of flight  
+            LET w BE the element at position two of flight  
+            APPEND tuple of v AND w TO the list at key u in graph  
+        END FOR  
+        
+        SET min_heap TO a list containing tuple of zero AND minus one AND src  
+        SET min_cost TO a dictionary mapping src TO minus one  
+        
+        WHILE min_heap is not empty  
+            SET cost AND stops AND city TO the result of extracting the smallest element from min_heap by cost order  
+            
+            IF city EQUALS dst  
+                RETURN cost  
+            END IF  
+            
+            IF stops GREATER THAN OR EQUAL TO k  
+                CONTINUE to the next iteration of the loop  
+            END IF  
+            
+            FOR each tuple of neighbor AND price IN the list at key city in graph  
+                SET next_cost TO cost PLUS price  
+                SET next_stops TO stops PLUS one  
+                
+                IF neighbor is not a key in min_cost OR next_stops LESS THAN the value at key neighbor in min_cost OR next_cost LESS THAN the smallest cost element at the front of min_heap  
+                    SET the value at key neighbor in min_cost TO next_stops  
+                    ADD tuple of next_cost AND next_stops AND neighbor TO min_heap according to cost order  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN minus one  
+    END FUNCTION  
+END CLASS

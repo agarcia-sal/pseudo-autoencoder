@@ -1,0 +1,56 @@
+CLASS Solution  
+    FUNCTION colorTheGrid(m, n)  
+        SET MOD TO 10 RAISED TO THE POWER OF 9 PLUS 7  
+        
+        FUNCTION generate_valid_columns(prev_col)  
+            SET colors TO LIST OF 1, 2, 3  
+            SET valid_cols TO EMPTY LIST  
+            
+            FUNCTION backtrack(col, row)  
+                IF row EQUALS m THEN  
+                    APPEND TUPLE OF col TO valid_cols  
+                    RETURN  
+                END IF  
+                FOR EACH color IN colors DO  
+                    IF col IS EMPTY OR LAST ELEMENT OF col IS NOT EQUAL TO color THEN  
+                        IF prev_col EXISTS AND prev_col AT row EQUALS color THEN  
+                            CONTINUE TO NEXT ITERATION  
+                        END IF  
+                        APPEND color TO col  
+                        CALL backtrack(col, row PLUS 1)  
+                        REMOVE LAST ELEMENT FROM col  
+                    END IF  
+                END FOR  
+            END FUNCTION  
+            
+            CALL backtrack WITH EMPTY LIST AND 0  
+            RETURN valid_cols  
+        END FUNCTION  
+        
+        SET all_valid_cols TO RESULT OF generate_valid_columns WITH None  
+        SET num_valid_cols TO LENGTH OF all_valid_cols  
+        
+        SET compatible_cols TO DICTIONARY FROM RANGE num_valid_cols WITH EMPTY LISTS  
+        FOR i FROM 0 TO num_valid_cols MINUS 1 DO  
+            FOR j FROM 0 TO num_valid_cols MINUS 1 DO  
+                IF FOR ALL k FROM 0 TO m MINUS 1, all_valid_cols AT i AND k IS NOT EQUAL TO all_valid_cols AT j AND k THEN  
+                    APPEND j TO compatible_cols AT i  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET dp TO LIST OF 1 REPEATED num_valid_cols TIMES  
+        
+        FOR _ FROM 1 TO n MINUS 1 DO  
+            SET next_dp TO LIST OF 0 REPEATED num_valid_cols TIMES  
+            FOR i FROM 0 TO num_valid_cols MINUS 1 DO  
+                FOR EACH j IN compatible_cols AT i DO  
+                    SET next_dp AT j TO (next_dp AT j PLUS dp AT i) MODULO MOD  
+                END FOR  
+            END FOR  
+            SET dp TO next_dp  
+        END FOR  
+        
+        RETURN SUM OF dp MODULO MOD  
+    END FUNCTION  
+END CLASS

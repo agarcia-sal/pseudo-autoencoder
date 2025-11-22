@@ -1,0 +1,62 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF the LENGTH OF values EQUALS zero  
+        RETURN none  
+    END IF  
+    SET root TO A NEW TreeNode WITH the element at position zero of values  
+    SET i TO one  
+    SET queue TO AN EMPTY DOUBLE ENDED QUEUE  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO THE FIRST ELEMENT REMOVED FROM queue  
+        IF i IS LESS THAN THE LENGTH OF values AND the element at position i of values IS NOT none  
+            SET node.left TO A NEW TreeNode WITH the element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN THE LENGTH OF values AND the element at position i of values IS NOT none  
+            SET node.right TO A NEW TreeNode WITH the element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF the val property of p IS NOT EQUALS the val property of q  
+        RETURN False  
+    ELSE  
+        RETURN the RESULT OF is_same_tree WITH p.left AND q.left AND THE RESULT OF is_same_tree WITH p.right AND q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION findFrequentTreeSum(self, root)  
+        FUNCTION subtree_sum(node)  
+            IF node IS none  
+                RETURN zero  
+            END IF  
+            SET current_sum TO the val property of node PLUS the RESULT OF subtree_sum WITH the left property of node PLUS the RESULT OF subtree_sum WITH the right property of node  
+            INCREMENT the value at key current_sum IN count BY one  
+            RETURN current_sum  
+        END FUNCTION  
+
+        SET count TO AN EMPTY DEFAULT DICTIONARY WITH INTEGER DEFAULT  
+        CALL subtree_sum WITH root  
+        SET max_freq TO THE MAXIMUM VALUE AMONG THE VALUES OF count OR zero IF count IS EMPTY  
+        SET result TO A LIST OF all keys FROM count WHERE THE VALUE AT THE key EQUALS max_freq  
+        RETURN result  
+    END FUNCTION  
+END CLASS

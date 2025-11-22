@@ -1,0 +1,88 @@
+CLASS Solution  
+    FUNCTION isSolvable(self, words, result)  
+        SET unique_chars TO set of all characters in concatenation of words and result  
+        IF size of unique_chars GREATER THAN 10 THEN  
+            RETURN False  
+        END IF  
+        
+        SET non_zero_chars TO set of first character of each word in words with length GREATER THAN 1  
+        ADD first character of result to non_zero_chars if length of result GREATER THAN 1  
+        
+        SET char_to_digit TO empty dictionary  
+        SET digit_to_char TO empty dictionary  
+        
+        FUNCTION can_assign(char, digit)  
+            RETURN char NOT IN char_to_digit AND (digit NOT IN digit_to_char OR digit_to_char[digit] EQUALS char)  
+        END FUNCTION  
+        
+        FUNCTION assign(char, digit)  
+            SET char_to_digit[char] TO digit  
+            SET digit_to_char[digit] TO char  
+        END FUNCTION  
+        
+        FUNCTION unassign(char, digit)  
+            REMOVE char FROM char_to_digit  
+            REMOVE digit FROM digit_to_char  
+        END FUNCTION  
+        
+        FUNCTION word_value(word)  
+            SET total TO 0  
+            FOR each index, char IN enumeration of characters of word in reverse order  
+                INCREMENT total BY char_to_digit[char] MULTIPLIED BY ten RAISED TO index  
+            END FOR  
+            RETURN total  
+        END FUNCTION  
+        
+        FUNCTION backtrack(index, col, sum_col)  
+            IF col GREATER THAN OR EQUAL TO maximum length among words AND col GREATER THAN OR EQUAL TO length of result THEN  
+                RETURN sum_col EQUALS 0  
+            END IF  
+            
+            IF index EQUALS length of words THEN  
+                IF col LESS THAN length of result THEN  
+                    SET digit_char TO character of result at position length of result MINUS 1 MINUS col  
+                    IF digit_char IN char_to_digit THEN  
+                        IF char_to_digit[digit_char] EQUALS sum_col MODULO 10 THEN  
+                            RETURN backtrack(0, col PLUS 1, sum_col DIVIDED BY 10)  
+                        ELSE  
+                            RETURN False  
+                        END IF  
+                    ELSE IF can_assign(digit_char, sum_col MODULO 10) AND (sum_col MODULO 10 NOT EQUAL TO 0 OR digit_char NOT IN non_zero_chars) THEN  
+                        assign(digit_char, sum_col MODULO 10)  
+                        IF backtrack(0, col PLUS 1, sum_col DIVIDED BY 10) THEN  
+                            RETURN True  
+                        END IF  
+                        unassign(digit_char, sum_col MODULO 10)  
+                    END IF  
+                ELSE  
+                    RETURN sum_col EQUALS 0  
+                END IF  
+                RETURN False  
+            END IF  
+            
+            SET word TO words at position index  
+            IF col GREATER THAN OR EQUAL TO length of word THEN  
+                RETURN backtrack(index PLUS 1, col, sum_col)  
+            END IF  
+            
+            SET char TO character of word at position length of word MINUS 1 MINUS col  
+            IF char IN char_to_digit THEN  
+                RETURN backtrack(index PLUS 1, col, sum_col PLUS char_to_digit[char])  
+            END IF  
+            
+            FOR digit FROM 0 TO 9  
+                IF can_assign(char, digit) AND (digit NOT EQUAL TO 0 OR char NOT IN non_zero_chars) THEN  
+                    assign(char, digit)  
+                    IF backtrack(index PLUS 1, col, sum_col PLUS digit) THEN  
+                        RETURN True  
+                    END IF  
+                    unassign(char, digit)  
+                END IF  
+            END FOR  
+            
+            RETURN False  
+        END FUNCTION  
+        
+        RETURN backtrack(0, 0, 0)  
+    END FUNCTION  
+END CLASS

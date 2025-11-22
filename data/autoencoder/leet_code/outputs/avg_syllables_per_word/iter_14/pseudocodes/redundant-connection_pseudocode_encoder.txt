@@ -1,0 +1,41 @@
+CLASS UnionFind  
+    FUNCTION __init__ WITH PARAMETER size  
+        SET parent TO LIST OF INTEGERS FROM zero TO size MINUS one INCLUSIVE  
+        SET rank TO LIST CONTAINING size TIMES the NUMBER one  
+    END FUNCTION  
+
+    FUNCTION find WITH PARAMETER p  
+        IF element AT position p OF parent IS NOT EQUAL TO p  
+            SET element AT position p OF parent TO RESULT OF find FUNCTION WITH PARAMETER element AT position p OF parent  
+        END IF  
+        RETURN element AT position p OF parent  
+    END FUNCTION  
+
+    FUNCTION union WITH PARAMETERS p AND q  
+        SET rootP TO RESULT OF find FUNCTION WITH PARAMETER p  
+        SET rootQ TO RESULT OF find FUNCTION WITH PARAMETER q  
+        IF rootP IS EQUAL TO rootQ  
+            RETURN false  
+        END IF  
+        IF element AT position rootP OF rank IS GREATER THAN element AT position rootQ OF rank  
+            SET element AT position rootQ OF parent TO rootP  
+        ELSE IF element AT position rootP OF rank IS LESS THAN element AT position rootQ OF rank  
+            SET element AT position rootP OF parent TO rootQ  
+        ELSE  
+            SET element AT position rootQ OF parent TO rootP  
+            INCREMENT element AT position rootP OF rank BY one  
+        END IF  
+        RETURN true  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION findRedundantConnection WITH PARAMETER edges  
+        SET uf TO NEW UnionFind WITH PARAMETER LENGTH OF edges PLUS one  
+        FOR each tuple u AND v IN edges  
+            IF RESULT OF uf.union WITH PARAMETERS u AND v IS false  
+                RETURN LIST CONTAINING u AND v  
+            END IF  
+        END FOR  
+    END FUNCTION  
+END CLASS

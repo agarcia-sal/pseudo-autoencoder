@@ -1,0 +1,31 @@
+CLASS Solution
+    FUNCTION maximumCost(n, highways, k)
+        IMPORT defaultdict FROM collections
+        
+        SET graph TO defaultdict with empty list as default
+        
+        FOR each (city1, city2, toll) IN highways
+            APPEND (city2, toll) TO graph[city1]
+            APPEND (city1, toll) TO graph[city2]
+        
+        DEFINE FUNCTION dfs(city, visited, cost, highways_used)
+            IF highways_used EQUALS k THEN
+                SET max_cost TO maximum of max_cost and cost
+                RETURN
+            FOR each (neighbor, toll) IN graph[city]
+                IF neighbor NOT IN visited THEN
+                    ADD neighbor TO visited
+                    CALL dfs(neighbor, visited, cost PLUS toll, highways_used PLUS 1)
+                    REMOVE neighbor FROM visited
+            END FOR
+        END FUNCTION
+        
+        SET max_cost TO -1
+        FOR start_city FROM 0 TO n MINUS 1
+            SET visited TO set containing start_city
+            CALL dfs(start_city, visited, 0, 0)
+        END FOR
+        
+        RETURN max_cost
+    END FUNCTION
+END CLASS

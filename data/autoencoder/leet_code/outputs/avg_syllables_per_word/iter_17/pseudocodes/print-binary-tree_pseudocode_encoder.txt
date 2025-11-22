@@ -1,0 +1,75 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values AS list)
+    IF values IS empty
+        RETURN none
+    END IF
+    SET root TO CALL TreeNode WITH element at position zero of values
+    SET i TO one
+    SET queue TO CALL deque WITH no parameters
+    CALL APPEND root TO queue
+    WHILE queue IS NOT empty
+        SET node TO CALL popleft ON queue
+        IF i LESS THAN the LENGTH OF values AND element at position i of values IS NOT none
+            SET node.left TO CALL TreeNode WITH element at position i of values
+            CALL APPEND node.left TO queue
+        END IF
+        INCREMENT i BY one
+        IF i LESS THAN the LENGTH OF values AND element at position i of values IS NOT none
+            SET node.right TO CALL TreeNode WITH element at position i of values
+            CALL APPEND node.right TO queue
+        END IF
+        INCREMENT i BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS none AND q IS none
+        RETURN true
+    ELSE IF p IS none OR q IS none
+        RETURN false
+    ELSE IF p.val NOT EQUALS q.val
+        RETURN false
+    ELSE
+        RETURN CALL is_same_tree WITH p.left, q.left AND CALL is_same_tree WITH p.right, q.right
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION printTree(root AS optional TreeNode) RETURNS list of list of strings
+        FUNCTION getHeight(node)
+            IF node IS none
+                RETURN zero
+            END IF
+            RETURN one PLUS MAXIMUM OF CALL getHeight WITH node.left AND CALL getHeight WITH node.right
+        END FUNCTION
+
+        SET height TO CALL getHeight WITH root
+        SET width TO two RAISED TO THE POWER OF height MINUS one
+        SET res TO CALL create_empty_matrix_list WITH height, width
+
+        FUNCTION placeNode(node, row, left, right)
+            IF node IS none
+                RETURN
+            END IF
+            SET mid TO INTEGER DIVISION OF left PLUS right BY two
+            CALL SET element at position mid of list at position row of res TO string representation OF node.val
+            CALL placeNode WITH node.left, row PLUS one, left, mid
+            CALL placeNode WITH node.right, row PLUS one, mid, right
+        END FUNCTION
+
+        CALL placeNode WITH root, zero, zero, width
+        RETURN res
+    END FUNCTION
+END CLASS
+
+FUNCTION create_empty_matrix_list(number_of_rows, number_of_columns)
+    RETURN a list containing number_of_rows elements EACH IS a list containing number_of_columns elements EACH IS an empty string
+END FUNCTION

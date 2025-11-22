@@ -1,0 +1,67 @@
+CLASS TreeNode
+    FUNCTION __init__(val EQUALS zero, left EQUALS null, right EQUALS null)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values)
+    IF values IS empty
+        RETURN null
+    END IF
+    SET root TO CALL TreeNode WITH element at position zero of values
+    SET i TO one
+    SET queue TO CALL deque WITH no parameters
+    CALL APPEND root TO queue
+    WHILE queue IS not empty
+        SET node TO CALL popleft ON queue
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT null
+            SET node.left TO CALL TreeNode WITH element at position i of values
+            CALL APPEND node.left TO queue
+        END IF
+        INCREMENT i BY one
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT null
+            SET node.right TO CALL TreeNode WITH element at position i of values
+            CALL APPEND node.right TO queue
+        END IF
+        INCREMENT i BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS null AND q IS null
+        RETURN true
+    ELSE IF p IS null OR q IS null
+        RETURN false
+    ELSE IF p.val IS NOT EQUALS q.val
+        RETURN false
+    ELSE
+        RETURN CALL is_same_tree WITH p.left AND q.left AND CALL is_same_tree WITH p.right AND q.right
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION minCameraCover(root)
+        FUNCTION dfs(node)
+            IF node IS null
+                RETURN zero, zero, positive infinity
+            END IF
+            SET left_no_camera, left_monitored, left_camera TO CALL dfs WITH node.left
+            SET right_no_camera, right_monitored, right_camera TO CALL dfs WITH node.right
+
+            SET no_camera TO left_monitored PLUS right_monitored
+            SET monitored TO minimum OF
+                left_camera PLUS minimum OF right_monitored AND right_camera,
+                right_camera PLUS minimum OF left_monitored AND left_camera,
+                left_camera PLUS right_camera
+            SET camera TO one PLUS minimum OF left_no_camera, left_monitored, left_camera PLUS minimum OF right_no_camera, right_monitored, right_camera
+            
+            RETURN no_camera, monitored, camera
+        END FUNCTION
+        
+        SET root_no_camera, root_monitored, root_camera TO CALL dfs WITH root
+        RETURN minimum OF root_monitored AND root_camera
+    END FUNCTION
+END CLASS

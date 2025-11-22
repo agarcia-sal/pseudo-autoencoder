@@ -1,0 +1,68 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val EQUALS zero left EQUALS none right EQUALS none  
+        SET self dot val TO val  
+        SET self dot left TO left  
+        SET self dot right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values AS list  
+    IF the LENGTH OF values EQUALS zero  
+        RETURN none  
+    END IF  
+    SET root TO A NEW INSTANCE OF TreeNode WITH THE ELEMENT at position zero of values  
+    SET i TO one  
+    SET queue TO AN EMPTY DOUBLE ENDED QUEUE  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO THE FIRST ELEMENT REMOVED FROM queue  
+        IF i IS LESS THAN THE LENGTH OF values AND THE ELEMENT at position i of values IS NOT none  
+            SET node dot left TO A NEW INSTANCE OF TreeNode WITH THE ELEMENT at position i of values  
+            APPEND node dot left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN THE LENGTH OF values AND THE ELEMENT at position i of values IS NOT none  
+            SET node dot right TO A NEW INSTANCE OF TreeNode WITH THE ELEMENT at position i of values  
+            APPEND node dot right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p AND q  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF THE VALUE of p dot val IS NOT EQUALS TO THE VALUE of q dot val  
+        RETURN False  
+    ELSE  
+        RETURN THE RESULT OF is_same_tree WITH PARAMETERS p dot left AND q dot left AND AND THE RESULT OF is_same_tree WITH PARAMETERS p dot right AND q dot right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION closestKValues WITH PARAMETERS self root target k  
+        FUNCTION inorder_traversal WITH PARAMETER node  
+            IF node IS none  
+                RETURN  
+            END IF  
+            CALL inorder_traversal WITH PARAMETER node dot left  
+            IF THE LENGTH OF result IS LESS THAN k  
+                APPEND THE VALUE of node dot val TO result  
+            ELSE  
+                IF THE ABSOLUTE VALUE OF THE VALUE of node dot val MINUS target IS LESS THAN THE ABSOLUTE VALUE OF THE ELEMENT at position zero of result MINUS target  
+                    REMOVE THE FIRST ELEMENT FROM result  
+                    APPEND THE VALUE of node dot val TO result  
+                ELSE  
+                    RETURN  
+                END IF  
+            END IF  
+            CALL inorder_traversal WITH PARAMETER node dot right  
+        END FUNCTION  
+    SET result TO AN EMPTY DOUBLE ENDED QUEUE  
+    CALL inorder_traversal WITH PARAMETER root  
+    RETURN THE CONVERSION OF result TO A LIST  
+END FUNCTION  
+END CLASS

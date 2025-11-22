@@ -1,0 +1,63 @@
+CLASS Solution  
+    FUNCTION maximumMinutes(grid)  
+        SET m TO LENGTH OF grid  
+        SET n TO LENGTH OF grid AT INDEX 0  
+        SET directions TO LIST OF (1, 0), (-1, 0), (0, 1), (0, -1)  
+        
+        FUNCTION can_escape(wait)  
+            SET fire_times TO 2D LIST OF size m BY n FILLED WITH infinity  
+            SET queue TO new deque  
+            
+            FOR i FROM 0 TO m MINUS 1  
+                FOR j FROM 0 TO n MINUS 1  
+                    IF grid AT i AT j EQUALS 1 THEN  
+                        APPEND (i, j, 0) TO queue  
+                        SET fire_times AT i AT j TO 0  
+            
+            WHILE queue IS NOT EMPTY  
+                SET x, y, t TO REMOVE FIRST ELEMENT FROM queue  
+                FOR dx, dy IN directions  
+                    SET nx TO x PLUS dx  
+                    SET ny TO y PLUS dy  
+                    IF nx IS GREATER THAN OR EQUAL TO 0 AND nx IS LESS THAN m AND ny IS GREATER THAN OR EQUAL TO 0 AND ny IS LESS THAN n AND grid AT nx AT ny EQUALS 0 AND fire_times AT nx AT ny EQUALS infinity THEN  
+                        SET fire_times AT nx AT ny TO t PLUS 1  
+                        APPEND (nx, ny, t PLUS 1) TO queue  
+            
+            SET queue TO new deque WITH ELEMENT (0, 0, wait)  
+            SET visited TO SET CONTAINING (0, 0)  
+            
+            WHILE queue IS NOT EMPTY  
+                SET x, y, t TO REMOVE FIRST ELEMENT FROM queue  
+                FOR dx, dy IN directions  
+                    SET nx TO x PLUS dx  
+                    SET ny TO y PLUS dy  
+                    IF nx IS GREATER THAN OR EQUAL TO 0 AND nx IS LESS THAN m AND ny IS GREATER THAN OR EQUAL TO 0 AND ny IS LESS THAN n AND (nx, ny) NOT IN visited AND grid AT nx AT ny EQUALS 0 THEN  
+                        IF nx EQUALS m MINUS 1 AND ny EQUALS n MINUS 1 THEN  
+                            IF fire_times AT nx AT ny IS GREATER THAN OR EQUAL TO t PLUS 1 THEN  
+                                RETURN True  
+                            ELSE  
+                                RETURN False  
+                        IF fire_times AT nx AT ny IS GREATER THAN t PLUS 1 THEN  
+                            ADD (nx, ny) TO visited  
+                            APPEND (nx, ny, t PLUS 1) TO queue  
+            
+            RETURN False  
+        
+        SET left TO 0  
+        SET right TO m TIMES n  
+        SET result TO -1  
+        
+        WHILE left IS LESS THAN OR EQUAL TO right  
+            SET mid TO (left PLUS right) DIVIDED BY 2  
+            IF can_escape(mid) THEN  
+                SET result TO mid  
+                SET left TO mid PLUS 1  
+            ELSE  
+                SET right TO mid MINUS 1  
+        
+        IF result EQUALS m TIMES n THEN  
+            RETURN 10 RAISED TO THE POWER OF 9  
+        ELSE  
+            RETURN result  
+    END FUNCTION  
+END CLASS

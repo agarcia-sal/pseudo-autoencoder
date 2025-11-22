@@ -1,0 +1,54 @@
+CLASS Solution  
+    FUNCTION cutOffTree(forest)  
+        IF forest IS EMPTY OR forest AT INDEX 0 IS EMPTY  
+            RETURN -1  
+        
+        SET trees TO EMPTY LIST  
+        FOR i FROM 0 TO LENGTH OF forest MINUS 1  
+            FOR j FROM 0 TO LENGTH OF forest AT INDEX 0 MINUS 1  
+                IF forest AT INDEX i AT INDEX j GREATER THAN 1  
+                    APPEND tuple OF (forest AT INDEX i AT INDEX j, i, j) TO trees  
+        
+        SORT trees IN ASCENDING ORDER  
+        
+        FUNCTION bfs(start, end)  
+            IF start EQUALS end  
+                RETURN 0  
+            SET m TO LENGTH OF forest  
+            SET n TO LENGTH OF forest AT INDEX 0  
+            SET queue TO DEQUE CONTAINING start  
+            SET visited TO SET CONTAINING start  
+            SET steps TO 0  
+            
+            WHILE queue IS NOT EMPTY  
+                SET size TO LENGTH OF queue  
+                FOR index FROM 1 TO size  
+                    REMOVE FIRST ELEMENT FROM queue AND ASSIGN TO (x, y)  
+                    FOR each (dx, dy) IN LIST OF (-1, 0), (1, 0), (0, -1), (0, 1)  
+                        SET nx TO x PLUS dx  
+                        SET ny TO y PLUS dy  
+                        IF nx GREATER THAN OR EQUAL TO 0 AND nx LESS THAN m AND ny GREATER THAN OR EQUAL TO 0 AND ny LESS THAN n AND (nx, ny) NOT IN visited AND forest AT INDEX nx AT INDEX ny NOT EQUALS 0  
+                            IF (nx, ny) EQUALS end  
+                                RETURN steps PLUS 1  
+                            ADD (nx, ny) TO visited  
+                            APPEND (nx, ny) TO queue  
+                INCREMENT steps BY 1  
+            
+            RETURN -1  
+        END FUNCTION  
+        
+        SET x TO 0  
+        SET y TO 0  
+        SET total_steps TO 0  
+        
+        FOR each (height, tx, ty) IN trees  
+            SET steps TO CALL bfs WITH start AS (x, y) AND end AS (tx, ty)  
+            IF steps EQUALS -1  
+                RETURN -1  
+            INCREMENT total_steps BY steps  
+            SET x TO tx  
+            SET y TO ty  
+        
+        RETURN total_steps  
+    END FUNCTION  
+END CLASS

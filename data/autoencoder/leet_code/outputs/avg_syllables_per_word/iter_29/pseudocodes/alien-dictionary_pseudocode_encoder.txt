@@ -1,0 +1,50 @@
+CLASS Solution  
+    FUNCTION alienOrder(words)  
+        SET graph TO a collection that assigns each character TO an empty set  
+        SET indegree TO a collection that assigns each character TO zero  
+        
+        SET all_characters TO the set of all characters appearing in the concatenation of all elements IN words  
+        
+        FOR each integer i FROM zero TO the LENGTH OF words MINUS one MINUS one  
+            SET first_word TO the element at position i of words  
+            SET second_word TO the element at position i PLUS one of words  
+            SET minimum_length TO the smaller value between the LENGTH OF first_word AND the LENGTH OF second_word  
+            SET differing_character_found TO false  
+            
+            FOR each integer j FROM zero TO minimum_length MINUS one  
+                IF the character at position j of first_word NOT EQUALS the character at position j of second_word  
+                    IF the character at position j of second_word is NOT in the set assigned to the character at position j of first_word in graph  
+                        ADD the character at position j of second_word TO the set assigned to the character at position j of first_word in graph  
+                        INCREMENT the value assigned to the character at position j of second_word in indegree BY one  
+                    END IF  
+                    SET differing_character_found TO true  
+                    BREAK out of the inner FOR loop  
+                END IF  
+            END FOR  
+            
+            IF differing_character_found EQUALS false AND the LENGTH OF first_word GREATER THAN the LENGTH OF second_word  
+                RETURN an empty string expressed as no characters  
+            END IF  
+        END FOR  
+        
+        SET queue TO a double ended collection initialized with all characters in all_characters for which the value in indegree EQUALS zero  
+        SET result_list TO an empty list  
+        
+        WHILE queue is not empty  
+            REMOVE the first element from queue and ASSIGN it TO current_character  
+            ADD current_character TO result_list  
+            FOR each neighbor_character IN the set assigned to current_character in graph  
+                DECREMENT the value assigned to neighbor_character in indegree BY one  
+                IF the value assigned to neighbor_character in indegree EQUALS zero  
+                    ADD neighbor_character TO the end of queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        IF the LENGTH OF result_list NOT EQUALS the LENGTH OF all_characters  
+            RETURN an empty string expressed as no characters  
+        END IF  
+        
+        RETURN the concatenation of all characters in result_list in order  
+    END FUNCTION  
+END CLASS

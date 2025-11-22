@@ -1,0 +1,11 @@
+from typing import List
+
+class Solution:
+    def minimumLengthEncoding(self, words: List[str]) -> int:
+        reversed_words = sorted(word[::-1] for word in words)
+        total_length = 0
+        n = len(reversed_words)
+        for i in range(n):
+            if i == n - 1 or not reversed_words[i + 1].startswith(reversed_words[i]):
+                total_length += len(reversed_words[i]) + 1
+        return total_length

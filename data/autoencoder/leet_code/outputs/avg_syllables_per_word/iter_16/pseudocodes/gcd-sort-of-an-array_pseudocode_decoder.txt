@@ -1,0 +1,52 @@
+CLASS UnionFind  
+    FUNCTION __init__ WITH parameter size  
+        SET parent TO a list of integers from zero TO size MINUS one inclusive  
+        SET rank TO a list of the integer one repeated size times  
+    END FUNCTION  
+  
+    FUNCTION find WITH parameter p  
+        IF the element at position p of parent IS NOT EQUAL TO p  
+            SET the element at position p of parent TO the result of find WITH the element at position p of parent  
+        END IF  
+        RETURN the element at position p of parent  
+    END FUNCTION  
+  
+    FUNCTION union WITH parameters p, q  
+        SET rootP TO the result of find WITH p  
+        SET rootQ TO the result of find WITH q  
+        IF rootP IS EQUAL TO rootQ  
+            RETURN false  
+        END IF  
+        IF the element at position rootP of rank IS GREATER THAN the element at position rootQ of rank  
+            SET the element at position rootQ of parent TO rootP  
+        ELSE IF the element at position rootP of rank IS LESS THAN the element at position rootQ of rank  
+            SET the element at position rootP of parent TO rootQ  
+        ELSE  
+            SET the element at position rootQ of parent TO rootP  
+            INCREMENT the element at position rootP of rank BY one  
+        END IF  
+        RETURN true  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION gcdSort WITH parameter nums  
+        SET sorted_nums TO the result of sorting nums in ascending order  
+        SET max_val TO the maximum value in nums  
+        SET uf TO a new instance of UnionFind initialized with max_val PLUS one  
+        FOR each num IN nums  
+            FOR each factor FROM two TO the integer part of the square root of num PLUS one inclusive  
+                IF num modulo factor EQUALS zero  
+                    CALL union method of uf WITH arguments num and factor  
+                    CALL union method of uf WITH arguments num and num DIVIDED BY factor  
+                END IF  
+            END FOR  
+        END FOR  
+        FOR each index FROM zero TO the length of nums MINUS one inclusive  
+            IF the result of find method of uf WITH the element at position index of nums IS NOT EQUAL TO the result of find method of uf WITH the element at position index of sorted_nums  
+                RETURN false  
+            END IF  
+        END FOR  
+        RETURN true  
+    END FUNCTION  
+END CLASS

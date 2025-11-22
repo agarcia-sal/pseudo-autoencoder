@@ -1,0 +1,16 @@
+class Solution:
+    def maxSubArrayLen(self, nums, k):
+        cumulative_sum_index = {0: -1}
+        cumulative_sum = 0
+        max_length = 0
+
+        for index, num in enumerate(nums):
+            cumulative_sum += num
+            if (cumulative_sum - k) in cumulative_sum_index:
+                potential_length = index - cumulative_sum_index[cumulative_sum - k]
+                if potential_length > max_length:
+                    max_length = potential_length
+            if cumulative_sum not in cumulative_sum_index:
+                cumulative_sum_index[cumulative_sum] = index
+
+        return max_length

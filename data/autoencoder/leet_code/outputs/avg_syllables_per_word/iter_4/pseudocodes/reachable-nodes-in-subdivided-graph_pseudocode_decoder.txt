@@ -1,0 +1,41 @@
+CLASS Solution
+    FUNCTION reachableNodes(edges, maxMoves, n)
+        SET graph TO empty dictionary mapping integers TO empty lists
+        FOR i FROM 0 TO n - 1
+            SET graph[i] TO empty list
+        FOR each (u, v, cnt) IN edges
+            APPEND pair (v, cnt) TO graph[u]
+            APPEND pair (u, cnt) TO graph[v]
+
+        SET distances TO list of size n FILLED WITH infinity
+        SET distances[0] TO 0
+        SET priority_queue TO list containing pair (0, 0)
+
+        WHILE priority_queue is not empty
+            SET (dist, node) TO REMOVE smallest element FROM priority_queue
+            IF dist GREATER THAN distances[node]
+                CONTINUE LOOP
+            FOR each (neighbor, cnt) IN graph[node]
+                SET new_dist TO dist PLUS cnt PLUS 1
+                IF new_dist LESS THAN distances[neighbor]
+                    SET distances[neighbor] TO new_dist
+                    ADD pair (new_dist, neighbor) TO priority_queue
+
+        SET reachable_nodes TO 0
+
+        FOR each d IN distances
+            IF d LESS THAN OR EQUAL TO maxMoves
+                INCREMENT reachable_nodes BY 1
+
+        SET used_edges TO empty dictionary
+
+        FOR each (u, v, cnt) IN edges
+            SET moves_u TO MAXIMUM of 0 AND (maxMoves MINUS distances[u])
+            SET moves_v TO MAXIMUM of 0 AND (maxMoves MINUS distances[v])
+            SET reachable_new_nodes TO MINIMUM of cnt AND (moves_u PLUS moves_v)
+            INCREMENT reachable_nodes BY reachable_new_nodes
+            SET used_edges[(u, v)] TO reachable_new_nodes
+
+        RETURN reachable_nodes
+    END FUNCTION
+END CLASS

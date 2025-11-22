@@ -1,0 +1,64 @@
+CLASS UnionFind  
+    FUNCTION __init__(self)  
+        SET self.parent TO an empty dictionary  
+        SET self.count TO zero  
+    END FUNCTION  
+  
+    FUNCTION make_set(self, x)  
+        IF element x is NOT IN the keys of self.parent THEN  
+            ASSIGN x TO the reference in self.parent at key x  
+            INCREMENT self.count BY one  
+        END IF  
+    END FUNCTION  
+  
+    FUNCTION find(self, x)  
+        IF the value in self.parent at key x is NOT EQUALS TO x THEN  
+            SET the value in self.parent at key x TO THE RESULT OF self.find with parameter the value in self.parent at key x  
+        END IF  
+        RETURN the value in self.parent at key x  
+    END FUNCTION  
+  
+    FUNCTION union(self, x, y)  
+        SET rootX TO THE RESULT OF self.find with parameter x  
+        SET rootY TO THE RESULT OF self.find with parameter y  
+        IF rootX IS NOT EQUALS TO rootY THEN  
+            SET the value in self.parent at key rootX TO rootY  
+            DECREMENT self.count BY one  
+        END IF  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION numIslands2(self, m, n, positions)  
+        FUNCTION is_valid(x, y)  
+            RETURN x IS GREATER THAN OR EQUAL TO zero AND x IS LESS THAN m AND y IS GREATER THAN OR EQUAL TO zero AND y IS LESS THAN n  
+        END FUNCTION  
+  
+        SET directions TO a list of elements each being a pair consisting of (one, zero), (minus one, zero), (zero, one), and (zero, minus one)  
+        SET uf TO A NEW instance of UnionFind  
+        SET grid TO a list of m elements each being a list of n elements each being zero  
+        SET result TO an empty list  
+  
+        FOR each pair r and c IN positions  
+            IF the element at position c of the element at position r in grid IS EQUALS TO one THEN  
+                APPEND the value of uf.count TO result  
+                CONTINUE to the next iteration of the FOR loop  
+            END IF  
+  
+            SET the element at position c of the element at position r in grid TO one  
+            CALL uf.make_set WITH argument a pair consisting of r and c  
+  
+            FOR each pair dr and dc IN directions  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                IF calling is_valid with parameters nr and nc RETURNS true AND the element at position nc of the element at position nr in grid IS EQUALS TO one THEN  
+                    CALL uf.union WITH arguments a pair consisting of r and c, and a pair consisting of nr and nc  
+                END IF  
+            END FOR  
+  
+            APPEND the value of uf.count TO result  
+        END FOR  
+  
+        RETURN result  
+    END FUNCTION  
+END CLASS

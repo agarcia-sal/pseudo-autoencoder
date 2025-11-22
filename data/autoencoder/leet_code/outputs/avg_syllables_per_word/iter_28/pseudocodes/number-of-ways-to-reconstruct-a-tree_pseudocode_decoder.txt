@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION checkWays(pairs)  
+        SET graph TO empty mapping from element to set of elements  
+        FOR each x and y IN pairs  
+            ADD y TO the set associated with x in graph  
+            ADD x TO the set associated with y in graph  
+        END FOR  
+        
+        SET max_degree TO an element in graph with the maximum size of the set associated with that element  
+        SET n TO the number of keys in graph  
+        
+        IF the size of the set associated with max_degree in graph NOT EQUALS n MINUS one THEN  
+            RETURN zero  
+        END IF  
+        
+        FUNCTION can_be_parent(u, v)  
+            RETURN all elements neighbor IN the set associated with v in graph satisfy neighbor IN the set associated with u in graph OR neighbor EQUALS u  
+        END FUNCTION  
+        
+        SET ways TO one  
+        
+        FOR each u IN the keys of graph  
+            IF u EQUALS max_degree THEN  
+                CONTINUE to next iteration  
+            END IF  
+            
+            SET parent TO None  
+            
+            FOR each v IN the set associated with u in graph  
+                IF v IS a key in graph AND the size of the set associated with v in graph GREATER THAN OR EQUAL TO the size of the set associated with u in graph AND can_be_parent called with v and u RETURNS true THEN  
+                    IF parent IS None OR the size of the set associated with v in graph LESS THAN the size of the set associated with parent in graph THEN  
+                        SET parent TO v  
+                    END IF  
+                END IF  
+            END FOR  
+            
+            IF parent IS None THEN  
+                RETURN zero  
+            END IF  
+            
+            IF the size of the set associated with parent in graph EQUALS the size of the set associated with u in graph THEN  
+                SET ways TO two  
+            END IF  
+        END FOR  
+        
+        RETURN ways  
+    END FUNCTION  
+END CLASS

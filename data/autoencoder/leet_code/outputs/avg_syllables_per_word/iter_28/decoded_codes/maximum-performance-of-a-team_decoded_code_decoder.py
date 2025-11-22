@@ -1,0 +1,23 @@
+import heapq
+from typing import List
+
+class Solution:
+    def maxPerformance(self, n: int, speed: List[int], efficiency: List[int], k: int) -> int:
+        engineers = [(e, s) for e, s in zip(efficiency, speed)]
+        engineers.sort(key=lambda x: x[0], reverse=True)
+
+        speed_heap = []
+        speed_sum = 0
+        max_performance = 0
+        MOD = 10**9 + 7
+
+        for eff, spd in engineers:
+            heapq.heappush(speed_heap, spd)
+            speed_sum += spd
+            if len(speed_heap) > k:
+                speed_sum -= heapq.heappop(speed_heap)
+            current_performance = speed_sum * eff
+            if current_performance > max_performance:
+                max_performance = current_performance
+
+        return max_performance % MOD

@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION totalStrength(strength)  
+        SET MOD TO 10 raised TO power 9 plus 7  
+        SET n TO LENGTH OF strength  
+        
+        SET prefix TO list of zeros of size n plus 1  
+        FOR i FROM 0 TO n MINUS 1  
+            SET prefix at position i plus 1 TO prefix at position i plus strength at position i MODULO MOD  
+        
+        SET prefix_prefix TO list of zeros of size n plus 2  
+        FOR i FROM 0 TO n  
+            SET prefix_prefix at position i plus 1 TO prefix_prefix at position i plus prefix at position i MODULO MOD  
+        
+        SET prev_smaller TO list of minus 1 repeated n times  
+        SET next_smaller_or_equal TO list of n repeated n times  
+        
+        SET stack TO empty list  
+        FOR i FROM 0 TO n MINUS 1  
+            WHILE stack IS NOT empty AND strength at position last element of stack GREATER THAN OR EQUAL TO strength at position i  
+                REMOVE last element FROM stack  
+            IF stack IS NOT empty  
+                SET prev_smaller at position i TO last element of stack  
+            APPEND i TO stack  
+        
+        CLEAR stack  
+        FOR i FROM n MINUS 1 DOWN TO 0  
+            WHILE stack IS NOT empty AND strength at position last element of stack GREATER THAN strength at position i  
+                REMOVE last element FROM stack  
+            IF stack IS NOT empty  
+                SET next_smaller_or_equal at position i TO last element of stack  
+            APPEND i TO stack  
+        
+        SET total_strength TO 0  
+        FOR i FROM 0 TO n MINUS 1  
+            SET left TO prev_smaller at position i PLUS 1  
+            SET right TO next_smaller_or_equal at position i  
+            
+            SET sum_left TO (i MINUS left PLUS 1) MULTIPLIED BY (prefix_prefix at position right PLUS 1 MINUS prefix_prefix at position i PLUS 1) MODULO MOD  
+            SET sum_right TO (right MINUS i) MULTIPLIED BY (prefix_prefix at position i PLUS 1 MINUS prefix_prefix at position left) MODULO MOD  
+            
+            SET contribution TO strength at position i MULTIPLIED BY (sum_left MINUS sum_right) MODULO MOD  
+            SET total_strength TO (total_strength PLUS contribution) MODULO MOD  
+        
+        RETURN total_strength  
+    END FUNCTION  
+END CLASS

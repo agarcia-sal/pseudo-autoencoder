@@ -1,0 +1,16 @@
+def minKBitFlips(nums, k):
+    n = len(nums)
+    flips = 0
+    flipped = [0] * (n + 1)
+    state = 0
+
+    for i in range(n):
+        state ^= flipped[i]
+        if nums[i] == state:
+            if i + k > n:
+                return -1
+            state ^= 1
+            flipped[i + k] ^= 1
+            flips += 1
+
+    return flips

@@ -1,0 +1,41 @@
+CLASS Solution
+    FUNCTION ladderLength(beginWord, endWord, wordList)
+        IF endWord NOT IN wordList THEN
+            RETURN 0
+        END IF
+
+        SET word_dict TO empty default dictionary of lists
+        SET word_length TO LENGTH OF beginWord
+
+        FOR each word IN wordList
+            FOR i FROM 0 TO word_length MINUS 1
+                SET intermediate_word TO substring of word from start TO i CONCATENATED WITH "*" CONCATENATED WITH substring of word from i+1 TO end
+                APPEND word TO word_dict[intermediate_word]
+            END FOR
+        END FOR
+
+        SET queue TO deque containing tuple (beginWord, 1)
+        SET visited TO set containing beginWord
+
+        WHILE queue IS NOT empty
+            SET current_word, current_length TO dequeue first element FROM queue
+
+            FOR i FROM 0 TO word_length MINUS 1
+                SET intermediate_word TO substring of current_word from start TO i CONCATENATED WITH "*" CONCATENATED WITH substring of current_word from i+1 TO end
+
+                FOR each word IN word_dict[intermediate_word]
+                    IF word EQUALS endWord THEN
+                        RETURN current_length + 1
+                    END IF
+
+                    IF word NOT IN visited THEN
+                        ADD word TO visited
+                        APPEND tuple (word, current_length + 1) TO queue
+                    END IF
+                END FOR
+            END FOR
+        END WHILE
+
+        RETURN 0
+    END FUNCTION
+END CLASS

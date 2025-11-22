@@ -1,0 +1,85 @@
+CLASS Solution  
+    FUNCTION containVirus(isInfected)  
+        FUNCTION neighbors(r, c)  
+            RETURN list of pairs consisting of element at position r PLUS one and element at position c  
+            element at position r MINUS one and element at position c  
+            element at position r and element at position c PLUS one  
+            element at position r and element at position c MINUS one  
+        END FUNCTION  
+
+        FUNCTION bfs(r, c)  
+            SET infected TO empty set  
+            SET threatened TO empty set  
+            SET queue TO deque initialized with pair consisting of r and c  
+            SET visited TO set initialized with pair consisting of r and c  
+            WHILE queue holds elements  
+                REMOVE element from the left of queue and assign to x and y  
+                ADD pair consisting of x and y TO infected  
+                FOR each pair nx and ny IN neighbors of x and y  
+                    IF nx GREATER THAN OR EQUAL TO zero AND nx LESS THAN m AND ny GREATER THAN OR EQUAL TO zero AND ny LESS THAN n AND pair consisting of nx and ny NOT IN visited THEN  
+                        ADD pair consisting of nx and ny TO visited  
+                        IF element at position nx and position ny of isInfected EQUALS one THEN  
+                            APPEND pair consisting of nx and ny TO queue  
+                        ELSE IF element at position nx and position ny of isInfected EQUALS zero THEN  
+                            ADD pair consisting of nx and ny TO threatened  
+                        END IF  
+                    END IF  
+                END FOR  
+            END WHILE  
+            RETURN infected AND threatened  
+        END FUNCTION  
+
+        FUNCTION build_walls(infected)  
+            SET walls TO zero  
+            FOR each pair x and y IN infected  
+                FOR each pair nx and ny IN neighbors of x and y  
+                    IF nx GREATER THAN OR EQUAL TO zero AND nx LESS THAN m AND ny GREATER THAN OR EQUAL TO zero AND ny LESS THAN n AND element at position nx and position ny of isInfected EQUALS zero THEN  
+                        INCREMENT walls BY one  
+                    END IF  
+                END FOR  
+            END FOR  
+            RETURN walls  
+        END FUNCTION  
+
+        FUNCTION spread_virus(threatened)  
+            FOR each pair x and y IN threatened  
+                SET element at position x and position y of isInfected TO one  
+            END FOR  
+        END FUNCTION  
+
+        SET m TO the LENGTH OF isInfected  
+        SET n TO the LENGTH OF element at position zero of isInfected  
+        SET total_walls TO zero  
+
+        WHILE true holds  
+            SET regions TO empty list  
+            SET visited TO empty set  
+            FOR r FROM zero TO m MINUS one  
+                FOR c FROM zero TO n MINUS one  
+                    IF element at position r and position c of isInfected EQUALS one AND pair consisting of r and c NOT IN visited THEN  
+                        CALL bfs WITH r AND c AND ASSIGN RESULT TO infected AND threatened  
+                        APPEND pair consisting of infected AND threatened TO regions  
+                        ASSIGN visited UNION infected TO visited  
+                    END IF  
+                END FOR  
+            END FOR  
+
+            IF the LENGTH OF regions EQUALS zero THEN  
+                BREAK  
+            END IF  
+
+            SORT regions IN descending order BY the LENGTH OF second element of each pair  
+
+            INCREMENT total_walls BY build_walls CALLED WITH first element of first pair OF regions  
+            FOR each pair x and y IN first element of first pair OF regions  
+                SET element at position x and position y of isInfected TO minus one  
+            END FOR  
+
+            FOR i FROM one TO the LENGTH OF regions MINUS one  
+                CALL spread_virus WITH second element of element at position i of regions  
+            END FOR  
+        END WHILE  
+
+        RETURN total_walls  
+    END FUNCTION  
+END CLASS

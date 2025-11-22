@@ -1,0 +1,42 @@
+CLASS Solution  
+    FUNCTION ladderLength(beginWord STRING, endWord STRING, wordList LIST OF STRING) RETURNS INTEGER  
+        IF endWord NOT IN wordList THEN  
+            RETURN zero  
+        END IF  
+        
+        SET word_dict TO a new mapping from STRING TO LIST OF STRING with default empty list  
+        SET word_length TO the LENGTH OF beginWord  
+        
+        FOR each word IN wordList  
+            FOR i FROM zero TO word_length MINUS one  
+                SET intermediate_word TO substring from position zero TO i MINUS one of word CONCATENATED WITH the character ASTERISK CONCATENATED WITH substring from position i PLUS one TO word_length MINUS one of word  
+                APPEND word TO the list at key intermediate_word IN word_dict  
+            END FOR  
+        END FOR  
+        
+        SET queue TO a new double ended queue initialized with the pair consisting of beginWord AND integer one  
+        SET visited TO a new set initialized with beginWord  
+        
+        WHILE the LENGTH OF queue GREATER THAN zero  
+            SET current_pair TO the element removed from the left end of queue  
+            SET current_word TO the first element of current_pair  
+            SET current_length TO the second element of current_pair  
+            
+            FOR i FROM zero TO word_length MINUS one  
+                SET intermediate_word TO substring from position zero TO i MINUS one of current_word CONCATENATED WITH the character ASTERISK CONCATENATED WITH substring from position i PLUS one TO word_length MINUS one of current_word  
+                
+                FOR each word IN the list at key intermediate_word IN word_dict  
+                    IF word EQUALS endWord THEN  
+                        RETURN current_length PLUS one  
+                    END IF  
+                    IF word NOT IN visited THEN  
+                        ADD word TO visited  
+                        APPEND the pair consisting of word AND current_length PLUS one TO queue  
+                    END IF  
+                END FOR  
+            END FOR  
+        END WHILE  
+        
+        RETURN zero  
+    END FUNCTION  
+END CLASS

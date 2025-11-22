@@ -1,0 +1,56 @@
+CLASS Solution
+    FUNCTION kMirror(k, n)
+        FUNCTION is_palindrome(s)
+            RETURN s EQUALS reversed s
+        END FUNCTION
+
+        FUNCTION to_base_k(num, k)
+            IF num EQUALS 0 THEN
+                RETURN "0"
+            END IF
+            SET digits TO empty list
+            WHILE num IS NOT 0
+                APPEND remainder of num DIVIDED BY k TO digits
+                SET num TO num DIVIDED BY k (integer division)
+            END WHILE
+            RETURN concatenation of digits reversed as strings
+        END FUNCTION
+
+        FUNCTION generate_palindromes(length)
+            IF length EQUALS 1 THEN
+                FOR i FROM 1 TO 9
+                    YIELD string representation of i
+                END FOR
+            ELSE
+                SET start TO 10 RAISED TO power of ((length - 1) DIVIDED BY 2)
+                SET end TO 10 RAISED TO power of ((length + 1) DIVIDED BY 2)
+                FOR half FROM start TO end MINUS 1
+                    SET half_str TO string representation of half
+                    IF length MODULO 2 EQUALS 0 THEN
+                        SET full TO half_str CONCATENATED WITH reversed half_str
+                    ELSE
+                        SET full TO half_str CONCATENATED WITH reversed half_str EXCLUDING last character
+                    END IF
+                    YIELD full
+                END FOR
+            END IF
+        END FUNCTION
+
+        SET k_mirror_numbers TO empty list
+        SET length TO 1
+        WHILE LENGTH OF k_mirror_numbers LESS THAN n
+            FOR pal IN generate_palindromes(length)
+                SET num TO integer value of pal
+                IF is_palindrome(to_base_k(num, k)) THEN
+                    APPEND num TO k_mirror_numbers
+                    IF LENGTH OF k_mirror_numbers EQUALS n THEN
+                        BREAK
+                    END IF
+                END IF
+            END FOR
+            INCREMENT length BY 1
+        END WHILE
+
+        RETURN sum of k_mirror_numbers
+    END FUNCTION
+END CLASS

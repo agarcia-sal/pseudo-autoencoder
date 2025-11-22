@@ -1,0 +1,61 @@
+CLASS Solution  
+    FUNCTION smallestMissingValueSubtree(parents, nums)  
+        SET number_of_nodes TO the LENGTH OF parents  
+        SET tree TO a new mapping from keys to empty lists  
+        
+        FOR index FROM one TO number_of_nodes MINUS one  
+            APPEND index TO the list at key element at position index of parents IN tree  
+        END FOR  
+        
+        SET node_with_value_one TO negative one  
+        FOR index FROM zero TO number_of_nodes MINUS one  
+            IF element at position index of nums EQUALS one  
+                SET node_with_value_one TO index  
+                BREAK  
+            END IF  
+        END FOR  
+        
+        IF node_with_value_one EQUALS negative one  
+            RETURN a list of the value one repeated number_of_nodes times  
+        END IF  
+        
+        SET result TO a list of the value one repeated number_of_nodes times  
+        
+        FUNCTION dfs(node)  
+            ADD node TO visited  
+            SET genetic_values TO a new set containing element at position node of nums  
+            FOR each child IN the list at key node IN tree  
+                IF child NOT IN visited  
+                    SET explored_values TO dfs(child)  
+                    UPDATE genetic_values TO INCLUDE all elements of explored_values  
+                END IF  
+            END FOR  
+            SET smallest_missing TO one  
+            WHILE smallest_missing IS IN genetic_values  
+                INCREMENT smallest_missing BY one  
+            END WHILE  
+            SET element at position node of result TO smallest_missing  
+            RETURN genetic_values  
+        END FUNCTION  
+        
+        SET visited TO an empty set  
+        SET path TO an empty list  
+        SET current_node TO node_with_value_one  
+        
+        WHILE current_node NOT EQUALS negative one  
+            APPEND current_node TO path  
+            SET current_node TO element at position current_node of parents  
+        END WHILE  
+        
+        SET path_set TO a set containing all elements of path  
+        
+        FOR each node IN the reversal of path  
+            IF node IN visited  
+                CONTINUE  
+            END IF  
+            CALL dfs WITH node  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,25 @@
+CLASS Solution  
+    FUNCTION connectTwoGroups(cost)  
+        SET size1 TO LENGTH OF cost  
+        SET size2 TO LENGTH OF cost AT INDEX 0  
+        SET dp TO 2D list of size (size1 PLUS 1) by (2 RAISED TO size2) with all values INFINITY  
+        SET dp AT INDEX 0 AND 0 TO 0  
+  
+        FOR i FROM 0 TO size1 MINUS 1  
+            FOR mask FROM 0 TO (2 RAISED TO size2) MINUS 1  
+                FOR j FROM 0 TO size2 MINUS 1  
+                    SET new_mask TO mask OR (1 LEFT SHIFTED BY j)  
+                    SET dp AT INDEX i PLUS 1 AND new_mask TO MINIMUM OF dp AT INDEX i PLUS 1 AND new_mask AND (dp AT INDEX i AND mask PLUS cost AT INDEX i AND j)  
+                END FOR  
+  
+                FOR j FROM 0 TO size2 MINUS 1  
+                    IF mask AND (1 LEFT SHIFTED BY j) IS NOT 0 THEN  
+                        SET dp AT INDEX i PLUS 1 AND mask TO MINIMUM OF dp AT INDEX i PLUS 1 AND mask AND (dp AT INDEX i PLUS 1 AND (mask XOR (1 LEFT SHIFTED BY j)) PLUS cost AT INDEX i AND j)  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+  
+        RETURN dp AT INDEX size1 AND ((1 LEFT SHIFTED BY size2) MINUS 1)  
+    END FUNCTION  
+END CLASS

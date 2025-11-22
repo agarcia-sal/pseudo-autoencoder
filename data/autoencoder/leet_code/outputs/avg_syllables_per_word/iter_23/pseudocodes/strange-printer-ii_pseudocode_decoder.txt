@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION isPrintable(targetGrid)  
+        SET color_bounds TO dictionary with default value of list containing positive infinity positive infinity negative infinity negative infinity  
+        FOR r FROM zero TO the LENGTH OF targetGrid MINUS one  
+            FOR c FROM zero TO the LENGTH OF element at position r of targetGrid MINUS one  
+                SET color TO element at position r of targetGrid at position c  
+                SET element at position zero of color_bounds at key color TO the smaller of element at position zero of color_bounds at key color AND r  
+                SET element at position one of color_bounds at key color TO the smaller of element at position one of color_bounds at key color AND c  
+                SET element at position two of color_bounds at key color TO the larger of element at position two of color_bounds at key color AND r  
+                SET element at position three of color_bounds at key color TO the larger of element at position three of color_bounds at key color AND c  
+            END FOR  
+        END FOR  
+        SET graph TO dictionary with default value of empty list  
+        SET in_degree TO dictionary with default value of zero  
+        FOR each key color AND list with elements minr minc maxr maxc IN the items of color_bounds  
+            FOR r FROM minr TO maxr  
+                FOR c FROM minc TO maxc  
+                    IF element at position r of targetGrid at position c NOT EQUALS color THEN  
+                        SET other_color TO element at position r of targetGrid at position c  
+                        APPEND color TO the list at key other_color in graph  
+                        INCREMENT in_degree at key color BY one  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+        SET queue TO deque initialized with colors from color_bounds where in_degree at key color EQUALS zero  
+        SET visited_colors TO zero  
+        WHILE queue is not empty  
+            REMOVE element from the left of queue and ASSIGN it TO color  
+            INCREMENT visited_colors BY one  
+            FOR each next_color IN the list at key color in graph  
+                DECREMENT in_degree at key next_color BY one  
+                IF in_degree at key next_color EQUALS zero THEN  
+                    APPEND next_color TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        RETURN visited_colors EQUALS the LENGTH OF color_bounds  
+    END FUNCTION  
+END CLASS

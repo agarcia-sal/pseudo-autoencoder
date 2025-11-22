@@ -1,0 +1,77 @@
+```
+CLASS TrieNode
+    FUNCTION __init__()
+        SET children TO a new default dictionary of TrieNode
+        SET count TO 0
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION maxGeneticDifference(parents: List[int], queries: List[List[int]]) RETURNS List[int]
+        SET tree TO a new default dictionary of list
+        FOR each index i and parent IN parents
+            IF parent IS NOT -1 THEN
+                APPEND i TO tree[parent]
+        
+        SET node_queries TO a new default dictionary of list
+        FOR each node, val IN queries
+            APPEND val TO node_queries[node]
+        
+        SET root TO a new TrieNode()
+        SET result TO list of zeroes with length equal to LENGTH OF queries
+        
+        FUNCTION dfs(node: int)
+            CALL insert(trie_root=root, value=node)
+            FOR each val IN node_queries[node]
+                SET result[query_idx[(node, val)]] TO max_xor(trie_root=root, value=val)
+            FOR each child IN tree[node]
+                CALL dfs(child)
+            CALL erase(trie_root=root, value=node)
+        END FUNCTION
+        
+        FUNCTION insert(trie_root: TrieNode, value: int)
+            SET node TO trie_root
+            FOR i FROM 17 DOWNTO 0
+                SET bit TO the i-th bit of value
+                SET node TO node.children[bit]
+                INCREMENT node.count BY 1
+            END FOR
+        END FUNCTION
+        
+        FUNCTION erase(trie_root: TrieNode, value: int)
+            SET node TO trie_root
+            FOR i FROM 17 DOWNTO 0
+                SET bit TO the i-th bit of value
+                SET node TO node.children[bit]
+                DECREMENT node.count BY 1
+            END FOR
+        END FUNCTION
+        
+        FUNCTION max_xor(trie_root: TrieNode, value: int) RETURNS int
+            SET node TO trie_root
+            SET max_xor_val TO 0
+            FOR i FROM 17 DOWNTO 0
+                SET bit TO the i-th bit of value
+                SET toggled_bit TO 1 MINUS bit
+                IF toggled_bit EXISTS IN node.children AND node.children[toggled_bit].count > 0 THEN
+                    SET max_xor_val TO max_xor_val OR (1 LEFT SHIFT i)
+                    SET node TO node.children[toggled_bit]
+                ELSE
+                    SET node TO node.children[bit]
+            END FOR
+            RETURN max_xor_val
+        END FUNCTION
+        
+        SET query_idx TO empty dictionary
+        FOR each index idx, (node, val) IN ENUMERATE queries
+            SET query_idx[(node, val)] TO idx
+        
+        FOR each index i, parent IN parents
+            IF parent IS -1 THEN
+                CALL dfs(i)
+                BREAK
+        
+        RETURN result
+    END FUNCTION
+END CLASS
+```

@@ -1,0 +1,47 @@
+CLASS Solution
+    FUNCTION maximumBeauty(flowers: List of int, newFlowers: int, target: int, full: int, partial: int) RETURNS int
+        SORT flowers IN ASCENDING ORDER
+        SET n TO LENGTH OF flowers
+        SET max_beauty TO 0
+        
+        SET prefix_sum TO LIST OF SIZE (n + 1) WITH ALL ELEMENTS 0
+        FOR i FROM 0 TO n - 1
+            SET prefix_sum[i + 1] TO prefix_sum[i] + flowers[i]
+        
+        SET complete_gardens TO 0
+        FOR i FROM n - 1 DOWNTO 0
+            IF flowers[i] >= target THEN
+                INCREMENT complete_gardens BY 1
+            ELSE
+                BREAK
+        
+        SET remaining_flowers TO newFlowers
+        SET max_incomplete_flowers TO 0
+        
+        FOR i FROM complete_gardens TO n
+            IF i > 0 THEN
+                DECREMENT remaining_flowers BY (target - flowers[n - i])
+                IF remaining_flowers < 0 THEN
+                    BREAK
+            
+            SET left TO 0
+            SET right TO n - i - 1
+            WHILE left <= right
+                SET mid TO (left + right) DIVIDED BY 2
+                SET cost TO flowers[mid] * (mid + 1) - prefix_sum[mid + 1]
+                IF cost > remaining_flowers THEN
+                    SET right TO mid - 1
+                ELSE
+                    SET left TO mid + 1
+            
+            IF right >= 0 THEN
+                SET max_incomplete_flowers TO flowers[right] + (remaining_flowers - (flowers[right] * (right + 1) - prefix_sum[right + 1])) DIVIDED BY (right + 1)
+            ELSE
+                SET max_incomplete_flowers TO 0
+            
+            SET total_beauty TO (i * full) + (MINIMUM OF max_incomplete_flowers AND (target - 1)) * partial
+            SET max_beauty TO MAXIMUM OF max_beauty AND total_beauty
+        
+        RETURN max_beauty
+    END FUNCTION
+END CLASS

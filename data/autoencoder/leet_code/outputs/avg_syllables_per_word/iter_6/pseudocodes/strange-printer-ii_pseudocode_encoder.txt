@@ -1,0 +1,36 @@
+CLASS Solution  
+    FUNCTION isPrintable(targetGrid)  
+        SET color_bounds TO a map with default value as list of [infinity, infinity, negative infinity, negative infinity]  
+        FOR r FROM 0 TO LENGTH OF targetGrid MINUS 1  
+            FOR c FROM 0 TO LENGTH OF targetGrid AT INDEX 0 MINUS 1  
+                SET color TO targetGrid AT r AND c  
+                SET color_bounds[color] AT 0 TO the smaller value BETWEEN color_bounds[color] AT 0 AND r  
+                SET color_bounds[color] AT 1 TO the smaller value BETWEEN color_bounds[color] AT 1 AND c  
+                SET color_bounds[color] AT 2 TO the larger value BETWEEN color_bounds[color] AT 2 AND r  
+                SET color_bounds[color] AT 3 TO the larger value BETWEEN color_bounds[color] AT 3 AND c  
+        
+        SET graph TO a map with default empty list  
+        SET in_degree TO a map with default zero  
+        
+        FOR each color AND bounds (minr, minc, maxr, maxc) IN color_bounds  
+            FOR r FROM minr TO maxr  
+                FOR c FROM minc TO maxc  
+                    IF targetGrid AT r AND c IS NOT EQUALS color  
+                        SET other_color TO targetGrid AT r AND c  
+                        APPEND color TO graph AT other_color  
+                        INCREMENT in_degree[color] BY 1  
+        
+        SET queue TO a deque containing colors FROM color_bounds WHERE in_degree[color] EQUALS 0  
+        SET visited_colors TO 0  
+        
+        WHILE queue IS NOT EMPTY  
+            REMOVE first element FROM queue AND SET TO color  
+            INCREMENT visited_colors BY 1  
+            FOR each next_color IN graph AT color  
+                DECREMENT in_degree[next_color] BY 1  
+                IF in_degree[next_color] EQUALS 0  
+                    APPEND next_color TO queue  
+        
+        RETURN visited_colors EQUALS LENGTH OF color_bounds  
+    END FUNCTION  
+END CLASS

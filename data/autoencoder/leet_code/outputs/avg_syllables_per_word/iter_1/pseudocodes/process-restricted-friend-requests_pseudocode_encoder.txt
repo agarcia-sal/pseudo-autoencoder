@@ -1,0 +1,39 @@
+```
+init UnionFind(n):
+    parent = [0..n-1]
+    size = [1]*n
+
+find(u):
+    if parent[u] != u: parent[u] = find(parent[u])
+    return parent[u]
+
+union(u,v):
+    ru, rv = find(u), find(v)
+    if ru != rv:
+        if size[ru] > size[rv]:
+            parent[rv] = ru; size[ru]+=size[rv]
+        else:
+            parent[ru] = rv; size[rv]+=size[ru]
+
+friendRequests(n, restrictions, requests):
+    uf = UnionFind(n)
+    res = []
+    rmap = {}
+    for x,y in restrictions:
+        rmap[x] = rmap.get(x,set()) | {y}
+        rmap[y] = rmap.get(y,set()) | {x}
+    can_union(u,v):
+        ru, rv = uf.find(u), uf.find(v)
+        for p in rmap.get(ru,{}):
+            if uf.find(p) == rv: return False
+        for p in rmap.get(rv,{}):
+            if uf.find(p) == ru: return False
+        return True
+    for u,v in requests:
+        if uf.find(u) == uf.find(v) or can_union(u,v):
+            uf.union(u,v)
+            res.append(True)
+        else:
+            res.append(False)
+    return res
+```

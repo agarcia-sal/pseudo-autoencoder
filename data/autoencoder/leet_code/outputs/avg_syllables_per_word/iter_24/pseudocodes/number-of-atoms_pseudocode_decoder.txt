@@ -1,0 +1,68 @@
+CLASS Solution  
+    FUNCTION countOfAtoms(formula)  
+        FUNCTION parse(segment)  
+            CREATE atom_count AS a mapping from element names TO zero counts  
+            SET elements TO the list of pairs of each element name followed by its count found in segment where element name IS one uppercase letter FOLLOWED BY zero or more lowercase letters and count IS zero or more digits  
+            FOR each element name AND count IN elements  
+                IF count IS empty string  
+                    INCREMENT atom_count FOR the element name BY one  
+                ELSE  
+                    INCREMENT atom_count FOR the element name BY the integer value of count  
+                END IF  
+            END FOR  
+            RETURN atom_count  
+        END FUNCTION  
+        
+        FUNCTION multiply_counts(counts, multiplier)  
+            FOR each element name IN counts  
+                MULTIPLY counts FOR the element name BY multiplier  
+            END FOR  
+            RETURN counts  
+        END FUNCTION  
+        
+        CREATE stack AS a list containing a single mapping from element names TO zero counts  
+        SET i TO zero  
+        WHILE i IS LESS THAN the length of formula  
+            IF element at position i of formula EQUALS the character representing an opening parenthesis  
+                APPEND a new mapping from element names TO zero counts TO stack  
+                INCREMENT i BY one  
+            ELSE IF element at position i of formula EQUALS the character representing a closing parenthesis  
+                CREATE j and SET j TO i PLUS one  
+                WHILE j IS LESS THAN length of formula AND element at position j of formula IS a digit character  
+                    INCREMENT j BY one  
+                END WHILE  
+                IF j IS GREATER THAN i PLUS one  
+                    SET multiplier TO the integer value represented by elements from position i PLUS one TO position j MINUS one of formula  
+                ELSE  
+                    SET multiplier TO one  
+                END IF  
+                SET segment_count TO multiply_counts OF popping the last mapping FROM stack WITH multiplier  
+                FOR each element name IN segment_count  
+                    INCREMENT the mapping at the last position of stack AT element name BY segment_count FOR element name  
+                END FOR  
+                SET i TO j  
+            ELSE  
+                CREATE j and SET j TO i PLUS one  
+                WHILE j IS LESS THAN length of formula AND the element at position j of formula IS a lowercase letter OR a digit character  
+                    INCREMENT j BY one  
+                END WHILE  
+                SET segment_count TO parse OF the substring of formula from position i TO position j MINUS one  
+                FOR each element name IN segment_count  
+                    INCREMENT the mapping at the last position of stack AT element name BY segment_count FOR element name  
+                END FOR  
+                SET i TO j  
+            END IF  
+        END WHILE  
+        
+        SET final_count TO popping the last mapping FROM stack  
+        CREATE result_string AS empty string  
+        FOR each element name IN the keys of final_count sorted in alphabetical order  
+            APPEND the element name TO result_string  
+            IF final_count FOR element name IS GREATER THAN one  
+                APPEND the string representation of final_count FOR element name TO result_string  
+            END IF  
+        END FOR  
+        
+        RETURN result_string  
+    END FUNCTION  
+END CLASS

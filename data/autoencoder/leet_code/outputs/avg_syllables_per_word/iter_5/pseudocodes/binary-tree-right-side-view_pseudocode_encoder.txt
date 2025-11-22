@@ -1,0 +1,62 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET root TO new TreeNode WITH val AS values AT INDEX 0  
+    SET i TO 1  
+    SET queue TO new deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO REMOVE first element FROM queue  
+        IF i IS LESS THAN LENGTH OF values AND values AT INDEX i IS NOT None  
+            SET node.left TO new TreeNode WITH val AS values AT INDEX i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i IS LESS THAN LENGTH OF values AND values AT INDEX i IS NOT None  
+            SET node.right TO new TreeNode WITH val AS values AT INDEX i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION rightSideView(self, root)  
+        IF root IS None  
+            RETURN empty list  
+        SET right_side_view TO empty list  
+        SET queue TO new deque WITH root AS ONLY ELEMENT  
+        WHILE queue IS NOT EMPTY  
+            SET level_length TO LENGTH OF queue  
+            FOR i FROM 0 TO level_length MINUS 1  
+                SET node TO REMOVE first element FROM queue  
+                IF i IS EQUAL TO level_length MINUS 1  
+                    APPEND node.val TO right_side_view  
+                IF node.left IS NOT None  
+                    APPEND node.left TO queue  
+                IF node.right IS NOT None  
+                    APPEND node.right TO queue  
+            END FOR  
+        END WHILE  
+        RETURN right_side_view  
+    END FUNCTION  
+END CLASS

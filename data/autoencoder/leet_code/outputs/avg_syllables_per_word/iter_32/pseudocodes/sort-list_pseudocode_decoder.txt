@@ -1,0 +1,77 @@
+CLASS ListNode  
+    FUNCTION __init__ WITH PARAMETERS val SET TO zero AND next SET TO none  
+        SET the val ATTRIBUTE OF self TO val  
+        SET the next ATTRIBUTE OF self TO next  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION list_node WITH PARAMETER values  
+    IF the LENGTH OF values EQUALS zero  
+        RETURN none  
+    END IF  
+    SET head TO A NEW INSTANCE OF ListNode WITH PARAMETER element at position one of values  
+    SET p TO head  
+    FOR each val IN the SUBLIST of values FROM position two TO the END  
+        SET node TO A NEW INSTANCE OF ListNode WITH PARAMETER val  
+        SET the next ATTRIBUTE OF p TO node  
+        SET p TO node  
+    END FOR  
+    RETURN head  
+END FUNCTION  
+
+FUNCTION is_same_list WITH PARAMETERS p1 AND p2  
+    IF p1 EQUALS none AND p2 EQUALS none  
+        RETURN true  
+    END IF  
+    IF p1 EQUALS none OR p2 EQUALS none  
+        RETURN false  
+    END IF  
+    RETURN the CONDITION that the val ATTRIBUTE OF p1 EQUALS the val ATTRIBUTE OF p2 AND the RESULT OF is_same_list WITH PARAMETERS the next ATTRIBUTE OF p1 AND the next ATTRIBUTE OF p2  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION sortList WITH PARAMETERS self AND head  
+        IF head EQUALS none OR the next ATTRIBUTE OF head EQUALS none  
+            RETURN head  
+        END IF  
+
+        FUNCTION split WITH PARAMETER head  
+            SET slow TO head  
+            SET fast TO the next ATTRIBUTE OF head  
+            WHILE fast IS NOT none AND the next ATTRIBUTE OF fast IS NOT none  
+                SET slow TO the next ATTRIBUTE OF slow  
+                SET fast TO the next ATTRIBUTE OF the next ATTRIBUTE OF fast  
+            END WHILE  
+            SET mid TO the next ATTRIBUTE OF slow  
+            SET the next ATTRIBUTE OF slow TO none  
+            RETURN head AND mid  
+        END FUNCTION  
+
+        FUNCTION merge WITH PARAMETERS l1 AND l2  
+            SET dummy TO A NEW INSTANCE OF ListNode WITH NO PARAMETERS  
+            SET current TO dummy  
+            WHILE l1 IS NOT none AND l2 IS NOT none  
+                IF the val ATTRIBUTE OF l1 LESS THAN the val ATTRIBUTE OF l2  
+                    SET the next ATTRIBUTE OF current TO l1  
+                    SET l1 TO the next ATTRIBUTE OF l1  
+                ELSE  
+                    SET the next ATTRIBUTE OF current TO l2  
+                    SET l2 TO the next ATTRIBUTE OF l2  
+                END IF  
+                SET current TO the next ATTRIBUTE OF current  
+            END WHILE  
+            IF l1 IS NOT none  
+                SET the next ATTRIBUTE OF current TO l1  
+            ELSE  
+                SET the next ATTRIBUTE OF current TO l2  
+            END IF  
+            RETURN the next ATTRIBUTE OF dummy  
+        END FUNCTION  
+
+        SET left AND right TO the RESULT OF split WITH PARAMETER head  
+        SET left TO the RESULT OF self dot sortList WITH PARAMETER left  
+        SET right TO the RESULT OF self dot sortList WITH PARAMETER right  
+
+        RETURN the RESULT OF merge WITH PARAMETERS left AND right  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,64 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val EQUALS zero, left EQUALS none, right EQUALS none  
+        SET val ATTRIBUTE OF self TO val  
+        SET left ATTRIBUTE OF self TO left  
+        SET right ATTRIBUTE OF self TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values AS list  
+    IF values IS EMPTY  
+        RETURN none  
+    END IF  
+    SET root TO NEW TreeNode WITH PARAMETER element at position zero OF values  
+    SET i TO one  
+    SET queue TO NEW deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO FIRST ELEMENT REMOVED FROM queue  
+        IF i IS LESS THAN LENGTH OF values AND element at position i OF values IS NOT none  
+            SET left ATTRIBUTE OF node TO NEW TreeNode WITH PARAMETER element at position i OF values  
+            APPEND left ATTRIBUTE OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN LENGTH OF values AND element at position i OF values IS NOT none  
+            SET right ATTRIBUTE OF node TO NEW TreeNode WITH PARAMETER element at position i OF values  
+            APPEND right ATTRIBUTE OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p, q  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF val ATTRIBUTE OF p IS NOT EQUALS val ATTRIBUTE OF q  
+        RETURN false  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETER left ATTRIBUTE OF p AND left ATTRIBUTE OF q AND is_same_tree WITH PARAMETER right ATTRIBUTE OF p AND right ATTRIBUTE OF q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION countUnivalSubtrees WITH PARAMETERS root AS Optional TreeNode  
+        FUNCTION helper WITH PARAMETER node  
+            IF node IS none  
+                RETURN true, zero  
+            END IF  
+            SET is_left_unival, left_count TO helper WITH PARAMETER left ATTRIBUTE OF node  
+            SET is_right_unival, right_count TO helper WITH PARAMETER right ATTRIBUTE OF node  
+            IF is_left_unival IS true AND is_right_unival IS true  
+                IF left ATTRIBUTE OF node IS none OR val ATTRIBUTE OF left ATTRIBUTE OF node EQUALS val ATTRIBUTE OF node  
+                    AND right ATTRIBUTE OF node IS none OR val ATTRIBUTE OF right ATTRIBUTE OF node EQUALS val ATTRIBUTE OF node  
+                    RETURN true, left_count PLUS right_count PLUS one  
+                END IF  
+            END IF  
+            RETURN false, left_count PLUS right_count  
+        END FUNCTION  
+        SET _, count TO helper WITH PARAMETER root  
+        RETURN count  
+    END FUNCTION  
+END CLASS

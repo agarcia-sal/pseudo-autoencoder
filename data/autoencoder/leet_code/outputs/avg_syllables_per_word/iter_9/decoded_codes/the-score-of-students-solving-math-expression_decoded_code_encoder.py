@@ -1,0 +1,63 @@
+class Solution:
+    def scoreOfStudents(self, s, answers):
+        def evaluate_expression(expression):
+            tokens = []
+            num = 0
+            for char in expression:
+                if char.isdigit():
+                    num = num * 10 + int(char)
+                else:
+                    tokens.append(num)
+                    tokens.append(char)
+                    num = 0
+            tokens.append(num)
+
+            i = 1
+            while i < len(tokens):
+                if tokens[i] == '*':
+                    tokens[i-1] = tokens[i-1] * tokens[i+1]
+                    del tokens[i:i+2]
+                else:
+                    i += 1
+
+            result = tokens[0]
+            i = 1
+            while i < len(tokens):
+                if tokens[i] == '+':
+                    result += tokens[i+1]
+                i += 2
+            return result
+
+        from functools import lru_cache
+
+        @lru_cache(None)
+        def get_possible_answers(expr):
+            if expr.isdigit():
+                return {int(expr)}
+
+            results = set()
+            for i in range(1, len(expr) - 1, 2):
+                left_results = get_possible_answers(expr[:i])
+                right_results = get_possible_answers(expr[i+1:])
+                op = expr[i]
+                for left in left_results:
+                    for right in right_results:
+                        if op == '+':
+                            val = left + right
+                        else:
+                            val = left * right
+                        if val <= 1000:
+                            results.add(val)
+            return results
+
+        correct_answer = evaluate_expression(s)
+        possible_answers = get_possible_answers(s)
+        points = 0
+        answers_set = set(answers)  # Optional: speed up membership check
+
+        for answer in answers:
+            if answer == correct_answer:
+                points += 5
+            elif answer in possible_answers:
+                points += 2
+        return points

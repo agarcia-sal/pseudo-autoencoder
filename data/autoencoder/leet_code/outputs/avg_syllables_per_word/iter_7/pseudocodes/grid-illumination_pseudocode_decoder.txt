@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION gridIllumination(n, lamps, queries)  
+        INITIALIZE row_count AS map with default integer 0  
+        INITIALIZE col_count AS map with default integer 0  
+        INITIALIZE diag_count AS map with default integer 0  
+        INITIALIZE anti_diag_count AS map with default integer 0  
+        
+        INITIALIZE lamp_positions AS empty set  
+        
+        FOR each (r, c) IN lamps  
+            IF (r, c) NOT IN lamp_positions  
+                ADD (r, c) TO lamp_positions  
+                INCREMENT row_count[r] BY 1  
+                INCREMENT col_count[c] BY 1  
+                INCREMENT diag_count[r MINUS c] BY 1  
+                INCREMENT anti_diag_count[r PLUS c] BY 1  
+        
+        SET directions TO list of all pairs from (-1, -1) to (1, 1) inclusive  
+        
+        INITIALIZE result AS empty list  
+        
+        FOR each (r, c) IN queries  
+            IF row_count[r] GREATER THAN 0 OR col_count[c] GREATER THAN 0 OR diag_count[r MINUS c] GREATER THAN 0 OR anti_diag_count[r PLUS c] GREATER THAN 0  
+                APPEND 1 TO result  
+            ELSE  
+                APPEND 0 TO result  
+            
+            FOR each (dr, dc) IN directions  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                IF (nr, nc) IN lamp_positions  
+                    REMOVE (nr, nc) FROM lamp_positions  
+                    DECREMENT row_count[nr] BY 1  
+                    DECREMENT col_count[nc] BY 1  
+                    DECREMENT diag_count[nr MINUS nc] BY 1  
+                    DECREMENT anti_diag_count[nr PLUS nc] BY 1  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

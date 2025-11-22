@@ -1,0 +1,85 @@
+CLASS Solution  
+    FUNCTION countCombinations(pieces AS List of String, positions AS List of List of Integer) RETURNS Integer  
+        SET directions TO mapping with keys rook queen bishop and values each associated with list of pairs representing directions as follows  
+            rook ASSOCIATED WITH list of pairs consisting of one and zero negative one and zero zero and one zero and negative one  
+            queen ASSOCIATED WITH list of pairs consisting of one and zero negative one and zero zero and one zero and negative one one and one negative one and one one and negative one negative one and negative one  
+            bishop ASSOCIATED WITH list of pairs consisting of one and one negative one and one one and negative one negative one and negative one  
+  
+        SET adjusted_positions TO empty list  
+        FOR each pair r and c IN positions  
+            SET adjusted_r TO r MINUS one  
+            SET adjusted_c TO c MINUS one  
+            APPEND pair adjusted_r and adjusted_c TO adjusted_positions  
+        END FOR  
+  
+        FUNCTION get_destinations(start AS pair of Integer, piece_type AS String) RETURNS List of pair of Integer  
+            SET r TO element at position zero of start  
+            SET c TO element at position one of start  
+            SET dests TO list containing start  
+            FOR each pair dr and dc IN directions key piece_type  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                WHILE nr GREATER THAN OR EQUAL TO zero AND nr LESS THAN eight AND nc GREATER THAN OR EQUAL TO zero AND nc LESS THAN eight  
+                    APPEND pair nr and nc TO dests  
+                    INCREMENT nr BY dr  
+                    INCREMENT nc BY dc  
+                END WHILE  
+            END FOR  
+            RETURN dests  
+        END FUNCTION  
+  
+        SET all_destinations TO empty list  
+        FOR each pos and piece IN zip adjusted_positions pieces  
+            APPEND get_destinations with arguments pos and piece TO all_destinations  
+        END FOR  
+  
+        FUNCTION is_valid_combination(combination AS List of pair of Integer) RETURNS Boolean  
+            SET pos TO copy of adjusted_positions  
+            SET n TO length of pos  
+            WHILE True  
+                SET unique_positions_count TO length of set of elements in pos  
+                IF unique_positions_count LESS THAN n THEN  
+                    RETURN False  
+                END IF  
+                SET all_reached TO True  
+                FOR index FROM zero TO n MINUS one  
+                    IF element at position index of pos EQUALS element at position index of combination THEN  
+                        CONTINUE  
+                    END IF  
+                    SET all_reached TO False  
+                    SET r TO element at position zero of element at position index of pos  
+                    SET c TO element at position one of element at position index of pos  
+                    SET dest_r TO element at position zero of element at position index of combination  
+                    SET dest_c TO element at position one of element at position index of combination  
+                    IF dest_r GREATER THAN r THEN  
+                        SET dr TO one  
+                    ELSE IF dest_r LESS THAN r THEN  
+                        SET dr TO negative one  
+                    ELSE  
+                        SET dr TO zero  
+                    END IF  
+                    IF dest_c GREATER THAN c THEN  
+                        SET dc TO one  
+                    ELSE IF dest_c LESS THAN c THEN  
+                        SET dc TO negative one  
+                    ELSE  
+                        SET dc TO zero  
+                    END IF  
+                    SET element at position index of pos TO pair r PLUS dr and c PLUS dc  
+                END FOR  
+                IF all_reached THEN  
+                    RETURN True  
+                END IF  
+            END WHILE  
+        END FUNCTION  
+  
+        SET valid_count TO zero  
+        FOR each combination IN Cartesian product of all elements in all_destinations  
+            IF is_valid_combination with argument combination THEN  
+                INCREMENT valid_count BY one  
+            END IF  
+        END FOR  
+  
+        RETURN valid_count  
+    END FUNCTION  
+END CLASS

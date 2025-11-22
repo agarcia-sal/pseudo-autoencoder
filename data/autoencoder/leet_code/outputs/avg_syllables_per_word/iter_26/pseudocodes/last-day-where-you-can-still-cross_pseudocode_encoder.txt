@@ -1,0 +1,75 @@
+CLASS UnionFind
+    FUNCTION __init__(self, number_of_elements)
+        SET self.parent TO the list of integers from zero TO number_of_elements MINUS one INCLUSIVE
+        SET self.rank TO a list FILLED WITH zero repeated number_of_elements times
+    END FUNCTION
+
+    FUNCTION find(self, element)
+        IF the element at position element OF self.parent NOT EQUALS element THEN
+            SET the element at position element OF self.parent TO the result of calling find WITH the element at position element OF self.parent
+        END IF
+        RETURN the element at position element OF self.parent
+    END FUNCTION
+
+    FUNCTION union(self, first_element, second_element)
+        SET root_of_first TO the result of calling find WITH first_element
+        SET root_of_second TO the result of calling find WITH second_element
+        IF root_of_first NOT EQUALS root_of_second THEN
+            IF the element at position root_of_first OF self.rank GREATER THAN the element at position root_of_second OF self.rank THEN
+                SET the element at position root_of_second OF self.parent TO root_of_first
+            ELSE IF the element at position root_of_first OF self.rank LESS THAN the element at position root_of_second OF self.rank THEN
+                SET the element at position root_of_first OF self.parent TO root_of_second
+            ELSE
+                SET the element at position root_of_second OF self.parent TO root_of_first
+                INCREMENT the element at position root_of_first OF self.rank BY one
+            END IF
+        END IF
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION latestDayToCross(self, row, col, cells)
+        SET grid TO a list OF row elements WHERE each element IS a list FILLED WITH one repeated col times
+        
+        SET uf TO a new UnionFind object INITIALIZED WITH row MULTIPLIED BY col PLUS two
+        
+        SET TOP TO row MULTIPLIED BY col
+        SET BOTTOM TO row MULTIPLIED BY col PLUS one
+        
+        SET directions TO the list containing four pairs representing moving up and down and left and right:
+            the first pair IS negative one AND zero
+            the second pair IS positive one AND zero
+            the third pair IS zero AND negative one
+            the fourth pair IS zero AND positive one
+        
+        FOR day FROM the LENGTH OF cells MINUS one DOWN TO zero INCLUSIVE DECREMENTING BY one
+            SET r TO the first element at position day OF cells
+            SET c TO the second element at position day OF cells
+            DECREMENT r BY one TO CONVERT TO zero-based index
+            DECREMENT c BY one TO CONVERT TO zero-based index
+            SET the element at position r OF grid TO a list WHERE the element at position c IS set TO zero
+            
+            FOR each pair dr and dc IN directions
+                SET nr TO r PLUS dr
+                SET nc TO c PLUS dc
+                IF nr GREATER THAN OR EQUAL TO zero AND nr LESS THAN row AND nc GREATER THAN OR EQUAL TO zero AND nc LESS THAN col AND the element at position nr AND nc OF grid EQUALS zero THEN
+                    CALL uf.union WITH arguments r MULTIPLIED BY col PLUS c AND nr MULTIPLIED BY col PLUS nc
+                END IF
+            END FOR
+            
+            IF r EQUALS zero THEN
+                CALL uf.union WITH arguments r MULTIPLIED BY col PLUS c AND TOP
+            END IF
+            
+            IF r EQUALS row MINUS one THEN
+                CALL uf.union WITH arguments r MULTIPLIED BY col PLUS c AND BOTTOM
+            END IF
+            
+            IF the result of calling uf.find WITH TOP EQUALS the result of calling uf.find WITH BOTTOM THEN
+                RETURN day
+            END IF
+        END FOR
+        
+        RETURN zero
+    END FUNCTION
+END CLASS

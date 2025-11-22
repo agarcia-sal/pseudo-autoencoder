@@ -1,0 +1,39 @@
+CLASS Solution  
+    FUNCTION calcEquation(equations, values, queries)  
+        SET graph TO a default dictionary of dictionaries  
+        FOR each pair of variable_a and variable_b AND each corresponding value IN equations AND values  
+            SET element at key variable_b IN dictionary at key variable_a of graph TO value  
+            SET element at key variable_a IN dictionary at key variable_b of graph TO one DIVIDED BY value  
+        END FOR  
+
+        FUNCTION dfs(start, end, visited)  
+            IF start NOT IN graph OR end NOT IN graph THEN  
+                RETURN negative one  
+            END IF  
+            IF start EQUALS end THEN  
+                RETURN one  
+            END IF  
+            ADD start TO visited  
+            FOR each neighbor and corresponding weight IN the dictionary at key start of graph  
+                IF neighbor NOT IN visited THEN  
+                    SET recursive_result TO the result of calling dfs with neighbor, end, and visited  
+                    IF recursive_result NOT EQUALS negative one THEN  
+                        RETURN weight MULTIPLIED BY recursive_result  
+                    END IF  
+                END IF  
+            END FOR  
+            REMOVE start FROM visited  
+            RETURN negative one  
+        END FUNCTION  
+
+        SET results TO an empty list  
+        FOR each query IN queries  
+            SET variable start and variable end TO the first and second elements of query respectively  
+            SET visited TO an empty set  
+            SET result TO the result of calling dfs with start, end, and visited  
+            APPEND result TO results  
+        END FOR  
+
+        RETURN results  
+    END FUNCTION  
+END CLASS

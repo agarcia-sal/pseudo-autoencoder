@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION trapRainWater(heightMap)  
+        IF heightMap IS empty OR element at position zero of heightMap IS empty  
+            RETURN zero  
+        END IF  
+        
+        SET m TO the LENGTH OF heightMap  
+        SET n TO the LENGTH OF element at position zero of heightMap  
+        SET visited TO a two dimensional list of size m BY n FILLED WITH False  
+        SET min_heap TO an empty list  
+        
+        FOR i FROM zero TO m MINUS one  
+            PUSH onto min_heap a tuple of the element at position i of heightMap at position zero, i, zero  
+            PUSH onto min_heap a tuple of the element at position i of heightMap at position n MINUS one, i, n MINUS one  
+            SET element at position i at position zero of visited TO True  
+            SET element at position i at position n MINUS one of visited TO True  
+        END FOR  
+        
+        FOR j FROM zero TO n MINUS one  
+            PUSH onto min_heap a tuple of the element at position zero of heightMap at position j, zero, j  
+            PUSH onto min_heap a tuple of the element at position m MINUS one of heightMap at position j, m MINUS one, j  
+            SET element at position zero at position j of visited TO True  
+            SET element at position m MINUS one at position j of visited TO True  
+        END FOR  
+        
+        SET directions TO a list containing tuples of minus one and zero, one and zero, zero and minus one, zero and one  
+        SET water_trapped TO zero  
+        
+        WHILE min_heap IS NOT empty  
+            POP from min_heap the tuple of height, x, y with the smallest height  
+            
+            FOR each pair dx AND dy IN directions  
+                SET nx TO x PLUS dx  
+                SET ny TO y PLUS dy  
+                
+                IF nx IS GREATER THAN OR EQUAL TO zero AND nx IS LESS THAN m AND ny IS GREATER THAN OR EQUAL TO zero AND ny IS LESS THAN n AND element at position nx at position ny of visited IS False  
+                    SET element at position nx at position ny of visited TO True  
+                    INCREMENT water_trapped BY the GREATER OF zero AND height MINUS element at position nx at position ny of heightMap  
+                    PUSH onto min_heap a tuple of the GREATER OF height AND element at position nx at position ny of heightMap, nx, ny  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN water_trapped  
+    END FUNCTION  
+END CLASS

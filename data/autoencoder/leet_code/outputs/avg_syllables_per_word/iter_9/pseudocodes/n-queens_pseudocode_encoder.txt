@@ -1,0 +1,51 @@
+CLASS Solution  
+    FUNCTION solveNQueens(self, n)  
+        FUNCTION is_not_under_attack(row, col)  
+            RETURN the logical negation of (cols at position col PLUS hills at position row MINUS col PLUS dales at position row PLUS col)  
+        END FUNCTION  
+        
+        FUNCTION place_queen(row, col)  
+            ADD the tuple of row and col TO queens  
+            SET cols at position col TO 1  
+            SET hills at position row MINUS col TO 1  
+            SET dales at position row PLUS col TO 1  
+        END FUNCTION  
+        
+        FUNCTION remove_queen(row, col)  
+            REMOVE the tuple of row and col FROM queens  
+            SET cols at position col TO 0  
+            SET hills at position row MINUS col TO 0  
+            SET dales at position row PLUS col TO 0  
+        END FUNCTION  
+        
+        FUNCTION add_solution()  
+            SET solution TO empty list  
+            FOR each tuple of row and col IN queens sorted by row  
+                APPEND a string composed of 'dot' repeated col times PLUS 'Q' PLUS 'dot' repeated (n MINUS col MINUS 1) times TO solution  
+            END FOR  
+            APPEND solution TO output  
+        END FUNCTION  
+        
+        FUNCTION backtrack(row)  
+            FOR col FROM zero TO n MINUS one  
+                IF is_not_under_attack(row, col) IS true THEN  
+                    CALL place_queen(row, col)  
+                    IF row PLUS one EQUALS n THEN  
+                        CALL add_solution()  
+                    ELSE  
+                        CALL backtrack(row PLUS one)  
+                    END IF  
+                    CALL remove_queen(row, col)  
+                END IF  
+            END FOR  
+        END FUNCTION  
+        
+        SET cols TO a list of n zeros  
+        SET hills TO a list of (two times n MINUS one) zeros  
+        SET dales TO a list of (two times n MINUS one) zeros  
+        SET queens TO empty set  
+        SET output TO empty list  
+        CALL backtrack(zero)  
+        RETURN output  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION ipToCIDR(ip AS string, n AS integer) RETURNS list of strings  
+        
+        FUNCTION ip_to_int(ip AS string) RETURNS integer  
+            SET parts TO list of integer converted from split of ip by character dot  
+            SET res TO zero  
+            FOR each part IN parts  
+                SET res TO res MULTIPLIED BY two HUNDRED FIFTY SIX PLUS part  
+            END FOR  
+            RETURN res  
+        END FUNCTION  
+        
+        FUNCTION int_to_ip(num AS integer) RETURNS string  
+            SET result_parts TO empty list  
+            FOR index FROM three TO zero DECREMENT BY one  
+                SET part_value TO num DIVIDED BY two HUNDRED FIFTY SIX RAISED TO index MODULO two HUNDRED FIFTY SIX  
+                APPEND string converted part_value TO result_parts  
+            END FOR  
+            SET joined_ip TO concatenation OF elements IN result_parts SEPARATED BY character dot  
+            RETURN joined_ip  
+        END FUNCTION  
+        
+        FUNCTION largest_cidr_size(start AS integer, n AS integer) RETURNS integer  
+            IF start MODULO two EQUALS one  
+                RETURN one  
+            END IF  
+            SET x TO one  
+            WHILE x LESS THAN OR EQUAL TO n AND bitwise AND of start AND x MINUS one EQUALS zero  
+                SET x TO x MULTIPLIED BY two  
+            END WHILE  
+            RETURN x DIVIDED BY two  
+        END FUNCTION  
+        
+        SET result TO empty list  
+        SET start_ip TO ip_to_int(ip)  
+        
+        WHILE n GREATER THAN zero  
+            SET size TO largest_cidr_size(start_ip, n)  
+            SET prefix_length TO thirty TWO MINUS bit length of size MINUS one  
+            SET ip_block TO concatenation OF int_to_ip(start_ip) CONCATENATED WITH character slash CONCATENATED WITH string converted prefix_length  
+            APPEND ip_block TO result  
+            INCREMENT start_ip BY size  
+            DECREMENT n BY size  
+        END WHILE  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

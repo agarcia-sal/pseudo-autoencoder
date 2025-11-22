@@ -1,0 +1,63 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values)
+    IF values IS empty
+        RETURN none
+    END IF
+    SET root TO A NEW TreeNode WITH the element at position zero OF values
+    SET i TO one
+    SET queue TO an empty double ended queue
+    APPEND root TO queue
+    WHILE queue IS NOT empty HOLDS
+        SET node TO the element REMOVED FROM the front OF queue
+        IF i LESS THAN the LENGTH OF values AND the element at position i OF values IS NOT none
+            SET node.left TO A NEW TreeNode WITH the element at position i OF values
+            APPEND node.left TO queue
+        END IF
+        INCREMENT i BY one
+        IF i LESS THAN the LENGTH OF values AND the element at position i OF values IS NOT none
+            SET node.right TO A NEW TreeNode WITH the element at position i OF values
+            APPEND node.right TO queue
+        END IF
+        INCREMENT i BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS none AND q IS none
+        RETURN true
+    ELSE IF p IS none OR q IS none
+        RETURN false
+    ELSE IF p.val NOT EQUALS q.val
+        RETURN false
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION countUnivalSubtrees(self, root)
+        FUNCTION helper(node)
+            IF node IS none
+                RETURN true, zero
+            END IF
+            SET is_left_unival, left_count TO helper(node.left)
+            SET is_right_unival, right_count TO helper(node.right)
+            IF is_left_unival AND is_right_unival
+                IF (node.left IS none OR the val OF node.left EQUALS the val OF node) AND (node.right IS none OR the val OF node.right EQUALS the val OF node)
+                    RETURN true, left_count PLUS right_count PLUS one
+                END IF
+            END IF
+            RETURN false, left_count PLUS right_count
+        END FUNCTION
+        SET _, count TO helper(root)
+        RETURN count
+    END FUNCTION
+END CLASS

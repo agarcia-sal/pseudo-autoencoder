@@ -1,0 +1,55 @@
+CLASS Solution  
+    FUNCTION countPalindromicSubsequences WITH PARAMETER s AS string  
+        SET MODULO_DIVISOR TO one billion PLUS seven  
+        SET length_of_s TO the LENGTH OF s  
+        
+        CREATE next_occurrence AS a two dimensional list with four rows and length_of_s columns all SET TO negative one  
+        CREATE prev_occurrence AS a two dimensional list with four rows and length_of_s columns all SET TO negative one  
+        
+        FOR each numeric_character_index FROM zero TO three  
+            SET character_to_check TO the character represented by adding numeric_character_index TO the character a  
+            SET last_recorded_position TO negative one  
+            FOR each index_in_s FROM zero TO length_of_s MINUS one  
+                IF character at position index_in_s of s EQUALS character_to_check THEN  
+                    SET last_recorded_position TO index_in_s  
+                END IF  
+                SET element at position index_in_s of the row numeric_character_index in prev_occurrence TO last_recorded_position  
+            END FOR  
+            
+            SET last_recorded_position TO negative one  
+            FOR each index_in_s_reversed FROM length_of_s MINUS one DOWN TO zero  
+                IF character at position index_in_s_reversed of s EQUALS character_to_check THEN  
+                    SET last_recorded_position TO index_in_s_reversed  
+                END IF  
+                SET element at position index_in_s_reversed of the row numeric_character_index in next_occurrence TO last_recorded_position  
+            END FOR  
+        END FOR  
+        
+        CREATE dp AS a two dimensional list with length_of_s rows and length_of_s columns all SET TO zero  
+        
+        FOR each single_index FROM zero TO length_of_s MINUS one  
+            SET element at row single_index column single_index of dp TO one  
+        END FOR  
+        
+        FOR each subsequence_length FROM two TO length_of_s  
+            FOR each start_index FROM zero TO length_of_s MINUS subsequence_length  
+                SET end_index TO start_index PLUS subsequence_length MINUS one  
+                FOR each numeric_character_index FROM zero TO three  
+                    SET character_to_check TO the character represented by adding numeric_character_index TO the character a  
+                    SET left_position TO element at row numeric_character_index column start_index of next_occurrence  
+                    SET right_position TO element at row numeric_character_index column end_index of prev_occurrence  
+                    
+                    IF left_position GREATER THAN end_index OR right_position LESS THAN start_index THEN  
+                        CONTINUE to next iteration of numeric_character_index loop  
+                    ELSE IF left_position EQUALS right_position THEN  
+                        SET element at row start_index column end_index of dp TO the value of element at row start_index column end_index of dp PLUS one MODULO MODULO_DIVISOR  
+                    ELSE  
+                        SET element at row start_index column end_index of dp TO the value of element at row start_index column end_index of dp PLUS element at row left_position PLUS one column right_position MINUS one of dp PLUS two MODULO MODULO_DIVISOR  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+        
+        RETURN element at row zero column length_of_s MINUS one of dp  
+    END FUNCTION  
+END CLASS

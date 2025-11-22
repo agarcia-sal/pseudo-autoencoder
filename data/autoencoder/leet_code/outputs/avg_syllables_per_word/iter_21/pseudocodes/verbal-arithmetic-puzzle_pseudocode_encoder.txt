@@ -1,0 +1,93 @@
+CLASS Solution  
+    FUNCTION isSolvable(words, result)  
+        CALL IMPORT collections.defaultdict AS placeholder
+        
+        SET unique_chars TO the SET OF all characters IN the concatenation OF all words AND result  
+        IF the LENGTH OF unique_chars GREATER THAN ten THEN  
+            RETURN False  
+        END IF  
+        
+        SET non_zero_chars TO the SET OF the first character OF each word IN words WHERE the LENGTH OF word GREATER THAN one  
+        IF the LENGTH OF result GREATER THAN one THEN  
+            ADD the first character OF result TO non_zero_chars  
+        END IF  
+        
+        SET char_to_digit TO an empty DICTIONARY  
+        SET digit_to_char TO an empty DICTIONARY  
+        
+        FUNCTION can_assign(char, digit)  
+            RETURN the LOGICAL CONDITION that char NOT IN char_to_digit AND (digit NOT IN digit_to_char OR digit_to_char AT digit EQUALS char)  
+        END FUNCTION  
+        
+        FUNCTION assign(char, digit)  
+            SET the value AT key char IN char_to_digit TO digit  
+            SET the value AT key digit IN digit_to_char TO char  
+        END FUNCTION  
+        
+        FUNCTION unassign(char, digit)  
+            REMOVE the key char FROM char_to_digit  
+            REMOVE the key digit FROM digit_to_char  
+        END FUNCTION  
+        
+        FUNCTION word_value(word)  
+            SET total_value TO zero  
+            FOR each index FROM zero TO the LENGTH OF word MINUS one  
+                SET character TO the element at position the LENGTH OF word MINUS one MINUS index OF word  
+                INCREMENT total_value BY the value AT key character IN char_to_digit MULTIPLIED BY TEN RAISED TO THE POWER OF index  
+            END FOR  
+            RETURN total_value  
+        END FUNCTION  
+        
+        FUNCTION backtrack(index, col, sum_col)  
+            IF col GREATER THAN OR EQUAL TO the MAXIMUM length AMONG all words AND col GREATER THAN OR EQUAL TO the LENGTH OF result THEN  
+                RETURN the LOGICAL CONDITION that sum_col EQUALS zero  
+            END IF  
+            
+            IF index EQUALS the LENGTH OF words THEN  
+                IF col LESS THAN the LENGTH OF result THEN  
+                    SET digit_char TO the element at position the LENGTH OF result MINUS one MINUS col OF result  
+                    IF digit_char IN char_to_digit THEN  
+                        IF the value AT key digit_char IN char_to_digit EQUALS the remainder OF sum_col DIVIDED BY ten THEN  
+                            RETURN CALL backtrack WITH PARAMETERS zero, col PLUS one, the INTEGER DIVISION OF sum_col BY ten  
+                        ELSE  
+                            RETURN False  
+                        END IF  
+                    ELSE IF CALL can_assign WITH PARAMETERS digit_char, the remainder OF sum_col DIVIDED BY ten AND the LOGICAL CONDITION that the remainder OF sum_col DIVIDED BY ten NOT EQUALS zero OR digit_char NOT IN non_zero_chars THEN  
+                        CALL assign WITH PARAMETERS digit_char, the remainder OF sum_col DIVIDED BY ten  
+                        IF CALL backtrack WITH PARAMETERS zero, col PLUS one, the INTEGER DIVISION OF sum_col BY ten THEN  
+                            RETURN True  
+                        END IF  
+                        CALL unassign WITH PARAMETERS digit_char, the remainder OF sum_col DIVIDED BY ten  
+                    END IF  
+                ELSE  
+                    RETURN the LOGICAL CONDITION that sum_col EQUALS zero  
+                END IF  
+                RETURN False  
+            END IF  
+            
+            SET word TO the element at position index OF words  
+            IF col GREATER THAN OR EQUAL TO the LENGTH OF word THEN  
+                RETURN CALL backtrack WITH PARAMETERS index PLUS one, col, sum_col  
+            END IF  
+            
+            SET char TO the element at position the LENGTH OF word MINUS one MINUS col OF word  
+            IF char IN char_to_digit THEN  
+                RETURN CALL backtrack WITH PARAMETERS index PLUS one, col, sum_col PLUS the value AT key char IN char_to_digit  
+            END IF  
+            
+            FOR each digit FROM zero TO nine inclusive  
+                IF CALL can_assign WITH PARAMETERS char, digit AND the LOGICAL CONDITION that digit NOT EQUALS zero OR char NOT IN non_zero_chars THEN  
+                    CALL assign WITH PARAMETERS char, digit  
+                    IF CALL backtrack WITH PARAMETERS index PLUS one, col, sum_col PLUS digit THEN  
+                        RETURN True  
+                    END IF  
+                    CALL unassign WITH PARAMETERS char, digit  
+                END IF  
+            END FOR  
+            
+            RETURN False  
+        END FUNCTION  
+        
+        RETURN CALL backtrack WITH PARAMETERS zero, zero, zero  
+    END FUNCTION  
+END CLASS

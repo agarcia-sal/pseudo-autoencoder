@@ -1,0 +1,114 @@
+CLASS Solution  
+    FUNCTION canMouseWin(grid, catJump, mouseJump)  
+        SET m TO LENGTH OF grid  
+        SET n TO LENGTH OF element at position zero of grid  
+        SET cat_start TO zero  
+        SET mouse_start TO zero  
+        SET food TO zero  
+        SET dirs TO sequence MINUS ONE, ZERO, ONE, ZERO, MINUS ONE  
+        CALL initialize empty list g_mouse of LENGTH m MULTIPLIED BY n, each element an empty list  
+        CALL initialize empty list g_cat of LENGTH m MULTIPLIED BY n, each element an empty list  
+
+        FOR each i, row IN enumeration of grid  
+            FOR each j, c IN enumeration of row  
+                IF c EQUALS string HASH  
+                    CONTINUE to next iteration  
+                END IF  
+                SET v TO i MULTIPLIED BY n PLUS j  
+                IF c EQUALS string C  
+                    SET cat_start TO v  
+                ELSE IF c EQUALS string M  
+                    SET mouse_start TO v  
+                ELSE IF c EQUALS string F  
+                    SET food TO v  
+                END IF  
+                FOR each pair a, b IN pairwise iteration over dirs  
+                    FOR k FROM zero TO mouseJump  
+                        SET x TO i PLUS k MULTIPLIED BY a  
+                        SET y TO j PLUS k MULTIPLIED BY b  
+                        IF x LESS THAN zero OR x GREATER THAN OR EQUAL TO m OR y LESS THAN zero OR y GREATER THAN OR EQUAL TO n OR element at position x of grid AT position y EQUALS string HASH  
+                            BREAK inner loop  
+                        END IF  
+                        APPEND x MULTIPLIED BY n PLUS y TO element at position v of g_mouse  
+                    END FOR  
+                    FOR k FROM zero TO catJump  
+                        SET x TO i PLUS k MULTIPLIED BY a  
+                        SET y TO j PLUS k MULTIPLIED BY b  
+                        IF x LESS THAN zero OR x GREATER THAN OR EQUAL TO m OR y LESS THAN zero OR y GREATER THAN OR EQUAL TO n OR element at position x of grid AT position y EQUALS string HASH  
+                            BREAK inner loop  
+                        END IF  
+                        APPEND x MULTIPLIED BY n PLUS y TO element at position v of g_cat  
+                    END FOR  
+                END FOR  
+            END FOR  
+        END FOR  
+        RETURN the result of calling FUNCTION calc WITH parameters g_mouse, g_cat, mouse_start, cat_start, food EQUALS integer one  
+    END FUNCTION  
+
+    FUNCTION calc(g_mouse, g_cat, mouse_start, cat_start, hole)  
+        FUNCTION get_prev_states(state)  
+            SET m TO first element of state  
+            SET c TO second element of state  
+            SET t TO third element of state  
+            SET pt TO bitwise exclusive OR of t WITH integer one  
+            INITIALIZE empty list pre  
+            IF pt EQUALS integer one  
+                FOR each pc IN element at position c of g_cat  
+                    IF element at position m of ans AT position pc AT position one EQUALS zero  
+                        APPEND tuple (m, pc, pt) TO pre  
+                    END IF  
+                END FOR  
+            ELSE  
+                FOR each pm IN element at position m of g_mouse  
+                    IF element at position pm of ans AT position c AT position zero EQUALS zero  
+                        APPEND tuple (pm, c, zero) TO pre  
+                    END IF  
+                END FOR  
+            END IF  
+            RETURN pre  
+        END FUNCTION  
+
+        SET n TO LENGTH OF g_mouse  
+        CALL initialize three-dimensional list degree TO dimension n BY n BY two, each element initialized to zero  
+        FOR i FROM zero TO n MINUS one  
+            FOR j FROM zero TO n MINUS one  
+                SET element at position i of degree AT position j AT position zero TO LENGTH OF element at position i of g_mouse  
+                SET element at position i of degree AT position j AT position one TO LENGTH OF element at position j of g_cat  
+            END FOR  
+        END FOR  
+
+        CALL initialize three-dimensional list ans TO dimension n BY n BY two, each element initialized to zero  
+        INITIALIZE empty deque q  
+        FOR i FROM zero TO n MINUS one  
+            SET element at position hole of ans AT position i AT position one TO integer one  
+            SET element at position i of ans AT position hole AT position zero TO integer two  
+            SET element at position i of ans AT position i AT position one TO integer two  
+            SET element at position i of ans AT position i AT position zero TO integer two  
+            APPEND tuple (hole, i, one) TO q  
+            APPEND tuple (i, hole, zero) TO q  
+            APPEND tuple (i, i, zero) TO q  
+            APPEND tuple (i, i, one) TO q  
+        END FOR  
+
+        WHILE q is not empty  
+            REMOVE first element FROM q AND SET TO state  
+            SET t TO element at position zero of state of ans AT position one of state AT position two of state  
+            FOR each prev_state IN calling get_prev_states WITH state  
+                SET pm TO first element of prev_state  
+                SET pc TO second element of prev_state  
+                SET pt TO third element of prev_state  
+                IF pt EQUALS t MINUS one  
+                    SET element at position pm of ans AT position pc AT position pt TO t  
+                    APPEND prev_state TO q  
+                ELSE  
+                    DECREMENT element at position pm of degree AT position pc AT position pt BY integer one  
+                    IF element at position pm of degree AT position pc AT position pt EQUALS zero  
+                        SET element at position pm of ans AT position pc AT position pt TO t  
+                        APPEND prev_state TO q  
+                    END IF  
+                END IF  
+            END FOR  
+        END WHILE  
+        RETURN element at position mouse_start of ans AT position cat_start AT position zero  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION trapRainWater(heightMap)  
+        IF heightMap EQUALS empty OR element at position zero of heightMap EQUALS empty  
+            RETURN zero  
+        END IF  
+        
+        SET m TO the LENGTH OF heightMap  
+        SET n TO the LENGTH OF element at position zero of heightMap  
+        SET visited TO a list of m elements each being a list of n elements SET TO False  
+        SET min_heap TO empty list  
+        
+        FOR index i FROM zero TO m MINUS one  
+            INSERT a tuple consisting of element at position i and zero of heightMap, i, zero INTO min_heap USING heap push  
+            INSERT a tuple consisting of element at position i and position n MINUS one of heightMap, i, n MINUS one INTO min_heap USING heap push  
+            SET element at position i and zero of visited TO True  
+            SET element at position i and position n MINUS one of visited TO True  
+        END FOR  
+        
+        FOR index j FROM zero TO n MINUS one  
+            INSERT a tuple consisting of element at position zero and position j of heightMap, zero, j INTO min_heap USING heap push  
+            INSERT a tuple consisting of element at position m MINUS one and position j of heightMap, m MINUS one, j INTO min_heap USING heap push  
+            SET element at position zero and position j of visited TO True  
+            SET element at position m MINUS one and position j of visited TO True  
+        END FOR  
+        
+        SET directions TO a list of tuples consisting of minus one and zero, one and zero, zero and minus one, zero and one  
+        SET water_trapped TO zero  
+        
+        WHILE min_heap IS NOT empty  
+            EXTRACT minimum tuple height, x, y FROM min_heap USING heap pop  
+            
+            FOR each tuple dx, dy IN directions  
+                SET nx TO x PLUS dx  
+                SET ny TO y PLUS dy  
+                
+                IF nx GREATER THAN OR EQUAL TO zero AND nx LESS THAN m AND ny GREATER THAN OR EQUAL TO zero AND ny LESS THAN n AND element at position nx and ny of visited EQUALS False  
+                    SET element at position nx and ny of visited TO True  
+                    SET water_trapped TO water_trapped PLUS the MAXIMUM of zero and height MINUS element at position nx and ny of heightMap  
+                    INSERT a tuple consisting of the MAXIMUM of height and element at position nx and ny of heightMap, nx, ny INTO min_heap USING heap push  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN water_trapped  
+    END FUNCTION  
+END CLASS

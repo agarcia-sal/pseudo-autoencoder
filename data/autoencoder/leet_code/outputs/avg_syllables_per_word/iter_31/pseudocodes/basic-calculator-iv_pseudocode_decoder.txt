@@ -1,0 +1,150 @@
+CLASS Term  
+    FUNCTION __init__ with parameters coefficient and variables  
+        SET self.coefficient TO coefficient  
+        SET self.variables TO variables  
+    END FUNCTION  
+
+    FUNCTION __lt__ with parameter other  
+        IF the LENGTH OF self.variables NOT EQUALS the LENGTH OF other.variables  
+            RETURN the LENGTH OF self.variables GREATER THAN the LENGTH OF other.variables  
+        END IF  
+        RETURN the string formed by joining self.variables with a star CHARACTER LESS THAN the string formed by joining other.variables with a star CHARACTER  
+    END FUNCTION  
+
+    FUNCTION __repr__  
+        IF the LENGTH OF self.variables EQUALS zero  
+            RETURN the string REPRESENTATION of self.coefficient  
+        END IF  
+        RETURN the string REPRESENTATION of self.coefficient CONCATENATED WITH a star CHARACTER CONCATENATED WITH the string formed by joining self.variables with a star CHARACTER  
+    END FUNCTION  
+END CLASS  
+
+CLASS Expression  
+    FUNCTION __init__  
+        SET self.terms TO a new empty DEFAULT DICTIONARY OF integers  
+    END FUNCTION  
+
+    FUNCTION add_term with parameter term  
+        SET key TO the TUPLE formed by SORTING term.variables  
+        INCREMENT the value at key in self.terms BY term.coefficient  
+    END FUNCTION  
+
+    FUNCTION multiply with parameter other  
+        SET result TO a new Expression  
+        FOR each pair vars1 and coeff1 IN the items of self.terms  
+            FOR each pair vars2 and coeff2 IN the items of other.terms  
+                SET combined_vars TO the SORTED LIST formed by concatenating vars1 and vars2  
+                CALL result.add_term with a new Term constructed with coefficient coeff1 MULTIPLIED BY coeff2 and variables combined_vars  
+            END FOR  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+
+    FUNCTION add with parameter other  
+        FOR each pair vars and coeff IN the items of other.terms  
+            CALL self.add_term with a new Term constructed with coefficient coeff and variables LIST formed from vars  
+        END FOR  
+        RETURN self  
+    END FUNCTION  
+
+    FUNCTION subtract with parameter other  
+        FOR each pair vars and coeff IN the items of other.terms  
+            CALL self.add_term with a new Term constructed with coefficient NEGATIVE coeff and variables LIST formed from vars  
+        END FOR  
+        RETURN self  
+    END FUNCTION  
+
+    FUNCTION evaluate with parameter var_map  
+        SET result TO a new Expression  
+        FOR each pair vars and coeff IN the items of self.terms  
+            SET new_vars TO an empty LIST  
+            FOR each var IN vars  
+                IF var IS IN var_map  
+                    APPEND the string REPRESENTATION of the value from var_map at var TO new_vars  
+                ELSE  
+                    APPEND var TO new_vars  
+                END IF  
+            END FOR  
+            IF the LENGTH OF new_vars IS GREATER THAN zero  
+                SET new_coeff TO the result of evaluating the expression formed by concatenating all elements of new_vars in order interpreted as arithmetic  
+            ELSE  
+                SET new_coeff TO one  
+            END IF  
+            CALL result.add_term with a new Term constructed with coefficient coeff MULTIPLIED BY new_coeff and empty variables LIST  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+
+    FUNCTION simplify  
+        SET simplified_terms TO the LIST of Term constructed from each pair vars and coeff in self.terms where coeff NOT EQUALS zero with coefficient coeff and variables LIST from vars  
+        SORT simplified_terms  
+        RETURN simplified_terms  
+    END FUNCTION  
+
+    FUNCTION __repr__  
+        RETURN the string formed by joining the string REPRESENTATION of each Term in the result of calling simplify with the string CHARACTERS PLUS separated  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION basicCalculatorIV with parameters expression variables evalvars and evalints  
+        SET var_map TO a new DICTIONARY by PAIRING each element of evalvars WITH the corresponding element of evalints  
+        SET tokens TO the LIST of substrings extracted from expression representing LEFT PARENTHESIS RIGHT PARENTHESIS PLUS MINUS MULTIPLICATION NUMBER OR WORD tokens in order  
+        SET output TO an empty LIST  
+        SET operators TO an empty LIST  
+
+        FUNCTION apply_operator  
+            SET right TO the last element REMOVED from output  
+            SET left TO the last element REMOVED from output  
+            SET op TO the last element REMOVED from operators  
+            IF op EQUALS the PLUS character  
+                APPEND the result of calling add on left with right TO output  
+            ELSE IF op EQUALS the MINUS character  
+                APPEND the result of calling subtract on left with right TO output  
+            ELSE IF op EQUALS the MULTIPLICATION character  
+                APPEND the result of calling multiply on left with right TO output  
+            END IF  
+        END FUNCTION  
+
+        SET i TO zero  
+        WHILE i LESS THAN the LENGTH OF tokens  
+            SET token TO the element at position i of tokens  
+            IF token consists only of digits  
+                APPEND a new Expression TO output  
+                CALL the last element of output's add_term with a new Term constructed with coefficient parsed from token as integer and empty variables LIST  
+            ELSE IF token consists only of alphabetic characters  
+                APPEND a new Expression TO output  
+                SET coef TO the value from var_map at token if present otherwise one  
+                IF coef EQUALS one  
+                    IF token IS NOT IN var_map  
+                        CALL the last element of output's add_term with a new Term constructed with coefficient one and variables LIST containing token  
+                    ELSE  
+                        CALL the last element of output's add_term with a new Term constructed with coefficient one and empty variables LIST  
+                    END IF  
+                ELSE  
+                    CALL the last element of output's add_term with a new Term constructed with coefficient coef and empty variables LIST  
+                END IF  
+            ELSE IF token EQUALS left parenthesis  
+                APPEND token TO operators  
+            ELSE IF token EQUALS right parenthesis  
+                WHILE operators IS NOT empty AND the last element of operators NOT EQUALS left parenthesis  
+                    CALL apply_operator  
+                END WHILE  
+                REMOVE the last element from operators  
+            ELSE IF token EQUALS one of the characters plus minus or multiplication  
+                WHILE operators IS NOT empty AND the last element of operators NOT EQUALS left parenthesis AND (token IS one of plus or minus OR the last element of operators EQUALS multiplication)  
+                    CALL apply_operator  
+                END WHILE  
+                APPEND token TO operators  
+            END IF  
+            INCREMENT i BY one  
+        END WHILE  
+
+        WHILE operators IS NOT empty  
+            CALL apply_operator  
+        END WHILE  
+
+        SET simplified_terms TO the result of calling simplify on the first element of output  
+        RETURN the LIST obtained by transforming each term in simplified_terms to a string where if term.variables IS NOT empty then the string REPRESENTATION of term.coefficient CONCATENATED WITH a star CHARACTER CONCATENATED WITH the string formed by joining term.variables with a star CHARACTER else the string REPRESENTATION of term.coefficient  
+    END FUNCTION  
+END CLASS

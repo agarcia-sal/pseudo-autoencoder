@@ -1,0 +1,38 @@
+CLASS Solution
+    FUNCTION maximalPathQuality(values, edges, maxTime)
+        SET graph TO a new mapping with default empty list
+        
+        FOR each tuple of start_node, end_node, travel_time IN edges
+            APPEND the pair of end_node and travel_time TO the list at key start_node OF graph
+            APPEND the pair of start_node and travel_time TO the list at key end_node OF graph
+        END FOR
+        
+        SET visited TO an empty set
+        SET max_quality TO zero
+        
+        FUNCTION dfs(node, current_time, current_quality)
+            NONLOCAL max_quality
+            
+            IF node EQUALS zero THEN
+                SET max_quality TO the GREATER OF max_quality AND current_quality
+            END IF
+            
+            FOR each pair of neighbor_node and travel_time IN the list at key node OF graph
+                IF travel_time LESS THAN OR EQUAL TO current_time THEN
+                    IF neighbor_node NOT IN visited THEN
+                        ADD neighbor_node TO visited
+                        CALL dfs WITH neighbor_node, current_time MINUS travel_time, current_quality PLUS the element at position neighbor_node OF values
+                        REMOVE neighbor_node FROM visited
+                    ELSE
+                        CALL dfs WITH neighbor_node, current_time MINUS travel_time, current_quality
+                    END IF
+                END IF
+            END FOR
+        END FUNCTION
+        
+        ADD zero TO visited
+        CALL dfs WITH zero, maxTime, the element at position zero OF values
+        
+        RETURN max_quality
+    END FUNCTION
+END CLASS

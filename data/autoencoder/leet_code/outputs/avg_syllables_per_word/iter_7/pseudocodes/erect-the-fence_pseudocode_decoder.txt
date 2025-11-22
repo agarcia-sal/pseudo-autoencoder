@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION outerTrees(trees)  
+        FUNCTION cross(i, j, k)  
+            SET a TO trees at index i  
+            SET b TO trees at index j  
+            SET c TO trees at index k  
+            RETURN (b at coordinate 0 MINUS a at coordinate 0) MULTIPLIED BY (c at coordinate 1 MINUS b at coordinate 1) MINUS (b at coordinate 1 MINUS a at coordinate 1) MULTIPLIED BY (c at coordinate 0 MINUS b at coordinate 0)  
+        END FUNCTION  
+          
+        SET n TO LENGTH OF trees  
+        IF n LESS THAN 4 THEN  
+            RETURN trees  
+        END IF  
+          
+        SORT trees IN ASCENDING ORDER  
+        SET vis TO LIST OF False OF LENGTH n  
+        SET stk TO LIST CONTAINING 0  
+          
+        FOR i FROM 1 TO n MINUS 1 DO  
+            WHILE LENGTH OF stk GREATER THAN 1 AND cross(second LAST ELEMENT OF stk, LAST ELEMENT OF stk, i) LESS THAN 0 DO  
+                SET vis AT INDEX OF stk POPPED TO False  
+            END WHILE  
+            SET vis AT i TO True  
+            APPEND i TO stk  
+        END FOR  
+          
+        SET m TO LENGTH OF stk  
+        FOR i FROM n MINUS 2 DOWNTO 0 DO  
+            IF vis AT i IS True THEN  
+                CONTINUE TO NEXT i  
+            END IF  
+            WHILE LENGTH OF stk GREATER THAN m AND cross(second LAST ELEMENT OF stk, LAST ELEMENT OF stk, i) LESS THAN 0 DO  
+                POP stk  
+            END WHILE  
+            APPEND i TO stk  
+        END FOR  
+          
+        POP stk  
+        RETURN LIST OF trees AT INDICES IN stk  
+    END FUNCTION  
+END CLASS

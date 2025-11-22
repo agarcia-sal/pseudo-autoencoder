@@ -1,0 +1,64 @@
+CLASS Solution
+    FUNCTION countOfAtoms(formula)
+        FUNCTION parse(segment)
+            SET atom_count TO new dictionary with default 0
+            SET elements TO all matches of pattern (uppercase letter followed by lowercase letters optional) and digits optional in segment
+            FOR each element, count IN elements
+                IF count is not empty
+                    INCREMENT atom_count[element] BY integer value of count
+                ELSE
+                    INCREMENT atom_count[element] BY 1
+            RETURN atom_count
+        END FUNCTION
+
+        FUNCTION multiply_counts(counts, multiplier)
+            FOR each element IN counts
+                MULTIPLY counts[element] BY multiplier
+            RETURN counts
+        END FUNCTION
+
+        SET stack TO list containing one new dictionary with default 0
+        SET i TO 0
+        WHILE i LESS THAN length of formula
+            IF formula[i] IS '('
+                APPEND new dictionary with default 0 TO stack
+                INCREMENT i BY 1
+            ELSE IF formula[i] IS ')'
+                SET j TO i plus 1
+                WHILE j LESS THAN length of formula AND formula[j] IS a digit
+                    INCREMENT j BY 1
+                END WHILE
+                IF j GREATER THAN i plus 1
+                    SET multiplier TO integer value of substring from i plus 1 TO j
+                ELSE
+                    SET multiplier TO 1
+                END IF
+                SET segment_count TO multiply_counts(pop from stack, multiplier)
+                FOR each element IN segment_count
+                    INCREMENT stack last element's element BY segment_count[element]
+                END FOR
+                SET i TO j
+            ELSE
+                SET j TO i plus 1
+                WHILE j LESS THAN length of formula AND (formula[j] IS lowercase letter OR digit)
+                    INCREMENT j BY 1
+                END WHILE
+                SET segment_count TO parse(substring of formula from i TO j)
+                FOR each element IN segment_count
+                    INCREMENT stack last element's element BY segment_count[element]
+                END FOR
+                SET i TO j
+            END IF
+        END WHILE
+
+        SET final_count TO pop from stack
+        SET result TO empty string
+        FOR each element IN final_count keys sorted lexicographically
+            APPEND element TO result
+            IF final_count[element] GREATER THAN 1
+                APPEND string of final_count[element] TO result
+            END IF
+        END FOR
+        RETURN result
+    END FUNCTION
+END CLASS

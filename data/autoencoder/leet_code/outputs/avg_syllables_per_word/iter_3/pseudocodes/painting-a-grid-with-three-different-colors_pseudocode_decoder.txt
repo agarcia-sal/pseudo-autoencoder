@@ -1,0 +1,56 @@
+CLASS Solution
+    FUNCTION colorTheGrid(m, n)
+        SET MOD TO 10^9 + 7
+
+        FUNCTION generate_valid_columns(prev_col)
+            SET colors TO [1, 2, 3]
+            SET valid_cols TO empty list
+
+            FUNCTION backtrack(col, row)
+                IF row EQUALS m
+                    APPEND tuple of col TO valid_cols
+                    RETURN
+                END IF
+                FOR each color IN colors
+                    IF col IS empty OR last element of col NOT EQUALS color
+                        IF prev_col EXISTS AND prev_col[row] EQUALS color
+                            CONTINUE to next color
+                        END IF
+                        APPEND color TO col
+                        CALL backtrack(col, row + 1)
+                        REMOVE last element FROM col
+                    END IF
+                END FOR
+            END FUNCTION
+
+            CALL backtrack(empty list, 0)
+            RETURN valid_cols
+        END FUNCTION
+
+        SET all_valid_cols TO generate_valid_columns(None)
+        SET num_valid_cols TO LENGTH OF all_valid_cols
+
+        SET compatible_cols TO dictionary mapping each index 0 to num_valid_cols - 1 TO empty list
+        FOR i FROM 0 TO num_valid_cols - 1
+            FOR j FROM 0 TO num_valid_cols - 1
+                IF FOR ALL k FROM 0 TO m - 1 all_valid_cols[i][k] NOT EQUALS all_valid_cols[j][k]
+                    APPEND j TO compatible_cols[i]
+                END IF
+            END FOR
+        END FOR
+
+        SET dp TO list of 1 repeated num_valid_cols times
+
+        FOR iteration FROM 1 TO n - 1
+            SET next_dp TO list of 0 repeated num_valid_cols times
+            FOR i FROM 0 TO num_valid_cols - 1
+                FOR each j IN compatible_cols[i]
+                    SET next_dp[j] TO (next_dp[j] + dp[i]) MODULO MOD
+                END FOR
+            END FOR
+            SET dp TO next_dp
+        END FOR
+
+        RETURN sum of dp MODULO MOD
+    END FUNCTION
+END CLASS

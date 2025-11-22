@@ -1,0 +1,76 @@
+CLASS Solution  
+    FUNCTION networkDelayTime(times, n, k)  
+        SET graph TO CALL initialize_graph WITH n  
+        FOR each element (u, v, w) IN times  
+            APPEND pair of v AND w TO element at position u OF graph  
+        END FOR  
+        
+        SET dist TO CALL initialize_distances WITH n AND k  
+        SET min_heap TO CALL initialize_min_heap WITH k
+        
+        WHILE min_heap IS NOT empty  
+            SET current_dist, node TO CALL pop_minimum FROM min_heap  
+            
+            IF current_dist IS GREATER THAN element at position node OF dist  
+                CONTINUE to next iteration of WHILE  
+            END IF  
+            
+            FOR each element (neighbor, weight) IN element at position node OF graph  
+                SET distance TO current_dist PLUS weight  
+                
+                IF distance IS LESS THAN element at position neighbor OF dist  
+                    SET element at position neighbor OF dist TO distance  
+                    CALL push_minimum WITH min_heap AND pair of distance AND neighbor  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        SET max_time TO CALL maximum_value FROM all elements OF dist  
+        
+        IF max_time IS EQUALS TO infinity  
+            RETURN minus one  
+        ELSE  
+            RETURN max_time  
+        END IF  
+    END FUNCTION  
+    
+    FUNCTION initialize_graph(n)  
+        SET graph TO empty collection mapping integers TO empty lists  
+        FOR index FROM one TO n  
+            SET element at position index OF graph TO empty list  
+        END FOR  
+        RETURN graph  
+    END FUNCTION  
+    
+    FUNCTION initialize_distances(n, k)  
+        SET dist TO empty collection mapping integers TO infinity  
+        FOR index FROM one TO n  
+            SET element at position index OF dist TO infinity  
+        END FOR  
+        SET element at position k OF dist TO zero  
+        RETURN dist  
+    END FUNCTION  
+    
+    FUNCTION initialize_min_heap(k)  
+        SET min_heap TO list containing pair of zero AND k  
+        RETURN min_heap  
+    END FUNCTION  
+    
+    FUNCTION pop_minimum(min_heap)  
+        RETURN element popped from min_heap with smallest first element  
+    END FUNCTION  
+    
+    FUNCTION push_minimum(min_heap, pair)  
+        INSERT pair INTO min_heap maintaining heap property  
+    END FUNCTION  
+    
+    FUNCTION maximum_value(collection)  
+        SET max_value TO negative infinity  
+        FOR each value IN collection  
+            IF value IS GREATER THAN max_value  
+                SET max_value TO value  
+            END IF  
+        END FOR  
+        RETURN max_value  
+    END FUNCTION  
+END CLASS

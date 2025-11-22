@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION gridIllumination(n parameter_of_integer, lamps parameter_of_list_of_list_of_integer, queries parameter_of_list_of_list_of_integer) RETURNS list_of_integer  
+        SET row_count TO a mapping from integer to integer with default value zero  
+        SET col_count TO a mapping from integer to integer with default value zero  
+        SET diag_count TO a mapping from integer to integer with default value zero representing the diagonal identified by row MINUS column  
+        SET anti_diag_count TO a mapping from integer to integer with default value zero representing the anti diagonal identified by row PLUS column  
+        
+        SET lamp_positions TO an empty set to hold tuples of row and column positions that have lamps turned on  
+        
+        FOR each pair of row AND column IN lamps  
+            IF the pair of row AND column is NOT IN lamp_positions  
+                ADD the pair of row AND column TO lamp_positions  
+                INCREMENT the value at key row IN row_count BY one  
+                INCREMENT the value at key column IN col_count BY one  
+                INCREMENT the value at key row MINUS column IN diag_count BY one  
+                INCREMENT the value at key row PLUS column IN anti_diag_count BY one  
+            END IF  
+        END FOR  
+        
+        SET directions TO the list of pairs consisting of negative one MINUS one negative one zero negative one one zero MINUS one zero zero zero one one MINUS one one zero one one one  
+        
+        SET result TO an empty list to hold integers  
+        
+        FOR each pair of row AND column IN queries  
+            IF the value at key row IN row_count IS GREATER THAN zero OR the value at key column IN col_count IS GREATER THAN zero OR the value at key row MINUS column IN diag_count IS GREATER THAN zero OR the value at key row PLUS column IN anti_diag_count IS GREATER THAN zero  
+                APPEND one TO result  
+            ELSE  
+                APPEND zero TO result  
+            END IF  
+            
+            FOR each pair of delta_row AND delta_column IN directions  
+                SET new_row TO row PLUS delta_row  
+                SET new_column TO column PLUS delta_column  
+                IF the pair of new_row AND new_column IS IN lamp_positions  
+                    REMOVE the pair of new_row AND new_column FROM lamp_positions  
+                    DECREMENT the value at key new_row IN row_count BY one  
+                    DECREMENT the value at key new_column IN col_count BY one  
+                    DECREMENT the value at key new_row MINUS new_column IN diag_count BY one  
+                    DECREMENT the value at key new_row PLUS new_column IN anti_diag_count BY one  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

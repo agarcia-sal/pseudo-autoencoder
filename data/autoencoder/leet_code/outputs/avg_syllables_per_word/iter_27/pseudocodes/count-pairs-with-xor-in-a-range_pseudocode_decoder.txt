@@ -1,0 +1,59 @@
+CLASS TrieNode  
+    FUNCTION __init__()  
+        SET children TO empty mapping from integer to TrieNode  
+        SET count TO zero  
+    END FUNCTION  
+END CLASS  
+
+CLASS Trie  
+    FUNCTION __init__(bit_length)  
+        ASSIGN reference TO new TrieNode as root  
+        SET bit_length TO bit_length  
+    END FUNCTION  
+
+    FUNCTION insert(num)  
+        ASSIGN reference TO root as node  
+        FOR i FROM bit_length TO zero DECREMENT BY one  
+            SET bit TO the result of bitwise right shift of num by i AND with one EXPLAINED as the value of the bit at position i of num  
+            IF bit IS NOT a key in node.children  
+                ASSIGN reference TO new TrieNode  
+                ADD key bit with value referenced TrieNode TO node.children  
+            END IF  
+            ASSIGN reference TO the child of node.children at key bit as node  
+            INCREMENT node.count BY one  
+        END FOR  
+    END FUNCTION  
+
+    FUNCTION count_less_than(num, threshold)  
+        SET count TO zero  
+        ASSIGN reference TO root as node  
+        FOR i FROM bit_length TO zero DECREMENT BY one  
+            IF node IS null  
+                BREAK the loop  
+            END IF  
+            SET bit TO the bit at position i of num explained as the result of bitwise right shift of num by i AND with one  
+            SET threshold_bit TO the bit at position i of threshold explained as the result of bitwise right shift of threshold by i AND with one  
+            IF threshold_bit EQUALS one  
+                SET count TO count PLUS the count of the child at key bit of node.children OR zero IF NOT PRESENT  
+                ASSIGN reference TO the child of node.children at key bit EXCLUSIVE OR with one as node  
+            ELSE  
+                ASSIGN reference TO the child of node.children at key bit as node  
+            END IF  
+        END FOR  
+        RETURN count  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION countPairs(nums, low, high)  
+        ASSIGN reference TO new Trie as trie  
+        SET nice_pairs TO zero  
+
+        FOR each num IN nums  
+            SET nice_pairs TO nice_pairs PLUS the result of calling trie.count_less_than with num and high PLUS one MINUS the result of calling trie.count_less_than with num and low  
+            CALL trie.insert with argument num  
+        END FOR  
+
+        RETURN nice_pairs  
+    END FUNCTION  
+END CLASS

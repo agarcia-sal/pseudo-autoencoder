@@ -1,0 +1,59 @@
+CLASS Solution  
+    FUNCTION wordsAbbreviation(words)  
+        FUNCTION abbreviate(word, prefix_length)  
+            IF the LENGTH OF word MINUS prefix_length LESS THAN OR EQUAL TO two  
+                RETURN word  
+            END IF  
+            RETURN concatenation of the substring of word from the first position to the position prefix_length PLUS the string representing the LENGTH OF word MINUS prefix_length MINUS one PLUS the last character of word  
+        END FUNCTION  
+
+        FUNCTION get_unique_abbreviations(words_with_indices, prefix_length)  
+            SET abbs TO a new mapping with default empty list  
+            FOR each element consisting of index AND word IN words_with_indices  
+                APPEND the tuple of index AND word TO the list in abbs identified by the key obtained by calling abbreviate on word with prefix_length  
+            END FOR  
+            RETURN abbs  
+        END FUNCTION  
+
+        SET n TO the LENGTH OF words  
+        SET ans TO a list containing n empty strings  
+        SET words_with_indices TO an empty list  
+        FOR each index AND word obtained by enumerating words starting from the first element  
+            APPEND the tuple of index AND word TO words_with_indices  
+        END FOR  
+
+        SET abbs TO the result of get_unique_abbreviations with words_with_indices AND one as arguments  
+
+        FOR each abb AND group IN the items of abbs  
+            IF the LENGTH OF group EQUALS one  
+                SET index TO the first element of the first tuple in group  
+                SET word TO the second element of the first tuple in group  
+                SET the element at position index of ans TO abb  
+            ELSE  
+                SET new_group TO an empty list  
+                FOR each index AND word IN group  
+                    APPEND the tuple of index AND word TO new_group  
+                END FOR  
+                SET prefix_length TO two  
+                WHILE the LENGTH OF new_group GREATER THAN zero  
+                    SET new_abbs TO the result of get_unique_abbreviations with new_group AND prefix_length as arguments  
+                    SET new_group TO an empty list  
+                    FOR each new_abb AND new_group_items IN the items of new_abbs  
+                        IF the LENGTH OF new_group_items EQUALS one  
+                            SET index TO the first element of the first tuple in new_group_items  
+                            SET word TO the second element of the first tuple in new_group_items  
+                            SET the element at position index of ans TO new_abb  
+                        ELSE  
+                            FOR each element IN new_group_items  
+                                APPEND element TO new_group  
+                            END FOR  
+                        END IF  
+                    END FOR  
+                    INCREMENT prefix_length BY one  
+                END WHILE  
+            END IF  
+        END FOR  
+
+        RETURN ans  
+    END FUNCTION  
+END CLASS

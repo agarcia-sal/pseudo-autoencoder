@@ -1,0 +1,70 @@
+CLASS Solution  
+    FUNCTION colorTheGrid(m parameter n parameter) RETURNS integer  
+        SET MODULUS TO ten raised to the power of nine PLUS one  
+        
+        FUNCTION generate_valid_columns(prev_col parameter) RETURNS list_of_columns  
+            SET colors_list TO list containing the first color the second color and the third color  
+            SET valid_columns_list TO empty list  
+            
+            FUNCTION backtrack(current_column parameter current_row parameter)  
+                IF current_row EQUALS m  
+                    APPEND an immutable sequence formed from current_column TO valid_columns_list  
+                    RETURN  
+                END IF  
+                FOR each color IN colors_list  
+                    IF length of current_column EQUALS zero OR the element at position last in current_column NOT EQUALS color  
+                        IF prev_col IS NOT none AND the element at position current_row in prev_col EQUALS color  
+                            CONTINUE to next iteration  
+                        END IF  
+                        APPEND color TO current_column  
+                        CALL backtrack WITH current_column AND current_row PLUS one  
+                        REMOVE the last element FROM current_column  
+                    END IF  
+                END FOR  
+            END FUNCTION  
+            
+            CALL backtrack WITH empty list AND zero  
+            RETURN valid_columns_list  
+        END FUNCTION  
+        
+        SET all_valid_columns TO the result of calling generate_valid_columns WITH none  
+        SET number_of_valid_columns TO the length of all_valid_columns  
+        
+        SET compatible_columns_mapping TO a mapping from each index from zero TO number_of_valid_columns MINUS one TO an empty list  
+        FOR each index_i FROM zero TO number_of_valid_columns MINUS one  
+            FOR each index_j FROM zero TO number_of_valid_columns MINUS one  
+                SET all_positions_different TO true  
+                FOR each position_k FROM zero TO m MINUS one  
+                    IF the element at position position_k of the element at position index_i in all_valid_columns EQUALS the element at position position_k of the element at position index_j in all_valid_columns  
+                        SET all_positions_different TO false  
+                        BREAK out of inner loop  
+                    END IF  
+                END FOR  
+                IF all_positions_different  
+                    APPEND index_j TO the list at key index_i in compatible_columns_mapping  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET dp_table TO a list of ones with length number_of_valid_columns  
+        
+        FOR iteration_variable FROM one TO n MINUS one  
+            SET next_dp_table TO a list of zeros with length number_of_valid_columns  
+            FOR each index_i FROM zero TO number_of_valid_columns MINUS one  
+                FOR each index_j IN the list at key index_i in compatible_columns_mapping  
+                    SET next_dp_table at position index_j TO next_dp_table at position index_j PLUS dp_table at position index_i  
+                    SET next_dp_table at position index_j TO next_dp_table at position index_j MODULO MODULUS  
+                END FOR  
+            END FOR  
+            SET dp_table TO next_dp_table  
+        END FOR  
+        
+        SET total_ways TO zero  
+        FOR each count IN dp_table  
+            INCREMENT total_ways BY count  
+        END FOR  
+        SET total_ways TO total_ways MODULO MODULUS  
+        
+        RETURN total_ways  
+    END FUNCTION  
+END CLASS

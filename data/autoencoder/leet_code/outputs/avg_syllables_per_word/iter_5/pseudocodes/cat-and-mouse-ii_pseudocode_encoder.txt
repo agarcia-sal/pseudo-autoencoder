@@ -1,0 +1,92 @@
+CLASS Solution  
+    FUNCTION canMouseWin(grid, catJump, mouseJump)  
+        SET m TO LENGTH OF grid  
+        SET n TO LENGTH OF grid AT 0  
+        SET cat_start TO 0  
+        SET mouse_start TO 0  
+        SET food TO 0  
+        SET dirs TO SEQUENCE (-1, 0, 1, 0, -1)  
+        SET g_mouse TO LIST OF EMPTY LISTS WITH LENGTH m TIMES n  
+        SET g_cat TO LIST OF EMPTY LISTS WITH LENGTH m TIMES n  
+
+        FOR EACH i, row IN ENUMERATE(grid)  
+            FOR EACH j, c IN ENUMERATE(row)  
+                IF c EQUALS "#" THEN  
+                    CONTINUE TO NEXT ITERATION  
+                SET v TO i TIMES n PLUS j  
+                IF c EQUALS "C" THEN  
+                    SET cat_start TO v  
+                ELSE IF c EQUALS "M" THEN  
+                    SET mouse_start TO v  
+                ELSE IF c EQUALS "F" THEN  
+                    SET food TO v  
+                FOR EACH a, b IN PAIRWISE(dirs)  
+                    FOR k FROM 0 TO mouseJump INCLUSIVE  
+                        SET x TO i PLUS k TIMES a  
+                        SET y TO j PLUS k TIMES b  
+                        IF NOT (x GREATER THAN OR EQUAL TO 0 AND x LESS THAN m AND y GREATER THAN OR EQUAL TO 0 AND y LESS THAN n AND grid AT x AT y NOT EQUAL TO "#") THEN  
+                            BREAK LOOP  
+                        APPEND x TIMES n PLUS y TO g_mouse AT v  
+                    FOR k FROM 0 TO catJump INCLUSIVE  
+                        SET x TO i PLUS k TIMES a  
+                        SET y TO j PLUS k TIMES b  
+                        IF NOT (x GREATER THAN OR EQUAL TO 0 AND x LESS THAN m AND y GREATER THAN OR EQUAL TO 0 AND y LESS THAN n AND grid AT x AT y NOT EQUAL TO "#") THEN  
+                            BREAK LOOP  
+                        APPEND x TIMES n PLUS y TO g_cat AT v  
+        RETURN SELF.calc(g_mouse, g_cat, mouse_start, cat_start, food) EQUALS 1  
+    END FUNCTION  
+
+    FUNCTION calc(g_mouse, g_cat, mouse_start, cat_start, hole)  
+        FUNCTION get_prev_states(state)  
+            SET m TO state AT 0  
+            SET c TO state AT 1  
+            SET t TO state AT 2  
+            SET pt TO t XOR 1  
+            SET pre TO EMPTY LIST  
+            IF pt EQUALS 1 THEN  
+                FOR EACH pc IN g_cat AT c  
+                    IF ans AT m AT pc AT 1 EQUALS 0 THEN  
+                        APPEND (m, pc, pt) TO pre  
+            ELSE  
+                FOR EACH pm IN g_mouse AT m  
+                    IF ans AT pm AT c AT 0 EQUALS 0 THEN  
+                        APPEND (pm, c, 0) TO pre  
+            RETURN pre  
+        END FUNCTION  
+
+        SET n TO LENGTH OF g_mouse  
+        SET degree TO THREE-DIMENSIONAL LIST OF SIZE n BY n BY 2 FILLED WITH 0  
+        FOR i FROM 0 TO n MINUS 1  
+            FOR j FROM 0 TO n MINUS 1  
+                SET degree AT i AT j AT 0 TO LENGTH OF g_mouse AT i  
+                SET degree AT i AT j AT 1 TO LENGTH OF g_cat AT j  
+
+        SET ans TO THREE-DIMENSIONAL LIST OF SIZE n BY n BY 2 FILLED WITH 0  
+        SET q TO EMPTY QUEUE  
+        FOR i FROM 0 TO n MINUS 1  
+            SET ans AT hole AT i AT 1 TO 1  
+            SET ans AT i AT hole AT 0 TO 2  
+            SET ans AT i AT i AT 1 TO 2  
+            SET ans AT i AT i AT 0 TO 2  
+            ENQUEUE (hole, i, 1) TO q  
+            ENQUEUE (i, hole, 0) TO q  
+            ENQUEUE (i, i, 0) TO q  
+            ENQUEUE (i, i, 1) TO q  
+        WHILE q NOT EMPTY  
+            SET state TO DEQUEUE FROM q  
+            SET t TO ans AT state AT 0 AT state AT 1 AT state AT 2  
+            FOR EACH prev_state IN get_prev_states(state)  
+                SET pm TO prev_state AT 0  
+                SET pc TO prev_state AT 1  
+                SET pt TO prev_state AT 2  
+                IF pt EQUALS t MINUS 1 THEN  
+                    SET ans AT pm AT pc AT pt TO t  
+                    ENQUEUE prev_state TO q  
+                ELSE  
+                    DECREMENT degree AT pm AT pc AT pt BY 1  
+                    IF degree AT pm AT pc AT pt EQUALS 0 THEN  
+                        SET ans AT pm AT pc AT pt TO t  
+                        ENQUEUE prev_state TO q  
+        RETURN ans AT mouse_start AT cat_start AT 0  
+    END FUNCTION  
+END CLASS

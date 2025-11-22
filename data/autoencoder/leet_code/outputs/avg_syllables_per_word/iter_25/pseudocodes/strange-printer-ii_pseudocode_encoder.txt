@@ -1,0 +1,45 @@
+CLASS Solution  
+    FUNCTION isPrintable(targetGrid)  
+        SET color_bounds TO a default dictionary with default value being a list of four elements where the first and second elements are positive infinity and the third and fourth elements are negative infinity  
+        FOR r FROM zero TO the LENGTH OF targetGrid MINUS one  
+            FOR c FROM zero TO the LENGTH OF the element at position zero of targetGrid MINUS one  
+                SET color TO the element at position r of targetGrid at position c  
+                SET the element at position zero of the list at key color in color_bounds TO the smaller value between the element at position zero of the list at key color in color_bounds AND r  
+                SET the element at position one of the list at key color in color_bounds TO the smaller value between the element at position one of the list at key color in color_bounds AND c  
+                SET the element at position two of the list at key color in color_bounds TO the larger value between the element at position two of the list at key color in color_bounds AND r  
+                SET the element at position three of the list at key color in color_bounds TO the larger value between the element at position three of the list at key color in color_bounds AND c  
+            END FOR  
+        END FOR  
+        
+        SET graph TO a default dictionary with default value being an empty list  
+        SET in_degree TO a default dictionary with default value being zero  
+        
+        FOR each color and its corresponding list of four bounds consisting of minr minc maxr maxc IN color_bounds  
+            FOR r FROM minr TO maxr  
+                FOR c FROM minc TO maxc  
+                    IF the element at position r of targetGrid at position c IS NOT EQUAL TO color  
+                        SET other_color TO the element at position r of targetGrid at position c  
+                        APPEND color TO the list at key other_color in graph  
+                        INCREMENT the value at key color in in_degree BY one  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+        
+        SET queue TO a double-ended queue containing all colors in color_bounds for which the value at key color in in_degree EQUALS zero  
+        SET visited_colors TO zero  
+        
+        WHILE queue is not empty  
+            REMOVE and RETURN the leftmost element from queue AND ASSIGN it TO color  
+            INCREMENT visited_colors BY one  
+            FOR each next_color IN the list at key color in graph  
+                DECREMENT the value at key next_color in in_degree BY one  
+                IF the value at key next_color in in_degree EQUALS zero  
+                    APPEND next_color TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN whether visited_colors EQUALS the number of keys in color_bounds  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,35 @@
+CLASS Solution  
+    FUNCTION minInterval(intervals AS List OF List OF integer, queries AS List OF integer) RETURNS List OF integer  
+        SORT intervals IN ASCENDING ORDER BY the ELEMENT at position zero of each interval  
+        SET sorted_queries TO the LIST OF PAIRS OF each query AND its original position index SORTED BY the query value in ASCENDING ORDER  
+        
+        SET min_heap TO EMPTY LIST THAT WILL STORE PAIRS OF interval_size AND interval_end  
+        SET result TO LIST OF negative one WITH THE LENGTH EQUAL TO the LENGTH OF queries  
+        
+        SET interval_index TO zero  
+        FOR each query_and_index IN sorted_queries  
+            SET query TO the FIRST ELEMENT OF query_and_index  
+            SET original_index TO the SECOND ELEMENT OF query_and_index  
+            
+            WHILE interval_index IS LESS THAN the LENGTH OF intervals AND  
+                  the ELEMENT at position zero of the interval at position interval_index OF intervals IS LESS THAN OR EQUAL TO query  
+                SET start TO the ELEMENT at position zero of the interval at position interval_index OF intervals  
+                SET end TO the ELEMENT at position one of the interval at position interval_index OF intervals  
+                SET interval_size TO end MINUS start PLUS one  
+                INSERT PAIR OF interval_size AND end INTO min_heap MAINTAINING THE MINIMUM INTERVAL_SIZE AT THE TOP  
+                INCREMENT interval_index BY one  
+            END WHILE  
+            
+            WHILE min_heap IS NOT EMPTY AND  
+                  the SECOND ELEMENT OF THE FIRST PAIR IN min_heap IS LESS THAN query  
+                REMOVE THE FIRST ELEMENT FROM min_heap WHICH HAS THE SMALLEST interval_size  
+            END WHILE  
+            
+            IF min_heap IS NOT EMPTY  
+                SET the ELEMENT at position original_index of result TO the FIRST ELEMENT OF THE FIRST PAIR IN min_heap  
+            END IF  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

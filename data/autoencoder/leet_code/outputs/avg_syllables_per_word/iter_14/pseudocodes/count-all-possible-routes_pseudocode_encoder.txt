@@ -1,0 +1,35 @@
+CLASS Solution  
+    FUNCTION countRoutes(locations AS list of integers, start AS integer, finish AS integer, fuel AS integer) RETURNS integer  
+        SET MOD TO one billion PLUS seven  
+        SET n TO the LENGTH OF locations  
+        
+        FUNCTION dp(city AS integer, remaining_fuel AS integer) RETURNS integer  
+            IF remaining_fuel LESS THAN zero THEN  
+                RETURN zero  
+            END IF  
+            
+            SET routes TO zero  
+            IF city EQUAL TO finish THEN  
+                SET routes TO one  
+            END IF  
+            
+            FOR next_city FROM zero TO n MINUS one  
+                IF next_city NOT EQUAL TO city THEN  
+                    SET distance_difference TO the ABSOLUTE VALUE OF the element at position city OF locations MINUS the element at position next_city OF locations  
+                    SET fuel_cost TO distance_difference  
+                    IF remaining_fuel GREATER THAN OR EQUAL TO fuel_cost THEN  
+                        SET recursive_result TO CALL dp WITH next_city AND remaining_fuel MINUS fuel_cost  
+                        SET routes TO routes PLUS recursive_result  
+                        IF routes GREATER THAN OR EQUAL TO MOD THEN  
+                            SET routes TO routes MINUS MOD  
+                        END IF  
+                    END IF  
+                END IF  
+            END FOR  
+            
+            RETURN routes  
+        END FUNCTION  
+        
+        RETURN CALL dp WITH start AND fuel  
+    END FUNCTION  
+END CLASS

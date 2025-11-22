@@ -1,0 +1,51 @@
+CLASS Solution  
+    FUNCTION minOperationsToFlip(expression)  
+        SET stack TO empty list
+
+        FOR each e IN expression  
+            IF e is one of '(' or '&' or '|'  
+                APPEND (e, 0) TO stack  
+                CONTINUE to next iteration  
+            END IF
+
+            IF e equals ')'  
+                SET lastPair TO POP from stack  
+                POP from stack  # to remove '('  
+            ELSE  # e equals '0' or '1'  
+                SET lastPair TO (e, 1)  
+            END IF
+
+            IF stack is not empty AND the last element in stack has first element in '&' or '|'  
+                SET op TO POP first element from stack  
+                SET a, costA TO POP from stack  
+                SET b, costB TO lastPair  
+
+                IF op equals '&'  
+                    IF a equals '0' AND b equals '0'  
+                        SET lastPair TO ('0', 1 PLUS minimum of costA and costB)  
+                    ELSE IF a equals '0' AND b equals '1'  
+                        SET lastPair TO ('0', 1)  
+                    ELSE IF a equals '1' AND b equals '0'  
+                        SET lastPair TO ('0', 1)  
+                    ELSE  # a equals '1' AND b equals '1'  
+                        SET lastPair TO ('1', minimum of costA and costB)  
+                    END IF  
+                ELSE  # op equals '|'  
+                    IF a equals '0' AND b equals '0'  
+                        SET lastPair TO ('0', minimum of costA and costB)  
+                    ELSE IF a equals '0' AND b equals '1'  
+                        SET lastPair TO ('1', 1)  
+                    ELSE IF a equals '1' AND b equals '0'  
+                        SET lastPair TO ('1', 1)  
+                    ELSE  # a equals '1' AND b equals '1'  
+                        SET lastPair TO ('1', 1 PLUS minimum of costA and costB)  
+                    END IF  
+                END IF  
+            END IF
+
+            APPEND lastPair TO stack  
+        END FOR
+
+        RETURN the second element of the last tuple in stack  
+    END FUNCTION  
+END CLASS

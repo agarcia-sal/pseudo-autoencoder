@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION wordPatternMatch(pattern pattern STRING, s s STRING) RETURNS BOOLEAN  
+        FUNCTION backtrack(pattern_index pattern_index INTEGER, string_index string_index INTEGER, mapping mapping DICTIONARY, used used SET) RETURNS BOOLEAN  
+            IF pattern_index EQUALS the LENGTH OF pattern AND string_index EQUALS the LENGTH OF s  
+                RETURN TRUE  
+            END IF  
+            IF pattern_index EQUALS the LENGTH OF pattern OR string_index EQUALS the LENGTH OF s  
+                RETURN FALSE  
+            END IF  
+            
+            SET current_char TO the element at position pattern_index of pattern  
+            IF current_char IS IN mapping  
+                SET word TO the value for key current_char in mapping  
+                IF the substring of s from position string_index TO position string_index PLUS the LENGTH OF word NOT EQUALS word  
+                    RETURN FALSE  
+                END IF  
+                IF backtrack with arguments pattern_index PLUS one, string_index PLUS the LENGTH OF word, mapping, used RETURNS TRUE  
+                    RETURN TRUE  
+                END IF  
+            ELSE  
+                FOR end FROM string_index PLUS one TO the LENGTH OF s PLUS one  
+                    SET word TO the substring of s from position string_index TO position end  
+                    IF word IS IN used  
+                        CONTINUE  
+                    END IF  
+                    SET the value for key current_char in mapping TO word  
+                    ADD word TO used  
+                    IF backtrack with arguments pattern_index PLUS one, end, mapping, used RETURNS TRUE  
+                        RETURN TRUE  
+                    END IF  
+                    REMOVE the key current_char FROM mapping  
+                    REMOVE word FROM used  
+                END FOR  
+            END IF  
+            
+            RETURN FALSE  
+        END FUNCTION  
+        
+        RETURN backtrack with arguments zero, zero, an empty dictionary, an empty set  
+    END FUNCTION  
+END CLASS

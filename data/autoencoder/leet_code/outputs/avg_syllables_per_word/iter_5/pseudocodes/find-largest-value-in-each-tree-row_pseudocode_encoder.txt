@@ -1,0 +1,59 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val DEFAULT TO 0, left DEFAULT TO None, right DEFAULT TO None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN None  
+    SET root TO new TreeNode WITH val AS values AT position 0  
+    SET i TO 1  
+    SET queue TO new deque containing root  
+    WHILE queue IS NOT empty  
+        SET node TO dequeue first element FROM queue  
+        IF i IS LESS THAN length OF values AND values AT position i IS NOT None  
+            SET node.left TO new TreeNode WITH val AS values AT position i  
+            ENQUEUE node.left TO queue  
+        INCREMENT i BY 1  
+        IF i IS LESS THAN length OF values AND values AT position i IS NOT None  
+            SET node.right TO new TreeNode WITH val AS values AT position i  
+            ENQUEUE node.right TO queue  
+        INCREMENT i BY 1  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION largestValues(self, root)  
+        IF root IS None  
+            RETURN empty list  
+        SET queue TO new deque containing root  
+        SET largest_values TO empty list  
+        WHILE queue IS NOT empty  
+            SET level_size TO length OF queue  
+            SET max_value TO negative infinity  
+            FOR each count FROM 1 TO level_size  
+                SET node TO dequeue first element FROM queue  
+                IF node.val IS GREATER THAN max_value  
+                    SET max_value TO node.val  
+                IF node.left IS NOT None  
+                    ENQUEUE node.left TO queue  
+                IF node.right IS NOT None  
+                    ENQUEUE node.right TO queue  
+            APPEND max_value TO largest_values  
+        RETURN largest_values  
+    END FUNCTION  
+END CLASS

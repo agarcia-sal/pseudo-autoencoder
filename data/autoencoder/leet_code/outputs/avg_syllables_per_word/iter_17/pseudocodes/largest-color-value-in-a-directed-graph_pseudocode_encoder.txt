@@ -1,0 +1,41 @@
+CLASS Solution
+    FUNCTION largestPathValue(colors, edges)
+        SET number_of_nodes TO the LENGTH OF colors
+        CALL auxiliary FUNCTION InitializeGraph WITH parameters number_of_nodes TO graph
+        CALL auxiliary FUNCTION InitializeInDegreeList WITH parameters number_of_nodes TO in_degree_list
+        
+        FOR each pair start_node AND end_node IN edges
+            CALL auxiliary FUNCTION Append end_node TO the list at key start_node IN graph
+            INCREMENT element at position end_node of in_degree_list BY one
+        END FOR
+        
+        CALL auxiliary FUNCTION InitializeQueue WITH parameters number_of_nodes AND in_degree_list TO processing_queue
+        CALL auxiliary FUNCTION InitializeDpList WITH parameters number_of_nodes TO dp_list
+        
+        SET visited_node_count TO zero
+        SET maximum_color_value TO zero
+        
+        WHILE processing_queue is not empty
+            CALL auxiliary FUNCTION RemoveFirstElement FROM processing_queue TO current_node
+            INCREMENT element at position the alphabetical position of the character at position current_node of colors in dp_list BY one
+            SET maximum_color_value TO the GREATER THAN value BETWEEN maximum_color_value AND element at position the alphabetical position of the character at position current_node of colors in dp_list
+            
+            FOR each adjacent_node IN the list associated to current_node IN graph
+                FOR color_index FROM zero TO twenty five
+                    SET element at position color_index of dp_list at adjacent_node TO the GREATER THAN value BETWEEN element at position color_index of dp_list at adjacent_node AND element at position color_index of dp_list at current_node
+                END FOR
+                DECREMENT element at position adjacent_node of in_degree_list BY one
+                IF element at position adjacent_node of in_degree_list EQUALS zero
+                    APPEND adjacent_node TO processing_queue
+                END IF
+            END FOR
+            INCREMENT visited_node_count BY one
+        END WHILE
+        
+        IF visited_node_count EQUALS number_of_nodes
+            RETURN maximum_color_value
+        ELSE
+            RETURN negative one
+        END IF
+    END FUNCTION
+END CLASS

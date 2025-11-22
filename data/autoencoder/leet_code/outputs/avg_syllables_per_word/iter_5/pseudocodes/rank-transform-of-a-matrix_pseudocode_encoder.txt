@@ -1,0 +1,62 @@
+CLASS UnionFind  
+    FUNCTION __init__(size)  
+        SET parent TO list of integers from 0 TO size MINUS 1  
+    END FUNCTION  
+
+    FUNCTION find(u)  
+        IF parent at index u IS NOT u  
+            SET parent at index u TO find(parent at index u)  
+        END IF  
+        RETURN parent at index u  
+    END FUNCTION  
+
+    FUNCTION union(u, v)  
+        SET root_u TO find(u)  
+        SET root_v TO find(v)  
+        IF root_u IS NOT root_v  
+            SET parent at index root_u TO root_v  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION matrixRankTransform(matrix)  
+        SET m TO LENGTH OF matrix  
+        SET n TO LENGTH OF matrix at index 0  
+
+        SET value_to_indices TO new mapping from values TO empty lists  
+
+        FOR r FROM 0 TO m MINUS 1  
+            FOR c FROM 0 TO n MINUS 1  
+                APPEND tuple(r, c) TO value_to_indices at key matrix at r, c  
+            END FOR  
+        END FOR  
+
+        SET row_rank TO list of zeros with length m  
+        SET col_rank TO list of zeros with length n  
+        SET result TO list of lists filled with zeros of size m by n  
+
+        FOR each value IN sorted keys of value_to_indices  
+            SET uf TO new UnionFind with size m PLUS n  
+            SET rank TO new mapping from integer TO integer with default value zero  
+
+            FOR each (r, c) IN value_to_indices at value  
+                CALL uf.union(r, c PLUS m)  
+            END FOR  
+
+            FOR each (r, c) IN value_to_indices at value  
+                SET root TO uf.find(r)  
+                SET rank at root TO maximum of rank at root AND maximum of row_rank at r AND col_rank at c PLUS 1  
+            END FOR  
+
+            FOR each (r, c) IN value_to_indices at value  
+                SET root TO uf.find(r)  
+                SET result at r, c TO rank at root  
+                SET row_rank at r TO rank at root  
+                SET col_rank at c TO rank at root  
+            END FOR  
+        END FOR  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

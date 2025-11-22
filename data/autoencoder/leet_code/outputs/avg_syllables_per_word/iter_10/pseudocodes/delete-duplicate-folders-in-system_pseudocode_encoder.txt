@@ -1,0 +1,55 @@
+CLASS TrieNode  
+    FUNCTION __init__()  
+        SET children TO a new mapping with default value a new TrieNode  
+        SET deleted TO False  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION deleteDuplicateFolder(paths)  
+        SET ans TO an empty list  
+        SET root TO a new TrieNode  
+        SET subtreeToNodes TO a new mapping with default value an empty list  
+
+        FOR each path IN the sorted order of paths  
+            SET node TO root  
+            FOR each s IN path  
+                SET node TO the child of node.children at key s  
+            END FOR  
+        END FOR  
+
+        FUNCTION buildSubtreeToRoots(node)  
+            SET subtree TO the concatenation of an opening parenthesis  
+            FOLLOWED BY the concatenation for each s IN the keys of node.children of s PLUS the result of buildSubtreeToRoots on node.children at key s  
+            FOLLOWED BY a closing parenthesis  
+            IF subtree NOT EQUALS an empty pair of parentheses  
+                APPEND node TO the list at subtreeToNodes[subtree]  
+            END IF  
+            RETURN subtree  
+        END FUNCTION  
+
+        CALL buildSubtreeToRoots with argument root  
+
+        FOR each nodes IN the values of subtreeToNodes  
+            IF the length of nodes GREATER THAN one  
+                FOR each node IN nodes  
+                    SET node.deleted TO True  
+                END FOR  
+            END IF  
+        END FOR  
+
+        FUNCTION constructPath(node, path)  
+            FOR each pair s and child IN the items of node.children  
+                IF child.deleted IS False  
+                    CALL constructPath with arguments child and path concatenated with s  
+                END IF  
+            END FOR  
+            IF path IS NOT empty  
+                APPEND path TO ans  
+            END IF  
+        END FUNCTION  
+
+        CALL constructPath with arguments root and an empty list  
+        RETURN ans  
+    END FUNCTION  
+END CLASS

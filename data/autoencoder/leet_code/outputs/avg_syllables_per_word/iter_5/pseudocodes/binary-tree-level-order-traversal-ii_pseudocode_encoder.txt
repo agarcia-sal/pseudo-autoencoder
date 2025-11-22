@@ -1,0 +1,59 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET root TO NEW TreeNode WITH values AT POSITION ZERO  
+    SET i TO ONE  
+    INITIALIZE queue AS DEQUE  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO REMOVE FIRST ELEMENT FROM queue  
+        IF i IS LESS THAN LENGTH OF values AND values AT POSITION i IS NOT None  
+            SET node.left TO NEW TreeNode WITH values AT POSITION i  
+            APPEND node.left TO queue  
+        INCREMENT i BY ONE  
+        IF i IS LESS THAN LENGTH OF values AND values AT POSITION i IS NOT None  
+            SET node.right TO NEW TreeNode WITH values AT POSITION i  
+            APPEND node.right TO queue  
+        INCREMENT i BY ONE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION levelOrderBottom(self, root)  
+        IF root IS None  
+            RETURN EMPTY LIST  
+        SET result TO EMPTY LIST  
+        INITIALIZE queue AS DEQUE CONTAINING root  
+        WHILE queue IS NOT EMPTY  
+            SET level_size TO LENGTH OF queue  
+            SET current_level TO EMPTY LIST  
+            FOR index FROM ZERO TO level_size MINUS ONE  
+                SET node TO REMOVE FIRST ELEMENT FROM queue  
+                APPEND node.val TO current_level  
+                IF node.left IS NOT None  
+                    APPEND node.left TO queue  
+                IF node.right IS NOT None  
+                    APPEND node.right TO queue  
+            APPEND current_level TO result  
+        RETURN result IN REVERSE ORDER  
+    END FUNCTION  
+END CLASS

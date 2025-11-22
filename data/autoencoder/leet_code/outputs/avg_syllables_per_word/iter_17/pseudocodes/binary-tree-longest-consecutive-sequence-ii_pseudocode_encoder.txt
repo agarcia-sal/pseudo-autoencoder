@@ -1,0 +1,76 @@
+CLASS TreeNode
+    FUNCTION __init__(val equals zero, left equals none, right equals none)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(list_of_values)
+    IF list_of_values IS empty
+        RETURN none
+    END IF
+    SET root TO CALL TreeNode WITH element at position zero of list_of_values
+    SET index i TO one
+    SET queue TO CALL deque WITH no parameters
+    CALL APPEND root TO queue
+    WHILE queue is not empty
+        SET node TO CALL popleft FROM queue
+        IF index i LESS THAN the LENGTH OF list_of_values AND element at position i of list_of_values IS NOT none
+            SET node.left TO CALL TreeNode WITH element at position i of list_of_values
+            CALL APPEND node.left TO queue
+        END IF
+        INCREMENT index i BY one
+        IF index i LESS THAN the LENGTH OF list_of_values AND element at position i of list_of_values IS NOT none
+            SET node.right TO CALL TreeNode WITH element at position i of list_of_values
+            CALL APPEND node.right TO queue
+        END IF
+        INCREMENT index i BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(node_p, node_q)
+    IF node_p IS none AND node_q IS none
+        RETURN true
+    ELSE IF node_p IS none OR node_q IS none
+        RETURN false
+    ELSE IF node_p.val NOT EQUALS node_q.val
+        RETURN false
+    ELSE
+        RETURN CALL is_same_tree WITH node_p.left AND node_q.left AND CALL is_same_tree WITH node_p.right AND node_q.right
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION longestConsecutive(root)
+        FUNCTION dfs(node)
+            IF node IS none
+                RETURN zero, zero
+            END IF
+            SET inc_len TO one
+            SET dec_len TO one
+            SET left_inc, left_dec TO CALL dfs WITH node.left
+            SET right_inc, right_dec TO CALL dfs WITH node.right
+            IF node.left IS NOT none
+                IF node.val EQUALS node.left.val PLUS one
+                    SET dec_len TO left_dec PLUS one
+                ELSE IF node.val EQUALS node.left.val MINUS one
+                    SET inc_len TO left_inc PLUS one
+                END IF
+            END IF
+            IF node.right IS NOT none
+                IF node.val EQUALS node.right.val PLUS one
+                    SET dec_len TO the GREATER OF dec_len AND right_dec PLUS one
+                ELSE IF node.val EQUALS node.right.val MINUS one
+                    SET inc_len TO the GREATER OF inc_len AND right_inc PLUS one
+                END IF
+            END IF
+            SET max_len TO the GREATER OF max_len AND inc_len PLUS dec_len MINUS one
+            RETURN inc_len, dec_len
+        END FUNCTION
+        SET max_len TO zero
+        CALL dfs WITH root
+        RETURN max_len
+    END FUNCTION
+END CLASS

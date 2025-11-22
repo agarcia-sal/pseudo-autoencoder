@@ -1,0 +1,37 @@
+CLASS Solution
+    FUNCTION minChanges(nums, k)
+        SET groups TO a new mapping from integer to list
+        FOR i FROM 0 TO LENGTH OF nums MINUS 1
+            APPEND nums[i] TO groups AT KEY (i MODULO k)
+        END FOR
+
+        SET freq TO a list of k new mappings from integer to integer
+        SET min_size TO a list of length k FILLED WITH infinity
+        FOR i FROM 0 TO k MINUS 1
+            FOR each num IN groups[i]
+                INCREMENT freq[i][num] BY 1
+            END FOR
+            SET min_size[i] TO LENGTH OF groups[i]
+        END FOR
+
+        SET dp TO a list FILLED WITH infinity OF LENGTH (2 TO THE POWER OF 10)
+        SET dp[0] TO 0
+
+        FOR i FROM 0 TO k MINUS 1
+            SET new_dp TO a list FILLED WITH infinity OF LENGTH (2 TO THE POWER OF 10)
+            SET min_dp TO MINIMUM VALUE IN dp
+            FOR j FROM 0 TO (2 TO THE POWER OF 10) MINUS 1
+                SET new_dp[j] TO min_dp PLUS min_size[i]
+                FOR EACH (num, count) IN freq[i]
+                    SET candidate TO dp[j XOR num] PLUS min_size[i] MINUS count
+                    IF candidate LESS THAN new_dp[j]
+                        SET new_dp[j] TO candidate
+                    END IF
+                END FOR
+            END FOR
+            SET dp TO new_dp
+        END FOR
+
+        RETURN dp[0]
+    END FUNCTION
+END CLASS

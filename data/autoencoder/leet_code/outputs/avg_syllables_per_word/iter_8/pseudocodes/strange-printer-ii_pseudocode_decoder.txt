@@ -1,0 +1,37 @@
+CLASS Solution  
+    FUNCTION isPrintable(targetGrid)  
+        SET color_bounds TO a default dictionary mapping each color TO list of four values [positive infinity, positive infinity, negative infinity, negative infinity]  
+        
+        FOR each row index r FROM 0 TO length of targetGrid MINUS 1  
+            FOR each column index c FROM 0 TO length of targetGrid at row 0 MINUS 1  
+                SET color TO targetGrid at position r, c  
+                SET color_bounds at color at index 0 TO minimum of current value and r  
+                SET color_bounds at color at index 1 TO minimum of current value and c  
+                SET color_bounds at color at index 2 TO maximum of current value and r  
+                SET color_bounds at color at index 3 TO maximum of current value and c  
+        
+        SET graph TO a default dictionary mapping each color TO empty list  
+        SET in_degree TO a default dictionary mapping each color TO 0  
+        
+        FOR each color and its bounds (minr, minc, maxr, maxc) IN color_bounds  
+            FOR each row index r FROM minr TO maxr  
+                FOR each column index c FROM minc TO maxc  
+                    IF targetGrid at position r, c IS NOT EQUAL TO color THEN  
+                        SET other_color TO targetGrid at position r, c  
+                        APPEND color TO graph at other_color  
+                        INCREMENT in_degree at color BY 1  
+        
+        SET queue TO an empty deque containing colors FROM color_bounds WHERE in_degree of color EQUALS 0  
+        SET visited_colors TO 0  
+        
+        WHILE queue IS NOT EMPTY  
+            REMOVE the leftmost color FROM queue  
+            INCREMENT visited_colors BY 1  
+            FOR each next_color IN graph at color  
+                DECREMENT in_degree at next_color BY 1  
+                IF in_degree at next_color EQUALS 0 THEN  
+                    APPEND next_color TO queue  
+        
+        RETURN visited_colors EQUALS the number of keys in color_bounds  
+    END FUNCTION  
+END CLASS

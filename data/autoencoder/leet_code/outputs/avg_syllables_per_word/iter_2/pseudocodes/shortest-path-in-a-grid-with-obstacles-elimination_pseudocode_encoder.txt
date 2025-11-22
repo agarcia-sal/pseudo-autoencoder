@@ -1,0 +1,41 @@
+CLASS Solution
+    FUNCTION shortestPath(grid: List of List of int, k: int) RETURNS int
+        IF grid is empty OR grid[0] is empty THEN
+            RETURN -1
+        END IF
+
+        SET m TO LENGTH OF grid
+        SET n TO LENGTH OF grid[0]
+
+        IF k >= m + n - 2 THEN
+            RETURN m + n - 2
+        END IF
+
+        SET directions TO LIST OF (0, 1), (1, 0), (0, -1), (-1, 0)
+        SET queue TO DEQUE containing (0, 0, k, 0)
+        SET visited TO SET containing (0, 0, k)
+
+        WHILE queue is not empty DO
+            SET (x, y, remaining_k, steps) TO REMOVE FIRST ELEMENT FROM queue
+
+            IF x = m - 1 AND y = n - 1 THEN
+                RETURN steps
+            END IF
+
+            FOR EACH (dx, dy) IN directions DO
+                SET nx TO x + dx
+                SET ny TO y + dy
+
+                IF nx >= 0 AND nx < m AND ny >= 0 AND ny < n THEN
+                    SET new_k TO remaining_k - grid[nx][ny]
+                    IF new_k >= 0 AND (nx, ny, new_k) NOT IN visited THEN
+                        ADD (nx, ny, new_k) TO visited
+                        ADD (nx, ny, new_k, steps + 1) TO queue
+                    END IF
+                END IF
+            END FOR
+        END WHILE
+
+        RETURN -1
+    END FUNCTION
+END CLASS

@@ -1,0 +1,165 @@
+CLASS Term  
+    FUNCTION __init__ WITH PARAMETERS coefficient AND variables  
+        SET coefficient ATTRIBUTE OF self TO coefficient  
+        SET variables ATTRIBUTE OF self TO variables  
+    END FUNCTION  
+  
+    FUNCTION __lt__ WITH PARAMETERS other  
+        IF LENGTH OF variables ATTRIBUTE OF self IS NOT EQUAL TO LENGTH OF variables ATTRIBUTE OF other  
+            RETURN LENGTH OF variables ATTRIBUTE OF self IS GREATER THAN LENGTH OF variables ATTRIBUTE OF other  
+        END IF  
+        RETURN STRING RESULTING FROM JOINING variables ATTRIBUTE OF self WITH ASTERISK IS LESS THAN STRING RESULTING FROM JOINING variables ATTRIBUTE OF other WITH ASTERISK  
+    END FUNCTION  
+  
+    FUNCTION __repr__  
+        IF variables ATTRIBUTE OF self IS EMPTY  
+            RETURN STRING REPRESENTATION OF coefficient ATTRIBUTE OF self  
+        END IF  
+        RETURN STRING RESULTING FROM CONCATENATING STRING REPRESENTATION OF coefficient ATTRIBUTE OF self, ASTERISK, AND STRING RESULTING FROM JOINING variables ATTRIBUTE OF self WITH ASTERISK  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Expression  
+    FUNCTION __init__  
+        SET terms ATTRIBUTE OF self TO DEFAULT DICTIONARY WITH DEFAULT INTEGER ZERO  
+    END FUNCTION  
+  
+    FUNCTION add_term WITH PARAMETER term  
+        SET key TO TUPLE OF SORTED variables ATTRIBUTE OF term  
+        INCREMENT terms ATTRIBUTE OF self AT key BY coefficient ATTRIBUTE OF term  
+    END FUNCTION  
+  
+    FUNCTION multiply WITH PARAMETER other  
+        SET result TO NEW INSTANCE OF Expression  
+        FOR EACH vars1 AND coeff1 IN items OF terms ATTRIBUTE OF self  
+            FOR EACH vars2 AND coeff2 IN items OF terms ATTRIBUTE OF other  
+                SET combined_vars TO SORTED LIST OF CONCATENATION OF vars1 AND vars2  
+                CALL add_term OF result WITH NEW INSTANCE OF Term WITH PARAMETERS coeff1 MULTIPLIED BY coeff2 AND combined_vars  
+            END FOR  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+  
+    FUNCTION add WITH PARAMETER other  
+        FOR EACH vars AND coeff IN items OF terms ATTRIBUTE OF other  
+            CALL add_term OF self WITH NEW INSTANCE OF Term WITH PARAMETERS coeff AND LIST OF vars  
+        END FOR  
+        RETURN self  
+    END FUNCTION  
+  
+    FUNCTION subtract WITH PARAMETER other  
+        FOR EACH vars AND coeff IN items OF terms ATTRIBUTE OF other  
+            CALL add_term OF self WITH NEW INSTANCE OF Term WITH PARAMETERS NEGATIVE coeff AND LIST OF vars  
+        END FOR  
+        RETURN self  
+    END FUNCTION  
+  
+    FUNCTION evaluate WITH PARAMETER var_map  
+        SET result TO NEW INSTANCE OF Expression  
+        FOR EACH vars AND coeff IN items OF terms ATTRIBUTE OF self  
+            SET new_vars TO EMPTY LIST  
+            FOR EACH var IN vars  
+                IF var IS IN var_map  
+                    APPEND STRING REPRESENTATION OF VALUE ASSOCIATED WITH var IN var_map TO new_vars  
+                ELSE  
+                    APPEND var TO new_vars  
+                END IF  
+            END FOR  
+            IF new_vars IS NOT EMPTY  
+                SET new_coeff TO EVALUATION OF CONCATENATION OF ELEMENTS OF new_vars AS STRING  
+            ELSE  
+                SET new_coeff TO ONE  
+            END IF  
+            CALL add_term OF result WITH NEW INSTANCE OF Term WITH PARAMETERS coeff MULTIPLIED BY new_coeff AND EMPTY LIST  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+  
+    FUNCTION simplify  
+        SET simplified_terms TO EMPTY LIST  
+        FOR EACH vars AND coeff IN items OF terms ATTRIBUTE OF self  
+            IF coeff IS NOT EQUAL TO ZERO  
+                APPEND NEW INSTANCE OF Term WITH PARAMETERS coeff AND LIST OF vars TO simplified_terms  
+            END IF  
+        END FOR  
+        SORT simplified_terms ACCORDING TO __lt__ FUNCTION OF Term  
+        RETURN simplified_terms  
+    END FUNCTION  
+  
+    FUNCTION __repr__  
+        RETURN STRING RESULTING FROM JOINING MAP OF __repr__ FUNCTION ON CALL OF simplify OF self WITH PLUS SYMBOL AS SEPARATOR  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION basicCalculatorIV WITH PARAMETERS expression, evalvars, AND evalints  
+        SET var_map TO DICTIONARY MADE BY PAIRING EACH ELEMENT OF evalvars WITH CORRESPONDING ELEMENT OF evalints  
+        SET tokens TO LIST OF ALL MATCHES OF PATTERN CAPTURING OPENING PARENTHESIS OR CLOSING PARENTHESIS OR PLUS OR MINUS OR MULTIPLY OR ONE OR MORE DIGITS OR WORD CHARACTERS IN expression  
+        SET output TO EMPTY LIST  
+        SET operators TO EMPTY LIST  
+  
+        FUNCTION apply_operator  
+            SET right TO POP LAST ELEMENT FROM output  
+            SET left TO POP LAST ELEMENT FROM output  
+            SET op TO POP LAST ELEMENT FROM operators  
+            IF op IS EQUAL TO PLUS SYMBOL  
+                APPEND RESULT OF ADD FUNCTION OF left WITH PARAMETER right TO output  
+            ELSE IF op IS EQUAL TO MINUS SYMBOL  
+                APPEND RESULT OF subtract FUNCTION OF left WITH PARAMETER right TO output  
+            ELSE IF op IS EQUAL TO MULTIPLY SYMBOL  
+                APPEND RESULT OF multiply FUNCTION OF left WITH PARAMETER right TO output  
+            END IF  
+        END FUNCTION  
+  
+        SET i TO ZERO  
+        WHILE i IS LESS THAN LENGTH OF tokens  
+            SET token TO element AT position i OF tokens  
+            IF token CONSISTS ONLY OF DIGITS  
+                APPEND NEW INSTANCE OF Expression TO output  
+                CALL add_term OF LAST ELEMENT OF output WITH NEW INSTANCE OF Term WITH PARAMETERS INTEGER VALUE OF token AND EMPTY LIST  
+            ELSE IF token CONSISTS ONLY OF ALPHABETICAL CHARACTERS  
+                APPEND NEW INSTANCE OF Expression TO output  
+                SET coef TO VALUE ASSOCIATED WITH token IN var_map IF PRESENT OTHERWISE ONE  
+                IF coef IS EQUAL TO ONE  
+                    IF token IS NOT IN var_map  
+                        CALL add_term OF LAST ELEMENT OF output WITH NEW INSTANCE OF Term WITH PARAMETERS ONE AND LIST CONTAINING token  
+                    ELSE  
+                        CALL add_term OF LAST ELEMENT OF output WITH NEW INSTANCE OF Term WITH PARAMETERS ONE AND EMPTY LIST  
+                    END IF  
+                ELSE  
+                    CALL add_term OF LAST ELEMENT OF output WITH NEW INSTANCE OF Term WITH PARAMETERS coef AND EMPTY LIST  
+                END IF  
+            ELSE IF token IS EQUAL TO OPENING PARENTHESIS  
+                APPEND token TO operators  
+            ELSE IF token IS EQUAL TO CLOSING PARENTHESIS  
+                WHILE operators IS NOT EMPTY AND LAST ELEMENT OF operators IS NOT OPENING PARENTHESIS  
+                    CALL apply_operator  
+                END WHILE  
+                REMOVE LAST ELEMENT FROM operators  
+            ELSE IF token IS ONE OF PLUS SYMBOL, MINUS SYMBOL, OR MULTIPLY SYMBOL  
+                WHILE operators IS NOT EMPTY AND LAST ELEMENT OF operators IS NOT OPENING PARENTHESIS AND (token IS PLUS SYMBOL OR token IS MINUS SYMBOL OR LAST ELEMENT OF operators IS MULTIPLY SYMBOL)  
+                    CALL apply_operator  
+                END WHILE  
+                APPEND token TO operators  
+            END IF  
+            INCREMENT i BY ONE  
+        END WHILE  
+  
+        WHILE operators IS NOT EMPTY  
+            CALL apply_operator  
+        END WHILE  
+  
+        SET simplified_terms TO RESULT OF simplify FUNCTION CALLED ON FIRST ELEMENT OF output  
+  
+        SET result_strings TO EMPTY LIST  
+        FOR EACH term IN simplified_terms  
+            IF variables ATTRIBUTE OF term IS NOT EMPTY  
+                APPEND STRING RESULTING FROM CONCATENATION OF STRING REPRESENTATION OF coefficient ATTRIBUTE OF term, ASTERISK, AND STRING RESULTING FROM JOINING variables ATTRIBUTE OF term WITH ASTERISK TO result_strings  
+            ELSE  
+                APPEND STRING REPRESENTATION OF coefficient ATTRIBUTE OF term TO result_strings  
+            END IF  
+        END FOR  
+  
+        RETURN result_strings  
+    END FUNCTION  
+END CLASS

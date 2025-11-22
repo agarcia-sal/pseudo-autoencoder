@@ -1,0 +1,35 @@
+CLASS Solution  
+    FUNCTION numMusicPlaylists(n, goal, k)  
+        SET MODULO TO one billion PLUS seven  
+        
+        FUNCTION initialize_two_dimensional_list(rows, columns)  
+            CREATE list_of_lists AS empty list  
+            FOR each row_index FROM one TO rows  
+                CREATE row_list AS list of zeros with length columns  
+                APPEND row_list TO list_of_lists  
+            END FOR  
+            RETURN list_of_lists  
+        END FUNCTION  
+        
+        SET dp TO initialize_two_dimensional_list(goal PLUS one, n PLUS one)  
+        SET element at position zero OF list at position zero OF dp TO one  
+        
+        FOR i FROM one TO goal  
+            FOR j FROM one TO n  
+                SET previous_count_for_new_song TO element at position i MINUS one OF list at position j MINUS one OF dp  
+                SET available_new_songs TO n MINUS (j MINUS one)  
+                INCREMENT element at position j OF list at position i OF dp BY previous_count_for_new_song MULTIPLIED BY available_new_songs  
+                SET element at position j OF list at position i OF dp TO element at position j OF list at position i OF dp MODULO MODULO  
+                
+                IF j GREATER THAN k THEN  
+                    SET previous_count_for_repeat_song TO element at position i MINUS one OF list at position j OF dp  
+                    SET available_repeat_songs TO j MINUS k  
+                    INCREMENT element at position j OF list at position i OF dp BY previous_count_for_repeat_song MULTIPLIED BY available_repeat_songs  
+                    SET element at position j OF list at position i OF dp TO element at position j OF list at position i OF dp MODULO MODULO  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        RETURN element at position n OF list at position goal OF dp  
+    END FUNCTION  
+END CLASS

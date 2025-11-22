@@ -1,0 +1,55 @@
+CLASS TreeNode
+    FUNCTION __init__(val = 0, left = None, right = None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values: list)
+    IF values IS EMPTY
+        RETURN None
+    SET root TO NEW TreeNode(values[0])
+    SET i TO 1
+    SET queue TO NEW deque
+    APPEND root TO queue
+    WHILE queue IS NOT EMPTY
+        SET node TO REMOVE FIRST ELEMENT FROM queue
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.left TO NEW TreeNode(values[i])
+            APPEND node.left TO queue
+        INCREMENT i BY 1
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.right TO NEW TreeNode(values[i])
+            APPEND node.right TO queue
+        INCREMENT i BY 1
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val IS NOT EQUAL TO q.val
+        RETURN False
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+END FUNCTION
+
+CLASS Solution
+    FUNCTION maxPathSum(root: Optional[TreeNode]) RETURNS int
+        FUNCTION helper(node)
+            IF node IS None
+                RETURN NEGATIVE_INFINITY, NEGATIVE_INFINITY
+            SET left_max, left_gain TO helper(node.left)
+            SET right_max, right_gain TO helper(node.right)
+            SET current_max TO node.val + MAXIMUM OF left_gain AND 0 + MAXIMUM OF right_gain AND 0
+            SET current_gain TO node.val + MAXIMUM OF left_gain, right_gain, AND 0
+            SET global_max TO MAXIMUM OF left_max, right_max, AND current_max
+            RETURN global_max, current_gain
+        END FUNCTION
+        RETURN helper(root)[0]
+    END FUNCTION
+END CLASS

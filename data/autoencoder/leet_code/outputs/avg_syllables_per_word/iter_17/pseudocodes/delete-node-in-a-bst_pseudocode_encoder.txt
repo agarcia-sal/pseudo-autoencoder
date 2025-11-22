@@ -1,0 +1,72 @@
+CLASS TreeNode
+    FUNCTION __init__(val EQUALS zero, left EQUALS None, right EQUALS None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(list_of_values)
+    IF list_of_values IS empty
+        RETURN None
+    END IF
+    SET root TO CALL TreeNode WITH the element at position zero of list_of_values
+    SET i TO one
+    SET queue TO CALL deque WITH no parameters
+    CALL APPEND root TO queue
+    WHILE queue IS NOT empty
+        SET node TO CALL popleft ON queue
+        IF i LESS THAN the LENGTH OF list_of_values AND element at position i of list_of_values IS NOT None
+            SET node.left TO CALL TreeNode WITH element at position i of list_of_values
+            CALL APPEND node.left TO queue
+        END IF
+        INCREMENT i BY one
+        IF i LESS THAN the LENGTH OF list_of_values AND element at position i of list_of_values IS NOT None
+            SET node.right TO CALL TreeNode WITH element at position i of list_of_values
+            CALL APPEND node.right TO queue
+        END IF
+        INCREMENT i BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(node_p, node_q)
+    IF node_p IS None AND node_q IS None
+        RETURN True
+    ELSE IF node_p IS None OR node_q IS None
+        RETURN False
+    ELSE IF node_p.val IS NOT EQUALS TO node_q.val
+        RETURN False
+    ELSE
+        RETURN CALL is_same_tree WITH node_p.left AND node_q.left AND CALL is_same_tree WITH node_p.right AND node_q.right
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION deleteNode(root, key)
+        IF root IS None
+            RETURN None
+        END IF
+        IF root.val GREATER THAN key
+            SET root.left TO CALL deleteNode WITH root.left AND key
+            RETURN root
+        END IF
+        IF root.val LESS THAN key
+            SET root.right TO CALL deleteNode WITH root.right AND key
+            RETURN root
+        END IF
+        IF root.left IS None
+            RETURN root.right
+        END IF
+        IF root.right IS None
+            RETURN root.left
+        END IF
+        SET node TO root.right
+        WHILE node.left IS NOT None
+            SET node TO node.left
+        END WHILE
+        SET node.left TO root.left
+        SET root TO root.right
+        RETURN root
+    END FUNCTION
+END CLASS

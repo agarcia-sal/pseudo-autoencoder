@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION encode WITH PARAMETER s  
+        FUNCTION get_encoded_length WITH PARAMETERS count AND substring  
+            RETURN the LENGTH OF the STRING REPRESENTATION OF count PLUS the LENGTH OF substring PLUS two  
+        END FUNCTION  
+
+        FUNCTION dp WITH PARAMETERS i AND j  
+            SET substring TO the ELEMENTS AT POSITIONS FROM i TO j OF s  
+            SET n TO j MINUS i PLUS one  
+            IF n LESS THAN five  
+                RETURN substring  
+            END IF  
+
+            SET shortest TO substring  
+            FOR each k FROM one TO the INTEGER PART OF n DIVIDED BY two PLUS one  
+                IF n MODULO k EQUALS zero  
+                    SET repeat_count TO n DIVIDED BY k  
+                    IF substring EQUALS concatenation of ELEMENTS AT POSITIONS FROM zero TO k MINUS one OF substring REPEATED repeat_count TIMES  
+                        SET encoded_candidate TO the STRING REPRESENTATION OF repeat_count FOLLOWED BY the OPENING SQUARE BRACKET FOLLOWED BY the RESULT OF CALLING dp WITH PARAMETERS i AND i PLUS k MINUS one FOLLOWED BY the CLOSING SQUARE BRACKET  
+                        IF the LENGTH OF encoded_candidate LESS THAN the LENGTH OF shortest  
+                            SET shortest TO encoded_candidate  
+                        END IF  
+                    END IF  
+                END IF  
+            END FOR  
+
+            FOR each k FROM i TO j MINUS one  
+                SET left_encoded TO the RESULT OF CALLING dp WITH PARAMETERS i AND k  
+                SET right_encoded TO the RESULT OF CALLING dp WITH PARAMETERS k PLUS one AND j  
+                SET combined TO left_encoded CONCATENATED WITH right_encoded  
+                IF the LENGTH OF combined LESS THAN the LENGTH OF shortest  
+                    SET shortest TO combined  
+                END IF  
+            END FOR  
+
+            RETURN shortest  
+        END FUNCTION  
+
+        RETURN the RESULT OF CALLING dp WITH PARAMETERS zero AND the LENGTH OF s MINUS one  
+    END FUNCTION  
+END CLASS

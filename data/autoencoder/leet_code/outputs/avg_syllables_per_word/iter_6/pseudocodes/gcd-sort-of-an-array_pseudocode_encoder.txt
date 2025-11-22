@@ -1,0 +1,55 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.parent TO list of integers from zero TO size MINUS one  
+        SET self.rank TO list of ones of length size  
+    END FUNCTION  
+
+    FUNCTION find(self, p)  
+        IF self.parent at index p NOT EQUALS p THEN  
+            SET self.parent at index p TO CALL find WITH self.parent at index p  
+        END IF  
+        RETURN self.parent at index p  
+    END FUNCTION  
+
+    FUNCTION union(self, p, q)  
+        SET rootP TO CALL find WITH p  
+        SET rootQ TO CALL find WITH q  
+        IF rootP EQUALS rootQ THEN  
+            RETURN False  
+        END IF  
+        IF self.rank at index rootP GREATER THAN self.rank at index rootQ THEN  
+            SET self.parent at index rootQ TO rootP  
+        ELSE IF self.rank at index rootP LESS THAN self.rank at index rootQ THEN  
+            SET self.parent at index rootP TO rootQ  
+        ELSE  
+            SET self.parent at index rootQ TO rootP  
+            INCREMENT self.rank at index rootP BY one  
+        END IF  
+        RETURN True  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION gcdSort(self, nums)  
+        SET sorted_nums TO nums sorted in ascending order  
+        SET max_val TO maximum value in nums  
+        SET uf TO new instance of UnionFind WITH argument max_val PLUS one  
+        
+        FOR each num IN nums  
+            FOR factor FROM two TO integer square root of num PLUS one  
+                IF num MODULO factor EQUALS zero THEN  
+                    CALL uf.union WITH arguments num AND factor  
+                    CALL uf.union WITH arguments num AND num DIVIDED BY factor  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        FOR index FROM zero TO length of nums MINUS one  
+            IF CALL uf.find WITH nums at index NOT EQUALS CALL uf.find WITH sorted_nums at index THEN  
+                RETURN False  
+            END IF  
+        END FOR  
+        
+        RETURN True  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,98 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.parent TO list of integers from zero up to size minus one  
+        SET self.rank TO list of zeros of length size  
+        SET self.size TO list of ones of length size  
+    END FUNCTION  
+
+    FUNCTION find(self, u)  
+        IF self.parent at position u IS NOT u THEN  
+            SET self.parent at position u TO self.find(self.parent at position u)  
+        END IF  
+        RETURN self.parent at position u  
+    END FUNCTION  
+
+    FUNCTION union(self, u, v)  
+        SET rootU TO self.find(u)  
+        SET rootV TO self.find(v)  
+        IF rootU IS NOT rootV THEN  
+            IF self.rank at rootU GREATER THAN self.rank at rootV THEN  
+                SET self.parent at rootV TO rootU  
+                INCREMENT self.size at rootU BY self.size at rootV  
+            ELSE IF self.rank at rootU LESS THAN self.rank at rootV THEN  
+                SET self.parent at rootU TO rootV  
+                INCREMENT self.size at rootV BY self.size at rootU  
+            ELSE  
+                SET self.parent at rootV TO rootU  
+                INCREMENT self.size at rootU BY self.size at rootV  
+                INCREMENT self.rank at rootU BY one  
+            END IF  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION groupStrings(self, words)  
+        FUNCTION bitmask(word)  
+            SET mask TO zero  
+            FOR each char IN word  
+                SET mask TO mask OR one shifted left by (ordinal value of char MINUS ordinal value of 'a')  
+            END FOR  
+            RETURN mask  
+        END FUNCTION  
+
+        SET word_map TO a map with default empty list values  
+        SET n TO LENGTH OF words  
+        SET uf TO a new UnionFind with parameter n  
+
+        FOR each index i, word IN enumeration of words  
+            SET mask TO bitmask of word  
+            APPEND i TO word_map at key mask  
+        END FOR  
+
+        FOR each index i, word IN enumeration of words  
+            SET mask TO bitmask of word  
+            FOR each integer j FROM zero UP TO twenty-five  
+                SET new_mask TO mask XOR one shifted left by j  
+                IF new_mask IS IN word_map THEN  
+                    FOR each k IN word_map at new_mask  
+                        CALL uf.union with i and k  
+                    END FOR  
+                END IF  
+
+                IF mask AND one shifted left by j IS zero THEN  
+                    SET new_mask TO mask OR one shifted left by j  
+                    IF new_mask IS IN word_map THEN  
+                        FOR each k IN word_map at new_mask  
+                            CALL uf.union with i and k  
+                        END FOR  
+                    END IF  
+                END IF  
+
+                IF mask AND one shifted left by j IS NOT zero THEN  
+                    FOR each integer k FROM zero UP TO twenty-five  
+                        IF mask AND one shifted left by k IS zero THEN  
+                            SET new_mask TO (mask XOR one shifted left by j) OR one shifted left by k  
+                            IF new_mask IS IN word_map THEN  
+                                FOR each l IN word_map at new_mask  
+                                    CALL uf.union with i and l  
+                                END FOR  
+                            END IF  
+                        END IF  
+                    END FOR  
+                END IF  
+            END FOR  
+        END FOR  
+
+        SET root_sizes TO a map with default zero integer values  
+        FOR each integer i FROM zero UP TO n minus one  
+            SET root TO uf.find(i)  
+            INCREMENT root_sizes at root BY one  
+        END FOR  
+
+        SET max_group_size TO maximum value in root_sizes  
+        SET num_groups TO LENGTH OF root_sizes  
+
+        RETURN list containing num_groups followed by max_group_size  
+    END FUNCTION  
+END CLASS

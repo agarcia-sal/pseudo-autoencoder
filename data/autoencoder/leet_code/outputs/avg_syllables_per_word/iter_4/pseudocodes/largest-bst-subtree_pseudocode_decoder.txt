@@ -1,0 +1,54 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val = 0, left = None, right = None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values: list)
+    IF values IS EMPTY
+        RETURN None
+    SET root TO TreeNode(values[0])
+    SET i TO 1
+    SET queue TO EMPTY DEQUE
+    APPEND root TO queue
+    WHILE queue IS NOT EMPTY
+        SET node TO POP LEFT FROM queue
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.left TO TreeNode(values[i])
+            APPEND node.left TO queue
+        INCREMENT i BY 1
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.right TO TreeNode(values[i])
+            APPEND node.right TO queue
+        INCREMENT i BY 1
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val IS NOT EQUAL TO q.val
+        RETURN False
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+END FUNCTION
+
+CLASS Solution
+    FUNCTION largestBSTSubtree(self, root: Optional[TreeNode]) RETURNS int
+        FUNCTION dfs(node)
+            IF node IS None
+                RETURN (INFINITY, NEGATIVE_INFINITY, 0)  # min, max, size
+            SET left_min, left_max, left_size TO dfs(node.left)
+            SET right_min, right_max, right_size TO dfs(node.right)
+            IF left_max < node.val AND node.val < right_min
+                RETURN (MIN(node.val, left_min), MAX(node.val, right_max), left_size + right_size + 1)
+            RETURN (NEGATIVE_INFINITY, INFINITY, MAX(left_size, right_size))
+        END FUNCTION
+        RETURN dfs(root)[2]
+    END FUNCTION
+END CLASS

@@ -1,0 +1,60 @@
+CLASS TreeNode  
+    FUNCTION __init__ with parameters val defaulting TO zero, left defaulting TO none, right defaulting TO none  
+        SET instance variable val TO val  
+        SET instance variable left TO left  
+        SET instance variable right TO right  
+    END FUNCTION  
+END CLASS
+
+FUNCTION tree_node with parameter values  
+    IF values EQUALS none OR values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO new TreeNode with value at position zero of values  
+    SET i TO one  
+    SET queue TO new deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO remove first element FROM queue  
+        IF i LESS THAN length OF values AND element at position i of values IS NOT none  
+            SET node.left TO new TreeNode with value at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN length OF values AND element at position i of values IS NOT none  
+            SET node.right TO new TreeNode with value at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION
+
+FUNCTION is_same_tree with parameters p, q  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF value at p DOES NOT EQUAL value at q  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(value at p.left, value at q.left) AND is_same_tree(value at p.right, value at q.right)  
+    END IF  
+END FUNCTION
+
+CLASS Solution  
+    FUNCTION maxPathSum with parameter root  
+        FUNCTION helper with parameter node  
+            IF node IS none  
+                RETURN negative infinity, negative infinity  
+            END IF  
+            SET left_max, left_gain TO helper(value at node.left)  
+            SET right_max, right_gain TO helper(value at node.right)  
+            SET current_max TO value at node PLUS the maximum of left_gain and zero PLUS the maximum of right_gain and zero  
+            SET current_gain TO value at node PLUS the maximum of left_gain, right_gain, and zero  
+            SET global_max TO the maximum of left_max, right_max, and current_max  
+            RETURN global_max, current_gain  
+        END FUNCTION  
+        RETURN the first element of helper called with root  
+    END FUNCTION  
+END CLASS

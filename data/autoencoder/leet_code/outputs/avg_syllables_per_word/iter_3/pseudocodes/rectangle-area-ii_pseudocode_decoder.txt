@@ -1,0 +1,39 @@
+CLASS Solution
+    FUNCTION rectangleArea(rectangles)
+        SET MOD TO 10^9 + 7
+        SET y_coords TO empty set
+        FOR EACH rectangle IN rectangles
+            SET x1, y1, x2, y2 TO values in rectangle
+            ADD y1 TO y_coords
+            ADD y2 TO y_coords
+        SET y_coords TO sorted list of y_coords
+        SET y_index TO empty map
+        FOR i FROM 0 TO LENGTH OF y_coords MINUS 1
+            SET y_index[y_coords[i]] TO i
+        SET count TO list of zeros with length LENGTH OF y_coords
+        SET events TO empty list
+        FOR EACH rectangle IN rectangles
+            SET x1, y1, x2, y2 TO values in rectangle
+            APPEND (x1, 1, y1, y2) TO events
+            APPEND (x2, -1, y1, y2) TO events
+        SORT events BY first element (x-coordinate)
+        SET prev_x TO 0
+        SET area TO 0
+        FOR EACH event IN events
+            SET x, eventType, y1, y2 TO values in event
+            SET current_length TO 0
+            FOR i FROM 1 TO LENGTH OF count MINUS 1
+                IF count[i - 1] GREATER THAN 0 THEN
+                    INCREMENT current_length BY y_coords[i] MINUS y_coords[i - 1]
+            INCREMENT area BY current_length TIMES (x MINUS prev_x)
+            SET area TO area MODULO MOD
+            IF eventType EQUALS 1 THEN
+                FOR i FROM y_index[y1] TO y_index[y2] MINUS 1
+                    INCREMENT count[i] BY 1
+            ELSE
+                FOR i FROM y_index[y1] TO y_index[y2] MINUS 1
+                    DECREMENT count[i] BY 1
+            SET prev_x TO x
+        RETURN area
+    END FUNCTION
+END CLASS

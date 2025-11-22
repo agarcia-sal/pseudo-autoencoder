@@ -1,0 +1,57 @@
+CLASS UnionFind  
+    FUNCTION __init__ WITH PARAMETER size  
+        SET parent TO a list containing numbers from zero TO size MINUS one  
+        SET rank TO a list containing the number one repeated size times  
+    END FUNCTION  
+  
+    FUNCTION find WITH PARAMETER p  
+        IF element at position p of parent NOT EQUALS p THEN  
+            SET element at position p of parent TO the result of calling find WITH the element at position p of parent  
+        END IF  
+        RETURN the element at position p of parent  
+    END FUNCTION  
+  
+    FUNCTION union WITH PARAMETERS p AND q  
+        SET rootP TO the result of calling find WITH p  
+        SET rootQ TO the result of calling find WITH q  
+        IF rootP EQUALS rootQ THEN  
+            RETURN False  
+        END IF  
+        IF element at position rootP of rank GREATER THAN element at position rootQ of rank THEN  
+            SET element at position rootQ of parent TO rootP  
+        ELSE IF element at position rootP of rank LESS THAN element at position rootQ of rank THEN  
+            SET element at position rootP of parent TO rootQ  
+        ELSE  
+            SET element at position rootQ of parent TO rootP  
+            INCREMENT element at position rootP of rank BY one  
+        END IF  
+        RETURN True  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION distanceLimitedPathsExist WITH PARAMETERS n edgeList queries  
+        SORT edgeList BY the third element of each item FROM smallest TO largest  
+        SET indexedQueries TO an empty list  
+        FOR each index and element consisting of p q and limit IN queries WITH enumeration  
+            APPEND a tuple consisting of limit p q and index TO indexedQueries  
+        END FOR  
+        SORT indexedQueries BY the first element FROM smallest TO largest  
+        SET uf TO a new instance of UnionFind CREATED WITH n  
+        SET edgeIndex TO zero  
+        SET numEdges TO the length of edgeList  
+        SET results TO a list containing False repeated the length of queries times  
+        FOR each tuple consisting of limit p q and originalIndex IN indexedQueries  
+            WHILE edgeIndex LESS THAN numEdges AND the third element at position edgeIndex of edgeList LESS THAN limit  
+                SET u TO the first element at position edgeIndex of edgeList  
+                SET v TO the second element at position edgeIndex of edgeList  
+                CALL union OF uf WITH u AND v  
+                INCREMENT edgeIndex BY one  
+            END WHILE  
+            IF the result of calling find OF uf WITH p EQUALS the result of calling find OF uf WITH q THEN  
+                SET element at position originalIndex of results TO True  
+            END IF  
+        END FOR  
+        RETURN results  
+    END FUNCTION  
+END CLASS

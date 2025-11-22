@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION gridIllumination(self, n, lamps, queries)  
+        SET row_count TO a mapping with default integer zero  
+        SET col_count TO a mapping with default integer zero  
+        SET diag_count TO a mapping with default integer zero representing diagonal index as row MINUS column  
+        SET anti_diag_count TO a mapping with default integer zero representing anti-diagonal index as row PLUS column  
+        
+        SET lamp_positions TO an empty set  
+        
+        FOR each pair of values r, c IN lamps  
+            IF the pair r, c is not in lamp_positions THEN  
+                ADD the pair r, c to lamp_positions  
+                INCREMENT row_count at key r BY one  
+                INCREMENT col_count at key c BY one  
+                INCREMENT diag_count at key r MINUS c BY one  
+                INCREMENT anti_diag_count at key r PLUS c BY one  
+            END IF  
+        END FOR  
+        
+        SET directions TO the list of pairs: (-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1), (1, -1), (1, 0), (1, 1)  
+        
+        SET result TO an empty list  
+        
+        FOR each pair of values r, c IN queries  
+            IF row_count at key r GREATER THAN zero OR col_count at key c GREATER THAN zero OR diag_count at key r MINUS c GREATER THAN zero OR anti_diag_count at key r PLUS c GREATER THAN zero THEN  
+                APPEND one TO result  
+            ELSE  
+                APPEND zero TO result  
+            END IF  
+            
+            FOR each pair of values dr, dc IN directions  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                IF the pair nr, nc is in lamp_positions THEN  
+                    REMOVE the pair nr, nc FROM lamp_positions  
+                    DECREMENT row_count at key nr BY one  
+                    DECREMENT col_count at key nc BY one  
+                    DECREMENT diag_count at key nr MINUS nc BY one  
+                    DECREMENT anti_diag_count at key nr PLUS nc BY one  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

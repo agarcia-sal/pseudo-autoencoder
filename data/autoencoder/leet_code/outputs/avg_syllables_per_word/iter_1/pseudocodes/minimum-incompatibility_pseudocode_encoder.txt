@@ -1,0 +1,22 @@
+```
+n ← len(nums)
+sz ← n // k
+if any(count > k for count in Counter(nums).values()) then return -1
+
+subset_incomp ← {}
+for mask in 0..(1 << n)-1:
+    if popcount(mask) = sz:
+        elems ← [nums[i] for i in 0..n-1 if mask & (1 << i)]
+        if len(set(elems)) = sz:
+            subset_incomp[mask] ← max(elems) - min(elems)
+
+dp ← array of size (1 << n) filled with ∞
+dp[0] ← 0
+for mask in 0..(1 << n)-1:
+    if popcount(mask) % sz ≠ 0: continue
+    for sub in subset_incomp.keys():
+        if (mask & sub) = sub:
+            dp[mask] ← min(dp[mask], dp[mask ^ sub] + subset_incomp[sub])
+
+return dp[(1 << n) - 1] if dp[(1 << n) - 1] ≠ ∞ else -1
+```

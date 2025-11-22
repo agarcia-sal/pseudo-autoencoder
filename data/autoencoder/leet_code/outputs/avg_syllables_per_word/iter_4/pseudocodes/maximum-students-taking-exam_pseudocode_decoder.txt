@@ -1,0 +1,37 @@
+CLASS Solution
+    FUNCTION maxStudents(seats: List of List of String)
+        SET m TO LENGTH OF seats
+        SET n TO LENGTH OF seats[0]
+        
+        SET broken TO LIST OF SIZE m WITH ALL VALUES 0
+        
+        FOR i FROM 0 TO m-1
+            FOR j FROM 0 TO n-1
+                IF seats[i][j] EQUALS '#'
+                    SET broken[i] TO broken[i] OR (1 LEFT SHIFTED BY j)
+        
+        FUNCTION is_valid(arrangement)
+            RETURN (arrangement AND (arrangement RIGHT SHIFTED BY 1)) EQUALS 0
+        END FUNCTION
+        
+        SET dp TO LIST OF SIZE m WITH EACH ELEMENT AS EMPTY DICTIONARY
+        
+        FOR arrangement FROM 0 TO (1 LEFT SHIFTED BY n) MINUS 1
+            IF is_valid(arrangement) AND (arrangement AND broken[0]) EQUALS 0
+                SET dp[0][arrangement] TO COUNT OF 1 BITS IN arrangement
+        
+        FOR i FROM 1 TO m-1
+            FOR arrangement FROM 0 TO (1 LEFT SHIFTED BY n) MINUS 1
+                IF is_valid(arrangement) AND (arrangement AND broken[i]) EQUALS 0
+                    SET max_students TO 0
+                    FOR EACH prev_arrangement IN KEYS OF dp[i-1]
+                        IF (arrangement AND (prev_arrangement RIGHT SHIFTED BY 1)) EQUALS 0 AND (arrangement AND (prev_arrangement LEFT SHIFTED BY 1)) EQUALS 0
+                            SET max_students TO MAXIMUM OF max_students AND dp[i-1][prev_arrangement]
+                    SET dp[i][arrangement] TO max_students PLUS COUNT OF 1 BITS IN arrangement
+        
+        IF dp[m-1] IS NOT EMPTY
+            RETURN MAXIMUM VALUE IN dp[m-1]
+        ELSE
+            RETURN 0
+    END FUNCTION
+END CLASS

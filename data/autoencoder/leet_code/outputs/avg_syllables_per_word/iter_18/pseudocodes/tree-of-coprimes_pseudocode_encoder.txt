@@ -1,0 +1,57 @@
+CLASS Solution  
+    FUNCTION getCoprimes(nums parameter named nums of type List of Integer comma edges parameter named edges of type List of List of Integer) RETURNS List of Integer  
+        SET n TO the LENGTH OF nums  
+        SET tree TO the DEFAULT MAPPING with default value as empty list  
+          
+        FOR each pair u and v IN edges  
+            APPEND v TO element at position u of tree  
+            APPEND u TO element at position v of tree  
+        END FOR  
+          
+        FUNCTION precompute_coprime_pairs RETURNS a two dimensional list of Boolean  
+            SET coprime_matrix TO two dimensional collection of False with dimensions fifty by fifty  
+            FOR value i FROM one TO fifty  
+                FOR value j FROM one TO fifty  
+                    SET element at position i and j of coprime_matrix TO the expression greatest common divisor of i and j EQUALS one  
+                END FOR  
+            END FOR  
+            RETURN coprime_matrix  
+        END FUNCTION  
+          
+        SET coprime TO the CALL OF precompute_coprime_pairs  
+          
+        SET result TO a list filled with minus one repeated n times  
+        SET ancestor_stack TO a list of None repeated fifty one times  
+          
+        FUNCTION dfs(node parameter named node comma parent parameter named parent comma depth parameter named depth)  
+            SET closest_ancestor TO minus one  
+            SET max_depth TO minus one  
+              
+            FOR value val FROM one TO fifty  
+                IF element at position element at position node of nums and val of coprime IS True AND element at position val of ancestor_stack IS NOT None THEN  
+                    SET anc_node comma anc_depth TO the tuple stored at element at position val of ancestor_stack  
+                    IF anc_depth GREATER THAN max_depth THEN  
+                        SET max_depth TO anc_depth  
+                        SET closest_ancestor TO anc_node  
+                    END IF  
+                END IF  
+            END FOR  
+              
+            SET element at position node of result TO closest_ancestor  
+              
+            SET original_ancestor TO element at position element at position node of nums of ancestor_stack  
+            SET element at position element at position node of nums of ancestor_stack TO a tuple of node and depth  
+              
+            FOR each child IN element at position node of tree  
+                IF child IS NOT EQUAL TO parent THEN  
+                    CALL dfs with child comma node comma depth PLUS one  
+                END IF  
+            END FOR  
+              
+            SET element at position element at position node of nums of ancestor_stack TO original_ancestor  
+        END FUNCTION  
+          
+        CALL dfs with zero comma minus one comma zero  
+          
+        RETURN result  
+END CLASS

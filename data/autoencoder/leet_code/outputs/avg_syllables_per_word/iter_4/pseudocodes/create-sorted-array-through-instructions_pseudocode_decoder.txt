@@ -1,0 +1,34 @@
+CLASS Solution
+    FUNCTION createSortedArray(instructions: List of Integer) RETURNS Integer
+        SET MOD TO 10^9 + 7
+        SET MAX TO max value in instructions PLUS 1
+        SET bit TO list of zeros with length MAX
+
+        FUNCTION update(idx, val)
+            WHILE idx LESS THAN MAX
+                INCREMENT bit[idx] BY val
+                SET idx TO idx PLUS (idx BITWISE AND NEGATION OF idx)
+            END WHILE
+        END FUNCTION
+
+        FUNCTION query(idx)
+            SET total TO 0
+            WHILE idx GREATER THAN 0
+                INCREMENT total BY bit[idx]
+                SET idx TO idx MINUS (idx BITWISE AND NEGATION OF idx)
+            END WHILE
+            RETURN total
+        END FUNCTION
+
+        SET total_cost TO 0
+        FOR EACH i, num IN instructions WITH INDEX
+            SET less_than TO query(num MINUS 1)
+            SET greater_than TO i MINUS query(num)
+            SET cost TO minimum of less_than AND greater_than
+            SET total_cost TO (total_cost PLUS cost) MODULO MOD
+            CALL update(num, 1)
+        END FOR
+
+        RETURN total_cost
+    END FUNCTION
+END CLASS

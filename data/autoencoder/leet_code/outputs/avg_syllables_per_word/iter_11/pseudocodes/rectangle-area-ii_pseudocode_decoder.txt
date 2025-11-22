@@ -1,0 +1,57 @@
+CLASS Solution  
+    FUNCTION rectangleArea(rectangles)  
+        SET MOD TO one billion PLUS seven  
+        
+        SET y_coords TO empty set  
+        FOR each x1, y1, x2, y2 IN rectangles  
+            ADD y1 TO y_coords  
+            ADD y2 TO y_coords  
+        END FOR  
+        
+        SET y_coords TO sorted y_coords  
+        SET y_index TO empty mapping  
+        FOR i FROM zero TO LENGTH OF y_coords MINUS one  
+            SET element at position i of y_coords TO y_value  
+            SET y_index AT y_value TO i  
+        END FOR  
+        
+        SET count TO list of zeros with LENGTH OF y_coords MINUS one  
+        
+        SET events TO empty list  
+        FOR each x1, y1, x2, y2 IN rectangles  
+            APPEND tuple of x1, one, y1, y2 TO events  
+            APPEND tuple of x2, minus one, y1, y2 TO events  
+        END FOR  
+        
+        SORT events BY first element of each tuple  
+        
+        SET prev_x TO zero  
+        SET area TO zero  
+        
+        FOR each x, eventType, y1, y2 IN events  
+            SET current_length TO zero  
+            FOR i FROM one TO LENGTH OF count  
+                IF element at position i MINUS one of count GREATER THAN zero THEN  
+                    INCREMENT current_length BY element at position i of y_coords MINUS element at position i MINUS one of y_coords  
+                END IF  
+            END FOR  
+            
+            INCREMENT area BY current_length MULTIPLIED BY x MINUS prev_x  
+            SET area TO area MODULO MOD  
+            
+            IF eventType EQUALS one THEN  
+                FOR i FROM y_index AT y1 TO y_index AT y2 MINUS one  
+                    INCREMENT element at position i of count BY one  
+                END FOR  
+            ELSE  
+                FOR i FROM y_index AT y1 TO y_index AT y2 MINUS one  
+                    DECREMENT element at position i of count BY one  
+                END FOR  
+            END IF  
+            
+            SET prev_x TO x  
+        END FOR  
+        
+        RETURN area  
+    END FUNCTION  
+END CLASS

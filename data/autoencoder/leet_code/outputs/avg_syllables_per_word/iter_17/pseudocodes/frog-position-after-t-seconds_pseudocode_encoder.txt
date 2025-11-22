@@ -1,0 +1,68 @@
+CLASS Solution
+    FUNCTION frogPosition(n, edges, t, target)
+        IF n EQUALS one
+            RETURN one point zero
+        END IF
+
+        CALL BuildGraph WITH edges ASSIGN TO graph
+
+        CALL InitializeQueue WITH no parameters ASSIGN TO queue
+        CALL InitializeVisited WITH no parameters ASSIGN TO visited
+
+        CALL Enqueue WITH parameters one current probability one point zero zero queue visited
+
+        WHILE queue is not empty
+            CALL Dequeue WITH queue ASSIGN TO current node current probability current time
+
+            IF current time EQUALS t OR (current node NOT EQUALS one AND SIZE OF element at position current node of graph EQUALS one)
+                IF current node EQUALS target
+                    RETURN current probability
+                ELSE
+                    CONTINUE
+                END IF
+            END IF
+            
+            SET possible moves TO SIZE OF element at position current node of graph MINUS (one IF current node NOT EQUALS one ELSE zero)
+            
+            FOR each neighbor IN element at position current node of graph
+                IF neighbor IS NOT IN visited
+                    CALL AddToVisited WITH neighbor visited
+                    CALL Enqueue WITH parameters neighbor current probability DIVIDED BY possible moves current time PLUS one queue visited
+                END IF
+            END FOR
+        END WHILE
+
+        RETURN zero point zero
+    END FUNCTION
+
+    FUNCTION BuildGraph(edges)
+        SET graph TO DEFAULT DICTIONARY OF lists
+        FOR each edge IN edges
+            SET u TO element at position zero of edge
+            SET v TO element at position one of edge
+            APPEND v TO element at position u of graph
+            APPEND u TO element at position v of graph
+        END FOR
+        RETURN graph
+    END FUNCTION
+
+    FUNCTION InitializeQueue()
+        RETURN NEW empty double ended queue
+    END FUNCTION
+
+    FUNCTION InitializeVisited()
+        RETURN NEW set containing one
+    END FUNCTION
+
+    FUNCTION Enqueue(node current probability current time queue visited)
+        APPEND tuple of node current probability current time TO queue
+    END FUNCTION
+
+    FUNCTION Dequeue(queue)
+        RETURN REMOVE AND RETURN element from left side OF queue
+    END FUNCTION
+
+    FUNCTION AddToVisited(neighbor visited)
+        ADD neighbor TO visited
+    END FUNCTION
+END CLASS

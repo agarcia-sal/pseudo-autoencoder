@@ -1,0 +1,67 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val EQUAL TO zero, left EQUAL TO none, right EQUAL TO none  
+        SET the attribute val TO val  
+        SET the attribute left TO left  
+        SET the attribute right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO new TreeNode WITH val AS element at position zero of values  
+    SET i TO one  
+    INITIALIZE queue AS a new empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO first element REMOVED FROM queue  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT none  
+            SET node.left TO new TreeNode WITH val AS element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT none  
+            SET node.right TO new TreeNode WITH val AS element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p, q  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF attribute val of p IS NOT EQUAL TO attribute val of q  
+        RETURN false  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETERS attribute left of p, attribute left of q AND is_same_tree WITH PARAMETERS attribute right of p, attribute right of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION addOneRow WITH PARAMETERS root, val, depth  
+        IF depth EQUALS one  
+            RETURN new TreeNode WITH val AS val AND left AS root  
+        END IF  
+        INITIALIZE queue AS a new empty deque CONTAINING the tuple of root AND one  
+        WHILE queue IS NOT empty  
+            SET node, level TO first tuple REMOVED FROM queue  
+            IF level EQUALS depth MINUS one  
+                SET node.left TO new TreeNode WITH val AS val AND left AS attribute left of node  
+                SET node.right TO new TreeNode WITH val AS val AND right AS attribute right of node  
+            ELSE IF level IS LESS THAN depth MINUS one  
+                IF attribute left of node IS NOT none  
+                    APPEND the tuple of attribute left of node AND level PLUS one TO queue  
+                END IF  
+                IF attribute right of node IS NOT none  
+                    APPEND the tuple of attribute right of node AND level PLUS one TO queue  
+                END IF  
+            END IF  
+        END WHILE  
+        RETURN root  
+    END FUNCTION  
+END CLASS

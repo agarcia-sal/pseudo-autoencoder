@@ -1,0 +1,16 @@
+from collections import deque
+
+class Solution:
+    def wallsAndGates(self, rooms):
+        if not rooms or not rooms[0]:
+            return
+        rows, cols = len(rooms), len(rooms[0])
+        queue = deque((r, c) for r in range(rows) for c in range(cols) if rooms[r][c] == 0)
+        directions = [(0,1), (1,0), (0,-1), (-1,0)]
+        while queue:
+            r, c = queue.popleft()
+            for dr, dc in directions:
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < rows and 0 <= nc < cols and rooms[nr][nc] == 2147483647:
+                    rooms[nr][nc] = rooms[r][c] + 1
+                    queue.append((nr, nc))

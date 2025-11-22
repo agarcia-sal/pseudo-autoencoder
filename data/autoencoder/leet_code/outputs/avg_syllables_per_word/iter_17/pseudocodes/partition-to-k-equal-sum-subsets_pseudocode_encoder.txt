@@ -1,0 +1,33 @@
+CLASS Solution
+    FUNCTION canPartitionKSubsets(nums, k)
+        SET total_sum TO the SUM OF nums
+        IF total_sum MODULO k IS NOT EQUALS zero
+            RETURN False
+        END IF
+        SET target TO total_sum DIVIDED BY k
+        CALL SORT ON nums WITH reverse order
+        
+        FUNCTION can_partition(index, k_inner, current_sum, used)
+            IF k_inner EQUALS zero
+                RETURN True
+            END IF
+            IF current_sum EQUALS target
+                RETURN CALL can_partition WITH parameters zero, k_inner MINUS one, zero, used
+            END IF
+            
+            FOR i FROM index TO the LENGTH OF nums MINUS one
+                IF element at position i of used IS False AND current_sum PLUS element at position i of nums IS LESS THAN OR EQUAL TO target
+                    SET element at position i of used TO True
+                    IF CALL can_partition WITH parameters i PLUS one, k_inner, current_sum PLUS element at position i of nums, used RETURNS True
+                        RETURN True
+                    END IF
+                    SET element at position i of used TO False
+                END IF
+            END FOR
+            RETURN False
+        END FUNCTION
+        
+        SET used TO a LIST OF False REPEATED the LENGTH OF nums times
+        RETURN CALL can_partition WITH parameters zero, k, zero, used
+    END FUNCTION
+END CLASS

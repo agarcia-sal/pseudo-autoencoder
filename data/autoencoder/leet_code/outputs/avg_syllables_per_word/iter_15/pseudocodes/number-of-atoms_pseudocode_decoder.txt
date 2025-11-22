@@ -1,0 +1,69 @@
+CLASS Solution  
+    FUNCTION countOfAtoms(formula)  
+        FUNCTION parse(segment)  
+            CREATE a new dictionary atom_count mapping elements to zero  
+            FIND all element and count pairs in segment where each element starts with an uppercase letter followed by zero or more lowercase letters and count is zero or more digits  
+            FOR each element and count pair IN the found pairs  
+                IF count is an empty string THEN  
+                    INCREMENT atom_count for that element BY one  
+                ELSE  
+                    INCREMENT atom_count for that element BY the numeric value of count  
+                END IF  
+            END FOR  
+            RETURN atom_count  
+        END FUNCTION  
+        
+        FUNCTION multiply_counts(counts, multiplier)  
+            FOR each element IN counts  
+                SET counts for that element TO counts for that element MULTIPLIED BY multiplier  
+            END FOR  
+            RETURN counts  
+        END FUNCTION  
+        
+        CREATE a stack initialized with one empty dictionary mapping elements to zero  
+        SET i TO zero  
+        WHILE i is LESS THAN the LENGTH OF formula  
+            IF element at position i of formula EQUALS the character left parenthesis THEN  
+                APPEND a new empty dictionary mapping elements to zero TO stack  
+                INCREMENT i BY one  
+            ELSE IF element at position i of formula EQUALS the character right parenthesis THEN  
+                SET j TO i PLUS one  
+                WHILE j is LESS THAN the LENGTH OF formula AND element at position j of formula IS a digit character  
+                    INCREMENT j BY one  
+                END WHILE  
+                IF j IS GREATER THAN i PLUS one THEN  
+                    SET multiplier TO the numeric value represented by the substring of formula from position i PLUS one TO j minus one inclusive  
+                ELSE  
+                    SET multiplier TO one  
+                END IF  
+                SET segment_count TO the result of multiply_counts applied to the last dictionary popped from stack and multiplier  
+                FOR each element IN segment_count  
+                    INCREMENT the value for that element in the last dictionary of stack BY segment_count for that element  
+                END FOR  
+                SET i TO j  
+            ELSE  
+                SET j TO i PLUS one  
+                WHILE j is LESS THAN the LENGTH OF formula AND element at position j of formula IS a lowercase letter OR digit character  
+                    INCREMENT j BY one  
+                END WHILE  
+                SET segment_count TO the result of parse applied to the substring of formula from position i TO j minus one inclusive  
+                FOR each element IN segment_count  
+                    INCREMENT the value for that element in the last dictionary of stack BY segment_count for that element  
+                END FOR  
+                SET i TO j  
+            END IF  
+        END WHILE  
+        
+        SET final_count TO the last dictionary popped from stack  
+        
+        CREATE an empty string result  
+        FOR each element IN the elements of final_count SORTED in ascending order  
+            APPEND element TO result  
+            IF final_count for that element IS GREATER THAN one THEN  
+                APPEND the string representation of final_count for that element TO result  
+            END IF  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

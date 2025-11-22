@@ -1,0 +1,69 @@
+CLASS Solution  
+    FUNCTION colorTheGrid(m number_of_rows n number_of_columns) RETURNS number  
+        SET MODULO TO ten POWERED BY nine PLUS seven  
+        
+        FUNCTION generate_valid_columns(previous_column) RETURNS list_of_columns  
+            SET available_colors TO list containing one two and three  
+            SET valid_columns TO empty list  
+            
+            FUNCTION backtrack(current_column current_row)  
+                IF current_row EQUALS number_of_rows  
+                    APPEND the current_column converted to tuple TO valid_columns  
+                    RETURN  
+                END IF  
+                FOR each color IN available_colors  
+                    IF current_column IS empty OR the last element of current_column DOES NOT EQUAL color  
+                        IF previous_column IS NOT null AND the element at position current_row of previous_column EQUALS color  
+                            CONTINUE to the next color  
+                        END IF  
+                        APPEND color TO current_column  
+                        CALL backtrack WITH current_column AND current_row PLUS one  
+                        REMOVE the last element FROM current_column  
+                    END IF  
+                END FOR  
+            END FUNCTION  
+            
+            CALL backtrack WITH empty list AND zero  
+            RETURN valid_columns  
+        END FUNCTION  
+        
+        SET all_valid_columns TO the result of calling generate_valid_columns WITH null  
+        SET number_of_valid_columns TO the LENGTH OF all_valid_columns  
+        
+        SET compatible_columns TO dictionary mapping each index from zero TO number_of_valid_columns MINUS one TO empty list  
+        FOR each index_i FROM zero TO number_of_valid_columns MINUS one  
+            FOR each index_j FROM zero TO number_of_valid_columns MINUS one  
+                SET columns_are_compatible TO true  
+                FOR each position_k FROM zero TO number_of_rows MINUS one  
+                    IF the element at position position_k of the column at index index_i of all_valid_columns EQUALS the element at position position_k of the column at index index_j of all_valid_columns  
+                        SET columns_are_compatible TO false  
+                        BREAK the inner loop  
+                    END IF  
+                END FOR  
+                IF columns_are_compatible IS true  
+                    APPEND index_j TO the list mapped by index_i in compatible_columns  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET dynamic_programming_table TO list of number_of_valid_columns elements each initialized to one  
+        
+        FOR each column_index FROM one TO number_of_columns MINUS one  
+            SET next_dynamic_programming_table TO list of number_of_valid_columns elements each initialized to zero  
+            FOR each valid_column_index FROM zero TO number_of_valid_columns MINUS one  
+                FOR each compatible_index IN the list mapped by valid_column_index in compatible_columns  
+                    SET the element at position compatible_index of next_dynamic_programming_table TO the sum of the element at position compatible_index of next_dynamic_programming_table AND the element at position valid_column_index of dynamic_programming_table MODULO MODULO  
+                END FOR  
+            END FOR  
+            SET dynamic_programming_table TO next_dynamic_programming_table  
+        END FOR  
+        
+        SET total_ways TO zero  
+        FOR each ways_count IN dynamic_programming_table  
+            INCREMENT total_ways BY ways_count  
+        END FOR  
+        SET total_ways TO total_ways MODULO MODULO  
+        
+        RETURN total_ways  
+    END FUNCTION  
+END CLASS

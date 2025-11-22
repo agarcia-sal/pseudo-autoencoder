@@ -1,0 +1,52 @@
+CLASS Solution  
+    FUNCTION maximizeXor(nums, queries)  
+        SORT nums IN ASCENDING ORDER  
+        SET sorted_queries TO the LIST OF PAIRS OF each INDEX AND corresponding ELEMENT IN queries SORTED BY the second ELEMENT at position one of each query  
+        SET result TO a LIST of LENGTH EQUAL TO the LENGTH OF queries FILLED WITH minus one  
+        SET trie TO an EMPTY MAP  
+        SET num_index TO zero  
+        
+        FOR each query_index AND query_pair IN sorted_queries  
+            SET xi TO the FIRST element of query_pair  
+            SET mi TO the SECOND element of query_pair  
+            
+            WHILE num_index LESS THAN the LENGTH OF nums AND the ELEMENT at position num_index of nums LESS THAN OR EQUAL TO mi  
+                SET num TO the ELEMENT at position num_index of nums  
+                SET node TO trie  
+                
+                FOR i FROM thirty ONE DOWN TO zero  
+                    SET bit TO the BIT at position i of num EXTRACTED AS the INTEGER RESULT of shifting num right BY i AND AND with one  
+                    IF bit NOT IN node  
+                        SET the ELEMENT at key bit IN node TO an EMPTY MAP  
+                    END IF  
+                    SET node TO the ELEMENT at key bit IN node  
+                END FOR  
+                
+                INCREMENT num_index BY one  
+            END WHILE  
+            
+            IF trie IS EMPTY  
+                CONTINUE TO the next query  
+            END IF  
+            
+            SET node TO trie  
+            SET max_xor TO zero  
+            
+            FOR i FROM thirty ONE DOWN TO zero  
+                SET bit TO the BIT at position i of xi EXTRACTED AS the INTEGER RESULT of shifting xi right BY i AND AND with one  
+                SET toggle_bit TO one MINUS bit  
+                
+                IF toggle_bit IN node  
+                    SET max_xor TO max_xor OR the INTEGER RESULT of shifting one left BY i  
+                    SET node TO the ELEMENT at key toggle_bit IN node  
+                ELSE  
+                    SET node TO the ELEMENT at key bit IN node  
+                END IF  
+            END FOR  
+            
+            SET the ELEMENT at position query_index of result TO max_xor  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

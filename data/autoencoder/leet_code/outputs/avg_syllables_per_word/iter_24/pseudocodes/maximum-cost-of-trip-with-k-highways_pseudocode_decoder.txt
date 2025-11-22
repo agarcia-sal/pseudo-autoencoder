@@ -1,0 +1,31 @@
+CLASS Solution  
+    FUNCTION maximumCost WITH PARAMETERS n highways k  
+        DEFINE FUNCTION dfs WITH PARAMETERS city visited cost highways_used  
+            IF highways_used EQUALS k THEN  
+                SET max_cost TO the GREATER VALUE BETWEEN max_cost AND cost  
+                RETURN  
+            END IF  
+            FOR each neighbor AND toll IN the list of neighbors and tolls of city in graph  
+                IF neighbor NOT IN visited THEN  
+                    ADD neighbor TO visited  
+                    CALL dfs WITH PARAMETERS neighbor visited cost PLUS toll highways_used PLUS one  
+                    REMOVE neighbor FROM visited  
+                END IF  
+            END FOR  
+        END FUNCTION  
+        
+        SET graph TO a default dictionary mapping each key to an empty list  
+        FOR each city1 AND city2 AND toll IN highways  
+            APPEND the pair of city2 AND toll TO the list that graph at key city1 refers to  
+            APPEND the pair of city1 AND toll TO the list that graph at key city2 refers to  
+        END FOR  
+        
+        SET max_cost TO negative one  
+        FOR start_city FROM zero TO n MINUS one  
+            SET visited TO a new set containing start_city  
+            CALL dfs WITH PARAMETERS start_city visited zero zero  
+        END FOR  
+        
+        RETURN max_cost  
+    END FUNCTION  
+END CLASS

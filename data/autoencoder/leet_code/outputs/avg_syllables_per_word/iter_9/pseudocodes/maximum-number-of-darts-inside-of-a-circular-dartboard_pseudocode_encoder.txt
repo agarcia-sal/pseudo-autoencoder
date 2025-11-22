@@ -1,0 +1,53 @@
+CLASS Solution  
+    FUNCTION numPoints(self, darts, r)  
+        FUNCTION distance(p1, p2)  
+            SET horizontal_difference TO p1 at index zero MINUS p2 at index zero  
+            SET vertical_difference TO p1 at index one MINUS p2 at index one  
+            RETURN square root of (horizontal_difference MULTIPLIED BY horizontal_difference PLUS vertical_difference MULTIPLIED BY vertical_difference)  
+        END FUNCTION  
+        
+        FUNCTION circle_center(p1, p2, r)  
+            SET d TO distance between p1 and p2  
+            IF d GREATER THAN 2 MULTIPLIED BY r THEN  
+                RETURN None  
+            END IF  
+            SET a TO square root of (r MULTIPLIED BY r MINUS (d DIVIDED BY 2) MULTIPLIED BY (d DIVIDED BY 2))  
+            SET h TO list containing [(p1 at index zero PLUS p2 at index zero) DIVIDED BY 2, (p1 at index one PLUS p2 at index one) DIVIDED BY 2]  
+            SET dx TO (p2 at index one MINUS p1 at index one) MULTIPLIED BY a DIVIDED BY d  
+            SET dy TO (p2 at index zero MINUS p1 at index zero) MULTIPLIED BY a DIVIDED BY d  
+            RETURN list containing [(h at index zero MINUS dx, h at index one PLUS dy), (h at index zero PLUS dx, h at index one MINUS dy)]  
+        END FUNCTION  
+        
+        FUNCTION is_inside(circle, point, r)  
+            RETURN distance between circle and point LESS THAN OR EQUAL TO r  
+        END FUNCTION  
+        
+        SET n TO length of darts  
+        IF n EQUALS 1 THEN  
+            RETURN 1  
+        END IF  
+        
+        SET max_count TO 1  
+        
+        FOR i FROM 0 TO n MINUS 1  
+            FOR j FROM i PLUS 1 TO n MINUS 1  
+                SET centers TO circle_center applied to darts at index i, darts at index j, and r  
+                IF centers NOT EQUAL TO None THEN  
+                    FOR each center IN centers  
+                        SET count TO zero  
+                        FOR each dart IN darts  
+                            IF is_inside applied to center, dart, and r THEN  
+                                INCREMENT count BY one  
+                            END IF  
+                        END FOR  
+                        IF count GREATER THAN max_count THEN  
+                            SET max_count TO count  
+                        END IF  
+                    END FOR  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        RETURN max_count  
+    END FUNCTION  
+END CLASS

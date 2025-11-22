@@ -1,0 +1,26 @@
+from collections import Counter
+from math import inf
+
+def min_window_substring(s, t):
+    t_count = Counter(t)
+    required = len(t_count)
+    left = right = formed = 0
+    window_counts = Counter()
+    min_length = inf
+    min_start = 0
+
+    while right < len(s):
+        window_counts[s[right]] += 1
+        if s[right] in t_count and window_counts[s[right]] == t_count[s[right]]:
+            formed += 1
+
+        while left <= right and formed == required:
+            if right - left + 1 < min_length:
+                min_length, min_start = right - left + 1, left
+            window_counts[s[left]] -= 1
+            if s[left] in t_count and window_counts[s[left]] < t_count[s[left]]:
+                formed -= 1
+            left += 1
+        right += 1
+
+    return "" if min_length == inf else s[min_start:min_start + min_length]

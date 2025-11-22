@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION minFlips(mat)  
+        FUNCTION flip(matrix, x, y)  
+            SET directions TO list of coordinate pairs: (-1, 0), (1, 0), (0, -1), (0, 1), (0, 0)  
+            FOR each dx, dy IN directions  
+                SET nx TO x PLUS dx  
+                SET ny TO y PLUS dy  
+                IF nx GREATER THAN OR EQUAL TO 0 AND nx LESS THAN m AND ny GREATER THAN OR EQUAL TO 0 AND ny LESS THAN n  
+                    SET matrix element at nx, ny TO 1 MINUS matrix element at nx, ny  
+                END IF  
+            END FOR  
+        END FUNCTION  
+
+        FUNCTION matrix_to_tuple(matrix)  
+            RETURN tuple formed by converting each row of matrix to tuple  
+        END FUNCTION  
+
+        SET m TO number of rows in mat  
+        SET n TO number of columns in mat  
+        SET target TO tuple of tuples filled with zeros matching m rows and n columns  
+        SET initial_state TO CALL matrix_to_tuple WITH mat  
+        SET queue TO list containing pair initial_state and zero  
+        SET visited TO set containing initial_state  
+
+        WHILE queue IS NOT EMPTY  
+            REMOVE and GET first element from queue as current_state and steps  
+            IF current_state EQUALS target  
+                RETURN steps  
+            END IF  
+
+            CONVERT current_state to list of lists named current_matrix  
+
+            FOR i FROM 0 TO m MINUS 1  
+                FOR j FROM 0 TO n MINUS 1  
+                    CREATE copy of current_matrix named next_matrix  
+                    CALL flip WITH next_matrix, i, j  
+                    SET next_state TO CALL matrix_to_tuple WITH next_matrix  
+                    IF next_state NOT IN visited  
+                        ADD next_state TO visited  
+                        APPEND pair next_state and steps PLUS 1 TO queue  
+                    END IF  
+                END FOR  
+            END FOR  
+        END WHILE  
+
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

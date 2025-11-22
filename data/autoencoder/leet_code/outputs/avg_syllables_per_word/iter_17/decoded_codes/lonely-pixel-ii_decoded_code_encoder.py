@@ -1,0 +1,33 @@
+from collections import defaultdict
+
+class Solution:
+    def findBlackPixel(self, picture, target):
+        if not picture or not picture[0]:
+            return 0
+
+        m = len(picture)
+        n = len(picture[0])
+        row_count = [0] * m
+        col_count = [0] * n
+        row_patterns = defaultdict(int)
+        black_pixel = 'B'
+
+        for r in range(m):
+            pattern = ''.join(picture[r])
+            row_patterns[pattern] += 1
+            for c in range(n):
+                if picture[r][c] == black_pixel:
+                    row_count[r] += 1
+                    col_count[c] += 1
+
+        lonely_pixels = 0
+
+        for r in range(m):
+            pattern = ''.join(picture[r])
+            if row_count[r] != target or row_patterns[pattern] != target:
+                continue
+            for c in range(n):
+                if picture[r][c] == black_pixel and col_count[c] == target:
+                    lonely_pixels += 1
+
+        return lonely_pixels

@@ -1,0 +1,67 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val DEFAULTING TO zero, left DEFAULTING TO none, right DEFAULTING TO none  
+        SET the val ATTRIBUTE OF self TO val  
+        SET the left ATTRIBUTE OF self TO left  
+        SET the right ATTRIBUTE OF self TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values AS list  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO A NEW TreeNode CREATED WITH the ELEMENT AT position zero OF values  
+    SET i TO one  
+    SET queue TO A NEW double ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO THE FIRST ELEMENT REMOVED FROM queue  
+        IF i IS LESS THAN THE LENGTH OF values AND THE ELEMENT AT position i OF values IS NOT none  
+            SET the left ATTRIBUTE OF node TO A NEW TreeNode CREATED WITH THE ELEMENT AT position i OF values  
+            APPEND the left ATTRIBUTE OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN THE LENGTH OF values AND THE ELEMENT AT position i OF values IS NOT none  
+            SET the right ATTRIBUTE OF node TO A NEW TreeNode CREATED WITH THE ELEMENT AT position i OF values  
+            APPEND the right ATTRIBUTE OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p AND q  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF THE val ATTRIBUTE OF p IS NOT EQUAL TO THE val ATTRIBUTE OF q  
+        RETURN False  
+    ELSE  
+        RETURN THE RESULT OF is_same_tree WITH PARAMETERS THE left ATTRIBUTE OF p AND THE left ATTRIBUTE OF q AND THE RESULT OF is_same_tree WITH PARAMETERS THE right ATTRIBUTE OF p AND THE right ATTRIBUTE OF q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION addOneRow WITH PARAMETERS self, root AS OPTIONAL TreeNode, val AS integer, depth AS integer RETURNING OPTIONAL TreeNode  
+        IF depth EQUALS one  
+            RETURN A NEW TreeNode CREATED WITH val AND left SET TO root  
+        END IF  
+        SET queue TO A NEW double ended queue INITIALIZED WITH A TUPLE COMPRISING root AND one  
+        WHILE queue IS NOT empty  
+            SET node AND level TO THE FIRST TUPLE REMOVED FROM queue  
+            IF level EQUALS depth MINUS one  
+                SET the left ATTRIBUTE OF node TO A NEW TreeNode CREATED WITH val AND left SET TO the left ATTRIBUTE OF node  
+                SET the right ATTRIBUTE OF node TO A NEW TreeNode CREATED WITH val AND right SET TO the right ATTRIBUTE OF node  
+            ELSE IF level IS LESS THAN depth MINUS one  
+                IF the left ATTRIBUTE OF node IS NOT none  
+                    APPEND A TUPLE COMPRISING the left ATTRIBUTE OF node AND level PLUS one TO queue  
+                END IF  
+                IF the right ATTRIBUTE OF node IS NOT none  
+                    APPEND A TUPLE COMPRISING the right ATTRIBUTE OF node AND level PLUS one TO queue  
+                END IF  
+            END IF  
+        END WHILE  
+        RETURN root  
+    END FUNCTION  
+END CLASS

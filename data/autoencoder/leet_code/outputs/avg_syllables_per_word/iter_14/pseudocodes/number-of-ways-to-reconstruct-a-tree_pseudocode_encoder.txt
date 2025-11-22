@@ -1,0 +1,52 @@
+CLASS Solution  
+    FUNCTION checkWays WITH PARAMETER pairs AS List OF List OF integer  
+        SET graph TO a new mapping that assigns an empty set to any key that does not exist  
+        FOR each pair consisting of x and y IN pairs  
+            ADD y TO the set mapped by x in graph  
+            ADD x TO the set mapped by y in graph  
+        END FOR  
+
+        SET max_degree TO the key in graph with the greatest number of elements in its mapped set  
+        SET n TO the number of keys in graph  
+
+        IF the number of elements in the set mapped by max_degree in graph IS NOT EQUAL TO n MINUS one  
+            RETURN zero  
+        END IF  
+
+        FUNCTION can_be_parent WITH PARAMETERS u and v  
+            FOR each neighbor IN the set mapped by v in graph  
+                IF neighbor IS NOT IN the set mapped by u in graph AND neighbor IS NOT EQUAL TO u  
+                    RETURN false  
+                END IF  
+            END FOR  
+            RETURN true  
+        END FUNCTION  
+
+        SET ways TO one  
+
+        FOR each u IN the keys of graph  
+            IF u IS EQUAL TO max_degree  
+                CONTINUE TO the next u  
+            END IF  
+
+            SET parent TO null  
+            FOR each v IN the set mapped by u in graph  
+                IF v IS A key IN graph AND the number of elements in the set mapped by v in graph IS GREATER THAN OR EQUAL TO the number of elements in the set mapped by u in graph AND can_be_parent WITH PARAMETERS v and u RETURNS true  
+                    IF parent IS null OR the number of elements in the set mapped by v in graph IS LESS THAN the number of elements in the set mapped by parent in graph  
+                        SET parent TO v  
+                    END IF  
+                END IF  
+            END FOR  
+
+            IF parent IS null  
+                RETURN zero  
+            END IF  
+
+            IF the number of elements in the set mapped by parent in graph IS EQUAL TO the number of elements in the set mapped by u in graph  
+                SET ways TO two  
+            END IF  
+        END FOR  
+
+        RETURN ways  
+    END FUNCTION  
+END CLASS

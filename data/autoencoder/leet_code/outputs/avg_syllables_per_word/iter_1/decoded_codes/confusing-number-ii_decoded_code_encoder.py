@@ -1,0 +1,25 @@
+rotate_map = {0:0, 1:1, 6:9, 8:8, 9:6}
+valid = [0, 1, 6, 8, 9]
+
+def is_confusing(num):
+    orig = num
+    rot = 0
+    while num > 0:
+        d = num % 10
+        rot = rot * 10 + rotate_map[d]
+        num //= 10
+    return rot != orig
+
+def count_confusing(limit, cur=0):
+    if cur > limit:
+        return 0
+    c = 1 if (cur != 0 and is_confusing(cur)) else 0
+    for d in valid:
+        nxt = cur * 10 + d
+        if nxt == 0:
+            continue
+        c += count_confusing(limit, nxt)
+    return c
+
+def confusingNumberII(n):
+    return count_confusing(n)

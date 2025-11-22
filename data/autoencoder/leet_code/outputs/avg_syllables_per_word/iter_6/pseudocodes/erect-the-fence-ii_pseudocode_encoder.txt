@@ -1,0 +1,44 @@
+CLASS Solution  
+    FUNCTION outerTrees(trees)  
+        FUNCTION dist_sq(p1, p2)  
+            RETURN squared distance between p1 and p2 calculated by summing the square of the difference of their first components and the square of the difference of their second components  
+        END FUNCTION  
+        
+        FUNCTION circumcenter(p1, p2, p3)  
+            SET ax, ay TO components of p1  
+            SET bx, by TO components of p2  
+            SET cx, cy TO components of p3  
+            SET d TO two MULTIPLIED BY (ax MULTIPLIED BY (by MINUS cy) PLUS bx MULTIPLIED BY (cy MINUS ay) PLUS cx MULTIPLIED BY (ay MINUS by))  
+            SET ux TO ((ax squared PLUS ay squared) MULTIPLIED BY (by MINUS cy) PLUS (bx squared PLUS by squared) MULTIPLIED BY (cy MINUS ay) PLUS (cx squared PLUS cy squared) MULTIPLIED BY (ay MINUS by)) DIVIDED BY d  
+            SET uy TO ((ax squared PLUS ay squared) MULTIPLIED BY (cx MINUS bx) PLUS (bx squared PLUS by squared) MULTIPLIED BY (ax MINUS cx) PLUS (cx squared PLUS cy squared) MULTIPLIED BY (bx MINUS ax)) DIVIDED BY d  
+            RETURN list containing ux and uy, square root of sum of square of (ux MINUS ax) and square of (uy MINUS ay)  
+        END FUNCTION  
+        
+        FUNCTION welzl(points, boundary, n)  
+            IF n EQUALS 0 OR LENGTH OF boundary EQUALS 3 THEN  
+                IF LENGTH OF boundary EQUALS 0 THEN  
+                    RETURN list containing zero and zero, zero  
+                ELSE IF LENGTH OF boundary EQUALS 1 THEN  
+                    RETURN only element in boundary, zero  
+                ELSE IF LENGTH OF boundary EQUALS 2 THEN  
+                    SET center TO list where first element is average of first components of boundary points, second element is average of second components of boundary points  
+                    SET radius TO square root of dist_sq of boundary points DIVIDED BY two  
+                    RETURN center, radius  
+                ELSE  
+                    RETURN CALL circumcenter WITH boundary unpacked  
+            END IF  
+            
+            SET p TO element at position n MINUS one in points  
+            SET center, radius TO CALL welzl WITH points, boundary, n MINUS one  
+            IF dist_sq of center and p LESS THAN OR EQUAL TO radius MULTIPLIED BY radius THEN  
+                RETURN center, radius  
+            END IF  
+            
+            RETURN CALL welzl WITH points, boundary appended with p, n MINUS one  
+        END FUNCTION  
+        
+        CALL random shuffle ON trees  
+        SET center, radius TO CALL welzl WITH trees, empty list, LENGTH OF trees  
+        RETURN list containing first component of center, second component of center, radius  
+    END FUNCTION  
+END CLASS

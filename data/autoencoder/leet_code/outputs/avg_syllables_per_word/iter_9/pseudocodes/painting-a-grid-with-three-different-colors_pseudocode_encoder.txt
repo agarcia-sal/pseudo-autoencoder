@@ -1,0 +1,64 @@
+CLASS Solution  
+    FUNCTION colorTheGrid(self, m, n)  
+        SET MOD TO ten raised to the power of nine plus seven  
+        
+        FUNCTION generate_valid_columns(prev_col)  
+            SET colors TO list containing one, two, three  
+            SET valid_cols TO empty list  
+            
+            FUNCTION backtrack(col, row)  
+                IF row EQUALS m THEN  
+                    APPEND col converted to tuple TO valid_cols  
+                    RETURN  
+                END IF  
+                FOR each color IN colors DO  
+                    IF col IS empty OR last element of col NOT EQUALS color THEN  
+                        IF prev_col IS NOT none AND element at index row of prev_col EQUALS color THEN  
+                            CONTINUE to next color  
+                        END IF  
+                        APPEND color TO col  
+                        CALL backtrack(col, row PLUS one)  
+                        REMOVE last element FROM col  
+                    END IF  
+                END FOR  
+            END FUNCTION  
+            
+            CALL backtrack(empty list, zero)  
+            RETURN valid_cols  
+        END FUNCTION  
+        
+        SET all_valid_cols TO CALL generate_valid_columns(none)  
+        SET num_valid_cols TO length of all_valid_cols  
+        
+        SET compatible_cols TO mapping from each index in range of num_valid_cols TO empty list  
+        FOR i FROM zero TO num_valid_cols MINUS one DO  
+            FOR j FROM zero TO num_valid_cols MINUS one DO  
+                SET all_positions_different TO true  
+                FOR k FROM zero TO m MINUS one DO  
+                    IF element at index k of all_valid_cols at i EQUALS element at index k of all_valid_cols at j THEN  
+                        SET all_positions_different TO false  
+                        BREAK inner loop  
+                    END IF  
+                END FOR  
+                IF all_positions_different THEN  
+                    APPEND j TO compatible_cols at key i  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET dp TO list of ones with length num_valid_cols  
+        
+        FOR each column_index FROM one TO n MINUS one DO  
+            SET next_dp TO list of zeros with length num_valid_cols  
+            FOR i FROM zero TO num_valid_cols MINUS one DO  
+                FOR each j IN compatible_cols at key i DO  
+                    SET next_dp at index j TO (next_dp at index j PLUS dp at index i) MODULO MOD  
+                END FOR  
+            END FOR  
+            SET dp TO next_dp  
+        END FOR  
+        
+        SET result TO sum of all elements in dp MODULO MOD  
+        RETURN result  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,80 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS 0, left EQUALS None, right EQUALS None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS
+
+FUNCTION tree_node(values)  
+    IF values is empty  
+        RETURN None  
+    END IF  
+    SET root TO new TreeNode WITH values at index 0  
+    SET i TO 1  
+    SET queue TO empty deque  
+    APPEND root TO queue  
+    WHILE queue is not empty  
+        SET node TO dequeue first element from queue  
+        IF i LESS THAN LENGTH OF values AND values at index i is not None  
+            SET node.left TO new TreeNode WITH values at index i  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY 1  
+        IF i LESS THAN LENGTH OF values AND values at index i is not None  
+            SET node.right TO new TreeNode WITH values at index i  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)  
+    IF p is None AND q is None  
+        RETURN True  
+    ELSE IF p is None OR q is None  
+        RETURN False  
+    ELSE IF p.val is not EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION
+
+CLASS Solution  
+    FUNCTION verticalOrder(self, root)  
+        IF root is None  
+            RETURN empty list  
+        END IF  
+        
+        SET column_table TO default dictionary of list  
+        SET queue TO deque containing tuple of root and 0  
+        SET min_column TO 0  
+        SET max_column TO 0  
+        
+        WHILE queue is not empty  
+            SET node, column_index TO dequeue first element from queue  
+            
+            IF node is not None  
+                APPEND node.val TO column_table at key column_index  
+                
+                IF column_index LESS THAN min_column  
+                    SET min_column TO column_index  
+                END IF  
+                IF column_index GREATER THAN max_column  
+                    SET max_column TO column_index  
+                END IF  
+                
+                APPEND tuple of node.left and column_index minus 1 TO queue  
+                APPEND tuple of node.right and column_index plus 1 TO queue  
+            END IF  
+        END WHILE  
+        
+        SET result TO empty list  
+        FOR x FROM min_column TO max_column  
+            APPEND column_table at key x TO result  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+END CLASS

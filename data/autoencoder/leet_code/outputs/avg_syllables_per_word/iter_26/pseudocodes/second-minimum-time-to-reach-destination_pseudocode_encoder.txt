@@ -1,0 +1,41 @@
+CLASS Solution
+    FUNCTION secondMinimum(n, edges, time, change)
+        SET graph TO a list of empty lists with length n PLUS one
+        FOR each pair u comma v IN edges
+            APPEND v TO element at position u OF graph
+            APPEND u TO element at position v OF graph
+        END FOR
+
+        ASSIGN queue TO an empty double ended queue with element a tuple of one comma zero comma zero
+        SET minTimes TO a list of lists where each inner list contains two elements each set to positive infinity with length n PLUS one
+
+        SET element at position one comma zero OF minTimes TO zero
+
+        WHILE queue IS NOT empty
+            REMOVE and RETURN the leftmost element of queue INTO current comma currentTime comma count
+
+            IF current EQUALS n AND count EQUALS one
+                RETURN currentTime
+            END IF
+
+            IF the integer division of currentTime BY change MODULO two EQUALS zero
+                SET nextTime TO currentTime PLUS time
+            ELSE
+                SET nextTime TO the sum of the product of the integer division of currentTime BY change PLUS one AND change PLUS time
+            END IF
+
+            FOR each neighbor IN element at position current OF graph
+                IF element at position zero OF element at position neighbor OF minTimes GREATER THAN nextTime
+                    SET element at position one OF element at position neighbor OF minTimes TO element at position zero OF element at position neighbor OF minTimes
+                    SET element at position zero OF element at position neighbor OF minTimes TO nextTime
+                    APPEND a tuple of neighbor comma nextTime comma zero TO queue
+                ELSE IF element at position zero OF element at position neighbor OF minTimes LESS THAN nextTime AND nextTime LESS THAN element at position one OF element at position neighbor OF minTimes
+                    SET element at position one OF element at position neighbor OF minTimes TO nextTime
+                    APPEND a tuple of neighbor comma nextTime comma one TO queue
+                END IF
+            END FOR
+        END WHILE
+
+        RETURN the negative of one
+    END FUNCTION
+END CLASS

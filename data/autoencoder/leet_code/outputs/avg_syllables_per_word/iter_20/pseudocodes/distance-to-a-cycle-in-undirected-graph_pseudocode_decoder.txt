@@ -1,0 +1,60 @@
+CLASS Solution  
+    FUNCTION distanceToCycle(n, edges)  
+        SET graph TO a new mapping with default empty list for each key  
+        FOR each pair of nodes u and v IN edges  
+            APPEND v TO element at position u of graph  
+            APPEND u TO element at position v of graph  
+        END FOR  
+        
+        FUNCTION dfs(node, parent, path, visited)  
+            IF element node IN visited THEN  
+                SET cycle_start TO the position of node in path  
+                RETURN the sublist of path from cycle_start TO the end  
+            END IF  
+            ADD node TO visited  
+            APPEND node TO path  
+            FOR each neighbor IN element at position node of graph  
+                IF neighbor IS NOT EQUAL TO parent THEN  
+                    SET cycle TO the result of dfs with parameters neighbor, node, path, visited  
+                    IF cycle IS NOT NONE THEN  
+                        RETURN cycle  
+                    END IF  
+                END IF  
+            END FOR  
+            REMOVE the last element FROM path  
+            RETURN NONE  
+        END FUNCTION  
+        
+        SET visited TO an empty set  
+        SET cycle TO NONE  
+        FOR each node FROM zero TO n MINUS ONE  
+            IF node IS NOT IN visited THEN  
+                SET cycle TO the result of dfs with parameters node, negative one, empty list, visited  
+                IF cycle IS NOT NONE THEN  
+                    BREAK the loop  
+                END IF  
+            END IF  
+        END FOR  
+        
+        SET distance TO a list of size n filled with zero  
+        SET queue TO a new double-ended queue initialized with elements of cycle  
+        SET visited TO a new set initialized with elements of cycle  
+        
+        SET level TO zero  
+        WHILE queue is not empty  
+            FOR a number of times equal to the length of queue  
+                REMOVE from the front of queue and assign to node  
+                SET element at position node of distance TO level  
+                FOR each neighbor IN element at position node of graph  
+                    IF neighbor IS NOT IN visited THEN  
+                        ADD neighbor TO visited  
+                        APPEND neighbor TO queue  
+                    END IF  
+                END FOR  
+            END FOR  
+            INCREMENT level BY one  
+        END WHILE  
+        
+        RETURN distance  
+    END FUNCTION  
+END CLASS

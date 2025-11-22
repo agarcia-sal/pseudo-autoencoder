@@ -1,0 +1,37 @@
+CLASS Solution  
+    FUNCTION wordSquares(words)  
+        CALL import_defaultdict_within_function WITH NO PARAMETERS  
+        SET prefix_to_words TO CALL create_defaultdict_list FUNCTION WITH NO PARAMETERS  
+        
+        FOR each word IN words  
+            FOR index FROM zero TO the LENGTH OF word MINUS one  
+                SET prefix TO substring FROM position zero TO index MINUS one OF word  
+                CALL append word TO prefix_to_words AT key prefix  
+            END FOR  
+        END FOR  
+        
+        SET results TO an empty list  
+        
+        FUNCTION backtrack(square)  
+            IF the LENGTH OF square EQUALS the LENGTH OF the element at position zero OF words  
+                CALL append square TO results  
+                RETURN  
+            END IF  
+            
+            SET prefix TO an empty string  
+            FOR each word_element IN square  
+                SET prefix TO prefix PLUS the character at position the LENGTH OF square OF word_element  
+            END FOR  
+            
+            FOR each candidate IN prefix_to_words AT key prefix  
+                CALL backtrack WITH PARAMETERS the concatenation OF square AND a list containing candidate  
+            END FOR  
+        END FUNCTION  
+        
+        FOR each word IN words  
+            CALL backtrack WITH PARAMETERS a list containing word  
+        END FOR  
+        
+        RETURN results  
+    END FUNCTION  
+END CLASS

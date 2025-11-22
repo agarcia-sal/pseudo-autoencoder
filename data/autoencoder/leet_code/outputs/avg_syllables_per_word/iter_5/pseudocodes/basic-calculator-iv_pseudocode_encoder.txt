@@ -1,0 +1,158 @@
+CLASS Term  
+    FUNCTION __init__(coefficient, variables)  
+        SET self.coefficient TO coefficient  
+        SET self.variables TO variables  
+    END FUNCTION  
+
+    FUNCTION __lt__(other)  
+        IF LENGTH OF self.variables NOT EQUAL TO LENGTH OF other.variables THEN  
+            RETURN LENGTH OF self.variables GREATER THAN LENGTH OF other.variables  
+        ELSE  
+            RETURN JOIN self.variables WITH '*' LESS THAN JOIN other.variables WITH '*'  
+        END IF  
+    END FUNCTION  
+
+    FUNCTION __repr__()  
+        IF self.variables IS EMPTY THEN  
+            RETURN STRING OF self.coefficient  
+        ELSE  
+            RETURN STRING OF self.coefficient CONCATENATED WITH '*' CONCATENATED WITH JOIN self.variables WITH '*'  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Expression  
+    FUNCTION __init__()  
+        SET self.terms TO a default mapping from keys TO integer zero  
+    END FUNCTION  
+
+    FUNCTION add_term(term)  
+        SET key TO SORTED TUPLE OF term.variables  
+        INCREMENT self.terms[key] BY term.coefficient  
+    END FUNCTION  
+
+    FUNCTION multiply(other)  
+        SET result TO NEW Expression  
+        FOR EACH vars1, coeff1 IN self.terms  
+            FOR EACH vars2, coeff2 IN other.terms  
+                SET combined_vars TO SORTED LIST OF vars1 CONCATENATED WITH vars2  
+                CALL result.add_term WITH Term(coeff1 MULTIPLIED BY coeff2, combined_vars)  
+            END FOR  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+
+    FUNCTION add(other)  
+        FOR EACH vars, coeff IN other.terms  
+            CALL self.add_term WITH Term(coeff, LIST OF vars)  
+        END FOR  
+        RETURN self  
+    END FUNCTION  
+
+    FUNCTION subtract(other)  
+        FOR EACH vars, coeff IN other.terms  
+            CALL self.add_term WITH Term(NEGATIVE coeff, LIST OF vars)  
+        END FOR  
+        RETURN self  
+    END FUNCTION  
+
+    FUNCTION evaluate(var_map)  
+        SET result TO NEW Expression  
+        FOR EACH vars, coeff IN self.terms  
+            SET new_vars TO EMPTY LIST  
+            FOR EACH var IN vars  
+                IF var IN var_map THEN  
+                    APPEND STRING OF var_map[var] TO new_vars  
+                ELSE  
+                    APPEND var TO new_vars  
+                END IF  
+            END FOR  
+            IF new_vars IS NOT EMPTY THEN  
+                SET new_coeff TO EVALUATION OF CONCATENATION OF new_vars  
+            ELSE  
+                SET new_coeff TO 1  
+            END IF  
+            CALL result.add_term WITH Term(coeff MULTIPLIED BY new_coeff, EMPTY LIST)  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+
+    FUNCTION simplify()  
+        SET simplified_terms TO LIST OF Term(coeff, LIST OF vars) FOR EACH vars, coeff IN self.terms WHERE coeff NOT EQUAL TO 0  
+        SORT simplified_terms  
+        RETURN simplified_terms  
+    END FUNCTION  
+
+    FUNCTION __repr__()  
+        RETURN JOIN MAP OF __repr__ OVER self.simplify() WITH ' + '  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION basicCalculatorIV(expression, evalvars, evalints)  
+        SET var_map TO MAPPING OF evalvars TO evalints  
+        SET tokens TO LIST OF FINDINGS OF PATTERNS OF PARENTHESES, OPERATORS, DIGITS, OR WORDS IN expression  
+        SET output TO EMPTY LIST  
+        SET operators TO EMPTY LIST  
+
+        FUNCTION apply_operator()  
+            SET right TO POP LAST ELEMENT FROM output  
+            SET left TO POP LAST ELEMENT FROM output  
+            SET op TO POP LAST ELEMENT FROM operators  
+            IF op EQUALS '+' THEN  
+                APPEND left.add(right) TO output  
+            ELSE IF op EQUALS '-' THEN  
+                APPEND left.subtract(right) TO output  
+            ELSE IF op EQUALS '*' THEN  
+                APPEND left.multiply(right) TO output  
+            END IF  
+        END FUNCTION  
+
+        SET i TO 0  
+        WHILE i LESS THAN LENGTH OF tokens  
+            SET token TO tokens[i]  
+            IF token IS ALL DIGITS THEN  
+                APPEND NEW Expression TO output  
+                CALL output[-1].add_term WITH Term(INTEGER OF token, EMPTY LIST)  
+            ELSE IF token IS ALL LETTERS THEN  
+                APPEND NEW Expression TO output  
+                SET coef TO var_map GET token OR 1  
+                IF coef EQUALS 1 THEN  
+                    IF token IN var_map THEN  
+                        CALL output[-1].add_term WITH Term(1, EMPTY LIST)  
+                    ELSE  
+                        CALL output[-1].add_term WITH Term(1, LIST WITH token)  
+                    END IF  
+                ELSE  
+                    CALL output[-1].add_term WITH Term(coef, EMPTY LIST)  
+                END IF  
+            ELSE IF token EQUALS '(' THEN  
+                APPEND token TO operators  
+            ELSE IF token EQUALS ')' THEN  
+                WHILE operators NOT EMPTY AND LAST OF operators NOT EQUAL TO '('  
+                    CALL apply_operator()  
+                END WHILE  
+                POP LAST ELEMENT FROM operators  # Remove '('  
+            ELSE IF token IN LIST '+', '-', '*' THEN  
+                WHILE operators NOT EMPTY AND LAST OF operators NOT EQUAL TO '(' AND (token IN LIST '+', '-' OR LAST OF operators EQUALS '*')  
+                    CALL apply_operator()  
+                END WHILE  
+                APPEND token TO operators  
+            END IF  
+            INCREMENT i BY 1  
+        END WHILE  
+
+        WHILE operators NOT EMPTY  
+            CALL apply_operator()  
+        END WHILE  
+
+        SET simplified_terms TO CALL output[0].simplify()  
+        RETURN LIST OF STRINGS FORMATTED AS  
+            IF term.variables NOT EMPTY THEN  
+                STRING OF term.coefficient CONCATENATED WITH '*' CONCATENATED WITH JOIN term.variables WITH '*'  
+            ELSE  
+                STRING OF term.coefficient  
+            END IF  
+            FOR EACH term IN simplified_terms  
+    END FUNCTION  
+END CLASS

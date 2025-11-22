@@ -1,0 +1,41 @@
+from math import inf
+from functools import lru_cache
+from typing import List, Tuple
+
+class Solution:
+    def shortestSuperstring(self, words: List[str]) -> str:
+        n = len(words)
+
+        def overlap(i: int, j: int) -> int:
+            max_len = min(len(words[i]), len(words[j]))
+            for k in range(max_len, 0, -1):
+                if words[i][-k:] == words[j][:k]:
+                    return k
+            return 0
+
+        @lru_cache(None)
+        def dp(mask: int, i: int) -> Tuple[int, str]:
+            if mask == (1 << n) - 1:
+                return 0, ""
+
+            min_len = inf
+            best_path = ""
+            for j in range(n):
+                if (mask & (1 << j)) == 0:
+                    length_rest, path_rest = dp(mask | (1 << j), j)
+                    ov = overlap(i, j)
+                    length = length_rest + len(words[j]) - ov
+                    if length < min_len:
+                        min_len = length
+                        best_path = words[j][ov:] + path_rest
+            return min_len, best_path
+
+        min_len = inf
+        shortest_path = ""
+        for i in range(n):
+            length_rest, path_rest = dp(1 << i, i)
+            length = length_rest + len(words[i])
+            if length < min_len:
+                min_len = length
+                shortest_path = words[i] + path_rest
+        return shortest_path

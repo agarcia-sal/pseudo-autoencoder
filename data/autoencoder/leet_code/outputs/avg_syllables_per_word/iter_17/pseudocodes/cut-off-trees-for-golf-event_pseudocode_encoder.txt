@@ -1,0 +1,63 @@
+CLASS Solution
+    FUNCTION cutOffTree(forest)
+        IF forest IS empty OR element at position zero of forest IS empty
+            RETURN minus one
+        END IF
+
+        SET trees TO the RESULT OF CALLING collectTrees WITH forest
+        CALL sort ON trees
+
+        FUNCTION bfs(start, end)
+            IF start EQUALS end
+                RETURN zero
+            END IF
+            SET m TO the LENGTH OF forest
+            SET n TO the LENGTH OF element at position zero of forest
+            SET queue TO a new deque containing start
+            SET visited TO a new set containing start
+            SET steps TO zero
+
+            WHILE queue IS NOT empty
+                FOR index FROM zero TO the LENGTH OF queue MINUS one
+                    SET x, y TO the RESULT OF REMOVING the FIRST element FROM queue
+                    FOR each dx, dy IN list of elements (minus one, zero), (one, zero), (zero, minus one), (zero, one)
+                        SET nx TO x PLUS dx
+                        SET ny TO y PLUS dy
+                        IF nx IS GREATER THAN OR EQUAL TO zero AND nx IS LESS THAN m AND ny IS GREATER THAN OR EQUAL TO zero AND ny IS LESS THAN n AND the pair (nx, ny) IS NOT IN visited AND element at position nx of forest AT position ny IS NOT zero
+                            IF the pair (nx, ny) EQUALS end
+                                RETURN steps PLUS one
+                            END IF
+                            ADD the pair (nx, ny) TO visited
+                            APPEND the pair (nx, ny) TO queue
+                        END IF
+                    END FOR
+                END FOR
+                INCREMENT steps BY one
+            END WHILE
+            RETURN minus one
+        END FUNCTION
+
+        SET x TO zero
+        SET y TO zero
+        SET total_steps TO zero
+
+        FOR each height, tx, ty IN trees
+            SET steps TO CALL bfs WITH the pair (x, y) AND the pair (tx, ty)
+            IF steps EQUALS minus one
+                RETURN minus one
+            END IF
+            INCREMENT total_steps BY steps
+            SET x TO tx
+            SET y TO ty
+        END FOR
+
+        RETURN total_steps
+    END FUNCTION
+
+    FUNCTION collectTrees(forest)
+        ABSTRACT the PROCESS OF
+            COLLECTING all elements GREATER THAN one AND their coordinates FROM forest
+            RETURNING a list of tuples containing the height and coordinates
+        END ABSTRACT
+    END FUNCTION
+END CLASS

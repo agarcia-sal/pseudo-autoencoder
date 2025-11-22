@@ -1,0 +1,44 @@
+CLASS Solution
+    FUNCTION sequenceReconstruction(nums, sequences)
+        SET n TO the LENGTH OF nums
+        SET graph TO CALL DefaultDict WITH parameter list
+        SET indegree TO a LIST OF zero REPEATED n PLUS one TIMES
+        
+        FOR each sequence IN sequences
+            FOR index FROM zero TO the LENGTH OF sequence MINUS one MINUS one
+                SET u TO the element at position index of sequence
+                SET v TO the element at position index PLUS one of sequence
+                CALL APPEND v TO the LIST at key u IN graph
+                INCREMENT the element at position v of indegree BY one
+            END FOR
+        END FOR
+        
+        SET queue TO CALL Deque WITH the LIST of elements i FOR each i IN the RANGE FROM one TO n PLUS one WHERE the element at position i of indegree EQUALS zero
+        
+        IF the LENGTH OF queue IS NOT EQUALS one
+            RETURN false
+        END IF
+        
+        SET index TO zero
+        WHILE queue IS NOT EMPTY
+            IF the LENGTH OF queue IS NOT EQUALS one
+                RETURN false
+            END IF
+            
+            SET node TO the FIRST element REMOVED FROM queue
+            IF node IS NOT EQUALS the element at position index of nums
+                RETURN false
+            END IF
+            INCREMENT index BY one
+            
+            FOR each neighbor IN the LIST at key node IN graph
+                DECREMENT the element at position neighbor of indegree BY one
+                IF the element at position neighbor of indegree EQUALS zero
+                    CALL APPEND neighbor TO queue
+                END IF
+            END FOR
+        END WHILE
+        
+        RETURN index IS EQUALS n
+    END FUNCTION
+END CLASS

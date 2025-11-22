@@ -1,0 +1,46 @@
+```
+CLASS Solution
+    FUNCTION calcEquation(equations: List of List of String, values: List of Float, queries: List of List of String) RETURNS List of Float
+        SET graph TO empty mapping of String to mapping of String to Float
+        FOR each pair (a, b) and corresponding value IN equations and values
+            SET graph[a][b] TO value
+            SET graph[b][a] TO 1.0 DIVIDED BY value
+        END FOR
+
+        FUNCTION dfs(start: String, end: String, visited: Set of String) RETURNS Float
+            IF start NOT IN graph OR end NOT IN graph THEN
+                RETURN -1.0
+            END IF
+
+            IF start EQUALS end THEN
+                RETURN 1.0
+            END IF
+
+            ADD start TO visited
+
+            FOR each neighbor, weight IN graph[start]
+                IF neighbor NOT IN visited THEN
+                    SET result TO dfs(neighbor, end, visited)
+                    IF result NOT EQUALS -1.0 THEN
+                        RETURN weight MULTIPLIED BY result
+                    END IF
+                END IF
+            END FOR
+
+            REMOVE start FROM visited
+            RETURN -1.0
+        END FUNCTION
+
+        SET results TO empty list
+        FOR each query IN queries
+            SET start TO first element of query
+            SET end TO second element of query
+            SET visited TO empty set
+            SET result TO dfs(start, end, visited)
+            APPEND result TO results
+        END FOR
+
+        RETURN results
+    END FUNCTION
+END CLASS
+```

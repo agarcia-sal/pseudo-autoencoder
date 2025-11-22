@@ -1,0 +1,42 @@
+```
+CLASS Solution
+    FUNCTION maxSumOfThreeSubarrays(nums: List[int], k: int) RETURNS List[int]
+        SET n TO LENGTH OF nums
+        SET sums TO LIST OF ZEROS WITH LENGTH (n - k + 1)
+        SET current_sum TO SUM OF FIRST k ELEMENTS IN nums
+        SET sums[0] TO current_sum
+        
+        FOR i FROM 1 TO (n - k)
+            INCREMENT current_sum BY nums[i + k - 1]
+            DECREMENT current_sum BY nums[i - 1]
+            SET sums[i] TO current_sum
+        
+        SET left TO LIST OF ZEROS WITH LENGTH (n - k + 1)
+        SET right TO LIST WITH EACH ELEMENT SET TO (n - k), LENGTH (n - k + 1)
+        
+        SET max_sum TO 0
+        FOR i FROM 0 TO (n - k)
+            IF sums[i] GREATER THAN sums[max_sum]
+                SET max_sum TO i
+            SET left[i] TO max_sum
+        
+        SET max_sum TO n - k
+        FOR i FROM (n - k) DOWN TO 0
+            IF sums[i] GREATER THAN OR EQUAL TO sums[max_sum]
+                SET max_sum TO i
+            SET right[i] TO max_sum
+        
+        SET max_total TO 0
+        SET result TO LIST [0, 0, 0]
+        FOR j FROM k TO (n - 2 * k)
+            SET i TO left[j - k]
+            SET l TO right[j + k]
+            SET total TO sums[i] + sums[j] + sums[l]
+            IF total GREATER THAN max_total
+                SET max_total TO total
+                SET result TO LIST [i, j, l]
+        
+        RETURN result
+    END FUNCTION
+END CLASS
+```

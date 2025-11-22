@@ -1,0 +1,51 @@
+CLASS Solution  
+    FUNCTION minOperationsToFlip(expression)  
+        SET stack TO empty list  
+
+        FOR each element e IN expression  
+            IF e IS '(' OR e IS '&' OR e IS '|'  
+                APPEND pair (e, 0) TO stack  
+                CONTINUE  
+            END IF  
+
+            IF e IS ')'  
+                SET lastPair TO POP from stack  
+                POP from stack  # Pop '('  
+            ELSE  # e IS '0' OR '1'  
+                SET lastPair TO pair (e, 1)  
+            END IF  
+
+            IF stack IS NOT empty AND last element of stack's first item IS '&' OR '|'  
+                SET op TO POP first item of last element from stack  
+                SET a, costA TO POP from stack  
+                SET b, costB TO lastPair  
+
+                IF op IS '&'  
+                    IF a IS '0' AND b IS '0'  
+                        SET lastPair TO pair ('0', 1 PLUS minimum of costA and costB)  
+                    ELSE IF a IS '0' AND b IS '1'  
+                        SET lastPair TO pair ('0', 1)  
+                    ELSE IF a IS '1' AND b IS '0'  
+                        SET lastPair TO pair ('0', 1)  
+                    ELSE  # a IS '1' AND b IS '1'  
+                        SET lastPair TO pair ('1', minimum of costA and costB)  
+                    END IF  
+                ELSE  # op IS '|'  
+                    IF a IS '0' AND b IS '0'  
+                        SET lastPair TO pair ('0', minimum of costA and costB)  
+                    ELSE IF a IS '0' AND b IS '1'  
+                        SET lastPair TO pair ('1', 1)  
+                    ELSE IF a IS '1' AND b IS '0'  
+                        SET lastPair TO pair ('1', 1)  
+                    ELSE  # a IS '1' AND b IS '1'  
+                        SET lastPair TO pair ('1', 1 PLUS minimum of costA and costB)  
+                    END IF  
+                END IF  
+            END IF  
+
+            APPEND lastPair TO stack  
+        END FOR  
+
+        RETURN second item of last element in stack  
+    END FUNCTION  
+END CLASS

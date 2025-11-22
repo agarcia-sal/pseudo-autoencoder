@@ -1,0 +1,158 @@
+CLASS Term  
+    FUNCTION __init__ WITH coefficient AND variables  
+        SET the coefficient attribute TO coefficient  
+        SET the variables attribute TO variables  
+    END FUNCTION  
+  
+    FUNCTION __lt__ WITH other  
+        IF the LENGTH OF the variables attribute NOT EQUALS the LENGTH OF the other object's variables attribute  
+            RETURN the LENGTH OF the variables attribute GREATER THAN the LENGTH OF the other object's variables attribute  
+        END IF  
+        RETURN the string obtained by JOINING the variables attribute WITH the string multiply SIGN LESS THAN the string obtained by JOINING the other object's variables attribute WITH the string multiply SIGN  
+    END FUNCTION  
+  
+    FUNCTION __repr__  
+        IF the variables attribute IS empty  
+            RETURN the COEFFICIENT attribute CONVERTED TO string  
+        END IF  
+        RETURN the string formed by the COEFFICIENT attribute CONCATENATED WITH the string multiply SIGN AND CONCATENATED WITH the string obtained by JOINING the variables attribute WITH the string multiply SIGN  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Expression  
+    FUNCTION __init__  
+        SET the terms attribute TO a mapping with default integer zero values  
+    END FUNCTION  
+  
+    FUNCTION add_term WITH term  
+        SET key TO the tuple of the sorted term's variables attribute  
+        INCREMENT the terms attribute at key BY the term's coefficient attribute  
+    END FUNCTION  
+  
+    FUNCTION multiply WITH other  
+        CREATE a new Expression object called result  
+        FOR each vars1 AND coeff1 IN the items OF the terms attribute  
+            FOR each vars2 AND coeff2 IN the items OF the other object's terms attribute  
+                SET combined_vars TO the sorted list of vars1 concatenated WITH vars2  
+                CALL add_term ON result WITH a new Term having the product OF coeff1 AND coeff2 AS coefficient AND combined_vars AS variables  
+            END FOR  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+  
+    FUNCTION add WITH other  
+        FOR each vars AND coeff IN the items OF the other object's terms attribute  
+            CALL add_term ON self WITH a new Term having coeff AS coefficient AND the list form OF vars AS variables  
+        END FOR  
+        RETURN self  
+    END FUNCTION  
+  
+    FUNCTION subtract WITH other  
+        FOR each vars AND coeff IN the items OF the other object's terms attribute  
+            CALL add_term ON self WITH a new Term having the negative of coeff AS coefficient AND the list form OF vars AS variables  
+        END FOR  
+        RETURN self  
+    END FUNCTION  
+  
+    FUNCTION evaluate WITH var_map  
+        CREATE a new Expression object called result  
+        FOR each vars AND coeff IN the items OF the terms attribute  
+            CREATE an empty list called new_vars  
+            FOR each var IN vars  
+                IF var EXISTS IN var_map  
+                    APPEND the string form OF the value FROM var_map AT var TO new_vars  
+                ELSE  
+                    APPEND var TO new_vars  
+                END IF  
+            END FOR  
+            IF new_vars IS empty  
+                SET new_coeff TO one  
+            ELSE  
+                SET new_coeff TO the evaluated value OF the concatenation OF all elements IN new_vars AS a string representation OF a numeric expression  
+            END IF  
+            CALL add_term ON result WITH a new Term having coeff MULTIPLIED BY new_coeff AS coefficient AND an empty list AS variables  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+  
+    FUNCTION simplify  
+        SET simplified_terms TO the list of new Terms created FROM each vars AND coeff IN the items OF the terms attribute WHERE coeff NOT EQUALS zero WITH coeff AS coefficient AND list form OF vars AS variables  
+        SORT simplified_terms USING the __lt__ method of Term  
+        RETURN simplified_terms  
+    END FUNCTION  
+  
+    FUNCTION __repr__  
+        RETURN the string formed by joining the string representations OF the elements IN the list obtained FROM calling simplify  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION basicCalculatorIV WITH expression AND evalvars AND evalints  
+        SET var_map TO the mapping formed by associating elements FROM evalvars WITH corresponding elements FROM evalints  
+        SET tokens TO the list of strings obtained BY extracting all the following from expression IN order  
+            the open parenthesis character  
+            the close parenthesis character  
+            the plus sign character  
+            the minus sign character  
+            the multiply sign character  
+            sequences of one or more digit characters  
+            sequences of one or more word characters  
+        SET output TO an empty list  
+        SET operators TO an empty list  
+  
+        FUNCTION apply_operator  
+            SET right TO the last element removed FROM output  
+            SET left TO the last element removed FROM output  
+            SET op TO the last element removed FROM operators  
+            IF op EQUALS the plus sign  
+                APPEND the result OF calling add ON left WITH right TO output  
+            ELSE IF op EQUALS the minus sign  
+                APPEND the result OF calling subtract ON left WITH right TO output  
+            ELSE IF op EQUALS the multiply sign  
+                APPEND the result OF calling multiply ON left WITH right TO output  
+            END IF  
+        END FUNCTION  
+  
+        SET i TO zero  
+        WHILE i LESS THAN the LENGTH OF tokens  
+            SET token TO the element at position i OF tokens  
+            IF token CONSISTS ONLY OF digit characters  
+                APPEND a new Expression object TO output  
+                CALL add_term ON the last element OF output WITH a new Term having the numeric value of token AS coefficient AND an empty list AS variables  
+            ELSE IF token CONSISTS ONLY OF alphabetic characters  
+                APPEND a new Expression object TO output  
+                SET coef TO the value FROM var_map AT token IF token EXISTS IN var_map OTHERWISE one  
+                IF coef EQUALS one  
+                    IF token NOT EXISTS IN var_map  
+                        CALL add_term ON the last element OF output WITH a new Term having one AS coefficient AND a list containing token AS variables  
+                    ELSE  
+                        CALL add_term ON the last element OF output WITH a new Term having one AS coefficient AND an empty list AS variables  
+                    END IF  
+                ELSE  
+                    CALL add_term ON the last element OF output WITH a new Term having coef AS coefficient AND an empty list AS variables  
+                END IF  
+            ELSE IF token EQUALS the open parenthesis character  
+                APPEND token TO operators  
+            ELSE IF token EQUALS the close parenthesis character  
+                WHILE operators IS NOT empty AND the last element OF operators NOT EQUALS the open parenthesis character  
+                    CALL apply_operator  
+                END WHILE  
+                REMOVE the last element FROM operators  
+            ELSE IF token EQUALS one of the plus sign OR minus sign OR multiply sign characters  
+                WHILE operators IS NOT empty AND the last element OF operators NOT EQUALS the open parenthesis character AND  
+                      (token EQUALS one of the plus sign OR minus sign OR the last element OF operators EQUALS the multiply sign character)  
+                    CALL apply_operator  
+                END WHILE  
+                APPEND token TO operators  
+            END IF  
+            INCREMENT i BY one  
+        END WHILE  
+  
+        WHILE operators IS NOT empty  
+            CALL apply_operator  
+        END WHILE  
+  
+        SET simplified_terms TO the result OF calling simplify ON the first element OF output  
+        RETURN the list obtained BY transforming each term IN simplified_terms INTO a string formed BY the coefficient attribute FOLLOWED BY the string multiply SIGN FOLLOWED BY the joined variables attribute IF variables attribute IS NOT empty OTHERWISE the string form of the coefficient attribute  
+    END FUNCTION  
+END CLASS

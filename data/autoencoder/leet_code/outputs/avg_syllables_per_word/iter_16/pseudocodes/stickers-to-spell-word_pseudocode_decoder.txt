@@ -1,0 +1,34 @@
+CLASS Solution  
+    FUNCTION minStickers(stickers AS List of strings, target AS string) RETURNS integer  
+        SET stickers TO a list where each element is a frequency count mapping of characters in the corresponding sticker string  
+        SORT the list of stickers by the negative value of the highest frequency count among their characters to optimize the search  
+        ASSIGN to queue a double-ended queue initialized with a pair consisting of the target string and zero as the number of stickers used so far  
+        ASSIGN to memo a mapping from strings to integers initialized with the target string mapped to zero  
+        
+        WHILE queue is not empty  
+            REMOVE the element from the front of queue and unpack it into current_target and used_stickers  
+            
+            FOR each sticker_frequency_map IN stickers  
+                IF the first character of current_target is NOT in the keys of sticker_frequency_map  
+                    CONTINUE to the next iteration of the for loop  
+                END IF  
+                
+                SET remaining TO a copy of the frequency count mapping of characters in current_target  
+                DECREMENT each character count in remaining by the corresponding count in sticker_frequency_map; counts that become zero or less are removed  
+                
+                SET new_target TO the string formed by concatenating in sorted order all characters repeated according to their counts in remaining  
+                
+                IF new_target is the empty string  
+                    RETURN used_stickers PLUS one  
+                END IF  
+                
+                IF new_target is NOT a key in memo  
+                    SET memo at new_target TO used_stickers PLUS one  
+                    APPEND the pair of new_target and used_stickers PLUS one TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

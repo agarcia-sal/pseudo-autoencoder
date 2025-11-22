@@ -1,0 +1,56 @@
+CLASS TrieNode  
+    FUNCTION __init__()  
+        SET children TO a mapping that returns a new TrieNode for missing keys  
+        SET deleted TO false  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION deleteDuplicateFolder(paths)  
+        SET ans TO an empty list  
+        SET root TO a new TrieNode  
+        SET subtreeToNodes TO a mapping from strings to lists of TrieNodes with default empty lists  
+
+        FOR each path IN the sorted version of paths  
+            SET node TO root  
+            FOR each s IN path  
+                SET node TO the child node at key s in node's children  
+            END FOR  
+        END FOR  
+
+        FUNCTION buildSubtreeToRoots(node)  
+            SET subtree TO the concatenation of an opening parenthesis,  
+                followed by the concatenation FOR each s IN node's children of s PLUS the result of buildSubtreeToRoots called on the child at s,  
+                followed by a closing parenthesis  
+            IF subtree is NOT EQUAL TO an empty pair of parentheses  
+                APPEND node TO the list under subtree in subtreeToNodes  
+            END IF  
+            RETURN subtree  
+        END FUNCTION  
+
+        CALL buildSubtreeToRoots ON root  
+
+        FOR each nodes IN the values of subtreeToNodes  
+            IF the LENGTH OF nodes IS GREATER THAN one  
+                FOR each node IN nodes  
+                    SET node.deleted TO true  
+                END FOR  
+            END IF  
+        END FOR  
+
+        FUNCTION constructPath(node, path)  
+            FOR each key s and child node IN node's children  
+                IF child.deleted IS false  
+                    CALL constructPath ON child AND path PLUS s  
+                END IF  
+            END FOR  
+            IF path IS NOT EMPTY  
+                APPEND path TO ans  
+            END IF  
+        END FUNCTION  
+
+        CALL constructPath ON root AND an empty list  
+
+        RETURN ans  
+    END FUNCTION  
+END CLASS

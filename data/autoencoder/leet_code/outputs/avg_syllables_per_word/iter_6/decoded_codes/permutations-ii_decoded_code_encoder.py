@@ -1,0 +1,20 @@
+class Solution:
+    def permuteUnique(self, nums):
+        def backtrack(path, used, res):
+            if len(path) == len(nums):
+                res.append(path[:])
+                return
+            for i in range(len(nums)):
+                if used[i] or (i > 0 and nums[i] == nums[i-1] and not used[i-1]):
+                    continue
+                used[i] = True
+                path.append(nums[i])
+                backtrack(path, used, res)
+                path.pop()
+                used[i] = False
+
+        nums.sort()
+        res = []
+        used = [False] * len(nums)
+        backtrack([], used, res)
+        return res

@@ -1,0 +1,49 @@
+CLASS Solution
+    FUNCTION minWindow(string_s, string_t)
+        CALL import_counter_functionality
+        
+        SET t_count TO CALL Counter WITH string_t
+        SET required TO the LENGTH OF t_count
+        
+        SET left TO zero
+        SET right TO zero
+        SET formed TO zero
+        SET window_counts TO CALL Counter WITH no parameters
+        
+        SET min_length TO infinity
+        SET min_start TO zero
+        
+        WHILE right LESS THAN the LENGTH OF string_s holds
+            INCREMENT the COUNT OF element at position right of string_s IN window_counts BY one
+            
+            IF the element at position right of string_s IS IN t_count AND the COUNT OF element at position right of string_s IN window_counts EQUALS the COUNT OF element at position right of string_s IN t_count
+                INCREMENT formed BY one
+            END IF
+            
+            WHILE left LESS THAN OR EQUAL TO right AND formed EQUALS required holds
+                SET char TO element at position left of string_s
+                
+                IF right MINUS left PLUS one LESS THAN min_length
+                    SET min_length TO right MINUS left PLUS one
+                    SET min_start TO left
+                END IF
+                
+                DECREMENT the COUNT OF char IN window_counts BY one
+                
+                IF char IS IN t_count AND the COUNT OF char IN window_counts LESS THAN the COUNT OF char IN t_count
+                    DECREMENT formed BY one
+                END IF
+                
+                INCREMENT left BY one
+            END WHILE
+            
+            INCREMENT right BY one
+        END WHILE
+        
+        IF min_length EQUALS infinity
+            RETURN empty_string
+        ELSE
+            RETURN substring from position min_start TO min_start PLUS min_length MINUS one of string_s
+        END IF
+    END FUNCTION
+END CLASS

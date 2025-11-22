@@ -1,0 +1,49 @@
+CLASS Solution
+    FUNCTION minFlips(matrix_of_lists NAMED mat)
+        FUNCTION flip(matrix_named matrix, position_x NAMED x, position_y NAMED y)
+            SET list_named directions TO a list containing the following pairs of values: minus one and zero, plus one and zero, zero and minus one, zero and plus one, zero and zero
+            FOR each pair_of_values NAMED dx_and_dy IN directions
+                SET new_x TO the sum of x PLUS the first value of dx_and_dy
+                SET new_y TO the sum of y PLUS the second value of dx_and_dy
+                IF new_x IS GREATER THAN OR EQUAL TO zero AND new_x IS LESS THAN the value of m AND new_y IS GREATER THAN OR EQUAL TO zero AND new_y IS LESS THAN the value of n THEN
+                    SET the element at position new_x AND position new_y OF matrix TO one MINUS the current value of the element at position new_x AND position new_y OF matrix
+                END IF
+            END FOR
+        END FUNCTION
+
+        FUNCTION matrix_to_tuple(matrix_named matrix)
+            RETURN a tuple consisting of tuples of each row OF matrix
+        END FUNCTION
+
+        SET m TO the LENGTH OF mat
+        SET n TO the LENGTH OF the first element OF mat
+        SET target TO a tuple consisting of tuples filled with zero FOR each row INDEX FROM zero TO m MINUS one AND each column INDEX FROM zero TO n MINUS one
+        SET initial_state TO the RESULT OF calling matrix_to_tuple WITH mat AS ARGUMENT
+        SET queue TO a list containing the tuple OF initial_state AND zero
+        SET visited TO an empty set
+        ADD initial_state TO visited
+
+        WHILE the LENGTH OF queue IS GREATER THAN zero HOLDS
+            REMOVE the element AT position zero FROM queue AND ASSIGN IT TO current_state AND steps
+            IF current_state IS EQUAL TO target THEN
+                RETURN steps
+            END IF
+
+            SET current_matrix TO a list consisting of lists converted from each row OF current_state
+
+            FOR i FROM zero TO m MINUS one INCLUSIVE
+                FOR j FROM zero TO n MINUS one INCLUSIVE
+                    SET next_matrix TO a DEEP COPY OF current_matrix
+                    CALL flip WITH next_matrix AND i AND j AS ARGUMENTS
+                    SET next_state TO the RESULT OF calling matrix_to_tuple WITH next_matrix AS ARGUMENT
+                    IF next_state IS NOT IN visited THEN
+                        ADD next_state TO visited
+                        APPEND the tuple OF next_state AND steps PLUS one TO queue
+                    END IF
+                END FOR
+            END FOR
+        END WHILE
+
+        RETURN negative one
+    END FUNCTION
+END CLASS

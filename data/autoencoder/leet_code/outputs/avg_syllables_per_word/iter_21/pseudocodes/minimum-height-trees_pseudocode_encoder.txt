@@ -1,0 +1,61 @@
+CLASS Solution  
+    FUNCTION findMinHeightTrees(n, edges)  
+        IF n EQUALS one  
+            RETURN list containing zero  
+        END IF  
+
+        CALL INITIALIZE_GRAPH WITH PARAMETERS n, edges  
+        SET graph TO the result of INITIALIZE_GRAPH  
+        SET degree TO the result of INITIALIZE_DEGREE_ARRAY WITH PARAMETER n  
+
+        FOR each pair u AND v IN edges  
+            APPEND v TO the list at position u OF graph  
+            APPEND u TO the list at position v OF graph  
+            INCREMENT degree at position u BY one  
+            INCREMENT degree at position v BY one  
+        END FOR  
+
+        CALL INITIALIZE_LEAVES WITH PARAMETERS degree AND n  
+        SET leaves TO the result of INITIALIZE_LEAVES  
+
+        SET remaining_nodes TO n  
+        WHILE remaining_nodes GREATER THAN two  
+            SET leaves_count TO the LENGTH OF leaves  
+            DECREMENT remaining_nodes BY leaves_count  
+            FOR counter FROM one TO leaves_count  
+                CALL POP_LEFT ON leaves AND ASSIGN RESULT TO leaf  
+                FOR each neighbor IN the list at position leaf OF graph  
+                    DECREMENT degree at position neighbor BY one  
+                    IF degree at position neighbor EQUALS one  
+                        CALL APPEND neighbor TO leaves  
+                    END IF  
+                END FOR  
+            END FOR  
+        END WHILE  
+
+        CALL CONVERT_TO_LIST WITH PARAMETER leaves  
+        RETURN the result of CONVERT_TO_LIST  
+    END FUNCTION  
+
+    FUNCTION INITIALIZE_GRAPH(n, edges)  
+        RETURN a mapping that returns an empty list when accessed with any key, prepared for storing adjacency lists  
+    END FUNCTION  
+
+    FUNCTION INITIALIZE_DEGREE_ARRAY(n)  
+        RETURN a list of length n initialized with zeros representing degrees  
+    END FUNCTION  
+
+    FUNCTION INITIALIZE_LEAVES(degree, n)  
+        CREATE an empty double-ended queue named leaves  
+        FOR index FROM zero TO n MINUS one  
+            IF degree at position index EQUALS one  
+                CALL APPEND index TO leaves  
+            END IF  
+        END FOR  
+        RETURN leaves  
+    END FUNCTION  
+
+    FUNCTION CONVERT_TO_LIST(deque_structure)  
+        RETURN a new list containing all elements extracted in order from deque_structure  
+    END FUNCTION  
+END CLASS

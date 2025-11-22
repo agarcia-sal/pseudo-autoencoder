@@ -1,0 +1,58 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS None, right EQUALS None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN None  
+    END IF  
+    SET root TO NEW TreeNode WITH PARAMETERS values at position zero OF values  
+    SET i TO one  
+    SET queue TO NEW deque  
+    CALL queue APPEND WITH PARAMETERS root  
+    WHILE queue IS NOT empty  
+        SET node TO CALL queue Popleft  
+        IF i IS LESS THAN THE LENGTH OF values AND value at position i OF values IS NOT None  
+            SET node.left TO NEW TreeNode WITH PARAMETERS value at position i OF values  
+            CALL queue APPEND WITH PARAMETERS node.left  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN THE LENGTH OF values AND value at position i OF values IS NOT None  
+            SET node.right TO NEW TreeNode WITH PARAMETERS value at position i OF values  
+            CALL queue APPEND WITH PARAMETERS node.right  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN CALL is_same_tree WITH PARAMETERS p.left AND q.left AND CALL is_same_tree WITH PARAMETERS p.right AND q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION isValidBST(self, root)  
+        FUNCTION validate(node, low EQUALS negative infinity, high EQUALS positive infinity)  
+            IF node IS None  
+                RETURN True  
+            END IF  
+            IF node.val IS LESS THAN OR EQUAL TO low OR node.val IS GREATER THAN OR EQUAL TO high  
+                RETURN False  
+            END IF  
+            RETURN CALL validate WITH PARAMETERS node.left, low, node.val AND CALL validate WITH PARAMETERS node.right, node.val, high  
+        END FUNCTION  
+        RETURN CALL validate WITH PARAMETERS root  
+    END FUNCTION  
+END CLASS

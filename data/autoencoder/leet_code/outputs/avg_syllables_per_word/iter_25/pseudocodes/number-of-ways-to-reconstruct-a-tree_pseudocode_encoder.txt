@@ -1,0 +1,38 @@
+CLASS Solution  
+    FUNCTION checkWays WITH PARAMETER pairs  
+        SET graph TO an empty mapping that creates empty sets for new keys  
+        FOR each x and y IN pairs  
+            ADD y TO the set of neighbors of x in graph  
+            ADD x TO the set of neighbors of y in graph  
+        END FOR  
+        SET max_degree TO the element in graph with the maximum size of its neighbor set  
+        SET n TO the size of graph  
+        IF the size of the neighbor set of max_degree does not EQUAL n MINUS one THEN  
+            RETURN zero  
+        END IF  
+        FUNCTION can_be_parent WITH PARAMETERS u v  
+            RETURN true if for every neighbor in the neighbor set of v the neighbor is in the neighbor set of u OR the neighbor EQUALS u  
+        END FUNCTION  
+        SET ways TO one  
+        FOR each u IN graph  
+            IF u EQUALS max_degree THEN  
+                CONTINUE  
+            END IF  
+            SET parent TO nothing  
+            FOR each v IN the neighbor set of u  
+                IF v exists in graph AND the size of the neighbor set of v is GREATER THAN OR EQUAL TO the size of the neighbor set of u AND can_be_parent WITH u as v and v as u returns true THEN  
+                    IF parent is nothing OR the size of the neighbor set of v is LESS THAN the size of the neighbor set of parent THEN  
+                        SET parent TO v  
+                    END IF  
+                END IF  
+            END FOR  
+            IF parent is nothing THEN  
+                RETURN zero  
+            END IF  
+            IF the size of the neighbor set of parent EQUALS the size of the neighbor set of u THEN  
+                SET ways TO two  
+            END IF  
+        END FOR  
+        RETURN ways  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,29 @@
+CLASS Solution
+    FUNCTION dieSimulator(n: integer, rollMax: list of integers) RETURNS integer
+        SET MOD TO 10^9 + 7
+        SET dp TO a 3-dimensional list of size (n+1) by 6 by (max of rollMax + 1), filled with 0
+
+        FOR j FROM 0 TO 5
+            SET dp[1][j][1] TO 1
+
+        FOR i FROM 2 TO n
+            FOR j FROM 0 TO 5
+                FOR k FROM 1 TO rollMax[j]
+                    IF k > 1 THEN
+                        SET dp[i][j][k] TO dp[i-1][j][k-1]
+                    ELSE
+                        SET total TO 0
+                        FOR x FROM 0 TO 5
+                            IF x IS NOT j THEN
+                                FOR y FROM 1 TO rollMax[x]
+                                    INCREMENT total BY dp[i-1][x][y]
+                        SET dp[i][j][k] TO total MODULO MOD
+
+        SET result TO 0
+        FOR j FROM 0 TO 5
+            FOR k FROM 1 TO rollMax[j]
+                INCREMENT result BY dp[n][j][k]
+
+        RETURN result MODULO MOD
+    END FUNCTION
+END CLASS

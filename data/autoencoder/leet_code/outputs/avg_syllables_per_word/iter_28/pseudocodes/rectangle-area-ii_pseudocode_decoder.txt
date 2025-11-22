@@ -1,0 +1,47 @@
+CLASS Solution  
+    FUNCTION rectangleArea(rectangles)  
+        SET MOD TO the value one billion PLUS one  
+        SET y_coords TO an empty set  
+        FOR each rectangle WITH coordinates x1 y1 x2 y2 IN rectangles  
+            ADD y1 TO y_coords  
+            ADD y2 TO y_coords  
+        END FOR  
+        SET y_coords TO the sorted list of elements in y_coords  
+        SET y_index TO an empty dictionary  
+        SET i TO zero  
+        FOR each element y IN y_coords  
+            SET y_index at key y TO i  
+            INCREMENT i BY one  
+        END FOR  
+        SET count TO a list of zeros with the length equal to the length of y_coords  
+        SET events TO an empty list  
+        FOR each rectangle WITH coordinates x1 y1 x2 y2 IN rectangles  
+            APPEND to events the tuple of x1, one, y1, and y2  
+            APPEND to events the tuple of x2, negative one, y1, and y2  
+        END FOR  
+        SORT events by the first element of each tuple which is the x-coordinate  
+        SET prev_x TO zero  
+        SET area TO zero  
+        FOR each event WITH values x, eventType, y1, y2 IN events  
+            SET current_length TO zero  
+            FOR i FROM one TO the length of count MINUS one  
+                IF the element at position i MINUS one of count is GREATER THAN zero THEN  
+                    INCREMENT current_length BY the element at position i of y_coords MINUS the element at position i MINUS one of y_coords  
+                END IF  
+            END FOR  
+            INCREMENT area BY current_length MULTIPLIED BY x MINUS prev_x  
+            SET area TO area MODULO MOD  
+            IF eventType EQUALS one THEN  
+                FOR i FROM y_index at key y1 TO y_index at key y2 MINUS one  
+                    INCREMENT the element at position i of count BY one  
+                END FOR  
+            ELSE  
+                FOR i FROM y_index at key y1 TO y_index at key y2 MINUS one  
+                    DECREMENT the element at position i of count BY one  
+                END FOR  
+            END IF  
+            SET prev_x TO x  
+        END FOR  
+        RETURN area  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION areSentencesSimilarTwo(sentence1 sentence_list OF STRINGS sentence2 sentence_list OF STRINGS similarPairs list_of_lists_of_strings) RETURNS BOOLEAN  
+        IF the LENGTH OF sentence1 NOT EQUALS the LENGTH OF sentence2  
+            RETURN false  
+        END IF  
+        
+        SET parent TO an empty mapping from elements to elements  
+        
+        FUNCTION find(x element) RETURNS element  
+            IF the element at key x IN parent NOT EQUALS x  
+                SET the element at key x IN parent TO find(the element at key x IN parent)  
+            END IF  
+            RETURN the element at key x IN parent  
+        END FUNCTION  
+        
+        FUNCTION union(x element y element)  
+            SET rootX TO find(x)  
+            SET rootY TO find(y)  
+            IF rootX NOT EQUALS rootY  
+                SET the element at key rootY IN parent TO rootX  
+            END IF  
+        END FUNCTION  
+        
+        FOR each pair IN similarPairs  
+            FOR each word IN pair  
+                IF the element at key word IN parent DOES NOT EXIST  
+                    SET the element at key word IN parent TO word  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        FOR each element x AND y IN the zipped pairs of sentence1 AND sentence2  
+            IF the element at key x IN parent DOES NOT EXIST  
+                SET the element at key x IN parent TO x  
+            END IF  
+            IF the element at key y IN parent DOES NOT EXIST  
+                SET the element at key y IN parent TO y  
+            END IF  
+            IF the result of find(x) NOT EQUALS the result of find(y)  
+                RETURN false  
+            END IF  
+        END FOR  
+        
+        RETURN true  
+    END FUNCTION  
+END CLASS

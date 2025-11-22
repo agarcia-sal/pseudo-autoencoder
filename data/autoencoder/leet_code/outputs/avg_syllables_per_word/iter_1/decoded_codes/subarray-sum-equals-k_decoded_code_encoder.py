@@ -1,0 +1,10 @@
+def subarray_sum(nums, k):
+    freq = {0: 1}
+    sum = 0
+    count = 0
+    for num in nums:
+        sum += num
+        if sum - k in freq:
+            count += freq[sum - k]
+        freq[sum] = freq.get(sum, 0) + 1
+    return count

@@ -1,0 +1,63 @@
+CLASS BIT  
+    FUNCTION __init__ WITH PARAMETERS self n  
+        SET self.size TO n  
+        SET self.tree TO a list of zeros WITH LENGTH n PLUS one  
+    END FUNCTION  
+
+    FUNCTION update WITH PARAMETERS self idx delta  
+        WHILE idx IS LESS THAN OR EQUAL TO self.size  
+            INCREMENT the element at position idx OF self.tree BY delta  
+            SET idx TO idx PLUS the bitwise AND of idx AND negative idx  
+        END WHILE  
+    END FUNCTION  
+
+    FUNCTION query WITH PARAMETERS self idx  
+        SET result TO zero  
+        WHILE idx IS GREATER THAN zero  
+            INCREMENT result BY the element at position idx OF self.tree  
+            SET idx TO idx MINUS the bitwise AND of idx AND negative idx  
+        END WHILE  
+        RETURN result  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION goodTriplets WITH PARAMETERS self nums1 nums2  
+        SET n TO the LENGTH OF nums1  
+
+        SET pos TO a list of zeros WITH LENGTH n  
+        FOR i FROM zero TO n MINUS one  
+            SET num TO the element at position i OF nums1  
+            SET the element at position num OF pos TO i  
+        END FOR  
+
+        SET compressed TO an empty list  
+        FOR each num IN nums2  
+            APPEND the element at position num OF pos TO compressed  
+        END FOR  
+
+        SET bit TO a new BIT OBJECT INITIALIZED WITH n  
+
+        SET smaller_count TO a list of zeros WITH LENGTH n  
+        SET larger_count TO a list of zeros WITH LENGTH n  
+
+        FOR i FROM zero TO n MINUS one  
+            SET the element at position i OF smaller_count TO bit.query WITH PARAMETER the element at position i OF compressed  
+            CALL bit.update WITH PARAMETERS the element at position i OF compressed PLUS one AND one  
+        END FOR  
+
+        SET bit TO a new BIT OBJECT INITIALIZED WITH n  
+
+        FOR i FROM n MINUS one DOWN TO zero  
+            SET the element at position i OF larger_count TO bit.query WITH PARAMETER n MINUS bit.query WITH PARAMETER the element at position i OF compressed PLUS one  
+            CALL bit.update WITH PARAMETERS the element at position i OF compressed PLUS one AND one  
+        END FOR  
+
+        SET good_triplets TO zero  
+        FOR i FROM zero TO n MINUS one  
+            INCREMENT good_triplets BY the element at position i OF smaller_count MULTIPLIED BY the element at position i OF larger_count  
+        END FOR  
+
+        RETURN good_triplets  
+    END FUNCTION  
+END CLASS

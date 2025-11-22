@@ -1,0 +1,56 @@
+CLASS Solution
+    FUNCTION minOperations(target_list, arr_list)
+        SET index_map TO CALL createIndexMap WITH target_list
+        SET transformed_arr TO CALL transformArray WITH arr_list AND index_map
+        SET lis TO CALL findLongestIncreasingSubsequence WITH transformed_arr
+        SET lcs_length TO the LENGTH OF lis
+        RETURN the LENGTH OF target_list MINUS lcs_length
+    END FUNCTION
+
+    FUNCTION createIndexMap(list_of_values)
+        SET mapping TO auxiliary empty mapping
+        SET index_counter TO zero
+        FOR each value IN list_of_values
+            SET mapping AT value TO index_counter
+            INCREMENT index_counter BY one
+        END FOR
+        RETURN mapping
+    END FUNCTION
+
+    FUNCTION transformArray(array, mapping)
+        SET transformed_list TO auxiliary empty list
+        FOR each value IN array
+            IF mapping CONTAINS value
+                APPEND mapping AT value TO transformed_list
+            END IF
+        END FOR
+        RETURN transformed_list
+    END FUNCTION
+
+    FUNCTION findLongestIncreasingSubsequence(sequence)
+        SET lis TO auxiliary empty list
+        FOR each number IN sequence
+            SET position TO CALL findInsertPosition WITH lis AND number
+            IF position EQUALS the LENGTH OF lis
+                APPEND number TO lis
+            ELSE
+                SET element at position of lis TO number
+            END IF
+        END FOR
+        RETURN lis
+    END FUNCTION
+
+    FUNCTION findInsertPosition(sorted_list, target_value)
+        SET left TO zero
+        SET right TO the LENGTH OF sorted_list MINUS one
+        WHILE left LESS THAN OR EQUAL TO right
+            SET mid TO left PLUS right DIVIDED BY two
+            IF element at position mid of sorted_list LESS THAN target_value
+                SET left TO mid PLUS one
+            ELSE
+                SET right TO mid MINUS one
+            END IF
+        END WHILE
+        RETURN left
+    END FUNCTION
+END CLASS

@@ -1,0 +1,56 @@
+from collections import deque
+from typing import Optional
+
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+def tree_node(values: list) -> Optional[TreeNode]:
+    if not values:
+        return None
+    # Replace null-like values with None explicitly if needed
+    # Assumes input may contain e.g. 'null', 'None', or actual None
+    # For robustness:
+    vals = [None if v is None else v for v in values]
+
+    root = TreeNode(vals[0])
+    i = 1
+    queue = deque([root])
+    while queue and i < len(vals):
+        node = queue.popleft()
+        if i < len(vals) and vals[i] is not None:
+            node.left = TreeNode(vals[i])
+            queue.append(node.left)
+        i += 1
+        if i < len(vals) and vals[i] is not None:
+            node.right = TreeNode(vals[i])
+            queue.append(node.right)
+        i += 1
+    return root
+
+def is_same_tree(p: Optional[TreeNode], q: Optional[TreeNode]) -> bool:
+    if p is None and q is None:
+        return True
+    if p is None or q is None:
+        return False
+    if p.val != q.val:
+        return False
+    return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)
+
+class Solution:
+    def longestConsecutive(self, root: Optional[TreeNode]) -> int:
+        if root is None:
+            return 0
+        def dfs(node: Optional[TreeNode], parent_val: Optional[int], current_length: int) -> int:
+            if node is None:
+                return current_length
+            if parent_val is not None and node.val == parent_val + 1:
+                current_length += 1
+            else:
+                current_length = 1
+            left_length = dfs(node.left, node.val, current_length)
+            right_length = dfs(node.right, node.val, current_length)
+            return max(current_length, left_length, right_length)
+        return dfs(root, None, 0)

@@ -1,0 +1,73 @@
+CLASS Solution  
+    FUNCTION longestRepeating WITH PARAMETERS s string queryCharacters string queryIndices list of integers RETURNS list of integers  
+        FUNCTION merge_intervals  
+            SET i TO zero  
+            WHILE i LESS THAN the LENGTH OF intervals MINUS one HOLDS  
+                SET start_position_first_interval TO element at position zero of element at position i of intervals  
+                SET end_position_first_interval TO element at position one of element at position i of intervals  
+                SET character_first_interval TO element at position two of element at position i of intervals  
+                SET start_position_second_interval TO element at position zero of element at position i PLUS one of intervals  
+                SET end_position_second_interval TO element at position one of element at position i PLUS one of intervals  
+                SET character_second_interval TO element at position two of element at position i PLUS one of intervals  
+                IF character_first_interval EQUALS character_second_interval THEN  
+                    SET element at position i of intervals TO a tuple with start_position_first_interval end_position_second_interval character_first_interval  
+                    REMOVE element at position i PLUS one FROM intervals  
+                ELSE  
+                    INCREMENT i BY one  
+                END IF  
+            END WHILE  
+        END FUNCTION  
+        
+        SET intervals TO empty list  
+        SET n TO the LENGTH OF s  
+        SET start TO zero  
+        FOR i FROM one TO n MINUS one  
+            SET character_at_i TO element at position i of s  
+            SET character_at_start TO element at position start of s  
+            IF character_at_i NOT EQUALS character_at_start THEN  
+                APPEND tuple with start i MINUS one character_at_start TO intervals  
+                SET start TO i  
+            END IF  
+        END FOR  
+        APPEND tuple with start n MINUS one element at position start of s TO intervals  
+        
+        SET results TO empty list  
+        SET longest TO the MAXIMUM OF end_position MINUS start_position PLUS one FOR each tuple start_position end_position character IN intervals  
+        
+        FOR char idx IN PAIRING OF queryCharacters AND queryIndices  
+            SET i TO zero  
+            WHILE i LESS THAN the LENGTH OF intervals HOLDS  
+                SET start_position TO element at position zero of element at position i of intervals  
+                SET end_position TO element at position one of element at position i of intervals  
+                SET character_current_interval TO element at position two of element at position i of intervals  
+                IF start_position LESS THAN OR EQUAL TO idx AND idx LESS THAN OR EQUAL TO end_position THEN  
+                    BREAK THE WHILE LOOP  
+                END IF  
+                INCREMENT i BY one  
+            END WHILE  
+            
+            SET start_position TO element at position zero of element at position i of intervals  
+            SET end_position TO element at position one of element at position i of intervals  
+            SET character_current_interval TO element at position two of element at position i of intervals  
+            
+            IF idx GREATER THAN start_position THEN  
+                INSERT tuple with start_position idx MINUS one character_current_interval AT position i OF intervals  
+                SET element at position i PLUS one of intervals TO tuple with idx end_position character_current_interval  
+            END IF  
+            
+            IF idx LESS THAN end_position THEN  
+                INSERT tuple with idx PLUS one end_position character_current_interval AT position i PLUS one OF intervals  
+                SET element at position i of intervals TO tuple with start_position idx character_current_interval  
+            END IF  
+            
+            SET element at position i of intervals TO tuple with element at position zero of element at position i of intervals element at position one of element at position i of intervals char  
+            
+            CALL merge_intervals  
+            
+            SET longest TO the MAXIMUM OF end_position MINUS start_position PLUS one FOR each tuple start_position end_position character IN intervals  
+            APPEND longest TO results  
+        END FOR  
+        
+        RETURN results  
+    END FUNCTION  
+END CLASS

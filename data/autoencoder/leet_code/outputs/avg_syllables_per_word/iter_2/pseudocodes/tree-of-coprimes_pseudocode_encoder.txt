@@ -1,0 +1,41 @@
+CLASS Solution
+    FUNCTION getCoprimes(nums: List[int], edges: List[List[int]]) RETURNS List[int]
+        SET n TO LENGTH OF nums
+        SET tree TO DEFAULT DICTIONARY OF LISTS
+        FOR EACH edge (u, v) IN edges
+            APPEND v TO tree[u]
+            APPEND u TO tree[v]
+
+        SET coprime TO 2D ARRAY OF SIZE 51 BY 51 FILLED WITH False
+        FOR i FROM 1 TO 50
+            FOR j FROM 1 TO 50
+                SET coprime[i][j] TO (gcd(i, j) EQUALS 1)
+
+        SET result TO ARRAY OF SIZE n FILLED WITH -1
+        SET ancestor_stack TO ARRAY OF SIZE 51 FILLED WITH None
+
+        FUNCTION dfs(node, parent, depth)
+            SET closest_ancestor TO -1
+            SET max_depth TO -1
+            FOR value FROM 1 TO 50
+                IF coprime[nums[node]][value] IS True AND ancestor_stack[value] IS NOT None
+                    SET (anc_node, anc_depth) TO ancestor_stack[value]
+                    IF anc_depth GREATER THAN max_depth
+                        SET max_depth TO anc_depth
+                        SET closest_ancestor TO anc_node
+            SET result[node] TO closest_ancestor
+
+            SET original_ancestor TO ancestor_stack[nums[node]]
+            SET ancestor_stack[nums[node]] TO (node, depth)
+
+            FOR EACH child IN tree[node]
+                IF child IS NOT parent
+                    CALL dfs(child, node, depth PLUS 1)
+
+            SET ancestor_stack[nums[node]] TO original_ancestor
+        END FUNCTION
+
+        CALL dfs(0, -1, 0)
+        RETURN result
+    END FUNCTION
+END CLASS

@@ -1,0 +1,56 @@
+CLASS Solution  
+    FUNCTION maxScoreWords(words AS List OF string, letters AS List OF string, score AS List OF integer) RETURNS integer  
+        FUNCTION word_score(word AS string, score_map AS dictionary FROM character TO integer) RETURNS integer  
+            SET total_score TO zero  
+            FOR each character IN word  
+                INCREMENT total_score BY the value ASSOCIATED WITH character IN score_map  
+            END FOR  
+            RETURN total_score  
+        END FUNCTION  
+        
+        FUNCTION can_form(word AS string, letter_count AS dictionary FROM character TO integer) RETURNS boolean  
+            SET word_count TO the COUNT OF each character IN word USING Counter  
+            FOR each character AND count IN word_count  
+                IF the value ASSOCIATED WITH character IN letter_count IS LESS THAN count THEN  
+                    RETURN false  
+                END IF  
+            END FOR  
+            RETURN true  
+        END FUNCTION  
+        
+        FUNCTION update_letter_count(letter_count AS dictionary FROM character TO integer, word AS string, add AS boolean EQUALS true)  
+            FOR each character IN word  
+                IF add IS true THEN  
+                    INCREMENT the value ASSOCIATED WITH character IN letter_count BY one  
+                ELSE  
+                    DECREMENT the value ASSOCIATED WITH character IN letter_count BY one  
+                END IF  
+            END FOR  
+        END FUNCTION  
+        
+        FUNCTION backtrack(index AS integer, current_score AS integer, letter_count AS dictionary FROM character TO integer) RETURNS integer  
+            IF index EQUALS the LENGTH OF words THEN  
+                RETURN current_score  
+            END IF  
+            
+            SET max_score TO current_score  
+            FOR each i FROM index TO the LENGTH OF words MINUS one  
+                IF can_form(the element at position i of words, letter_count) IS true THEN  
+                    CALL update_letter_count WITH letter_count, the element at position i of words, add EQUALS false  
+                    SET temp_score TO backtrack(i PLUS one, current_score PLUS word_score(the element at position i of words, score_map), letter_count)  
+                    IF temp_score IS GREATER THAN max_score THEN  
+                        SET max_score TO temp_score  
+                    END IF  
+                    CALL update_letter_count WITH letter_count, the element at position i of words, add EQUALS true  
+                END IF  
+            END FOR  
+            
+            RETURN max_score  
+        END FUNCTION  
+        
+        SET score_map TO a dictionary MAPPING each lowercase letter FROM a TO z TO the corresponding element at position of their alphabetical zero-based index in score  
+        SET letter_count TO the COUNTER of elements in letters  
+        
+        RETURN backtrack(zero, zero, letter_count)  
+    END FUNCTION  
+END CLASS

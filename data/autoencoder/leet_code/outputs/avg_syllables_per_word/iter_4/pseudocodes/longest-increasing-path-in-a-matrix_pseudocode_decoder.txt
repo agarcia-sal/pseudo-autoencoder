@@ -1,0 +1,39 @@
+CLASS Solution
+    FUNCTION longestIncreasingPath(matrix: List of List of Integer) RETURNS Integer
+        IF matrix IS EMPTY OR matrix[0] IS EMPTY THEN
+            RETURN 0
+        END IF
+
+        SET m TO LENGTH OF matrix
+        SET n TO LENGTH OF matrix[0]
+        SET directions TO LIST OF (1, 0), (-1, 0), (0, 1), (0, -1)
+        SET dp TO 2D LIST OF SIZE m BY n FILLED WITH -1
+
+        FUNCTION dfs(x, y) RETURNS Integer
+            IF dp[x][y] IS NOT EQUAL TO -1 THEN
+                RETURN dp[x][y]
+            END IF
+
+            SET max_length TO 1
+            FOR EACH dx, dy IN directions DO
+                SET nx TO x + dx
+                SET ny TO y + dy
+                IF nx IS BETWEEN 0 AND m - 1 AND ny IS BETWEEN 0 AND n - 1 AND matrix[nx][ny] > matrix[x][y] THEN
+                    SET max_length TO MAXIMUM OF max_length AND 1 + dfs(nx, ny)
+                END IF
+            END FOR
+
+            SET dp[x][y] TO max_length
+            RETURN max_length
+        END FUNCTION
+
+        SET longest_path TO 0
+        FOR i FROM 0 TO m - 1 DO
+            FOR j FROM 0 TO n - 1 DO
+                SET longest_path TO MAXIMUM OF longest_path AND dfs(i, j)
+            END FOR
+        END FOR
+
+        RETURN longest_path
+    END FUNCTION
+END CLASS

@@ -1,0 +1,31 @@
+CLASS Solution  
+    FUNCTION minTransfers(transactions)  
+        SET balance TO an empty dictionary  
+        FOR each triple named frm to amount IN transactions  
+            SET balance at key frm TO balance at key frm IF key frm EXISTS OTHERWISE zero MINUS amount  
+            SET balance at key to TO balance at key to IF key to EXISTS OTHERWISE zero PLUS amount  
+        END FOR  
+        SET balances TO a list of values from balance where the value is NOT EQUALS zero  
+        IF the LENGTH OF balances EQUALS zero  
+            RETURN zero  
+        END IF  
+        FUNCTION settle(start cnt)  
+            WHILE start LESS THAN the LENGTH OF balances AND element at position start of balances EQUALS zero  
+                INCREMENT start BY one  
+            END WHILE  
+            IF start EQUALS the LENGTH OF balances  
+                RETURN cnt  
+            END IF  
+            SET min_cnt TO positive infinity  
+            FOR i FROM start PLUS one TO the LENGTH OF balances MINUS one  
+                IF element at position start of balances MULTIPLIED BY element at position i of balances LESS THAN zero  
+                    INCREMENT element at position i of balances BY element at position start of balances  
+                    SET min_cnt TO the SMALLER OF min_cnt AND settle(start PLUS one cnt PLUS one)  
+                    DECREMENT element at position i of balances BY element at position start of balances  
+                END IF  
+            END FOR  
+            RETURN min_cnt  
+        END FUNCTION  
+        RETURN settle(zero zero)  
+    END FUNCTION  
+END CLASS

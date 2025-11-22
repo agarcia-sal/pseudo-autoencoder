@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION wordPatternMatch(self, pattern, s)  
+        FUNCTION backtrack(pattern_index, string_index, mapping, used)  
+            IF pattern_index EQUALS length of pattern AND string_index EQUALS length of s THEN  
+                RETURN True  
+            END IF  
+            IF pattern_index EQUALS length of pattern OR string_index EQUALS length of s THEN  
+                RETURN False  
+            END IF  
+          
+            SET current_char TO element at pattern_index in pattern  
+            IF current_char IN mapping THEN  
+                SET word TO mapping at current_char  
+                IF substring of s from string_index TO string_index PLUS length of word NOT EQUALS word THEN  
+                    RETURN False  
+                END IF  
+                IF backtrack(pattern_index PLUS one, string_index PLUS length of word, mapping, used) THEN  
+                    RETURN True  
+                END IF  
+            ELSE  
+                FOR end FROM string_index PLUS one TO length of s PLUS one  
+                    SET word TO substring of s from string_index TO end  
+                    IF word IN used THEN  
+                        CONTINUE  
+                    END IF  
+                    SET mapping at current_char TO word  
+                    ADD word TO used  
+                    IF backtrack(pattern_index PLUS one, end, mapping, used) THEN  
+                        RETURN True  
+                    END IF  
+                    REMOVE mapping entry for current_char  
+                    REMOVE word FROM used  
+                END FOR  
+            END IF  
+          
+            RETURN False  
+        END FUNCTION  
+      
+        RETURN backtrack(zero, zero, empty mapping, empty set)  
+    END FUNCTION  
+END CLASS

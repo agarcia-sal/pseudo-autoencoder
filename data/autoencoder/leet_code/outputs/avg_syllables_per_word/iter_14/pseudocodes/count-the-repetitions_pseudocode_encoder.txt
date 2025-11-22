@@ -1,0 +1,38 @@
+CLASS Solution  
+    FUNCTION getMaxRepetitions(s1 STRING, n1 INTEGER, s2 STRING, n2 INTEGER) RETURNS INTEGER  
+        IF n1 EQUAL TO zero THEN  
+            RETURN zero  
+        END IF  
+
+        SET s2_count TO a list of zero VALUES with LENGTH equal TO the LENGTH OF s2 PLUS one  
+        SET index_map TO a list of zero VALUES with LENGTH equal TO the LENGTH OF s2 PLUS one  
+
+        SET current_index_s2 TO zero  
+        SET s1_count TO zero  
+
+        WHILE s1_count LESS THAN n1 DO  
+            INCREMENT s1_count BY one  
+            FOR each character IN the elements OF s1 DO  
+                IF character EQUAL TO the element at position current_index_s2 OF s2 THEN  
+                    INCREMENT current_index_s2 BY one  
+                    IF current_index_s2 EQUAL TO the LENGTH OF s2 THEN  
+                        SET the element at position s1_count OF s2_count TO the element at position s1_count MINUS one OF s2_count PLUS one  
+                        SET current_index_s2 TO zero  
+                    END IF  
+                END IF  
+                SET the element at position s1_count OF index_map TO current_index_s2  
+            END FOR  
+
+            IF current_index_s2 IS FOUND WITHIN the elements OF index_map FROM position zero TO s1_count MINUS one THEN  
+                SET start TO the POSITION OF current_index_s2 WITHIN index_map  
+                SET cycle_length TO s1_count MINUS start  
+                SET cycles_fit TO (n1 MINUS start) DIVIDED BY cycle_length  
+                SET remainder TO (n1 MINUS start) MODULO cycle_length  
+                SET total_s2_count TO the element at position start OF s2_count PLUS cycles_fit MULTIPLIED BY (the element at position start PLUS cycle_length OF s2_count MINUS the element at position start OF s2_count) PLUS the element at position start PLUS remainder OF s2_count MINUS the element at position start OF s2_count  
+                RETURN total_s2_count DIVIDED BY n2  
+            END IF  
+        END WHILE  
+
+        RETURN the element at position s1_count OF s2_count DIVIDED BY n2  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,48 @@
+CLASS Solution
+    FUNCTION shortestSuperstring(list_of_words)
+        SET number_of_words TO the LENGTH OF list_of_words
+
+        FUNCTION overlap(index_i, index_j)
+            FOR k FROM the MINIMUM OF the LENGTH OF element at position index_i of list_of_words AND the LENGTH OF element at position index_j of list_of_words DOWN TO one
+                IF the SUBSTRING from position the LENGTH OF element at position index_i of list_of_words MINUS k PLUS one TO the LENGTH OF element at position index_i of list_of_words of element at position index_i of list_of_words EQUALS the SUBSTRING from position one TO k of element at position index_j of list_of_words
+                    RETURN k
+                END IF
+            END FOR
+            RETURN zero
+        END FUNCTION
+
+        FUNCTION dp(mask, index_i)
+            IF mask EQUALS one SHIFTED LEFT BY number_of_words MINUS one
+                RETURN zero AND empty_string
+            END IF
+
+            SET minimum_length TO positive_infinity
+            SET best_path TO empty_string
+            FOR index_j FROM zero TO number_of_words MINUS one
+                IF NOT mask BITWISE AND one SHIFTED LEFT BY index_j
+                    CALL dp WITH mask BITWISE OR one SHIFTED LEFT BY index_j AND index_j ASSIGN TO length AND path
+                    SET length TO length PLUS the LENGTH OF element at position index_j of list_of_words MINUS CALL overlap WITH index_i AND index_j
+                    IF length LESS THAN minimum_length
+                        SET minimum_length TO length
+                        SET best_path TO the SUBSTRING from position CALL overlap WITH index_i AND index_j PLUS one TO the LENGTH OF element at position index_j of list_of_words OF element at position index_j of list_of_words CONCATENATED WITH path
+                    END IF
+                END IF
+            END FOR
+
+            RETURN minimum_length AND best_path
+        END FUNCTION
+
+        SET minimum_length TO positive_infinity
+        SET shortest_path TO empty_string
+        FOR index_i FROM zero TO number_of_words MINUS one
+            CALL dp WITH one SHIFTED LEFT BY index_i AND index_i ASSIGN TO length AND path
+            SET length TO length PLUS the LENGTH OF element at position index_i of list_of_words
+            IF length LESS THAN minimum_length
+                SET minimum_length TO length
+                SET shortest_path TO element at position index_i of list_of_words CONCATENATED WITH path
+            END IF
+        END FOR
+
+        RETURN shortest_path
+    END FUNCTION
+END CLASS

@@ -1,0 +1,36 @@
+CLASS Solution  
+    FUNCTION waysToBuildRooms(prevRoom)  
+        IMPORT defaultdict FROM collections  
+        SET n TO the LENGTH OF prevRoom  
+        ASSIGN graph TO a new default dictionary with lists as default values  
+        FOR room FROM one TO n MINUS one  
+            APPEND room TO the element at position room of prevRoom in graph  
+        END FOR  
+        
+        FUNCTION dp(node)  
+            IF graph at position node EQUALS an empty list THEN  
+                RETURN one AND one  
+            END IF  
+            
+            SET total_ways TO one  
+            SET total_size TO one  
+            ASSIGN child_results TO an empty list  
+            
+            FOR each child IN graph at position node  
+                ASSIGN ways AND size TO the RESULT OF dp with child as argument  
+                APPEND the tuple ways AND size TO child_results  
+                INCREMENT total_size BY size  
+            END FOR  
+            
+            SET current_size TO one  
+            FOR each ways AND size IN child_results  
+                SET total_ways TO total_ways MULTIPLIED BY the combination of current_size PLUS size MINUS one TAKEN size AT A TIME MULTIPLIED BY ways MODULO the constant MOD  
+                INCREMENT current_size BY size  
+            END FOR  
+            
+            RETURN total_ways AND total_size  
+        END FUNCTION  
+        
+        RETURN the first element OF the RESULT OF dp with zero AS argument  
+    END FUNCTION  
+END CLASS

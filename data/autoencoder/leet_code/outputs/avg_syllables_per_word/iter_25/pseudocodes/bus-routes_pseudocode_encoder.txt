@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION numBusesToDestination(routes LIST OF LIST OF INTEGERS source INTEGER target INTEGER) RETURNS INTEGER  
+        IF source EQUALS target THEN  
+            RETURN zero  
+        END IF  
+
+        SET stop_to_buses TO default dictionary mapping from stop TO list of buses  
+        FOR each bus AND route IN enumeration of routes  
+            FOR each stop IN route  
+                APPEND bus TO the list of buses for the stop in stop_to_buses  
+            END FOR  
+        END FOR  
+
+        SET bus_queue TO empty double ended queue  
+        SET visited_buses TO empty set  
+        SET visited_stops TO empty set  
+
+        FOR each bus IN the list of buses that stop at source in stop_to_buses  
+            APPEND the tuple of bus AND one to bus_queue  
+            ADD bus TO visited_buses  
+            ADD source TO visited_stops  
+        END FOR  
+
+        WHILE bus_queue is not empty  
+            REMOVE the first element from bus_queue and DESTRUCTURE it to current_bus AND bus_count  
+
+            FOR each stop IN the route of current_bus in routes  
+                IF stop EQUALS target THEN  
+                    RETURN bus_count  
+                END IF  
+
+                IF stop NOT IN visited_stops THEN  
+                    ADD stop TO visited_stops  
+                    FOR each next_bus IN the list of buses that stop at stop in stop_to_buses  
+                        IF next_bus NOT IN visited_buses THEN  
+                            ADD next_bus TO visited_buses  
+                            APPEND the tuple of next_bus AND bus_count PLUS one TO bus_queue  
+                        END IF  
+                    END FOR  
+                END IF  
+            END FOR  
+        END WHILE  
+
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

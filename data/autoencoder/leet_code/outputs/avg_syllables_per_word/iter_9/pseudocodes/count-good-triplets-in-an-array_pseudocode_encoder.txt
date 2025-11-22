@@ -1,0 +1,62 @@
+CLASS BIT  
+    FUNCTION __init__(self, n)  
+        SET self.size TO n  
+        SET self.tree TO a list of zero repeated n PLUS one times  
+    END FUNCTION  
+
+    FUNCTION update(self, idx, delta)  
+        WHILE idx LESS THAN OR EQUAL TO self.size DO  
+            INCREMENT self.tree at position idx BY delta  
+            SET idx TO idx PLUS (idx BITWISE AND negative idx)  
+        END WHILE  
+    END FUNCTION  
+
+    FUNCTION query(self, idx)  
+        SET result TO zero  
+        WHILE idx GREATER THAN zero DO  
+            INCREMENT result BY self.tree at position idx  
+            SET idx TO idx MINUS (idx BITWISE AND negative idx)  
+        END WHILE  
+        RETURN result  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION goodTriplets(self, nums1, nums2)  
+        SET n TO length of nums1  
+
+        SET pos TO a list of zero repeated n times  
+        FOR each index i and element num IN nums1 DO  
+            SET pos at position num TO i  
+        END FOR  
+
+        SET compressed TO an empty list  
+        FOR each element num IN nums2 DO  
+            APPEND pos at position num TO compressed  
+        END FOR  
+
+        SET bit TO a new BIT instance with n  
+
+        SET smaller_count TO a list of zero repeated n times  
+        SET larger_count TO a list of zero repeated n times  
+
+        FOR index i FROM zero TO n MINUS one DO  
+            SET smaller_count at position i TO bit query at compressed at position i  
+            CALL bit update at compressed at position i PLUS one WITH one  
+        END FOR  
+
+        SET bit TO a new BIT instance with n  
+
+        FOR index i FROM n MINUS one DOWN TO zero DO  
+            SET larger_count at position i TO bit query at n MINUS bit query at compressed at position i PLUS one  
+            CALL bit update at compressed at position i PLUS one WITH one  
+        END FOR  
+
+        SET good_triplets TO zero  
+        FOR index i FROM zero TO n MINUS one DO  
+            INCREMENT good_triplets BY smaller_count at position i MULTIPLIED BY larger_count at position i  
+        END FOR  
+
+        RETURN good_triplets  
+    END FUNCTION  
+END CLASS

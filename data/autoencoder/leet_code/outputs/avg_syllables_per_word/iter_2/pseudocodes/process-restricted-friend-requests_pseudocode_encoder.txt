@@ -1,0 +1,63 @@
+CLASS UnionFind
+    FUNCTION __init__(self, n)
+        SET self.parent TO list of integers from 0 to n - 1
+        SET self.size TO list of 1 repeated n times
+    END FUNCTION
+
+    FUNCTION find(self, u)
+        IF self.parent[u] NOT EQUAL TO u
+            SET self.parent[u] TO self.find(self.parent[u])
+        RETURN self.parent[u]
+    END FUNCTION
+
+    FUNCTION union(self, u, v)
+        SET root_u TO self.find(u)
+        SET root_v TO self.find(v)
+        IF root_u NOT EQUAL TO root_v
+            IF self.size[root_u] GREATER THAN self.size[root_v]
+                SET self.parent[root_v] TO root_u
+                INCREMENT self.size[root_u] BY self.size[root_v]
+            ELSE
+                SET self.parent[root_u] TO root_v
+                INCREMENT self.size[root_v] BY self.size[root_u]
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION friendRequests(self, n, restrictions, requests)
+        SET uf TO new UnionFind(n)
+        SET result TO empty list
+        SET restriction_map TO empty dictionary
+
+        FOR each (x, y) IN restrictions
+            IF x NOT IN restriction_map
+                SET restriction_map[x] TO empty set
+            IF y NOT IN restriction_map
+                SET restriction_map[y] TO empty set
+            ADD y TO restriction_map[x]
+            ADD x TO restriction_map[y]
+
+        FUNCTION can_union(u, v)
+            SET root_u TO uf.find(u)
+            SET root_v TO uf.find(v)
+            FOR each person IN restriction_map.GET(root_u, empty set)
+                IF uf.find(person) EQUALS root_v
+                    RETURN False
+            FOR each person IN restriction_map.GET(root_v, empty set)
+                IF uf.find(person) EQUALS root_u
+                    RETURN False
+            RETURN True
+        END FUNCTION
+
+        FOR each (u, v) IN requests
+            IF uf.find(u) EQUALS uf.find(v)
+                APPEND True TO result
+            ELSE IF can_union(u, v)
+                CALL uf.union(u, v)
+                APPEND True TO result
+            ELSE
+                APPEND False TO result
+
+        RETURN result
+    END FUNCTION
+END CLASS

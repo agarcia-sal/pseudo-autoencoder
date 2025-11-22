@@ -1,0 +1,55 @@
+CLASS Solution  
+    FUNCTION checkRecord(n)  
+        SET MOD TO one billion PLUS seven  
+        
+        CALL initialize_dp WITH PARAMETERS n TO OBTAIN dp
+        
+        SET element at position zero OF element at position zero OF element at position zero OF dp TO one  
+        
+        FOR i FROM one TO n  
+            FOR j FROM zero TO one  
+                FOR k FROM zero TO two  
+                    CALL add_present WITH PARAMETERS dp i j k MOD TO UPDATE dp
+                    
+                    IF j EQUALS zero  
+                        CALL add_absent WITH PARAMETERS dp i k MOD TO UPDATE dp  
+                    END IF  
+                    
+                    IF k LESS THAN two  
+                        CALL add_late WITH PARAMETERS dp i j k MOD TO UPDATE dp  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+        
+        SET result TO zero  
+        FOR j FROM zero TO one  
+            FOR k FROM zero TO two  
+                INCREMENT result BY element at position n OF dp AT position j AT position k  
+                SET result TO the REMAINDER OF result DIVIDED BY MOD  
+            END FOR  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+    
+    FUNCTION initialize_dp(n)  
+        CREATE three dimensional list dp OF size (n PLUS one) BY two BY three FILLED WITH zeroes  
+        RETURN dp  
+    END FUNCTION  
+    
+    FUNCTION add_present(dp i j k MOD)  
+        INCREMENT element at position i OF dp AT position j AT position zero BY element at position (i MINUS one) OF dp AT position j AT position k  
+        SET element at position i OF dp AT position j AT position zero TO the REMAINDER OF element at position i OF dp AT position j AT position zero DIVIDED BY MOD  
+    END FUNCTION  
+    
+    FUNCTION add_absent(dp i k MOD)  
+        INCREMENT element at position i OF dp AT position one AT position zero BY element at position (i MINUS one) OF dp AT position zero AT position k  
+        SET element at position i OF dp AT position one AT position zero TO the REMAINDER OF element at position i OF dp AT position one AT position zero DIVIDED BY MOD  
+    END FUNCTION  
+    
+    FUNCTION add_late(dp i j k MOD)  
+        INCREMENT element at position i OF dp AT position j AT position (k PLUS one) BY element at position (i MINUS one) OF dp AT position j AT position k  
+        SET element at position i OF dp AT position j AT position (k PLUS one) TO the REMAINDER OF element at position i OF dp AT position j AT position (k PLUS one) DIVIDED BY MOD  
+    END FUNCTION  
+END CLASS

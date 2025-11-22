@@ -1,0 +1,64 @@
+CLASS UnionFind
+    FUNCTION __init__(self)
+        SET self.parent TO empty dictionary
+        SET self.count TO zero
+    END FUNCTION
+
+    FUNCTION make_set(self, x)
+        IF x NOT IN self.parent THEN
+            SET self.parent at x TO x
+            INCREMENT self.count BY one
+        END IF
+    END FUNCTION
+
+    FUNCTION find(self, x)
+        IF value at self.parent at x NOT EQUALS x THEN
+            SET self.parent at x TO self.find(value at self.parent at x)
+        END IF
+        RETURN value at self.parent at x
+    END FUNCTION
+
+    FUNCTION union(self, x, y)
+        SET rootX TO self.find(x)
+        SET rootY TO self.find(y)
+        IF rootX NOT EQUALS rootY THEN
+            SET self.parent at rootX TO rootY
+            DECREMENT self.count BY one
+        END IF
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION numIslands2(self, m, n, positions)
+        FUNCTION is_valid(x, y)
+            RETURN x GREATER THAN OR EQUAL TO zero AND x LESS THAN m AND y GREATER THAN OR EQUAL TO zero AND y LESS THAN n
+        END FUNCTION
+
+        SET directions TO a list containing (one, zero), (minus one, zero), (zero, one), (zero, minus one)
+        SET uf TO a new UnionFind object
+        SET grid TO a list of m elements where each element is a list of n zeros
+        SET result TO empty list
+
+        FOR each r, c IN positions
+            IF value at grid at position r, c EQUALS one THEN
+                APPEND uf.count TO result
+                CONTINUE to next iteration
+            END IF
+
+            SET value at grid at position r, c TO one
+            CALL uf.make_set with argument (r, c)
+
+            FOR each dr, dc IN directions
+                SET nr TO r PLUS dr
+                SET nc TO c PLUS dc
+                IF is_valid(nr, nc) AND value at grid at position nr, nc EQUALS one THEN
+                    CALL uf.union with arguments (r, c) and (nr, nc)
+                END IF
+            END FOR
+
+            APPEND uf.count TO result
+        END FOR
+
+        RETURN result
+    END FUNCTION
+END CLASS

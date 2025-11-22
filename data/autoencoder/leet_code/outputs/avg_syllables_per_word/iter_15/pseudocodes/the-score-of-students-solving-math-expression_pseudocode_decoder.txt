@@ -1,0 +1,78 @@
+CLASS Solution  
+    FUNCTION scoreOfStudents(s, answers)  
+        FUNCTION evaluate_expression(expression)  
+            SET tokens TO an empty list  
+            SET num TO zero  
+            FOR each character IN expression  
+                IF character IS a digit THEN  
+                    SET num TO num MULTIPLIED BY ten PLUS the integer value of character  
+                ELSE  
+                    APPEND num TO tokens  
+                    APPEND character TO tokens  
+                    SET num TO zero  
+                END IF  
+            END FOR  
+            APPEND num TO tokens  
+            
+            SET i TO one  
+            WHILE i IS LESS THAN the LENGTH OF tokens  
+                IF element at position i of tokens IS an asterisk THEN  
+                    SET element at position i minus one of tokens TO element at position i minus one MULTIPLIED BY element at position i plus one of tokens  
+                    REMOVE element at position i and the element immediately following from tokens  
+                ELSE  
+                    INCREMENT i BY one  
+                END IF  
+            END WHILE  
+            
+            SET result TO element at position zero of tokens  
+            SET i TO one  
+            WHILE i IS LESS THAN the LENGTH OF tokens  
+                IF element at position i of tokens IS a plus sign THEN  
+                    SET result TO result PLUS element at position i plus one of tokens  
+                END IF  
+                INCREMENT i BY two  
+            END WHILE  
+            
+            RETURN result  
+        END FUNCTION  
+        
+        FUNCTION get_possible_answers(expression)  
+            IF expression CONTAINS only digits THEN  
+                RETURN a set containing the integer conversion of expression  
+            END IF  
+            
+            SET results TO an empty set  
+            FOR index FROM one TO the LENGTH OF expression MINUS two IN STEPS OF two  
+                SET left_results TO get_possible_answers(substring from position zero TO index of expression)  
+                SET right_results TO get_possible_answers(substring from position index plus one TO the end of expression)  
+                FOR each left IN left_results  
+                    FOR each right IN right_results  
+                        IF element at position index of expression IS a plus sign THEN  
+                            SET result TO left PLUS right  
+                        ELSE  
+                            SET result TO left MULTIPLIED BY right  
+                        END IF  
+                        IF result IS LESS THAN OR EQUAL TO one thousand THEN  
+                            ADD result TO results  
+                        END IF  
+                    END FOR  
+                END FOR  
+            END FOR  
+            RETURN results  
+        END FUNCTION  
+        
+        SET correct_answer TO evaluate_expression(s)  
+        SET possible_answers TO get_possible_answers(s)  
+        
+        SET points TO zero  
+        FOR each answer IN answers  
+            IF answer EQUALS correct_answer THEN  
+                INCREMENT points BY five  
+            ELSE IF answer IS IN possible_answers THEN  
+                INCREMENT points BY two  
+            END IF  
+        END FOR  
+        
+        RETURN points  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,34 @@
+CLASS Solution
+    FUNCTION sumOfDistancesInTree(n, edges)
+        SET graph TO a mapping with default empty list
+        FOR each pair a, b IN edges
+            APPEND b TO graph[a]
+            APPEND a TO graph[b]
+
+        SET count TO a list of size n with each element 1
+        SET dist TO a list of size n with each element 0
+
+        FUNCTION dfs1(u, p)
+            FOR each v IN graph[u]
+                IF v IS NOT p
+                    CALL dfs1(v, u)
+                    INCREMENT count[u] BY count[v]
+                    INCREMENT dist[u] BY dist[v] PLUS count[v]
+            END FOR
+        END FUNCTION
+
+        CALL dfs1(0, -1)
+
+        FUNCTION dfs2(u, p)
+            FOR each v IN graph[u]
+                IF v IS NOT p
+                    SET dist[v] TO dist[u] MINUS count[v] PLUS (n MINUS count[v])
+                    CALL dfs2(v, u)
+            END FOR
+        END FUNCTION
+
+        CALL dfs2(0, -1)
+
+        RETURN dist
+    END FUNCTION
+END CLASS

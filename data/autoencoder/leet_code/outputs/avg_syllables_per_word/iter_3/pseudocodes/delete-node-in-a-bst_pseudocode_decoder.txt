@@ -1,0 +1,72 @@
+CLASS TreeNode
+    FUNCTION __init__(val = 0, left = None, right = None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values: list)
+    IF values IS EMPTY
+        RETURN None
+    END IF
+    SET root TO new TreeNode with val values[0]
+    SET i TO 1
+    SET queue TO empty deque
+    APPEND root TO queue
+    WHILE queue IS NOT EMPTY
+        SET node TO queue.popleft()
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.left TO new TreeNode with val values[i]
+            APPEND node.left TO queue
+        END IF
+        INCREMENT i BY 1
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.right TO new TreeNode with val values[i]
+            APPEND node.right TO queue
+        END IF
+        INCREMENT i BY 1
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val IS NOT EQUAL TO q.val
+        RETURN False
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION deleteNode(root: Optional[TreeNode], key: int) RETURNS Optional[TreeNode]
+        IF root IS None
+            RETURN None
+        END IF
+        IF root.val > key
+            SET root.left TO self.deleteNode(root.left, key)
+            RETURN root
+        END IF
+        IF root.val < key
+            SET root.right TO self.deleteNode(root.right, key)
+            RETURN root
+        END IF
+        IF root.left IS None
+            RETURN root.right
+        END IF
+        IF root.right IS None
+            RETURN root.left
+        END IF
+        SET node TO root.right
+        WHILE node.left IS NOT None
+            SET node TO node.left
+        END WHILE
+        SET node.left TO root.left
+        SET root TO root.right
+        RETURN root
+    END FUNCTION
+END CLASS

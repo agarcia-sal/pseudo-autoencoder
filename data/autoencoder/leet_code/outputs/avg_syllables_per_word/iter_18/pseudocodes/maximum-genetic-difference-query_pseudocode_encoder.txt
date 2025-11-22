@@ -1,0 +1,85 @@
+CLASS TrieNode  
+    FUNCTION __init__  
+        SET children TO a mapping that by default creates new TrieNode instances for absent keys  
+        SET count TO zero  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION maxGeneticDifference WITH parameters parents as List of integers AND queries as List of List of integers  
+        SET tree TO a mapping from each key to an empty list by default  
+        FOR each index and parent_element IN enumeration of parents  
+            IF parent_element does not equal negative one THEN  
+                APPEND index TO the list at key parent_element in tree  
+            END IF  
+        END FOR  
+
+        SET node_queries TO a mapping from each key to an empty list by default  
+        FOR each pair consisting of node_element and value_element IN queries  
+            APPEND value_element TO the list at key node_element in node_queries  
+        END FOR  
+
+        ASSIGN reference root TO a new instance of TrieNode  
+
+        SET result TO a list of zeros with length equal to the LENGTH OF queries  
+
+        FUNCTION dfs WITH parameter node_element as integer  
+            CALL insert WITH trie_root set to root AND value set to node_element  
+
+            FOR each value_element IN the list at key node_element in node_queries  
+                SET result at position determined by query_idx at key composed of node_element and value_element TO the return value of calling max_xor WITH trie_root as root AND value as value_element  
+            END FOR  
+
+            FOR each child_element IN the list at key node_element in tree  
+                CALL dfs WITH child_element  
+            END FOR  
+
+            CALL erase WITH trie_root as root AND value as node_element  
+        END FUNCTION  
+
+        FUNCTION insert WITH parameters trie_root as TrieNode AND value as integer  
+            ASSIGN current_node TO trie_root  
+            FOR bit_index FROM seventeen DOWN TO zero  
+                SET bit_value TO the integer result of value right shifted by bit_index AND with one  
+                ASSIGN current_node TO the element at key bit_value in children of current_node  
+                INCREMENT count of current_node BY one  
+            END FOR  
+        END FUNCTION  
+
+        FUNCTION erase WITH parameters trie_root as TrieNode AND value as integer  
+            ASSIGN current_node TO trie_root  
+            FOR bit_index FROM seventeen DOWN TO zero  
+                SET bit_value TO the integer result of value right shifted by bit_index AND with one  
+                ASSIGN current_node TO the element at key bit_value in children of current_node  
+                DECREMENT count of current_node BY one  
+            END FOR  
+        END FUNCTION  
+
+        FUNCTION max_xor WITH parameters trie_root as TrieNode AND value as integer  
+            ASSIGN current_node TO trie_root  
+            SET maximum_xor_value TO zero  
+            FOR bit_index FROM seventeen DOWN TO zero  
+                SET bit_value TO the integer result of value right shifted by bit_index AND with one  
+                SET toggled_bit TO one MINUS bit_value  
+                IF toggled_bit is a key in children of current_node AND count of the corresponding child is greater than zero THEN  
+                    SET maximum_xor_value TO maximum_xor_value PLUS one shifted left by bit_index  
+                    ASSIGN current_node TO the element at key toggled_bit in children of current_node  
+                ELSE  
+                    ASSIGN current_node TO the element at key bit_value in children of current_node  
+                END IF  
+            END FOR  
+            RETURN maximum_xor_value  
+        END FUNCTION  
+
+        SET query_idx TO a mapping from each pair consisting of node_element and value_element in queries to their corresponding index in the enumeration of queries  
+
+        FOR each index and parent_element IN enumeration of parents  
+            IF parent_element equals negative one THEN  
+                CALL dfs WITH index  
+                BREAK the loop  
+            END IF  
+        END FOR  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

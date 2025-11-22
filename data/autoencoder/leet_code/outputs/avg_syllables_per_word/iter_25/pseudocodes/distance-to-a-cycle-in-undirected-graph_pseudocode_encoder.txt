@@ -1,0 +1,61 @@
+CLASS Solution  
+    FUNCTION distanceToCycle WITH PARAMETERS n AND edges  
+        SET graph TO a new default dictionary with lists as default values  
+        FOR each element u comma v IN edges  
+            APPEND v TO the list associated with key u in graph  
+            APPEND u TO the list associated with key v in graph  
+        END FOR  
+        
+        FUNCTION dfs WITH PARAMETERS node AND parent AND path AND visited  
+            IF node is contained within visited THEN  
+                SET cycle_start TO the position of node within path  
+                RETURN the sublist of path starting from cycle_start to the end  
+            END IF  
+            ADD node to visited  
+            APPEND node TO path  
+            FOR each neighbor IN the list associated with node in graph  
+                IF neighbor is not equal to parent THEN  
+                    SET cycle TO the result of calling dfs with parameters neighbor comma node comma path comma visited  
+                    IF cycle is not None THEN  
+                        RETURN cycle  
+                    END IF  
+                END IF  
+            END FOR  
+            REMOVE the last element from path  
+            RETURN None  
+        END FUNCTION  
+        
+        SET visited TO an empty set  
+        SET cycle TO None  
+        FOR node FROM zero TO n MINUS one  
+            IF node is not contained within visited THEN  
+                SET cycle TO the result of calling dfs with parameters node comma negative one comma empty list comma visited  
+                IF cycle is not None THEN  
+                    BREAK out of the loop  
+                END IF  
+            END IF  
+        END FOR  
+        
+        SET distance TO a list of zeros with length equal to n  
+        SET queue TO a new deque initialized with the elements of cycle  
+        SET visited TO a set initialized with the elements of cycle  
+        
+        SET level TO zero  
+        WHILE queue is not empty DO  
+            SET iteration_count TO the current length of queue  
+            FOR iterator FROM zero TO iteration_count MINUS one  
+                REMOVE the first element from queue and assign it to node  
+                SET the element at position node of distance TO level  
+                FOR each neighbor IN the list associated with node in graph  
+                    IF neighbor is not contained within visited THEN  
+                        ADD neighbor to visited  
+                        APPEND neighbor TO queue  
+                    END IF  
+                END FOR  
+            END FOR  
+            INCREMENT level BY one  
+        END WHILE  
+        
+        RETURN distance  
+    END FUNCTION  
+END CLASS

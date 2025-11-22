@@ -1,0 +1,57 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val = 0, left = None, right = None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET root TO TreeNode WITH val AS values AT index 0  
+    SET i TO 1  
+    SET queue TO EMPTY COLLECTION  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO REMOVE FIRST ELEMENT FROM queue  
+        IF i IS LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.left TO TreeNode WITH val AS values AT i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i IS LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.right TO TreeNode WITH val AS values AT i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION pathSum(self, root, targetSum)  
+        FUNCTION helper(node, current_sum, prefix_sums)  
+            IF node IS None  
+                RETURN 0  
+            SET current_sum TO current_sum PLUS node.val  
+            SET paths_to_here TO VALUE FROM prefix_sums FOR KEY (current_sum MINUS targetSum) OR 0 IF KEY NOT FOUND  
+            SET prefix_sums AT current_sum TO VALUE FROM prefix_sums FOR current_sum OR 0 PLUS 1  
+            SET paths_in_left TO helper(node.left, current_sum, prefix_sums)  
+            SET paths_in_right TO helper(node.right, current_sum, prefix_sums)  
+            DECREMENT prefix_sums AT current_sum BY 1  
+            RETURN paths_to_here PLUS paths_in_left PLUS paths_in_right  
+        END FUNCTION  
+        SET prefix_sums TO DICTIONARY WITH KEY 0 AND VALUE 1  
+        RETURN helper(root, 0, prefix_sums)  
+    END FUNCTION  
+END CLASS

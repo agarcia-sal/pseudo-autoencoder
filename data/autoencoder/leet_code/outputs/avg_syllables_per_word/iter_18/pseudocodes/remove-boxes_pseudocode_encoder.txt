@@ -1,0 +1,32 @@
+CLASS Solution  
+    FUNCTION removeBoxes(boxes AS List of integers) RETURNS integer  
+        FUNCTION dp(l AS integer, r AS integer, k AS integer, memo AS mapping) RETURNS integer  
+            IF l IS GREATER THAN r THEN  
+                RETURN zero  
+            END IF  
+
+            IF the triple l r k IS A KEY IN memo THEN  
+                RETURN the VALUE of memo AT the triple l r k  
+            END IF  
+
+            WHILE r IS GREATER THAN l AND the element at position r of boxes EQUALS the element at position r MINUS one of boxes HOLDS  
+                DECREMENT r BY one  
+                INCREMENT k BY one  
+            END WHILE  
+
+            SET res TO the RESULT OF dp WITH PARAMETERS l AND r MINUS one AND zero AND memo PLUS the SQUARE OF k PLUS one  
+            
+            FOR i FROM l TO r MINUS one  
+                IF the element at position i of boxes EQUALS the element at position r of boxes THEN  
+                    SET candidate_result TO the RESULT OF dp WITH PARAMETERS l AND i AND k PLUS one AND memo PLUS the RESULT OF dp WITH PARAMETERS i PLUS one AND r MINUS one AND zero AND memo  
+                    SET res TO THE GREATER OF res AND candidate_result  
+                END IF  
+            END FOR  
+
+            SET memo AT the triple l r k TO res  
+            RETURN res  
+        END FUNCTION  
+
+        RETURN dp WITH PARAMETERS zero AND the LENGTH OF boxes MINUS one AND zero AND an EMPTY mapping  
+    END FUNCTION  
+END CLASS

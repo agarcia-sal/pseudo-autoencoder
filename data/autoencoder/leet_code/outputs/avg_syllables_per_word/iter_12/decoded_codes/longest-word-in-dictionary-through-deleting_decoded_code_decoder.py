@@ -1,0 +1,11 @@
+class Solution:
+    def findLongestWord(self, s: str, dictionary: list[str]) -> str:
+        def is_subsequence(word: str, s: str) -> bool:
+            it = iter(s)
+            return all(char in it for char in word)
+
+        dictionary.sort(key=lambda x: (-len(x), x))
+        for word in dictionary:
+            if is_subsequence(word, s):
+                return word
+        return ""

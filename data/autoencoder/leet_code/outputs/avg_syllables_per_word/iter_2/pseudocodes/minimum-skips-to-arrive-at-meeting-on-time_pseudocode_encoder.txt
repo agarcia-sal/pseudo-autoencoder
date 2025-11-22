@@ -1,0 +1,35 @@
+CLASS Solution
+    FUNCTION minSkips(dist: List[int], speed: int, hoursBefore: int)
+        SET n TO LENGTH OF dist
+        INITIALIZE dp AS 2D LIST OF SIZE n BY (n + 1) WITH ALL VALUES SET TO infinity
+        SET total_dist TO SUM OF dist
+        
+        IF total_dist DIVIDED BY speed GREATER THAN hoursBefore THEN
+            RETURN -1
+        END IF
+        
+        SET dp[0][0] TO dist[0]
+        FOR j FROM 1 TO n - 1
+            SET dp[0][j] TO dist[0]
+        END FOR
+        
+        FOR i FROM 1 TO n - 1
+            FOR j FROM 0 TO i
+                IF j LESS THAN i THEN
+                    SET dp[i][j] TO CEILING OF (dp[i-1][j] DIVIDED BY speed) MULTIPLIED BY speed PLUS dist[i]
+                END IF
+                IF j GREATER THAN 0 THEN
+                    SET dp[i][j] TO MINIMUM OF dp[i][j] AND dp[i-1][j-1] PLUS dist[i]
+                END IF
+            END FOR
+        END FOR
+        
+        FOR j FROM 0 TO n - 1
+            IF dp[n-1][j] LESS THAN OR EQUAL TO hoursBefore MULTIPLIED BY speed THEN
+                RETURN j
+            END IF
+        END FOR
+        
+        RETURN -1
+    END FUNCTION
+END CLASS

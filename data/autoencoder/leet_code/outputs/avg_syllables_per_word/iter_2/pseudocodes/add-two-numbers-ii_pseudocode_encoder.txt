@@ -1,0 +1,73 @@
+CLASS ListNode
+    FUNCTION __init__(val = 0, next = None)
+        SET self.val TO val
+        SET self.next TO next
+    END FUNCTION
+END CLASS
+
+FUNCTION list_node(values)
+    IF values IS EMPTY
+        RETURN None
+    END IF
+    SET head TO ListNode(values[0])
+    SET p TO head
+    FOR each val IN values FROM SECOND ELEMENT TO END
+        SET node TO ListNode(val)
+        SET p.next TO node
+        SET p TO node
+    END FOR
+    RETURN head
+END FUNCTION
+
+FUNCTION is_same_list(p1, p2)
+    IF p1 IS None AND p2 IS None
+        RETURN True
+    END IF
+    IF p1 IS None OR p2 IS None
+        RETURN False
+    END IF
+    RETURN p1.val EQUALS p2.val AND is_same_list(p1.next, p2.next)
+END FUNCTION
+
+CLASS Solution
+    FUNCTION addTwoNumbers(l1, l2)
+        FUNCTION pushIntoStack(node)
+            SET stack TO empty list
+            WHILE node IS NOT None
+                APPEND node.val TO stack
+                SET node TO node.next
+            END WHILE
+            RETURN stack
+        END FUNCTION
+
+        SET stack1 TO pushIntoStack(l1)
+        SET stack2 TO pushIntoStack(l2)
+
+        SET carry TO 0
+        SET result TO None
+
+        WHILE stack1 IS NOT EMPTY OR stack2 IS NOT EMPTY OR carry IS NOT 0
+            IF stack1 IS NOT EMPTY
+                SET val1 TO REMOVE last element FROM stack1
+            ELSE
+                SET val1 TO 0
+            END IF
+
+            IF stack2 IS NOT EMPTY
+                SET val2 TO REMOVE last element FROM stack2
+            ELSE
+                SET val2 TO 0
+            END IF
+
+            SET total TO val1 PLUS val2 PLUS carry
+            SET carry TO total DIVIDED BY 10
+            SET digit TO total MODULO 10
+
+            SET new_node TO ListNode(digit)
+            SET new_node.next TO result
+            SET result TO new_node
+        END WHILE
+
+        RETURN result
+    END FUNCTION
+END CLASS

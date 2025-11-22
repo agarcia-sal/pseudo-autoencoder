@@ -1,0 +1,36 @@
+CLASS Solution
+    FUNCTION fullJustify(words, maxWidth)
+        FUNCTION justify_line(line, num_of_letters, is_last_line)
+            IF LENGTH OF line EQUALS 1 OR is_last_line IS TRUE
+                RETURN JOIN line WITH SINGLE SPACES PLUS SPACES REPEATED (maxWidth MINUS num_of_letters MINUS LENGTH OF line PLUS 1)
+            ELSE
+                SET total_spaces TO maxWidth MINUS num_of_letters
+                SET num_of_gaps TO LENGTH OF line MINUS 1
+                SET spaces_between_words TO total_spaces DIVIDED BY num_of_gaps
+                SET extra_spaces TO total_spaces MODULO num_of_gaps
+                
+                FOR i FROM 0 TO num_of_gaps MINUS 1
+                    IF i LESS THAN extra_spaces
+                        APPEND SPACES REPEATED (spaces_between_words PLUS 1) TO line[i]
+                    ELSE
+                        APPEND SPACES REPEATED spaces_between_words TO line[i]
+                RETURN CONCATENATE ALL ELEMENTS OF line
+        END FUNCTION
+        
+        SET result TO EMPTY LIST
+        SET line TO EMPTY LIST
+        SET num_of_letters TO 0
+        
+        FOR EACH word IN words
+            IF num_of_letters PLUS LENGTH OF word PLUS LENGTH OF line GREATER THAN maxWidth
+                APPEND justify_line(line, num_of_letters, FALSE) TO result
+                SET line TO EMPTY LIST
+                SET num_of_letters TO 0
+            APPEND word TO line
+            INCREMENT num_of_letters BY LENGTH OF word
+        
+        APPEND justify_line(line, num_of_letters, TRUE) TO result
+        
+        RETURN result
+    END FUNCTION
+END CLASS

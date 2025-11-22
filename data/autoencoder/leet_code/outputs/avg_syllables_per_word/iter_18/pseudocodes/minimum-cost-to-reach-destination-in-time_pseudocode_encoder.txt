@@ -1,0 +1,38 @@
+CLASS Solution  
+    FUNCTION minCost(maxTime parameter maxTime INTEGER, edges parameter edges LIST OF LIST OF INTEGER, passingFees parameter passingFees LIST OF INTEGER) RETURNS INTEGER  
+        SET n TO the LENGTH OF passingFees  
+        SET graph TO a LIST OF empty LISTS with the LENGTH OF n  
+        
+        FOR each element edge IN edges  
+            SET x TO the element at position zero of edge  
+            SET y TO the element at position one of edge  
+            SET time TO the element at position two of edge  
+            APPEND the PAIR of y AND time TO the element at position x of graph  
+            APPEND the PAIR of x AND time TO the element at position y of graph  
+        END FOR  
+        
+        SET pq TO a LIST containing the TRIPLE of the element at position zero of passingFees AND zero AND zero  
+        SET visited_time TO a LIST of infinite value repeated n TIMES  
+        SET the element at position zero of visited_time TO zero  
+        
+        WHILE pq holds  
+            SET current_cost AND current_city AND current_time TO the result of REMOVING the SMALLEST ELEMENT from pq  
+            
+            IF current_city EQUALS n MINUS one THEN  
+                RETURN current_cost  
+            END IF  
+            
+            FOR each element neighbor AND travel_time IN the element at position current_city of graph  
+                SET new_time TO current_time PLUS travel_time  
+                SET new_cost TO current_cost PLUS the element at position neighbor of passingFees  
+                
+                IF new_time LESS THAN OR EQUAL TO maxTime AND (new_time LESS THAN the element at position neighbor of visited_time OR new_cost LESS THAN current_cost) THEN  
+                    SET the element at position neighbor of visited_time TO new_time  
+                    INSERT the TRIPLE of new_cost AND neighbor AND new_time INTO pq MAINTAINING ORDER  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

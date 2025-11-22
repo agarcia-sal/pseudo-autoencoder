@@ -1,0 +1,73 @@
+FUNCTION list_node(values_list)
+    IF values_list IS EMPTY
+        RETURN None
+    END IF
+    SET head TO ListNode(element at position one of values_list)
+    SET pointer TO head
+    FOR each value IN the SUBLIST of values_list FROM position two TO the END
+        SET node TO ListNode(value)
+        SET pointer.next TO node
+        SET pointer TO node
+    END FOR
+    RETURN head
+END FUNCTION
+
+FUNCTION is_same_list(pointer_one, pointer_two)
+    IF pointer_one IS None AND pointer_two IS None
+        RETURN True
+    END IF
+    IF pointer_one IS None OR pointer_two IS None
+        RETURN False
+    END IF
+    RETURN pointer_one.val EQUALS pointer_two.val AND CALL is_same_list WITH parameters pointer_one.next AND pointer_two.next
+END FUNCTION
+
+CLASS ListNode
+    FUNCTION __init__(val EQUALS zero, next EQUALS None)
+        SET self.val TO val
+        SET self.next TO next
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION sortList(head_pointer)
+        IF head_pointer IS None OR head_pointer.next IS None
+            RETURN head_pointer
+        END IF
+
+        FUNCTION split(head_parameter)
+            SET slow TO head_parameter
+            SET fast TO head_parameter.next
+            WHILE fast IS NOT None AND fast.next IS NOT None
+                SET slow TO slow.next
+                SET fast TO fast.next.next
+            END WHILE
+            SET mid TO slow.next
+            SET slow.next TO None
+            RETURN head_parameter, mid
+        END FUNCTION
+
+        FUNCTION merge(list_one, list_two)
+            SET dummy TO ListNode()
+            SET current TO dummy
+            WHILE list_one IS NOT None AND list_two IS NOT None
+                IF list_one.val LESS THAN list_two.val
+                    SET current.next TO list_one
+                    SET list_one TO list_one.next
+                ELSE
+                    SET current.next TO list_two
+                    SET list_two TO list_two.next
+                END IF
+                SET current TO current.next
+            END WHILE
+            SET current.next TO list_one OR list_two
+            RETURN dummy.next
+        END FUNCTION
+
+        SET left_part, right_part TO CALL split WITH parameter head_pointer
+        SET left_part TO CALL sortList WITH parameter left_part
+        SET right_part TO CALL sortList WITH parameter right_part
+
+        RETURN CALL merge WITH parameters left_part AND right_part
+    END FUNCTION
+END CLASS

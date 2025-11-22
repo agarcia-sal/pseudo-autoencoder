@@ -1,0 +1,30 @@
+CLASS Solution  
+    FUNCTION numMatchingSubseq WITH PARAMETERS s AS string AND words AS list of strings  
+        SET waiting TO a mapping FROM each distinct character in s TO an empty double-ended queue  
+        FOR each word IN words  
+            ASSIGN iterator it TO the sequence iterator of word  
+            ASSIGN first_letter TO the first element obtained from it  
+            IF first_letter is a key in waiting THEN  
+                APPEND it TO the double-ended queue associated with first_letter in waiting  
+            END IF  
+        END FOR  
+        SET match_count TO zero  
+        FOR each character c IN s  
+            IF c is a key in waiting THEN  
+                ASSIGN current_iterators TO the double-ended queue corresponding to c in waiting  
+                SET the value associated with c in waiting TO a new empty double-ended queue  
+                FOR each iterator it IN current_iterators  
+                    ASSIGN next_char TO the next element obtained from it or None if no more elements  
+                    IF next_char is None THEN  
+                        INCREMENT match_count BY one  
+                    ELSE  
+                        IF next_char is a key in waiting THEN  
+                            APPEND it TO the double-ended queue corresponding to next_char in waiting  
+                        END IF  
+                    END IF  
+                END FOR  
+            END IF  
+        END FOR  
+        RETURN match_count  
+    END FUNCTION  
+END CLASS

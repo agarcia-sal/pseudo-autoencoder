@@ -1,0 +1,50 @@
+CLASS Solution  
+    FUNCTION longestRepeating(s, queryCharacters, queryIndices)  
+        FUNCTION merge_intervals()  
+            SET i TO 0  
+            WHILE i LESS THAN LENGTH OF intervals MINUS 1  
+                IF character AT intervals[i] EQUALS character AT intervals[i PLUS 1]  
+                    SET intervals[i] TO NEW interval FROM start OF intervals[i] TO end OF intervals[i PLUS 1] WITH character OF intervals[i]  
+                    REMOVE interval AT i PLUS 1 FROM intervals  
+                ELSE  
+                    INCREMENT i BY 1  
+        END FUNCTION  
+      
+        SET intervals TO empty list  
+        SET n TO LENGTH OF s  
+        SET start TO 0  
+      
+        FOR i FROM 1 TO n MINUS 1  
+            IF character AT s[i] NOT EQUAL TO character AT s[start]  
+                APPEND interval FROM start TO i MINUS 1 WITH character s[start] TO intervals  
+                SET start TO i  
+        APPEND interval FROM start TO n MINUS 1 WITH character s[start] TO intervals  
+      
+        SET results TO empty list  
+        SET longest TO maximum length OF intervals BY computing end MINUS start PLUS 1 FOR EACH interval IN intervals  
+      
+        FOR each character char AND index idx IN queryCharacters AND queryIndices  
+            SET i TO 0  
+            WHILE i LESS THAN LENGTH OF intervals  
+                SET start, end, c TO intervals[i]  
+                IF start LESS THAN OR EQUAL TO idx AND idx LESS THAN OR EQUAL TO end  
+                    BREAK loop  
+                INCREMENT i BY 1  
+          
+            IF idx GREATER THAN start  
+                INSERT interval FROM start TO idx MINUS 1 WITH character c AT position i IN intervals  
+                SET intervals[i PLUS 1] TO interval FROM idx TO end WITH character c  
+            IF idx LESS THAN end  
+                INSERT interval FROM idx PLUS 1 TO end WITH character c AT position i PLUS 1 IN intervals  
+                SET intervals[i] TO interval FROM start TO idx WITH character c  
+          
+            SET intervals[i] TO interval FROM intervals[i]'s start TO intervals[i]'s end WITH character char  
+          
+            CALL merge_intervals()  
+          
+            SET longest TO maximum length OF intervals BY computing end MINUS start PLUS 1 FOR EACH interval IN intervals  
+            APPEND longest TO results  
+      
+        RETURN results  
+    END FUNCTION  
+END CLASS

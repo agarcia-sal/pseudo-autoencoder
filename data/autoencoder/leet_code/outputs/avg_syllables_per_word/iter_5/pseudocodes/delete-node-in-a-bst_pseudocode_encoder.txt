@@ -1,0 +1,72 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty THEN  
+        RETURN None  
+    END IF  
+    SET root TO new TreeNode with val as values at index 0  
+    SET i TO 1  
+    SET queue TO a new empty queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty DO  
+        SET node TO first element removed from queue  
+        IF i IS LESS THAN length of values AND values at i IS NOT None THEN  
+            SET node.left TO new TreeNode with val as values at i  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY 1  
+        IF i IS LESS THAN length of values AND values at i IS NOT None THEN  
+            SET node.right TO new TreeNode with val as values at i  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None THEN  
+        RETURN True  
+    ELSE IF p IS None OR q IS None THEN  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val THEN  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION deleteNode(self, root, key)  
+        IF root IS None THEN  
+            RETURN None  
+        END IF  
+        IF root.val IS GREATER THAN key THEN  
+            SET root.left TO self.deleteNode(root.left, key)  
+            RETURN root  
+        END IF  
+        IF root.val IS LESS THAN key THEN  
+            SET root.right TO self.deleteNode(root.right, key)  
+            RETURN root  
+        END IF  
+        IF root.left IS None THEN  
+            RETURN root.right  
+        END IF  
+        IF root.right IS None THEN  
+            RETURN root.left  
+        END IF  
+        SET node TO root.right  
+        WHILE node.left EXISTS DO  
+            SET node TO node.left  
+        END WHILE  
+        SET node.left TO root.left  
+        SET root TO root.right  
+        RETURN root  
+    END FUNCTION  
+END CLASS

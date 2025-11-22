@@ -1,0 +1,53 @@
+CLASS Solution  
+    FUNCTION smallestSufficientTeam(self, req_skills, people)  
+        SET skill_to_index TO an empty dictionary  
+        SET index_counter TO zero  
+        FOR each skill IN req_skills  
+            SET skill_to_index at key skill TO index_counter  
+            INCREMENT index_counter BY one  
+        END FOR  
+
+        SET total_skills TO the LENGTH OF req_skills  
+        SET total_people TO the LENGTH OF people  
+
+        SET skill_bitmasks TO a list of zeros WITH length total_people  
+
+        FOR each index i FROM zero TO total_people MINUS one  
+            FOR each skill s IN element at position i of people  
+                SET skill_bitmasks at position i TO the skill_bitmasks at position i MULTIPLIED BY zero PLUS one AND THEN MULTIPLIED BY two RAISED TO the power of skill_to_index at key s PLUS original skill_bitmasks at position i  
+            END FOR  
+        END FOR  
+
+        SET max_state TO two RAISED TO the power of total_skills  
+
+        SET f TO a list of infinite values WITH length max_state  
+        SET g TO a list of zeros WITH length max_state  
+        SET h TO a list of zeros WITH length max_state  
+
+        SET f at position zero TO zero  
+
+        FOR each state i FROM zero TO max_state MINUS one  
+            IF f at position i EQUALS infinite  
+                CONTINUE to next iteration  
+            END IF  
+            FOR each person j FROM zero TO total_people MINUS one  
+                SET combined_state TO bitwise OR of i AND skill_bitmasks at position j  
+                IF f at position i PLUS one LESS THAN f at position combined_state  
+                    SET f at position combined_state TO f at position i PLUS one  
+                    SET g at position combined_state TO j  
+                    SET h at position combined_state TO i  
+                END IF  
+            END FOR  
+        END FOR  
+
+        SET i TO max_state MINUS one  
+        SET answer TO an empty list  
+
+        WHILE i NOT EQUAL TO zero  
+            APPEND g at position i TO answer  
+            SET i TO h at position i  
+        END WHILE  
+
+        RETURN answer  
+    END FUNCTION  
+END CLASS

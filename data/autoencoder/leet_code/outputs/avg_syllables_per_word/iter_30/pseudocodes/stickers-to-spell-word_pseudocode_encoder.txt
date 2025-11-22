@@ -1,0 +1,27 @@
+CLASS Solution  
+    FUNCTION minStickers(stickers AS list of strings, target AS string) RETURNS integer  
+        SET sticker_counters TO list formed by CONVERTING each sticker TO a frequency map of characters  
+        SORT sticker_counters BY the NEGATIVE of the HIGHEST frequency count in each frequency map  
+        INITIALIZE queue AS a double ended queue containing a pair consisting of target string AND zero  
+        INITIALIZE memoization dictionary WITH key target AND value zero  
+        WHILE queue IS NOT EMPTY  
+            REMOVE the first element from queue AND ASSIGN to current_target AND used_stickers  
+            FOR each sticker_frequency_map IN sticker_counters  
+                IF the character at position one OF current_target IS NOT IN sticker_frequency_map THEN  
+                    CONTINUE to next iteration  
+                END IF  
+                CREATE remaining_counts AS frequency map of characters in current_target  
+                SUBTRACT sticker_frequency_map counts FROM remaining_counts  
+                CREATE new_target_string BY SORTING AND JOINING the characters from remaining_counts  
+                IF new_target_string IS EMPTY THEN  
+                    RETURN used_stickers PLUS one  
+                END IF  
+                IF new_target_string IS NOT A KEY IN memoization THEN  
+                    SET memoization entry for new_target_string TO used_stickers PLUS one  
+                    APPEND pair of new_target_string AND used_stickers PLUS one TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

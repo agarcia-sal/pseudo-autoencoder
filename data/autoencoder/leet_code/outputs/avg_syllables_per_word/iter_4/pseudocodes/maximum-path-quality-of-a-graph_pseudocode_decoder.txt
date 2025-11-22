@@ -1,0 +1,34 @@
+```
+CLASS Solution
+    FUNCTION maximalPathQuality(values, edges, maxTime)
+        SET graph TO empty map with default empty list
+        
+        FOR each (u, v, time) IN edges
+            APPEND (v, time) TO graph[u]
+            APPEND (u, time) TO graph[v]
+        
+        SET visited TO empty set
+        SET max_quality TO 0
+        
+        FUNCTION dfs(node, current_time, current_quality)
+            PREVENT max_quality from being local
+            
+            IF node EQUALS 0 THEN
+                SET max_quality TO maximum of max_quality and current_quality
+            
+            FOR each (neighbor, time) IN graph[node]
+                IF time LESS THAN OR EQUAL TO current_time THEN
+                    IF neighbor NOT IN visited THEN
+                        ADD neighbor TO visited
+                        CALL dfs(neighbor, current_time MINUS time, current_quality PLUS values[neighbor])
+                        REMOVE neighbor FROM visited
+                    ELSE
+                        CALL dfs(neighbor, current_time MINUS time, current_quality)
+        
+        ADD 0 TO visited
+        CALL dfs(0, maxTime, values[0])
+        
+        RETURN max_quality
+    END FUNCTION
+END CLASS
+```

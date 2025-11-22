@@ -1,0 +1,41 @@
+CLASS Solution
+    FUNCTION isValid(code: string) RETURNS bool
+        IMPORT regular_expression_module AS re
+        
+        SET cdata_pattern TO '<!\[CDATA\[.*?\]\]>'
+        SET code TO re SUBSTITUTE cdata_pattern WITH '' IN code
+        
+        SET stack TO empty list
+        SET i TO 0
+        
+        WHILE i LESS THAN LENGTH OF code
+            IF code AT i EQUALS '<' THEN
+                SET j TO POSITION OF '>' IN code AFTER i+1
+                IF j EQUALS -1 THEN
+                    RETURN False
+                
+                SET tag_content TO SUBSTRING OF code FROM i+1 TO j-1
+                
+                IF tag_content IS EMPTY THEN
+                    RETURN False
+                
+                IF FIRST CHARACTER OF tag_content EQUALS '/' THEN
+                    SET tag_name TO SUBSTRING OF tag_content FROM 2 TO END
+                    IF stack IS EMPTY OR TOP OF stack NOT EQUAL TO tag_name THEN
+                        RETURN False
+                    REMOVE TOP OF stack
+                ELSE IF FIRST CHARACTER OF tag_content EQUALS '!' THEN
+                    RETURN False
+                ELSE
+                    IF LENGTH OF tag_content LESS THAN 1 OR GREATER THAN 9 OR tag_content IS NOT ALL UPPERCASE THEN
+                        RETURN False
+                    ADD tag_content TO stack
+                
+                SET i TO j + 1
+            ELSE
+                INCREMENT i BY 1
+        
+        SET has_valid_tag TO LENGTH OF re FIND ALL PATTERNS '<[A-Z]+>.*</[A-Z]+>' IN code GREATER THAN 0
+        RETURN stack IS EMPTY AND has_valid_tag
+    END FUNCTION
+END CLASS

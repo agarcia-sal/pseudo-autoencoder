@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION wordPatternMatch(pattern string_parameter s string_parameter) RETURNS boolean  
+        FUNCTION backtrack(pattern_index integer_parameter string_index integer_parameter mapping dictionary_parameter used set_parameter) RETURNS boolean  
+            IF pattern_index EQUALS the LENGTH OF pattern AND string_index EQUALS the LENGTH OF s  
+                RETURN true  
+            END IF  
+            IF pattern_index EQUALS the LENGTH OF pattern OR string_index EQUALS the LENGTH OF s  
+                RETURN false  
+            END IF  
+            
+            SET current_char TO element at position pattern_index of pattern  
+            IF current_char EXISTS IN mapping  
+                SET word TO the value ASSOCIATED WITH current_char IN mapping  
+                IF the substring of s from position string_index TO the position string_index PLUS the LENGTH OF word NOT EQUALS word  
+                    RETURN false  
+                END IF  
+                IF backtrack(pattern_index PLUS one, string_index PLUS the LENGTH OF word, mapping, used) IS true  
+                    RETURN true  
+                END IF  
+            ELSE  
+                FOR end FROM string_index PLUS one TO the LENGTH OF s PLUS one  
+                    SET word TO the substring of s from position string_index TO position end  
+                    IF word EXISTS IN used  
+                        CONTINUE TO the next iteration  
+                    END IF  
+                    SET mapping current_char TO word  
+                    ADD word TO used  
+                    IF backtrack(pattern_index PLUS one, end, mapping, used) IS true  
+                        RETURN true  
+                    END IF  
+                    REMOVE the entry ASSOCIATED WITH current_char FROM mapping  
+                    REMOVE word FROM used  
+                END FOR  
+            END IF  
+            
+            RETURN false  
+        END FUNCTION  
+        
+        RETURN backtrack(zero, zero, an empty dictionary, an empty set)  
+    END FUNCTION  
+END CLASS

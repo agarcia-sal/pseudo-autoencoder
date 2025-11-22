@@ -1,0 +1,86 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val WITH DEFAULT 0, left WITH DEFAULT None, right WITH DEFAULT None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET root TO NEW TreeNode WITH val EQUALS values AT INDEX 0  
+    SET i TO 1  
+    INITIALIZE queue AS new empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO REMOVE FIRST ELEMENT FROM queue  
+        IF i LESS THAN LENGTH OF values AND values AT INDEX i IS NOT None  
+            SET node.left TO NEW TreeNode WITH val EQUALS values AT INDEX i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i LESS THAN LENGTH OF values AND values AT INDEX i IS NOT None  
+            SET node.right TO NEW TreeNode WITH val EQUALS values AT INDEX i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN CALL is_same_tree WITH p.left AND q.left AND CALL is_same_tree WITH p.right AND q.right  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION boundaryOfBinaryTree(root)  
+        IF root IS None  
+            RETURN empty list  
+        
+        FUNCTION is_leaf(node)  
+            RETURN node.left IS None AND node.right IS None  
+        END FUNCTION  
+        
+        SET left_boundary TO empty list  
+        SET current TO root.left  
+        WHILE current IS NOT None  
+            IF NOT CALL is_leaf WITH current  
+                APPEND current.val TO left_boundary  
+            IF current.left IS NOT None  
+                SET current TO current.left  
+            ELSE  
+                SET current TO current.right  
+        
+        SET right_boundary TO empty list  
+        SET current TO root.right  
+        WHILE current IS NOT None  
+            IF NOT CALL is_leaf WITH current  
+                APPEND current.val TO right_boundary  
+            IF current.right IS NOT None  
+                SET current TO current.right  
+            ELSE  
+                SET current TO current.left  
+        
+        SET leaves TO empty list  
+        FUNCTION collect_leaves(node)  
+            IF node IS None  
+                RETURN  
+            IF CALL is_leaf WITH node  
+                APPEND node.val TO leaves  
+            CALL collect_leaves WITH node.left  
+            CALL collect_leaves WITH node.right  
+        END FUNCTION  
+        
+        CALL collect_leaves WITH root  
+        
+        IF CALL is_leaf WITH root  
+            SET leaves TO empty list  
+        
+        RETURN list COMPOSED OF root.val FOLLOWED BY left_boundary FOLLOWED BY leaves FOLLOWED BY right_boundary IN REVERSE ORDER  
+    END FUNCTION  
+END CLASS

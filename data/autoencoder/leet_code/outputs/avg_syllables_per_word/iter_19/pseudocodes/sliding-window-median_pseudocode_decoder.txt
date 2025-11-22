@@ -1,0 +1,62 @@
+CLASS Solution  
+    FUNCTION medianSlidingWindow(nums, k)  
+        SET lo TO empty list  
+        SET hi TO empty list  
+
+        FUNCTION balance_heaps()  
+            IF the LENGTH OF lo IS GREATER THAN the LENGTH OF hi PLUS one  
+                REMOVE the element at position zero FROM lo AND ASSIGN IT TO variable temp_value  
+                PUSH the NEGATION OF temp_value INTO hi  
+            ELSE IF the LENGTH OF hi IS GREATER THAN the LENGTH OF lo  
+                REMOVE the element at position zero FROM hi AND ASSIGN IT TO variable temp_value  
+                PUSH the NEGATION OF temp_value INTO lo  
+            END IF  
+        END FUNCTION  
+
+        FUNCTION add_num(num)  
+            IF lo IS empty OR num IS LESS THAN OR EQUAL TO NEGATION OF the element at position zero OF lo  
+                PUSH the NEGATION OF num INTO lo  
+            ELSE  
+                PUSH num INTO hi  
+            END IF  
+            CALL balance_heaps()  
+        END FUNCTION  
+
+        FUNCTION remove_num(num)  
+            IF num IS LESS THAN OR EQUAL TO NEGATION OF the element at position zero OF lo  
+                REMOVE the NEGATION OF num FROM lo  
+                IF lo IS NOT empty  
+                    REORGANIZE lo INTO a heap structure  
+                END IF  
+            ELSE  
+                REMOVE num FROM hi  
+                IF hi IS NOT empty  
+                    REORGANIZE hi INTO a heap structure  
+                END IF  
+            END IF  
+            CALL balance_heaps()  
+        END FUNCTION  
+
+        FUNCTION get_median()  
+            IF the LENGTH OF lo IS GREATER THAN the LENGTH OF hi  
+                RETURN the NEGATION OF the element at position zero OF lo  
+            ELSE  
+                RETURN the SUM OF the NEGATION OF the element at position zero OF lo AND the element at position zero OF hi DIVIDED BY two  
+            END IF  
+        END FUNCTION  
+
+        FOR index FROM zero TO k MINUS one  
+            CALL add_num(element at position index OF nums)  
+        END FOR  
+
+        SET medians TO a list CONTAINING the result of get_median()  
+
+        FOR index FROM k TO the LENGTH OF nums MINUS one  
+            CALL add_num(element at position index OF nums)  
+            CALL remove_num(element at position index MINUS k OF nums)  
+            APPEND the result of get_median() TO medians  
+        END FOR  
+
+        RETURN medians  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION gridIllumination with parameters n integer lamps list of list of integer queries list of list of integer RETURNS list of integer  
+        SET row_count TO a dictionary that returns integer zero for any new key  
+        SET col_count TO a dictionary that returns integer zero for any new key  
+        SET diag_count TO a dictionary that returns integer zero for any new key representing the difference between row and column  
+        SET anti_diag_count TO a dictionary that returns integer zero for any new key representing the sum of row and column  
+        
+        SET lamp_positions TO an empty set to store pairs of integers for lamp coordinates  
+        
+        FOR each pair of integers r and c IN lamps  
+            IF the pair of r and c is not in lamp_positions  
+                ADD the pair of r and c to lamp_positions  
+                INCREMENT the value at key r in row_count BY one  
+                INCREMENT the value at key c in col_count BY one  
+                INCREMENT the value at key difference of r MINUS c in diag_count BY one  
+                INCREMENT the value at key sum of r PLUS c in anti_diag_count BY one  
+            END IF  
+        END FOR  
+        
+        SET directions TO the list of nine pairs of integers representing all combinations of minus one zero and one for row and column offsets including zero zero itself  
+        
+        SET result TO an empty list  
+        
+        FOR each pair of integers r and c IN queries  
+            IF the value at key r in row_count is GREATER THAN zero OR the value at key c in col_count is GREATER THAN zero OR the value at key difference of r MINUS c in diag_count is GREATER THAN zero OR the value at key sum of r PLUS c in anti_diag_count is GREATER THAN zero  
+                APPEND integer one TO result  
+            ELSE  
+                APPEND integer zero TO result  
+            END IF  
+            
+            FOR each pair of integers dr and dc IN directions  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                IF the pair of nr and nc is in lamp_positions  
+                    REMOVE the pair of nr and nc FROM lamp_positions  
+                    DECREMENT the value at key nr in row_count BY one  
+                    DECREMENT the value at key nc in col_count BY one  
+                    DECREMENT the value at key difference of nr MINUS nc in diag_count BY one  
+                    DECREMENT the value at key sum of nr PLUS nc in anti_diag_count BY one  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

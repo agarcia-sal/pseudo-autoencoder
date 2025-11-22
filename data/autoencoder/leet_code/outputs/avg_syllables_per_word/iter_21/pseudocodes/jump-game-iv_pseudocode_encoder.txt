@@ -1,0 +1,71 @@
+CLASS Solution  
+    FUNCTION minJumps(arr)  
+        SET n TO the LENGTH OF arr  
+        IF n EQUALS one  
+            RETURN zero  
+        END IF  
+          
+        CALL create_value_indices WITH arr RETURNING value_indices  
+          
+        CALL create_queue WITH zero zero RETURNING queue  
+        CALL create_visited WITH zero RETURNING visited  
+          
+        WHILE queue IS NOT EMPTY  
+            CALL dequeue_from_queue RETURNING current_index AND steps  
+              
+            IF current_index EQUALS n MINUS one  
+                RETURN steps  
+            END IF  
+              
+            CALL assemble_next_indices WITH current_index AND n AND value_indices AND arr RETURNING next_indices  
+              
+            FOR each next_index IN next_indices  
+                IF next_index IS GREATER THAN OR EQUAL TO zero AND next_index IS LESS THAN n AND next_index IS NOT IN visited  
+                    ADD next_index TO visited  
+                    CALL enqueue_to_queue WITH next_index AND steps PLUS one  
+                END IF  
+            END FOR  
+              
+            CALL clear_value_indices_for_value WITH value_indices AND arr AND current_index  
+        END WHILE  
+          
+        RETURN minus one  
+    END FUNCTION  
+      
+    FUNCTION create_value_indices(arr)  
+        SET value_indices TO a new mapping FROM default empty list  
+        FOR each position AND value IN arr WITH their positions AND values  
+            APPEND position TO the list MAPPED BY value_indices FOR value  
+        END FOR  
+        RETURN value_indices  
+    END FUNCTION  
+      
+    FUNCTION create_queue(starting_index, starting_steps)  
+        CREATE a new deque CONTAINING a pair of starting_index AND starting_steps  
+        RETURN this deque  
+    END FUNCTION  
+      
+    FUNCTION create_visited(starting_index)  
+        CREATE a new set CONTAINING starting_index  
+        RETURN this set  
+    END FUNCTION  
+      
+    FUNCTION dequeue_from_queue()  
+        REMOVE the first element FROM queue AND SET this element TO current_index AND steps  
+        RETURN current_index AND steps  
+    END FUNCTION  
+      
+    FUNCTION assemble_next_indices(current_index, n, value_indices, arr)  
+        SET next_indices TO a new list CONTAINING current_index PLUS one AND current_index MINUS one  
+        APPEND all positions FROM value_indices FOR the value at position current_index OF arr TO next_indices  
+        RETURN next_indices  
+    END FUNCTION  
+      
+    FUNCTION enqueue_to_queue(next_index, next_steps)  
+        APPEND the pair of next_index AND next_steps TO queue  
+    END FUNCTION  
+      
+    FUNCTION clear_value_indices_for_value(value_indices, arr, current_index)  
+        SET the list MAPPED BY value_indices FOR the value at position current_index OF arr TO an empty list  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,58 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS None, right EQUALS None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values EQUALS empty THEN  
+        RETURN None  
+    END IF  
+    SET root TO NEW TreeNode WITH PARAMETERS the element at position zero OF values  
+    SET i TO one  
+    SET queue TO NEW deque  
+    CALL queue APPEND WITH PARAMETERS root  
+    WHILE queue HOLDS elements  
+        SET node TO the element REMOVED FROM THE LEFT OF queue  
+        IF i LESS THAN the LENGTH OF values AND the element at position i OF values IS NOT None THEN  
+            SET node.left TO NEW TreeNode WITH PARAMETERS the element at position i OF values  
+            CALL queue APPEND WITH PARAMETERS node.left  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN the LENGTH OF values AND the element at position i OF values IS NOT None THEN  
+            SET node.right TO NEW TreeNode WITH PARAMETERS the element at position i OF values  
+            CALL queue APPEND WITH PARAMETERS node.right  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p EQUALS None AND q EQUALS None THEN  
+        RETURN True  
+    ELSE IF p EQUALS None OR q EQUALS None THEN  
+        RETURN False  
+    ELSE IF the val property OF p NOT EQUALS the val property OF q THEN  
+        RETURN False  
+    ELSE  
+        RETURN the CALL TO is_same_tree WITH PARAMETERS the left property OF p AND the left property OF q  
+        AND the CALL TO is_same_tree WITH PARAMETERS the right property OF p AND the right property OF q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION constructMaximumBinaryTree(self, nums)  
+        IF nums EQUALS empty THEN  
+            RETURN None  
+        END IF  
+        SET max_val TO THE MAXIMUM value IN nums  
+        SET max_index TO THE POSITION OF THE FIRST OCCURRENCE OF max_val IN nums  
+        SET root TO NEW TreeNode WITH PARAMETERS max_val  
+        SET root.left TO THE CALL TO constructMaximumBinaryTree WITH PARAMETERS THE SUBLIST OF nums FROM position zero TO max_index MINUS one  
+        SET root.right TO THE CALL TO constructMaximumBinaryTree WITH PARAMETERS THE SUBLIST OF nums FROM position max_index PLUS one TO THE END OF THE LIST  
+        RETURN root  
+    END FUNCTION  
+END CLASS

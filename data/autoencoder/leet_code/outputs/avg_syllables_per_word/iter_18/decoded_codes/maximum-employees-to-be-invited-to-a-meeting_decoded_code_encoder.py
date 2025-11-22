@@ -1,0 +1,61 @@
+from collections import defaultdict, deque
+from typing import List, DefaultDict
+
+class Solution:
+    def maximumInvitations(self, favorite: List[int]) -> int:
+        n = len(favorite)
+        graph: DefaultDict[int, List[int]] = defaultdict(list)
+        in_degree = [0] * n
+
+        for i in range(n):
+            graph[favorite[i]].append(i)
+            in_degree[favorite[i]] += 1
+
+        def find_chain_length(start: int, graph: DefaultDict[int, List[int]], visited: List[bool]) -> int:
+            length = 0
+            queue = deque([start])
+            visited[start] = True
+            while queue:
+                current = queue.popleft()
+                for neighbor in graph[current]:
+                    if not visited[neighbor]:
+                        visited[neighbor] = True
+                        queue.append(neighbor)
+                        length += 1
+            return length
+
+        mutual_chains = 0
+        visited = [False] * n
+
+        for i in range(n):
+            if favorite[favorite[i]] == i and i < favorite[i]:
+                a, b = i, favorite[i]
+                chain_a = find_chain_length(a, graph, visited[:])
+                chain_b = find_chain_length(b, graph, visited[:])
+                mutual_chains += chain_a + chain_b + 2  # Include the mutual pair nodes themselves
+
+        def find_cycle_length(start: int, graph: DefaultDict[int, List[int]], visited: List[bool], favorite: List[int]) -> int:
+            if visited[start]:
+                return 0
+            stack = []
+            current = start
+            while not visited[current]:
+                visited[current] = True
+                stack.append(current)
+                current = favorite[current]
+            if current not in stack:
+                return 0
+            cycle_start_index = stack.index(current)
+            cycle_length = len(stack) - cycle_start_index
+            return cycle_length
+
+        longest_cycle = 0
+        visited = [False] * n
+
+        for i in range(n):
+            if not visited[i]:
+                cycle_length = find_cycle_length(i, graph, visited, favorite)
+                if cycle_length > longest_cycle:
+                    longest_cycle = cycle_length
+
+        return max(mutual_chains, longest_cycle)

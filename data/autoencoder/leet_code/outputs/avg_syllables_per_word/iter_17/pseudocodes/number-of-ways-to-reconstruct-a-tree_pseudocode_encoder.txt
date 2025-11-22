@@ -1,0 +1,49 @@
+CLASS Solution
+    FUNCTION checkWays(pairs_of_lists_of_integers)
+        SET graph TO CALL defaultdict WITH parameter set
+        
+        FOR each pair_element_x_and_y IN pairs_of_lists_of_integers
+            CALL method add WITH parameter y ON element at position x of graph
+            CALL method add WITH parameter x ON element at position y of graph
+        END FOR
+        
+        SET max_degree_node TO the element IN keys of graph WITH maximum value of the LENGTH OF element at position node of graph
+        SET number_of_nodes TO the LENGTH OF keys of graph
+        
+        IF the LENGTH OF element at position max_degree_node of graph IS NOT EQUAL TO number_of_nodes MINUS one
+            RETURN zero
+        END IF
+        
+        FUNCTION can_be_parent(node_u, node_v)
+            RETURN for ALL neighbor IN element at position node_v of graph the condition neighbor IS IN element at position node_u of graph OR neighbor EQUALS node_u holds
+        END FUNCTION
+        
+        SET ways TO one
+        
+        FOR each node_u IN keys of graph
+            IF node_u EQUALS max_degree_node
+                CONTINUE
+            END IF
+            
+            SET parent_node TO None
+            
+            FOR each node_v IN element at position node_u of graph
+                IF node_v IS IN keys of graph AND the LENGTH OF element at position node_v of graph GREATER THAN OR EQUAL TO the LENGTH OF element at position node_u of graph AND CALL can_be_parent WITH parameters node_v AND node_u
+                    IF parent_node IS None OR the LENGTH OF element at position node_v of graph LESS THAN the LENGTH OF element at position parent_node of graph
+                        SET parent_node TO node_v
+                    END IF
+                END IF
+            END FOR
+            
+            IF parent_node IS None
+                RETURN zero
+            END IF
+            
+            IF the LENGTH OF element at position parent_node of graph EQUALS the LENGTH OF element at position node_u of graph
+                SET ways TO two
+            END IF
+        END FOR
+        
+        RETURN ways
+    END FUNCTION
+END CLASS

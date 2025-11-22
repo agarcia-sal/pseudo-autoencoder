@@ -1,0 +1,31 @@
+CLASS Solution  
+    FUNCTION minTransfers(transactions)  
+        SET balance TO an empty mapping  
+        FOR each tuple of from_person to_person and amount IN transactions  
+            SET the value at key from_person in balance TO the value at key from_person in balance OR zero MINUS amount  
+            SET the value at key to_person in balance TO the value at key to_person in balance OR zero PLUS amount  
+        END FOR  
+        SET balances TO a list of each net_balance IN the collection of values in balance WHERE net_balance is NOT EQUAL TO zero  
+        IF the LENGTH OF balances EQUALS zero THEN  
+            RETURN zero  
+        END IF  
+        FUNCTION settle(start, cnt)  
+            WHILE start LESS THAN the LENGTH OF balances AND the element at position start of balances EQUALS zero  
+                INCREMENT start BY one  
+            END WHILE  
+            IF start EQUALS the LENGTH OF balances THEN  
+                RETURN cnt  
+            END IF  
+            SET min_cnt TO positive infinity  
+            FOR each i FROM start PLUS one TO the LENGTH OF balances MINUS one  
+                IF the element at position start of balances MULTIPLIED BY the element at position i of balances LESS THAN zero THEN  
+                    INCREMENT the element at position i of balances BY the element at position start of balances  
+                    SET min_cnt TO the smaller of min_cnt AND the value returned by settle with start PLUS one and cnt PLUS one as arguments  
+                    DECREMENT the element at position i of balances BY the element at position start of balances  
+                END IF  
+            END FOR  
+            RETURN min_cnt  
+        END FUNCTION  
+        RETURN the value returned by settle with zero and zero as arguments  
+    END FUNCTION  
+END CLASS

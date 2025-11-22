@@ -1,0 +1,43 @@
+CLASS Solution
+    FUNCTION pathsWithMaxScore(board)
+        SET modulus_value TO ten raised to the power of nine PLUS one
+        SET board_size TO the LENGTH OF board
+
+        INITIALIZE dynamic_programming_grid TO a two dimensional grid of size board_size by board_size FILLED WITH pairs WHERE first element IS negative infinity AND second element IS zero
+
+        SET the element at position board_size MINUS one, board_size MINUS one OF dynamic_programming_grid TO a pair where first element IS zero AND second element IS one
+
+        FOR row_index FROM board_size MINUS one DOWN TO zero INCLUSIVE
+            FOR column_index FROM board_size MINUS one DOWN TO zero INCLUSIVE
+                IF the element at position row_index, column_index OF board IS EQUAL TO character 'X' OR the element at position row_index, column_index OF board IS EQUAL TO character 'S'
+                    CONTINUE TO the next iteration
+                END IF
+
+                IF the element at position row_index, column_index OF board IS NOT EQUAL TO character 'E'
+                    SET current_value TO the integer conversion OF the element at position row_index, column_index OF board
+                ELSE
+                    SET current_value TO zero
+                END IF
+
+                FOR each pair OF relative_row_shift AND relative_column_shift IN the collection of pairs consisting of one and zero, zero and one, one and one
+                    SET new_row TO row_index PLUS relative_row_shift
+                    SET new_column TO column_index PLUS relative_column_shift
+
+                    IF new_row IS GREATER THAN OR EQUAL TO zero AND new_row IS LESS THAN board_size AND new_column IS GREATER THAN OR EQUAL TO zero AND new_column IS LESS THAN board_size
+                        IF the first element of the pair at position new_row, new_column OF dynamic_programming_grid IS GREATER THAN the first element of the pair at position row_index, column_index OF dynamic_programming_grid
+                            SET the pair at position row_index, column_index OF dynamic_programming_grid TO a pair where first element IS the first element at position new_row, new_column OF dynamic_programming_grid PLUS current_value AND second element IS the second element at position new_row, new_column OF dynamic_programming_grid
+                        ELSE IF the first element at position new_row, new_column OF dynamic_programming_grid IS EQUAL TO the first element at position row_index, column_index OF dynamic_programming_grid
+                            SET the second element at position row_index, column_index OF dynamic_programming_grid TO the sum OF the second element at position row_index, column_index OF dynamic_programming_grid PLUS the second element at position new_row, new_column OF dynamic_programming_grid MODULO modulus_value
+                        END IF
+                    END IF
+                END FOR
+            END FOR
+        END FOR
+
+        IF the first element at position zero, zero OF dynamic_programming_grid IS EQUAL TO negative infinity
+            RETURN a pair consisting of zero AND zero
+        END IF
+
+        RETURN the pair at position zero, zero OF dynamic_programming_grid
+    END FUNCTION
+END CLASS

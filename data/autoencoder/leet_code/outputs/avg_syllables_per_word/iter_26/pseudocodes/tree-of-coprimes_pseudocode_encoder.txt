@@ -1,0 +1,50 @@
+CLASS Solution
+    FUNCTION getCoprimes(numbers_list, edges_list)
+        SET number_of_nodes TO the LENGTH OF numbers_list
+        ASSIGN reference TO a new mapping from default empty lists called adjacency_tree
+        FOR each pair of nodes current_node AND connected_node IN edges_list
+            APPEND connected_node TO the element at position current_node OF adjacency_tree
+            APPEND current_node TO the element at position connected_node OF adjacency_tree
+        END FOR
+        
+        ASSIGN reference TO a two dimensional list coprime_matrix with dimensions fifty by fifty FILLED WITH boolean FALSE
+        FOR index_i FROM one TO fifty INCLUSIVE
+            FOR index_j FROM one TO fifty INCLUSIVE
+                SET the element at position index_i AND position index_j OF coprime_matrix TO TRUE IF the greatest common divisor of index_i AND index_j EQUALS one OTHERWISE TO FALSE
+            END FOR
+        END FOR
+        
+        ASSIGN reference TO a list result_array FILLED WITH negative one with length number_of_nodes
+        ASSIGN reference TO a list ancestor_stack FILLED WITH none with length fifty to hold tuples of node and depth
+        
+        FUNCTION dfs(current_node, parent_node, current_depth)
+            SET closest_coprime_ancestor TO negative one
+            SET maximum_ancestor_depth TO negative one
+            FOR value_index FROM one TO fifty INCLUSIVE
+                IF the element at position current_node OF numbers_list IS COPRIME with value_index AND the element at position value_index OF ancestor_stack IS NOT none
+                    ASSIGN ancestor_node AND ancestor_depth TO the element at position value_index OF ancestor_stack
+                    IF ancestor_depth IS GREATER THAN maximum_ancestor_depth
+                        SET maximum_ancestor_depth TO ancestor_depth
+                        SET closest_coprime_ancestor TO ancestor_node
+                    END IF
+                END IF
+            END FOR
+            SET the element at position current_node OF result_array TO closest_coprime_ancestor
+            
+            ASSIGN original_ancestor TO the element at position the element at position current_node OF numbers_list OF ancestor_stack
+            SET the element at position the element at position current_node OF numbers_list OF ancestor_stack TO the tuple of current_node AND current_depth
+            
+            FOR each child_node IN the element at position current_node OF adjacency_tree
+                IF child_node IS NOT EQUAL TO parent_node
+                    CALL dfs WITH child_node, current_node, current_depth PLUS one
+                END IF
+            END FOR
+            
+            SET the element at position the element at position current_node OF numbers_list OF ancestor_stack TO original_ancestor
+        END FUNCTION
+        
+        CALL dfs WITH zero, negative one, zero
+        
+        RETURN result_array
+    END FUNCTION
+END CLASS

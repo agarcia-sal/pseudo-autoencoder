@@ -1,0 +1,33 @@
+CLASS Solution
+    FUNCTION minDays(grid)
+        FUNCTION dfs(x, y, visited)
+            IF x < 0 OR x >= LENGTH OF grid OR y < 0 OR y >= LENGTH OF grid[0] OR (x, y) IN visited OR grid[x][y] == 0
+                RETURN
+            ADD (x, y) TO visited
+            FOR EACH (dx, dy) IN [(-1, 0), (1, 0), (0, -1), (0, 1)]
+                CALL dfs(x + dx, y + dy, visited)
+        END FUNCTION
+
+        FUNCTION is_connected()
+            SET visited TO EMPTY SET
+            SET land_cells TO LIST OF (i, j) WHERE i FROM 0 TO LENGTH OF grid AND j FROM 0 TO LENGTH OF grid[0] AND grid[i][j] == 1
+            IF land_cells IS EMPTY
+                RETURN TRUE
+            CALL dfs(land_cells[0][0], land_cells[0][1], visited)
+            RETURN LENGTH OF visited EQUALS LENGTH OF land_cells
+        END FUNCTION
+
+        IF NOT is_connected()
+            RETURN 0
+
+        FOR i FROM 0 TO LENGTH OF grid MINUS 1
+            FOR j FROM 0 TO LENGTH OF grid[0] MINUS 1
+                IF grid[i][j] == 1
+                    SET grid[i][j] TO 0
+                    IF NOT is_connected()
+                        RETURN 1
+                    SET grid[i][j] TO 1
+
+        RETURN 2
+    END FUNCTION
+END CLASS

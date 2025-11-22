@@ -1,0 +1,60 @@
+CLASS Solution  
+    FUNCTION colorTheGrid WITH PARAMETERS m AND n  
+        SET MOD TO ten raised to the power of nine PLUS one  
+        
+        FUNCTION generate_valid_columns WITH PARAMETER prev_col  
+            SET colors TO list containing one two and three  
+            SET valid_cols TO empty list  
+            
+            FUNCTION backtrack WITH PARAMETERS col AND row  
+                IF row EQUALS m THEN  
+                    APPEND tuple version of col TO valid_cols  
+                    RETURN  
+                END IF  
+                FOR each color IN colors  
+                    IF col IS empty OR last element of col NOT EQUALS color THEN  
+                        IF prev_col IS NOT null AND element at position row of prev_col EQUALS color THEN  
+                            CONTINUE  
+                        END IF  
+                        APPEND color TO col  
+                        CALL backtrack WITH col AND row PLUS one  
+                        REMOVE last element FROM col  
+                    END IF  
+                END FOR  
+            END FUNCTION  
+            
+            CALL backtrack WITH empty list AND zero  
+            RETURN valid_cols  
+        END FUNCTION  
+        
+        SET all_valid_cols TO generate_valid_columns WITH null  
+        SET num_valid_cols TO the LENGTH OF all_valid_cols  
+        
+        SET compatible_cols TO mapping FROM each index FROM zero TO num_valid_cols MINUS one TO empty list  
+        FOR i FROM zero TO num_valid_cols MINUS one  
+            FOR j FROM zero TO num_valid_cols MINUS one  
+                IF FOR each k FROM zero TO m MINUS one element at position k of all_valid_cols at position i NOT EQUALS element at position k of all_valid_cols at position j THEN  
+                    APPEND j TO compatible_cols at key i  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET dp TO list of one repeated num_valid_cols times  
+        
+        FOR unused_variable FROM one TO n MINUS one  
+            SET next_dp TO list of zero repeated num_valid_cols times  
+            FOR i FROM zero TO num_valid_cols MINUS one  
+                FOR each j IN compatible_cols at key i  
+                    SET element at position j of next_dp TO element at position j of next_dp PLUS element at position i of dp MODULO MOD  
+                END FOR  
+            END FOR  
+            SET dp TO next_dp  
+        END FOR  
+        
+        SET total_ways TO zero  
+        FOR each value IN dp  
+            INCREMENT total_ways BY value  
+        END FOR  
+        RETURN total_ways MODULO MOD  
+    END FUNCTION  
+END CLASS

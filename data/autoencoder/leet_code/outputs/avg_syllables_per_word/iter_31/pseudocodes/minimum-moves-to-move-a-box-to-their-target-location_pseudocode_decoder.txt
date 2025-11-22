@@ -1,0 +1,49 @@
+CLASS Solution  
+    FUNCTION minPushBox(grid)  
+        SET directions TO list of pairs consisting of negative one and zero PLUS one and zero PLUS zero and negative one PLUS zero and one  
+        FOR i FROM zero TO the LENGTH OF grid MINUS one  
+            FOR j FROM zero TO the LENGTH OF first element of grid MINUS one  
+                IF element at position i of grid AND element at position j of that element EQUALS the character S  
+                    SET player_start TO pair consisting of i AND j  
+                ELSE IF element at position i of grid AND element at position j of that element EQUALS the character B  
+                    SET box_start TO pair consisting of i AND j  
+                ELSE IF element at position i of grid AND element at position j of that element EQUALS the character T  
+                    SET target TO pair consisting of i AND j  
+                END IF  
+            END FOR  
+        END FOR  
+        CREATE queue as a deque containing a tuple of player_start AND box_start AND zero  
+        CREATE visited as an empty set  
+        ADD tuple of player_start AND box_start TO visited  
+        WHILE queue is not empty  
+            REMOVE and RETURN the element from the left of queue and ASSIGN TO player_pos AND box_pos AND push_count  
+            IF box_pos EQUALS target  
+                RETURN push_count  
+            END IF  
+            FOR each dx AND dy IN directions  
+                SET new_player_pos TO pair consisting of first element of player_pos PLUS dx AND second element of player_pos PLUS dy  
+                IF the result of calling is_valid_position with new_player_pos AND grid IS true  
+                    IF new_player_pos EQUALS box_pos  
+                        SET new_box_pos TO pair consisting of first element of box_pos PLUS dx AND second element of box_pos PLUS dy  
+                        IF the result of calling is_valid_position with new_box_pos AND grid IS true AND tuple of new_player_pos AND new_box_pos NOT IN visited  
+                            ADD tuple of new_player_pos AND new_box_pos TO visited  
+                            APPEND tuple of new_player_pos AND new_box_pos AND push_count PLUS one TO queue  
+                        END IF  
+                    ELSE  
+                        IF tuple of new_player_pos AND box_pos NOT IN visited  
+                            ADD tuple of new_player_pos AND box_pos TO visited  
+                            APPEND tuple of new_player_pos AND box_pos AND push_count TO queue  
+                        END IF  
+                    END IF  
+                END IF  
+            END FOR  
+        END WHILE  
+        RETURN the negative one integer  
+    END FUNCTION  
+  
+    FUNCTION is_valid_position(position, grid)  
+        SET x TO first element of position  
+        SET y TO second element of position  
+        RETURN a boolean expression checking that zero LESS THAN OR EQUAL TO x AND x LESS THAN the LENGTH OF grid AND zero LESS THAN OR EQUAL TO y AND y LESS THAN the LENGTH OF first element of grid AND element at position x of grid AND element at position y of that element NOT EQUALS the character representing a wall symbol  
+    END FUNCTION  
+END CLASS

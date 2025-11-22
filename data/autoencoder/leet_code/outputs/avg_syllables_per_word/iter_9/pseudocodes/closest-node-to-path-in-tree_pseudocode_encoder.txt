@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION closestNode(self, n, edges, query)  
+        SET graph TO result of calling DEFAULT DICTIONARY with LIST as default value provider  
+        FOR each pair u, v IN edges  
+            APPEND v TO graph AT u  
+            APPEND u TO graph AT v  
+        END FOR  
+        
+        FUNCTION find_path(start, end)  
+            SET queue TO a new double ended queue containing a tuple of start and a list containing start  
+            SET visited TO a new SET containing start  
+            
+            WHILE queue is not empty  
+                REMOVE first element FROM queue AND SET AS tuple of node and path  
+                IF node EQUALS end THEN  
+                    RETURN path  
+                END IF  
+                FOR each neighbor IN graph AT node  
+                    IF neighbor NOT IN visited THEN  
+                        ADD neighbor TO visited  
+                        APPEND a tuple of neighbor and concatenation of path and list containing neighbor TO queue  
+                    END IF  
+                END FOR  
+            END WHILE  
+        END FUNCTION  
+        
+        FUNCTION closest_node_on_path(path, node)  
+            SET min_distance TO positive infinity  
+            SET closest_node TO None  
+            FOR each p IN path  
+                SET distance TO length of result of calling find_path with p and node MINUS one  
+                IF distance LESS THAN min_distance THEN  
+                    SET min_distance TO distance  
+                    SET closest_node TO p  
+                END IF  
+            END FOR  
+            RETURN closest_node  
+        END FUNCTION  
+        
+        SET answer TO an empty list  
+        FOR each triple start, end, node IN query  
+            SET path TO result of calling find_path with start and end  
+            APPEND result of calling closest_node_on_path with path and node TO answer  
+        END FOR  
+        
+        RETURN answer  
+    END FUNCTION  
+END CLASS

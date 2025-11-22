@@ -1,0 +1,36 @@
+CLASS Solution  
+    FUNCTION numSubmatrixSumTarget(matrix, target)  
+        FUNCTION subarraySum(nums, target)  
+            SET count TO zero  
+            SET seen_sums TO a map with default integer zero value  
+            SET cumulative_sum TO zero  
+            FOR each num IN nums  
+                SET cumulative_sum TO cumulative_sum PLUS num  
+                IF cumulative_sum EQUALS target  
+                    INCREMENT count BY one  
+                END IF  
+                IF seen_sums CONTAINS key cumulative_sum MINUS target  
+                    INCREMENT count BY value at key cumulative_sum MINUS target IN seen_sums  
+                END IF  
+                INCREMENT value at key cumulative_sum IN seen_sums BY one  
+            END FOR  
+            RETURN count  
+        END FUNCTION  
+        
+        SET rows TO the LENGTH OF matrix  
+        SET cols TO the LENGTH OF element at position zero OF matrix  
+        SET total_count TO zero  
+        
+        FOR top FROM zero TO rows MINUS one  
+            SET current_cols TO a new list of zeros with length cols  
+            FOR bottom FROM top TO rows MINUS one  
+                FOR col FROM zero TO cols MINUS one  
+                    SET element at position col OF current_cols TO element at position col OF current_cols PLUS element at position col OF element at position bottom OF matrix  
+                END FOR  
+                SET total_count TO total_count PLUS subarraySum(current_cols, target)  
+            END FOR  
+        END FOR  
+        
+        RETURN total_count  
+    END FUNCTION  
+END CLASS

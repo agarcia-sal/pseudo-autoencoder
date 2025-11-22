@@ -1,0 +1,54 @@
+CLASS Solution  
+    FUNCTION findPaths(m, n, maxMove, startRow, startColumn)  
+        SET MODULO_VALUE TO ten POWERED BY nine PLUS seven  
+        
+        SET list_of_directions TO list containing elements of pair zero AND one then pair zero AND negative one then pair one AND zero then pair negative one AND zero  
+        
+        CREATE three_dimensional_array dp WITH dimensions m BY n BY maxMove PLUS one FILLED WITH zeroes  
+        
+        FOR each number_of_moves FROM one TO maxMove  
+            FOR each row_index FROM zero TO m MINUS one  
+                FOR each column_index FROM zero TO n MINUS one  
+                    FOR each pair_of_direction IN list_of_directions  
+                        SET direction_row_offset TO first element of pair_of_direction  
+                        SET direction_column_offset TO second element of pair_of_direction  
+                        SET new_row_index TO row_index PLUS direction_row_offset  
+                        SET new_column_index TO column_index PLUS direction_column_offset  
+                        
+                        IF new_row_index LESS THAN zero OR new_row_index GREATER THAN OR EQUAL TO m OR new_column_index LESS THAN zero OR new_column_index GREATER THAN OR EQUAL TO n  
+                            SET dp_element TO element at position row_index of dp  
+                            SET dp_sub_element TO element at position column_index of dp_element  
+                            SET dp_value TO element at position number_of_moves of dp_sub_element  
+                            INCREMENT dp_value BY one  
+                            SET dp_value TO dp_value MODULO MODULO_VALUE  
+                            SET element at position number_of_moves of dp_sub_element TO dp_value  
+                            SET element at position column_index of dp_element TO dp_sub_element  
+                            SET element at position row_index of dp TO dp_element  
+                        ELSE  
+                            SET dp_element TO element at position row_index of dp  
+                            SET dp_sub_element TO element at position column_index of dp_element  
+                            SET current_dp_value TO element at position number_of_moves of dp_sub_element  
+                            
+                            SET adjacent_dp_element TO element at position new_row_index of dp  
+                            SET adjacent_dp_sub_element TO element at position new_column_index of adjacent_dp_element  
+                            SET previous_dp_value TO element at position number_of_moves MINUS one of adjacent_dp_sub_element  
+                            
+                            SET updated_dp_value TO current_dp_value PLUS previous_dp_value  
+                            SET updated_dp_value TO updated_dp_value MODULO MODULO_VALUE  
+                            
+                            SET element at position number_of_moves of dp_sub_element TO updated_dp_value  
+                            SET element at position column_index of dp_element TO dp_sub_element  
+                            SET element at position row_index of dp TO dp_element  
+                        END IF  
+                    END FOR  
+                END FOR  
+            END FOR  
+        END FOR  
+        
+        SET result_dp_element TO element at position startRow of dp  
+        SET result_dp_sub_element TO element at position startColumn of result_dp_element  
+        SET final_result TO element at position maxMove of result_dp_sub_element  
+        
+        RETURN final_result  
+    END FUNCTION  
+END CLASS

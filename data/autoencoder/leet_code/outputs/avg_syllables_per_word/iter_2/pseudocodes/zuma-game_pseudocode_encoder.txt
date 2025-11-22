@@ -1,0 +1,44 @@
+CLASS Solution
+    FUNCTION findMinStep(board, hand)
+        FUNCTION clean(board)
+            SET stack TO empty list
+            FOR each ball IN board
+                IF stack NOT empty AND stack last element's ball NOT EQUAL ball AND stack last element's count GREATER OR EQUAL 3
+                    REMOVE last element FROM stack
+                IF stack empty OR stack last element's ball NOT EQUAL ball
+                    APPEND [ball, 1] TO stack
+                ELSE
+                    INCREMENT stack last element's count BY 1
+            IF stack NOT empty AND stack last element's count GREATER OR EQUAL 3
+                REMOVE last element FROM stack
+            RETURN concatenation OF each ball repeated count times FROM stack
+        END FUNCTION
+
+        FUNCTION dfs(board, hand_counter)
+            IF board is empty
+                RETURN 0
+            SET min_steps TO infinity
+            SET i TO 0
+            WHILE i LESS THAN length of board
+                SET j TO i + 1
+                WHILE j LESS THAN length of board AND board at i EQUALS board at j
+                    INCREMENT j BY 1
+                SET increment TO 3 MINUS (j MINUS i)
+                IF hand_counter for board at i GREATER OR EQUAL increment
+                    SET new_hand_counter TO copy OF hand_counter
+                    DECREMENT new_hand_counter for board at i BY increment
+                    SET new_board TO clean(concatenate substring of board before i AND substring after j)
+                    SET steps TO dfs(new_board, new_hand_counter)
+                    IF steps GREATER OR EQUAL 0
+                        SET min_steps TO minimum OF min_steps AND steps PLUS increment
+                SET i TO j
+            IF min_steps EQUALS infinity
+                RETURN -1
+            ELSE
+                RETURN min_steps
+        END FUNCTION
+
+        SET hand_counter TO count occurrences OF each character IN hand
+        RETURN dfs(board, hand_counter)
+    END FUNCTION
+END CLASS

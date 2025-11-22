@@ -1,0 +1,54 @@
+CLASS Solution  
+    FUNCTION findMinStep(board, hand)  
+        FUNCTION clean(board)  
+            SET stack TO empty list  
+            FOR each ball IN board  
+                IF stack IS NOT empty AND the first element of the last item in stack DOES NOT EQUAL ball AND the second element of the last item in stack IS GREATER THAN OR EQUAL TO three  
+                    REMOVE the last item FROM stack  
+                END IF  
+                IF stack IS empty OR the first element of the last item in stack DOES NOT EQUAL ball  
+                    APPEND a list containing ball and one TO stack  
+                ELSE  
+                    INCREMENT the second element of the last item in stack BY one  
+                END IF  
+            END FOR  
+            IF stack IS NOT empty AND the second element of the last item in stack IS GREATER THAN OR EQUAL TO three  
+                REMOVE the last item FROM stack  
+            END IF  
+            RETURN the concatenation of each first element repeated by its second element FROM all items IN stack  
+        END FUNCTION  
+
+        FUNCTION dfs(board, hand_counter)  
+            IF board IS empty  
+                RETURN zero  
+            END IF  
+            SET min_steps TO positive infinity  
+            SET i TO zero  
+            WHILE i IS LESS THAN the LENGTH OF board  
+                SET j TO i PLUS one  
+                WHILE j IS LESS THAN the LENGTH OF board AND the element at position i OF board EQUALS the element at position j OF board  
+                    INCREMENT j BY one  
+                END WHILE  
+                SET increment TO three MINUS (j MINUS i)  
+                IF the value corresponding to the element at position i OF board IN hand_counter IS GREATER THAN OR EQUAL TO increment  
+                    SET new_hand_counter TO a copy OF hand_counter  
+                    DECREMENT the value corresponding to the element at position i OF board IN new_hand_counter BY increment  
+                    SET new_board TO CALL clean WITH PARAMETERS the substring from position zero TO i OF board concatenated WITH the substring from position j TO the end OF board  
+                    SET steps TO CALL dfs WITH PARAMETERS new_board AND new_hand_counter  
+                    IF steps IS GREATER THAN OR EQUAL TO zero  
+                        SET min_steps TO the minimum OF min_steps AND steps PLUS increment  
+                    END IF  
+                END IF  
+                SET i TO j  
+            END WHILE  
+            IF min_steps IS EQUAL TO positive infinity  
+                RETURN negative one  
+            ELSE  
+                RETURN min_steps  
+            END IF  
+        END FUNCTION  
+
+        SET hand_counter TO a new counter created FROM hand  
+        RETURN CALL dfs WITH PARAMETERS board AND hand_counter  
+    END FUNCTION  
+END CLASS

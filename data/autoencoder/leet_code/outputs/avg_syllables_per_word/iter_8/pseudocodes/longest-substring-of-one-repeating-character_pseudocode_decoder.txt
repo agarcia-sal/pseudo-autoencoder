@@ -1,0 +1,49 @@
+CLASS Solution  
+    FUNCTION longestRepeating(s, queryCharacters, queryIndices)  
+        FUNCTION merge_intervals()  
+            SET i TO 0  
+            WHILE i LESS THAN LENGTH OF intervals MINUS 1  
+                IF intervals AT i CHARACTER EQUALS intervals AT i PLUS 1 CHARACTER  
+                    SET intervals AT i TO (intervals AT i START, intervals AT i PLUS 1 END, intervals AT i CHARACTER)  
+                    REMOVE intervals AT i PLUS 1  
+                ELSE  
+                    INCREMENT i BY 1  
+        END FUNCTION  
+        
+        SET intervals TO empty list  
+        SET n TO LENGTH OF s  
+        SET start TO 0  
+        FOR i FROM 1 TO n MINUS 1  
+            IF CHARACTER s AT i NOT EQUAL TO CHARACTER s AT start  
+                APPEND (start, i MINUS 1, CHARACTER s AT start) TO intervals  
+                SET start TO i  
+        APPEND (start, n MINUS 1, CHARACTER s AT start) TO intervals  
+        
+        SET results TO empty list  
+        SET longest TO maximum LENGTH OF intervals BY (end MINUS start PLUS 1)  
+        
+        FOR EACH char, idx IN queryCharacters AND queryIndices  
+            SET i TO 0  
+            WHILE i LESS THAN LENGTH OF intervals  
+                SET start, end, c TO intervals AT i  
+                IF start LESS THAN OR EQUAL TO idx AND idx LESS THAN OR EQUAL TO end  
+                    BREAK  
+                INCREMENT i BY 1  
+            
+            IF idx GREATER THAN start  
+                INSERT (start, idx MINUS 1, c) INTO intervals AT i  
+                SET intervals AT i PLUS 1 TO (idx, end, c)  
+            IF idx LESS THAN end  
+                INSERT (idx PLUS 1, end, c) INTO intervals AT i PLUS 1  
+                SET intervals AT i TO (start, idx, c)  
+            
+            SET intervals AT i TO (intervals AT i START, intervals AT i END, char)  
+            
+            CALL merge_intervals()  
+            
+            SET longest TO maximum LENGTH OF intervals BY (end MINUS start PLUS 1)  
+            APPEND longest TO results  
+        
+        RETURN results  
+    END FUNCTION  
+END CLASS

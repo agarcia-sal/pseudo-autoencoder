@@ -1,0 +1,89 @@
+CLASS Solution  
+    FUNCTION cutOffTree(forest)  
+        IF forest EQUALS empty OR element at position zero OF forest EQUALS empty  
+            RETURN negative one  
+        END IF  
+        
+        CALL getAllTrees FROM forest AND ASSIGN result TO trees  
+        CALL sortTrees ON trees  
+        
+        FUNCTION bfs(start, end)  
+            IF start EQUALS end  
+                RETURN zero  
+            END IF  
+            SET m TO LENGTH OF forest  
+            SET n TO LENGTH OF element at position zero OF forest  
+            CALL initializeQueue WITH start AND ASSIGN TO queue  
+            CALL initializeVisitedSet WITH start AND ASSIGN TO visited  
+            SET steps TO zero  
+            
+            WHILE queue IS NOT empty  
+                SET currentLevelSize TO LENGTH OF queue  
+                FOR index FROM zero TO currentLevelSize MINUS one  
+                    CALL removeFirstElement FROM queue AND ASSIGN TO element  
+                    DECOMPOSE element INTO x AND y  
+                    FOR each pair dx AND dy IN collection of pairs negative one AND zero, one AND zero, zero AND negative one, zero AND one  
+                        SET nx TO x PLUS dx  
+                        SET ny TO y PLUS dy  
+                        IF nx GREATER THAN OR EQUAL TO zero AND nx LESS THAN m AND ny GREATER THAN OR EQUAL TO zero AND ny LESS THAN n AND pair nx AND ny NOT IN visited AND element at position nx OF forest AT position ny NOT EQUAL TO zero  
+                            IF pair nx AND ny EQUALS end  
+                                RETURN steps PLUS one  
+                            END IF  
+                            ADD pair nx AND ny TO visited  
+                            ADD pair nx AND ny TO queue  
+                        END IF  
+                    END FOR  
+                END FOR  
+                INCREMENT steps BY one  
+            END WHILE  
+            
+            RETURN negative one  
+        END FUNCTION  
+        
+        SET x TO zero  
+        SET y TO zero  
+        SET total_steps TO zero  
+        
+        FOR each triple height AND tx AND ty IN trees  
+            SET steps TO CALL bfs WITH PARAMETERS start as pair x AND y AND end as pair tx AND ty  
+            IF steps EQUALS negative one  
+                RETURN negative one  
+            END IF  
+            INCREMENT total_steps BY steps  
+            SET x TO tx  
+            SET y TO ty  
+        END FOR  
+        
+        RETURN total_steps  
+    END FUNCTION  
+        
+    FUNCTION getAllTrees(forest)  
+        SET result TO empty list  
+        SET rows TO LENGTH OF forest  
+        SET columns TO LENGTH OF element at position zero OF forest  
+        FOR i FROM zero TO rows MINUS one  
+            FOR j FROM zero TO columns MINUS one  
+                IF element at position i OF forest AT position j GREATER THAN one  
+                    APPEND triple of element at position i OF forest AT position j AND i AND j TO result  
+                END IF  
+            END FOR  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+    
+    FUNCTION sortTrees(trees)  
+        SORT trees IN ascending order BASED ON first element OF each triple  
+    END FUNCTION  
+      
+    FUNCTION initializeQueue(start)  
+        CREATE new empty double-ended queue  
+        ADD start TO queue  
+        RETURN queue  
+    END FUNCTION  
+    
+    FUNCTION initializeVisitedSet(start)  
+        CREATE new empty set  
+        ADD start TO set  
+        RETURN set  
+    END FUNCTION  
+END CLASS

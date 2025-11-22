@@ -1,0 +1,162 @@
+CLASS Term  
+    FUNCTION __init__(self coefficient variables)  
+        SET self.coefficient TO coefficient  
+        SET self.variables TO variables  
+    END FUNCTION  
+  
+    FUNCTION __lt__(self other)  
+        IF the LENGTH OF self.variables NOT EQUALS the LENGTH OF other.variables  
+            RETURN the LENGTH OF self.variables GREATER THAN the LENGTH OF other.variables  
+        END IF  
+        SET self_joined TO the STRING obtained by joining the elements in self.variables with the string consisting of a single asterisk  
+        SET other_joined TO the STRING obtained by joining the elements in other.variables with the string consisting of a single asterisk  
+        RETURN self_joined LESS THAN other_joined  
+    END FUNCTION  
+  
+    FUNCTION __repr__(self)  
+        IF the LENGTH OF self.variables EQUALS zero  
+            RETURN the STRING representation of self.coefficient  
+        END IF  
+        RETURN the STRING obtained by concatenating the STRING representation of self.coefficient with a single asterisk and then the STRING obtained by joining the elements in self.variables with the string consisting of a single asterisk  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Expression  
+    FUNCTION __init__(self)  
+        SET self.terms TO a new mapping with default integer zero for missing keys  
+    END FUNCTION  
+  
+    FUNCTION add_term(self term)  
+        SET key TO the tuple obtained by sorting the elements of term.variables  
+        INCREMENT the value at self.terms for the key BY term.coefficient  
+    END FUNCTION  
+  
+    FUNCTION multiply(self other)  
+        SET result TO a new Expression  
+        FOR each key_vars_one and value_coeff_one IN the items of self.terms  
+            FOR each key_vars_two and value_coeff_two IN the items of other.terms  
+                SET combined_vars_list TO the result of sorting the list obtained by concatenating the list form of key_vars_one and the list form of key_vars_two  
+                CALL result.add_term with a new Term with coefficient equal to value_coeff_one MULTIPLIED BY value_coeff_two and variables equal to combined_vars_list  
+            END FOR  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+  
+    FUNCTION add(self other)  
+        FOR each key_vars and value_coeff IN the items of other.terms  
+            CALL self.add_term with a new Term with coefficient equal to value_coeff and variables equal to the list form of key_vars  
+        END FOR  
+        RETURN self  
+    END FUNCTION  
+  
+    FUNCTION subtract(self other)  
+        FOR each key_vars and value_coeff IN the items of other.terms  
+            CALL self.add_term with a new Term with coefficient equal to NEGATIVE value_coeff and variables equal to the list form of key_vars  
+        END FOR  
+        RETURN self  
+    END FUNCTION  
+  
+    FUNCTION evaluate(self var_map)  
+        SET result TO a new Expression  
+        FOR each key_vars and value_coeff IN the items of self.terms  
+            SET new_vars_list TO an empty list  
+            FOR each variable IN key_vars  
+                IF variable is a key in var_map  
+                    APPEND the STRING representation of the value in var_map for variable TO new_vars_list  
+                ELSE  
+                    APPEND variable TO new_vars_list  
+                END IF  
+            END FOR  
+            IF the LENGTH OF new_vars_list IS zero  
+                SET new_coefficient TO one  
+            ELSE  
+                SET expression_string TO the STRING obtained by concatenating all elements in new_vars_list without any separator  
+                SET new_coefficient TO the numerical evaluation of the expression_string  
+            END IF  
+            CALL result.add_term with a new Term with coefficient equal to value_coeff MULTIPLIED BY new_coefficient and an empty list for variables  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+  
+    FUNCTION simplify(self)  
+        SET simplified_terms TO a list of new Terms each created with coefficient equal to value_coeff and variables equal to the list form of key_vars for each key_vars and value_coeff in the items of self.terms where value_coeff NOT EQUALS zero  
+        SORT simplified_terms using the __lt__ ordering of Term  
+        RETURN simplified_terms  
+    END FUNCTION  
+  
+    FUNCTION __repr__(self)  
+        RETURN the STRING obtained by joining with a string consisting of a single space then plus then a single space the result of mapping the __repr__ function over each element in self.simplify()  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION basicCalculatorIV(self expression evalvars evalints)  
+        SET var_map TO a new mapping created by associating each element of evalvars with the corresponding element of evalints  
+        SET tokens TO the list of substrings in expression matching the patterns for left parenthesis right parenthesis plus minus asterisk sequences of digits and sequences of word characters  
+        SET output TO an empty list  
+        SET operators TO an empty list  
+  
+        FUNCTION apply_operator()  
+            SET right_operand TO the last element removed from output  
+            SET left_operand TO the last element removed from output  
+            SET operator TO the last element removed from operators  
+            IF operator EQUALS the plus symbol  
+                APPEND the result of calling add on left_operand with right_operand TO output  
+            ELSE IF operator EQUALS the minus symbol  
+                APPEND the result of calling subtract on left_operand with right_operand TO output  
+            ELSE IF operator EQUALS the asterisk symbol  
+                APPEND the result of calling multiply on left_operand with right_operand TO output  
+            END IF  
+        END FUNCTION  
+  
+        SET index TO zero  
+        WHILE index LESS THAN the LENGTH OF tokens  
+            SET token TO the element at position index of tokens  
+            IF token consists of only digits  
+                APPEND a new Expression TO output  
+                CALL the add_term function of the last element in output with a new Term with coefficient equal to the integer value of token and an empty list for variables  
+            ELSE IF token consists only of alphabetic characters  
+                APPEND a new Expression TO output  
+                SET coefficient_value TO the value in var_map for token if it exists otherwise one  
+                IF coefficient_value EQUALS one  
+                    IF token is not a key in var_map  
+                        CALL the add_term function of the last element in output with a new Term with coefficient one and a list containing token as variables  
+                    ELSE  
+                        CALL the add_term function of the last element in output with a new Term with coefficient one and an empty list for variables  
+                    END IF  
+                ELSE  
+                    CALL the add_term function of the last element in output with a new Term with coefficient coefficient_value and an empty list for variables  
+                END IF  
+            ELSE IF token EQUALS the left parenthesis symbol  
+                APPEND token TO operators  
+            ELSE IF token EQUALS the right parenthesis symbol  
+                WHILE operators is not empty AND the last element of operators does NOT EQUAL the left parenthesis symbol  
+                    CALL apply_operator  
+                END WHILE  
+                REMOVE the last element from operators  
+            ELSE IF token EQUALS one of the plus symbol minus symbol or asterisk symbol  
+                WHILE operators is not empty AND the last element of operators does NOT EQUAL the left parenthesis symbol AND ( token EQUALS plus symbol OR token EQUALS minus symbol OR the last element of operators EQUALS asterisk symbol )  
+                    CALL apply_operator  
+                END WHILE  
+                APPEND token TO operators  
+            END IF  
+            INCREMENT index BY one  
+        END WHILE  
+  
+        WHILE operators is not empty  
+            CALL apply_operator  
+        END WHILE  
+  
+        SET simplified_terms TO the result of calling simplify on the first element of output  
+        SET result_strings TO an empty list  
+        FOR each term IN simplified_terms  
+            IF the LENGTH OF term.variables IS greater than zero  
+                SET term_string TO the STRING obtained by concatenating the STRING representation of term.coefficient with a single asterisk and then the STRING obtained by joining the elements in term.variables with a single asterisk  
+                APPEND term_string TO result_strings  
+            ELSE  
+                APPEND the STRING representation of term.coefficient TO result_strings  
+            END IF  
+        END FOR  
+        RETURN result_strings  
+    END FUNCTION  
+END CLASS

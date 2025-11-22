@@ -1,0 +1,62 @@
+CLASS TreeNode  
+    FUNCTION __init__(val DEFAULT TO 0, left DEFAULT TO None, right DEFAULT TO None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN None  
+    END IF  
+    SET root TO CALL TreeNode WITH values at first position  
+    SET i TO 1  
+    SET queue TO empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO REMOVE first element FROM queue  
+        IF i LESS THAN length of values AND values at i IS NOT None  
+            SET node.left TO CALL TreeNode WITH values at i  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY 1  
+        IF i LESS THAN length of values AND values at i IS NOT None  
+            SET node.right TO CALL TreeNode WITH values at i  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN CALL is_same_tree WITH p.left AND q.left AND CALL is_same_tree WITH p.right AND q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION pathSum(root, targetSum)  
+        FUNCTION helper(node, current_sum, prefix_sums)  
+            IF node IS None  
+                RETURN 0  
+            END IF  
+            SET current_sum TO current_sum PLUS node.val  
+            SET paths_to_here TO value FROM prefix_sums WITH key current_sum MINUS targetSum OR 0 IF key NOT FOUND  
+            SET prefix_sums[current_sum] TO value FROM prefix_sums WITH key current_sum OR 0 PLUS 1  
+            SET paths_in_left TO CALL helper WITH node.left, current_sum, prefix_sums  
+            SET paths_in_right TO CALL helper WITH node.right, current_sum, prefix_sums  
+            DECREMENT prefix_sums[current_sum] BY 1  
+            RETURN paths_to_here PLUS paths_in_left PLUS paths_in_right  
+        END FUNCTION  
+        SET prefix_sums TO dictionary WITH key 0 MAPPED TO 1  
+        RETURN CALL helper WITH root, 0, prefix_sums  
+    END FUNCTION  
+END CLASS

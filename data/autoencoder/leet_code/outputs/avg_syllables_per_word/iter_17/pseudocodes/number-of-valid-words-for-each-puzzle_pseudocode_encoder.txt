@@ -1,0 +1,38 @@
+CLASS Solution
+    FUNCTION findNumOfValidWords(words, puzzles)
+        FUNCTION to_mask(string_s)
+            SET mask TO zero
+            FOR each character IN string_s
+                SET mask TO mask OR one SHIFTED LEFT BY the UNICODE code point of character MINUS the UNICODE code point of letter a
+            END FOR
+            RETURN mask
+        END FUNCTION
+
+        CREATE a dictionary word_count WITH default integer zero value
+
+        FOR each word IN words
+            SET mask TO CALL to_mask WITH word
+            IF the NUMBER OF ONE BITS IN mask IS LESS THAN OR EQUAL TO seven
+                INCREMENT the value FOR key mask IN word_count BY one
+            END IF
+        END FOR
+
+        CREATE an empty list result
+
+        FOR each puzzle IN puzzles
+            SET first_char_mask TO one SHIFTED LEFT BY the UNICODE code point of the element at position zero of puzzle MINUS the UNICODE code point of letter a
+            SET puzzle_mask TO CALL to_mask WITH the substring from position one TO the END OF string puzzle
+            SET count TO the value FOR key first_char_mask IN word_count
+
+            SET subset TO puzzle_mask
+            WHILE subset IS NOT zero
+                INCREMENT count BY the value FOR key the BITWISE OR OF subset AND first_char_mask IN word_count
+                SET subset TO the BITWISE AND OF the BITWISE MINUS OF subset BY one AND puzzle_mask
+            END WHILE
+
+            APPEND count TO result
+        END FOR
+
+        RETURN result
+    END FUNCTION
+END CLASS

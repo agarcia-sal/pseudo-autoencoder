@@ -1,0 +1,150 @@
+CLASS Term  
+    FUNCTION __init__(self, coefficient, variables)  
+        SET self.coefficient TO coefficient  
+        SET self.variables TO variables  
+    END FUNCTION  
+  
+    FUNCTION __lt__(self, other)  
+        IF the LENGTH OF self.variables NOT EQUALS the LENGTH OF other.variables THEN  
+            RETURN the LENGTH OF self.variables GREATER THAN the LENGTH OF other.variables  
+        END IF  
+        RETURN the string formed by JOINING elements of self.variables WITH THE WORD multiplication SIGN LESS THAN the string formed by JOINING elements of other.variables WITH THE WORD multiplication SIGN  
+    END FUNCTION  
+  
+    FUNCTION __repr__(self)  
+        IF the LENGTH OF self.variables EQUALS zero THEN  
+            RETURN the STRING REPRESENTATION OF self.coefficient  
+        END IF  
+        RETURN the STRING REPRESENTATION OF self.coefficient FOLLOWED BY THE WORD multiplication SIGN FOLLOWED BY THE JOINING OF elements of self.variables WITH THE WORD multiplication SIGN  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Expression  
+    FUNCTION __init__(self)  
+        SET self.terms TO a DEFAULT DICTIONARY WITH DEFAULT INTEGER ZERO  
+    END FUNCTION  
+  
+    FUNCTION add_term(self, term)  
+        SET key TO the TUPLE OF the SORTED list of term.variables  
+        INCREMENT the value in self.terms at key BY term.coefficient  
+    END FUNCTION  
+  
+    FUNCTION multiply(self, other)  
+        SET result TO a NEW INSTANCE OF Expression  
+        FOR each pair of variables vars1 AND coefficient coeff1 IN the items of self.terms  
+            FOR each pair of variables vars2 AND coefficient coeff2 IN the items of other.terms  
+                SET combined_vars TO the SORTED list of elements in vars1 PLUS elements in vars2  
+                CALL the add_term FUNCTION OF result WITH a NEW Term CREATED WITH coefficient coeff1 MULTIPLIED BY coeff2 AND combined_vars  
+            END FOR  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+  
+    FUNCTION add(self, other)  
+        FOR each pair of variables vars AND coefficient coeff IN the items of other.terms  
+            CALL the add_term FUNCTION OF self WITH a NEW Term CREATED WITH coefficient coeff AND variables AS the list of vars  
+        END FOR  
+        RETURN self  
+    END FUNCTION  
+  
+    FUNCTION subtract(self, other)  
+        FOR each pair of variables vars AND coefficient coeff IN the items of other.terms  
+            CALL the add_term FUNCTION OF self WITH a NEW Term CREATED WITH coefficient the NEGATION OF coeff AND variables AS the list of vars  
+        END FOR  
+        RETURN self  
+    END FUNCTION  
+  
+    FUNCTION evaluate(self, var_map)  
+        SET result TO a NEW INSTANCE OF Expression  
+        FOR each pair of variables vars AND coefficient coeff IN the items of self.terms  
+            SET new_vars TO an EMPTY list  
+            FOR each variable var IN vars  
+                IF var IS A KEY IN var_map THEN  
+                    APPEND the STRING REPRESENTATION OF the value at var_map WITH key var TO new_vars  
+                ELSE  
+                    APPEND var TO new_vars  
+                END IF  
+            END FOR  
+            IF the LENGTH OF new_vars IS GREATER THAN zero THEN  
+                SET new_coeff TO the EVALUATION OF the concatenation of elements in new_vars AS a string EXPRESSED IN natural language FORM  
+            ELSE  
+                SET new_coeff TO one  
+            END IF  
+            CALL the add_term FUNCTION OF result WITH a NEW Term CREATED WITH coefficient coeff MULTIPLIED BY new_coeff AND an EMPTY list FOR variables  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+  
+    FUNCTION simplify(self)  
+        SET simplified_terms TO the LIST OF Term CREATED WITH coefficient coeff AND variables AS a list of vars FOR each pair of vars AND coeff IN the items of self.terms WHERE coeff NOT EQUALS zero  
+        SORT simplified_terms IN ASCENDING ORDER USING Term’s __lt__ FUNCTION  
+        RETURN simplified_terms  
+    END FUNCTION  
+  
+    FUNCTION __repr__(self)  
+        RETURN the STRING CREATED BY JOINING WITH THE STRING representation OF EACH Term IN the result of self.simplify USING THE STRING WITH THE WORD plus BETWEEN TERMS  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION basicCalculatorIV(self, expression, evalvars, evalints)  
+        SET var_map TO a DICTIONARY CREATED BY PAIRING each element of evalvars WITH the CORRESPONDING element of evalints  
+        SET tokens TO the LIST OF substrings FROM expression WHERE substrings ARE any OF the following natural language tokens open parenthesis close parenthesis plus minus multiplication integer numbers or words representing variables  
+        SET output TO an EMPTY list  
+        SET operators TO an EMPTY list  
+  
+        FUNCTION apply_operator()  
+            SET right TO the LAST element REMOVED FROM output  
+            SET left TO the LAST element REMOVED FROM output  
+            SET op TO the LAST element REMOVED FROM operators  
+            IF op EQUALS the word plus THEN  
+                APPEND the result of left.add(right) TO output  
+            ELSE IF op EQUALS the word minus THEN  
+                APPEND the result of left.subtract(right) TO output  
+            ELSE IF op EQUALS the word multiplication THEN  
+                APPEND the result of left.multiply(right) TO output  
+            END IF  
+        END FUNCTION  
+  
+        SET i TO zero  
+        WHILE i LESS THAN the LENGTH OF tokens DO  
+            SET token TO the element at position i OF tokens  
+            IF token REPRESENTS a digit THEN  
+                APPEND a NEW INSTANCE OF Expression TO output  
+                CALL the add_term FUNCTION OF the LAST element of output WITH a NEW Term CREATED WITH coefficient AS the INTEGER value of token AND an EMPTY list FOR variables  
+            ELSE IF token REPRESENTS only alphabetic letters THEN  
+                APPEND a NEW INSTANCE OF Expression TO output  
+                SET coef TO the value IN var_map CORRESPONDING TO key token OR one IF token IS NOT A KEY IN var_map  
+                IF coef EQUALS one THEN  
+                    IF token IS NOT A KEY IN var_map THEN  
+                        CALL the add_term FUNCTION OF the LAST element of output WITH a NEW Term CREATED WITH coefficient one AND variables AS a list CONTAINING token  
+                    ELSE  
+                        CALL the add_term FUNCTION OF the LAST element of output WITH a NEW Term CREATED WITH coefficient one AND an EMPTY list FOR variables  
+                    END IF  
+                ELSE  
+                    CALL the add_term FUNCTION OF the LAST element of output WITH a NEW Term CREATED WITH coefficient coef AND an EMPTY list FOR variables  
+                END IF  
+            ELSE IF token EQUALS the word open parenthesis THEN  
+                APPEND token TO operators  
+            ELSE IF token EQUALS the word close parenthesis THEN  
+                WHILE the LAST element in operators NOT EQUAL TO the word open parenthesis DO  
+                    CALL apply_operator()  
+                END WHILE  
+                REMOVE the LAST element from operators (which is open parenthesis)  
+            ELSE IF token IS one of the words plus minus OR multiplication THEN  
+                WHILE operators IS NOT empty AND the LAST element IN operators NOT EQUAL TO the word open parenthesis AND (token IS one OF the words plus OR minus OR the LAST element IN operators EQUALS the word multiplication) DO  
+                    CALL apply_operator()  
+                END WHILE  
+                APPEND token TO operators  
+            END IF  
+            INCREMENT i BY one  
+        END WHILE  
+  
+        WHILE operators IS NOT empty DO  
+            CALL apply_operator()  
+        END WHILE  
+  
+        SET simplified_terms TO the result of calling simplify ON the FIRST element OF output  
+        RETURN the LIST OF strings CREATED BY FOR each term IN simplified_terms RETURNING the STRING REPRESENTATION OF term.coefficient FOLLOWED BY THE WORD multiplication SIGN FOLLOWED BY THE JOINING OF term.variables WITH THE WORD multiplication SIGN IF term.variables IS NOT EMPTY OTHERWISE THE STRING REPRESENTATION OF term.coefficient  
+    END FUNCTION  
+END CLASS

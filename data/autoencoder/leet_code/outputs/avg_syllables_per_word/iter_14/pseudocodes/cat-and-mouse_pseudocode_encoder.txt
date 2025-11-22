@@ -1,0 +1,55 @@
+CLASS Solution  
+    FUNCTION catMouseGame WITH PARAMETER graph  
+        SET DRAW TO zero  
+        SET MOUSE_WIN TO one  
+        SET CAT_WIN TO two  
+        SET n TO the LENGTH OF graph  
+        
+        FUNCTION dfs WITH PARAMETERS turn mouse_pos cat_pos  
+            IF turn IS EQUAL TO two MULTIPLIED BY n THEN  
+                RETURN DRAW  
+            END IF  
+            IF mouse_pos IS EQUAL TO zero THEN  
+                RETURN MOUSE_WIN  
+            END IF  
+            IF mouse_pos IS EQUAL TO cat_pos THEN  
+                RETURN CAT_WIN  
+            END IF  
+            
+            IF turn MODULO two IS EQUAL TO zero THEN  
+                SET current_player TO mouse  
+            ELSE  
+                SET current_player TO cat  
+            END IF  
+            
+            IF current_player IS EQUAL TO mouse THEN  
+                SET result TO CAT_WIN  
+                FOR each next_pos IN the element at position mouse_pos OF graph  
+                    SET next_result TO dfs WITH turn INCREMENTED BY one next_pos cat_pos  
+                    IF next_result IS EQUAL TO MOUSE_WIN THEN  
+                        RETURN MOUSE_WIN  
+                    ELSE IF next_result IS EQUAL TO DRAW THEN  
+                        SET result TO DRAW  
+                    END IF  
+                END FOR  
+                RETURN result  
+            ELSE  
+                SET result TO MOUSE_WIN  
+                FOR each next_pos IN the element at position cat_pos OF graph  
+                    IF next_pos IS EQUAL TO zero THEN  
+                        CONTINUE  
+                    END IF  
+                    SET next_result TO dfs WITH turn INCREMENTED BY one mouse_pos next_pos  
+                    IF next_result IS EQUAL TO CAT_WIN THEN  
+                        RETURN CAT_WIN  
+                    ELSE IF next_result IS EQUAL TO DRAW THEN  
+                        SET result TO DRAW  
+                    END IF  
+                END FOR  
+                RETURN result  
+            END IF  
+        END FUNCTION  
+        
+        RETURN dfs WITH zero one two  
+    END FUNCTION  
+END CLASS

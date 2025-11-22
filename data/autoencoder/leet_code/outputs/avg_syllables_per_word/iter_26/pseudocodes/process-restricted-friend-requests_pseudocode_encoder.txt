@@ -1,0 +1,78 @@
+CLASS UnionFind
+    FUNCTION __init__(self, n)
+        SET self.parent TO the LIST OF INTEGERS FROM zero TO n MINUS one
+        SET self.size TO the LIST OF ONES WITH the LENGTH OF n
+    END FUNCTION
+
+    FUNCTION find(self, u)
+        IF the ELEMENT AT POSITION u OF self.parent IS NOT EQUAL TO u
+            SET the ELEMENT AT POSITION u OF self.parent TO the RESULT OF SELF find WITH the ELEMENT AT POSITION u OF self.parent
+        END IF
+        RETURN the ELEMENT AT POSITION u OF self.parent
+    END FUNCTION
+
+    FUNCTION union(self, u, v)
+        SET root_u TO THE RESULT OF SELF find WITH u
+        SET root_v TO THE RESULT OF SELF find WITH v
+        IF root_u IS NOT EQUAL TO root_v
+            IF the ELEMENT AT POSITION root_u OF self.size IS GREATER THAN the ELEMENT AT POSITION root_v OF self.size
+                SET the ELEMENT AT POSITION root_v OF self.parent TO root_u
+                INCREMENT the ELEMENT AT POSITION root_u OF self.size BY the ELEMENT AT POSITION root_v OF self.size
+            ELSE
+                SET the ELEMENT AT POSITION root_u OF self.parent TO root_v
+                INCREMENT the ELEMENT AT POSITION root_v OF self.size BY the ELEMENT AT POSITION root_u OF self.size
+            END IF
+        END IF
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION friendRequests(self, n, restrictions, requests)
+        ASSIGN uf TO A NEW INSTANCE OF UnionFind WITH n
+        SET result TO an EMPTY LIST
+        SET restriction_map TO an EMPTY DICTIONARY
+
+        FOR each pair x COMMA y IN restrictions
+            IF x IS NOT IN restriction_map
+                SET the VALUE AT KEY x IN restriction_map TO an EMPTY SET
+            END IF
+            IF y IS NOT IN restriction_map
+                SET the VALUE AT KEY y IN restriction_map TO an EMPTY SET
+            END IF
+            ADD y TO the SET AT KEY x IN restriction_map
+            ADD x TO the SET AT KEY y IN restriction_map
+        END FOR
+
+        FUNCTION can_union(u, v)
+            SET root_u TO THE RESULT OF uf FIND WITH u
+            SET root_v TO THE RESULT OF uf FIND WITH v
+
+            FOR each person IN THE SET AT KEY root_u IN restriction_map OR EMPTY SET IF NOT PRESENT
+                IF THE RESULT OF uf FIND WITH person IS EQUAL TO root_v
+                    RETURN False
+                END IF
+            END FOR
+
+            FOR each person IN THE SET AT KEY root_v IN restriction_map OR EMPTY SET IF NOT PRESENT
+                IF THE RESULT OF uf FIND WITH person IS EQUAL TO root_u
+                    RETURN False
+                END IF
+            END FOR
+
+            RETURN True
+        END FUNCTION
+
+        FOR each pair u COMMA v IN requests
+            IF THE RESULT OF uf FIND WITH u IS EQUAL TO THE RESULT OF uf FIND WITH v
+                APPEND True TO result
+            ELSE IF can_union(u, v) HOLDS TRUE
+                CALL uf UNION WITH u AND v
+                APPEND True TO result
+            ELSE
+                APPEND False TO result
+            END IF
+        END FOR
+
+        RETURN result
+    END FUNCTION
+END CLASS

@@ -1,0 +1,35 @@
+CLASS Solution
+    FUNCTION getSkyline(buildings AS list of list of integers) AS list of list of integers
+        SET events TO empty list
+
+        FOR each left_edge, right_edge, building_height IN buildings
+            APPEND a tuple consisting of left_edge, NEGATIVE building_height, right_edge TO events
+            APPEND a tuple consisting of right_edge, zero, zero TO events
+        END FOR
+
+        SORT events BY default ordering
+
+        SET result TO a list containing a single list of zero and zero
+        SET max_heap TO a list containing a single tuple of zero and positive infinity
+
+        FOR each position_x, negative_height, right_bound IN events
+            WHILE the second element of the first tuple IN max_heap IS LESS THAN OR EQUAL TO position_x HOLDS
+                REMOVE the first tuple FROM max_heap USING heap removal
+            END WHILE
+
+            IF negative_height IS NOT EQUAL TO zero THEN
+                ADD the tuple consisting of negative_height and right_bound TO max_heap USING heap insertion
+            END IF
+
+            IF the second element of the last list IN result IS NOT EQUAL TO the NEGATIVE of the first element of the first tuple IN max_heap THEN
+                APPEND a list consisting of position_x and the NEGATIVE of the first element of the first tuple IN max_heap TO result
+            END IF
+        END FOR
+
+        IF the first list IN result IS EQUAL TO a list of zero and zero THEN
+            REMOVE the first list FROM result
+        END IF
+
+        RETURN result
+    END FUNCTION
+END CLASS

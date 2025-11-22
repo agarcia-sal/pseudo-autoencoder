@@ -1,0 +1,25 @@
+from collections import deque
+from typing import List
+
+class Solution:
+    def constrainedSubsetSum(self, nums: List[int], k: int) -> int:
+        n = len(nums)
+        dp = [0] * n
+        dp[0] = nums[0]
+        max_sum = nums[0]
+        q = deque([0])  # stores indices of dp, elements are in decreasing order of dp values
+
+        for i in range(1, n):
+            # If dp[q[0]] > 0, add it to nums[i], else just nums[i]
+            dp[i] = nums[i] + (dp[q[0]] if dp[q[0]] > 0 else 0)
+            if dp[i] > max_sum:
+                max_sum = dp[i]
+            # Maintain deque decreasing order by dp values
+            while q and dp[i] >= dp[q[-1]]:
+                q.pop()
+            q.append(i)
+            # Remove indices out of the sliding window of size k
+            if q[0] == i - k:
+                q.popleft()
+
+        return max_sum

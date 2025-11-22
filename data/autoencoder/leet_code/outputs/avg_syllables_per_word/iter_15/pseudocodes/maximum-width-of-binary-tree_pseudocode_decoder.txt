@@ -1,0 +1,71 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val EQUALS zero LEFT EQUALS none RIGHT EQUALS none  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO NEW TreeNode WITH PARAMETER element at position zero of values  
+    SET i TO one  
+    SET queue TO a new double ended queue with root as the first element  
+    WHILE queue is not empty  
+        SET node TO the element removed from the left end of queue  
+        IF i LESS THAN the length of values AND element at position i of values IS NOT none  
+            SET the left attribute of node TO NEW TreeNode WITH PARAMETER element at position i of values  
+            APPEND the left attribute of node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN the length of values AND element at position i of values IS NOT none  
+            SET the right attribute of node TO NEW TreeNode WITH PARAMETER element at position i of values  
+            APPEND the right attribute of node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p, q  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF the val attribute of p IS NOT EQUALS the val attribute of q  
+        RETURN false  
+    ELSE  
+        RETURN the logical AND of the result of calling is_same_tree with the left attributes of p and q AND the result of calling is_same_tree with the right attributes of p and q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION widthOfBinaryTree WITH PARAMETER root  
+        IF root IS none  
+            RETURN zero  
+        END IF  
+        SET queue TO a new double ended queue with a tuple containing root and zero as the first element  
+        SET max_width TO zero  
+        WHILE queue is not empty  
+            SET level_length TO the length of queue  
+            SET first_index TO the second element of the first tuple in queue  
+            FOR each iteration_number FROM zero TO one LESS THAN level_length  
+                SET node_and_index TO the tuple removed from the left end of queue  
+                SET node TO the first element of node_and_index  
+                SET index TO the second element of node_and_index  
+                IF iteration_number EQUALS level_length MINUS one  
+                    SET max_width TO the greater value between max_width AND index MINUS first_index PLUS one  
+                END IF  
+                IF the left attribute of node EXISTS  
+                    APPEND a tuple containing the left attribute of node AND two MULTIPLIED BY index TO queue  
+                END IF  
+                IF the right attribute of node EXISTS  
+                    APPEND a tuple containing the right attribute of node AND two MULTIPLIED BY index PLUS one TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        RETURN max_width  
+    END FUNCTION  
+END CLASS

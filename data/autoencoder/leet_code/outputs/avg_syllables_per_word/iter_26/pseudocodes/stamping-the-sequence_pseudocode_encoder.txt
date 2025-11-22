@@ -1,0 +1,43 @@
+CLASS Solution
+    FUNCTION movesToStamp(stamp, target)
+        SET length_of_stamp TO the LENGTH OF stamp
+        SET length_of_target TO the LENGTH OF target
+        SET indeg TO a list containing the value length_of_stamp REPEATED for the count of length_of_target MINUS length_of_stamp PLUS one times
+        ASSIGN q TO a new double ended queue
+        SET g TO a list containing empty lists REPEATED for the count of length_of_target times
+        FOR index_i FROM zero TO length_of_target MINUS length_of_stamp INCLUSIVE
+            FOR enumeration_index_j AND character_c IN the enumeration of stamp
+                IF the element at position index_i PLUS enumeration_index_j OF target EQUALS character_c
+                    DECREMENT the element at position index_i OF indeg BY one
+                    IF the element at position index_i OF indeg EQUALS zero
+                        APPEND index_i TO q
+                    END IF
+                ELSE
+                    APPEND index_i TO the element at position index_i PLUS enumeration_index_j OF g
+                END IF
+            END FOR
+        END FOR
+        SET ans TO an empty list
+        SET vis TO a list containing False REPEATED for the count of length_of_target times
+        WHILE q HOLDS elements
+            REMOVE and ASSIGN the element from the left side of q TO i
+            APPEND i TO ans
+            FOR index_j FROM zero TO length_of_stamp MINUS one INCLUSIVE
+                IF the element at position i PLUS index_j OF vis IS NOT True
+                    SET the element at position i PLUS index_j OF vis TO True
+                    FOR each element k IN the element at position i PLUS index_j OF g
+                        DECREMENT the element at position k OF indeg BY one
+                        IF the element at position k OF indeg EQUALS zero
+                            APPEND k TO q
+                        END IF
+                    END FOR
+                END IF
+            END FOR
+        END WHILE
+        IF all elements OF vis ARE True
+            RETURN ans IN REVERSE ORDER
+        ELSE
+            RETURN an empty list
+        END IF
+    END FUNCTION
+END CLASS

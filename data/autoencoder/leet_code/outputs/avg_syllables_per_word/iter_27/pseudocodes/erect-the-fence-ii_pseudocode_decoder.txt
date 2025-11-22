@@ -1,0 +1,81 @@
+CLASS Solution
+    FUNCTION outerTrees(trees)
+        FUNCTION dist_sq(p1, p2)
+            SET difference in first element of p1 and first element of p2 TO delta_x
+            SET difference in second element of p1 and second element of p2 TO delta_y
+            SET square of delta_x TO delta_x_squared
+            SET square of delta_y TO delta_y_squared
+            SET sum of delta_x_squared AND delta_y_squared TO distance_squared
+            RETURN distance_squared
+        END FUNCTION
+
+        FUNCTION circumcenter(p1, p2, p3)
+            SET first element of p1 TO ax
+            SET second element of p1 TO ay
+            SET first element of p2 TO bx
+            SET second element of p2 TO by
+            SET first element of p3 TO cx
+            SET second element of p3 TO cy
+
+            SET two MULTIPLIED BY (ax MULTIPLIED BY (by MINUS cy) PLUS bx MULTIPLIED BY (cy MINUS ay) PLUS cx MULTIPLIED BY (ay MINUS by)) TO d
+
+            SET sum of ax SQUARED AND ay SQUARED TO a_squared_sum
+            SET sum of bx SQUARED AND by SQUARED TO b_squared_sum
+            SET sum of cx SQUARED AND cy SQUARED TO c_squared_sum
+
+            SET numerator for ux TO (a_squared_sum MULTIPLIED BY (by MINUS cy)) PLUS (b_squared_sum MULTIPLIED BY (cy MINUS ay)) PLUS (c_squared_sum MULTIPLIED BY (ay MINUS by))
+            SET numerator for uy TO (a_squared_sum MULTIPLIED BY (cx MINUS bx)) PLUS (b_squared_sum MULTIPLIED BY (ax MINUS cx)) PLUS (c_squared_sum MULTIPLIED BY (bx MINUS ax))
+
+            SET numerator for ux DIVIDED BY d TO ux
+            SET numerator for uy DIVIDED BY d TO uy
+
+            SET difference of ux MINUS ax TO delta_ux
+            SET difference of uy MINUS ay TO delta_uy
+            SET distance_squared TO delta_ux SQUARED PLUS delta_uy SQUARED
+            SET square root of distance_squared TO radius
+
+            RETURN list consisting of ux AND uy, radius
+        END FUNCTION
+
+        FUNCTION welzl(points, boundary, n)
+            IF n EQUALS zero OR LENGTH OF boundary EQUALS three
+                IF LENGTH OF boundary EQUALS zero
+                    RETURN list consisting of zero AND zero, zero
+                ELSE IF LENGTH OF boundary EQUALS one
+                    RETURN first element of boundary, zero
+                ELSE IF LENGTH OF boundary EQUALS two
+                    SET average of first elements of first element of boundary AND second element of boundary TO center_x
+                    SET average of second elements of first element of boundary AND second element of boundary TO center_y
+                    SET list consisting of center_x AND center_y TO center
+
+                    SET distance BETWEEN first AND second element of boundary USING dist_sq FUNCTION TO diameter_squared
+                    SET square root of diameter_squared DIVIDED BY two TO radius
+
+                    RETURN center, radius
+                ELSE
+                    RETURN result of circumcenter FUNCTION called with unpacked boundary elements
+                END IF
+            END IF
+
+            SET element at position n MINUS one of points TO p
+
+            SET result of calling welzl with points boundary n MINUS one TO center, radius
+
+            SET distance BETWEEN center AND p USING dist_sq FUNCTION TO dist_center_p
+
+            IF dist_center_p LESS THAN OR EQUAL TO radius MULTIPLIED BY radius
+                RETURN center, radius
+            END IF
+
+            SET result of calling welzl with points boundary appended WITH p at position n MINUS one TO center, radius
+
+            RETURN center, radius
+        END FUNCTION
+
+        CALL shuffle METHOD on list trees TO randomize order
+
+        SET result of calling welzl with trees empty list LENGTH OF trees TO center, radius
+
+        RETURN list consisting of first element of center AND second element of center AND radius
+    END FUNCTION
+END CLASS

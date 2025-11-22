@@ -1,0 +1,56 @@
+CLASS Solution  
+    FUNCTION findRedundantDirectedConnection(edges)  
+        FUNCTION find(parent, i)  
+            IF element at position i of parent NOT EQUALS i  
+                SET element at position i of parent TO find with arguments parent and element at position i of parent  
+            END IF  
+            RETURN element at position i of parent  
+        END FUNCTION  
+        
+        FUNCTION union(parent, rank, x, y)  
+            SET rootX TO find with arguments parent and x  
+            SET rootY TO find with arguments parent and y  
+            IF rootX NOT EQUALS rootY  
+                IF element at position rootX of rank GREATER THAN element at position rootY of rank  
+                    SET element at position rootY of parent TO rootX  
+                ELSE IF element at position rootX of rank LESS THAN element at position rootY of rank  
+                    SET element at position rootX of parent TO rootY  
+                ELSE  
+                    SET element at position rootY of parent TO rootX  
+                    INCREMENT element at position rootX of rank BY one  
+                END IF  
+                RETURN True  
+            END IF  
+            RETURN False  
+        END FUNCTION  
+        
+        SET n TO the LENGTH OF edges  
+        SET parent TO the list of integers from zero TO n PLUS one EXCLUSIVE  
+        SET rank TO the list of zeros of length n PLUS one  
+        
+        SET candidate1 TO None  
+        SET candidate2 TO None  
+        SET last TO None  
+        
+        FOR each pair u AND v IN edges  
+            IF element at position v of parent NOT EQUALS v  
+                SET candidate1 TO the list of element at position v of parent AND v  
+                SET candidate2 TO the list of u AND v  
+            ELSE  
+                IF union with arguments parent, rank, u, v EQUALS False  
+                    SET last TO the list of u AND v  
+                END IF  
+            END IF  
+        END FOR  
+        
+        IF candidate1 IS None  
+            RETURN last  
+        END IF  
+        
+        IF last IS NOT None  
+            RETURN candidate1  
+        END IF  
+        
+        RETURN candidate2  
+    END FUNCTION  
+END CLASS

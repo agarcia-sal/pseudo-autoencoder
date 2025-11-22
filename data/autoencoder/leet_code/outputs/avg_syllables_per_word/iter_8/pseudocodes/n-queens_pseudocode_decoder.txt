@@ -1,0 +1,52 @@
+CLASS Solution
+    FUNCTION solveNQueens(n)
+        FUNCTION is_not_under_attack(row, col)
+            RETURN NOT (cols AT col PLUS hills AT (row MINUS col) PLUS dales AT (row PLUS col))
+        END FUNCTION
+
+        FUNCTION place_queen(row, col)
+            ADD (row, col) TO queens
+            SET cols AT col TO 1
+            SET hills AT (row MINUS col) TO 1
+            SET dales AT (row PLUS col) TO 1
+        END FUNCTION
+
+        FUNCTION remove_queen(row, col)
+            REMOVE (row, col) FROM queens
+            SET cols AT col TO 0
+            SET hills AT (row MINUS col) TO 0
+            SET dales AT (row PLUS col) TO 0
+        END FUNCTION
+
+        FUNCTION add_solution()
+            SET solution TO empty list
+            FOR EACH (_, col) IN queens SORTED BY row
+                APPEND string WITH col REPEATED '.' FOLLOWED BY 'Q' FOLLOWED BY (n MINUS col MINUS 1) REPEATED '.' TO solution
+            END FOR
+            APPEND solution TO output
+        END FUNCTION
+
+        FUNCTION backtrack(row)
+            IF row IS NOT GIVEN THEN SET row TO 0
+            FOR col FROM 0 TO n MINUS 1
+                IF is_not_under_attack(row, col) THEN
+                    place_queen(row, col)
+                    IF row PLUS 1 EQUALS n THEN
+                        add_solution()
+                    ELSE
+                        CALL backtrack WITH row PLUS 1
+                    END IF
+                    remove_queen(row, col)
+                END IF
+            END FOR
+        END FUNCTION
+
+        SET cols TO list OF 0 REPEATED n TIMES
+        SET hills TO list OF 0 REPEATED (2 TIMES n MINUS 1) TIMES
+        SET dales TO list OF 0 REPEATED (2 TIMES n MINUS 1) TIMES
+        SET queens TO empty set
+        SET output TO empty list
+        CALL backtrack WITHOUT ARGUMENTS
+        RETURN output
+    END FUNCTION
+END CLASS

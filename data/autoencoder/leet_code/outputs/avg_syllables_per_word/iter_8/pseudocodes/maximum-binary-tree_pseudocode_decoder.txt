@@ -1,0 +1,57 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN None  
+    END IF  
+    SET root TO NEW TreeNode WITH val AS values AT position zero, left AS None, right AS None  
+    SET i TO 1  
+    SET queue TO NEW empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO REMOVE first element FROM queue  
+        IF i IS LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.left TO NEW TreeNode WITH val AS values AT i, left AS None, right AS None  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY 1  
+        IF i IS LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.right TO NEW TreeNode WITH val AS values AT i, left AS None, right AS None  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION constructMaximumBinaryTree(self, nums)  
+        IF nums IS empty  
+            RETURN None  
+        END IF  
+        SET max_val TO maximum value IN nums  
+        SET max_index TO position OF max_val IN nums  
+        SET root TO NEW TreeNode WITH val AS max_val, left AS None, right AS None  
+        SET root.left TO self.constructMaximumBinaryTree(nums FROM start TO max_index EXCLUSIVE)  
+        SET root.right TO self.constructMaximumBinaryTree(nums FROM max_index PLUS one TO end)  
+        RETURN root  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,45 @@
+CLASS Solution  
+    FUNCTION countPalindromicSubsequences(s)  
+        SET MOD TO one billion plus seven  
+        SET n TO LENGTH OF s  
+        
+        SET next_occurrence TO a two-dimensional list of size four by n filled with minus one  
+        SET prev_occurrence TO a two-dimensional list of size four by n filled with minus one  
+        
+        FOR c FROM 0 TO 3  
+            SET char TO character at position Unicode value of 'a' PLUS c  
+            SET last TO minus one  
+            FOR i FROM 0 TO n MINUS 1  
+                IF character at position i in s EQUALS char  
+                    SET last TO i  
+                SET prev_occurrence at c, i TO last  
+            
+            SET last TO minus one  
+            FOR i FROM n MINUS 1 DOWN TO 0  
+                IF character at position i in s EQUALS char  
+                    SET last TO i  
+                SET next_occurrence at c, i TO last  
+        
+        SET dp TO a two-dimensional list of size n by n filled with zero  
+        
+        FOR i FROM 0 TO n MINUS 1  
+            SET dp at i, i TO 1  
+        
+        FOR length FROM 2 TO n  
+            FOR i FROM 0 TO n MINUS length  
+                SET j TO i PLUS length MINUS 1  
+                FOR c FROM 0 TO 3  
+                    SET char TO character at position Unicode value of 'a' PLUS c  
+                    SET left TO next_occurrence at c, i  
+                    SET right TO prev_occurrence at c, j  
+                    
+                    IF left GREATER THAN j OR right LESS THAN i  
+                        CONTINUE to next c  
+                    ELSE IF left EQUALS right  
+                        SET dp at i, j TO dp at i, j PLUS 1 MODULO MOD  
+                    ELSE  
+                        SET dp at i, j TO dp at i, j PLUS dp at left PLUS 1, right MINUS 1 PLUS 2 MODULO MOD  
+        
+        RETURN dp at 0, n MINUS 1  
+    END FUNCTION  
+END CLASS

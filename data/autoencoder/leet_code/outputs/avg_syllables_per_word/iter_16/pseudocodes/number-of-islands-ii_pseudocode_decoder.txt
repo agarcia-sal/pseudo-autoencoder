@@ -1,0 +1,64 @@
+CLASS UnionFind  
+    FUNCTION __init__ WITH NO PARAMETERS  
+        SET parent TO empty dictionary  
+        SET count TO zero  
+    END FUNCTION  
+
+    FUNCTION make_set WITH PARAMETER x  
+        IF x NOT IN parent  
+            SET element at key x of parent TO x  
+            INCREMENT count BY one  
+        END IF  
+    END FUNCTION  
+
+    FUNCTION find WITH PARAMETER x  
+        IF element at key x of parent NOT EQUALS x  
+            SET element at key x of parent TO the RESULT OF find WITH PARAMETER element at key x of parent  
+        END IF  
+        RETURN element at key x of parent  
+    END FUNCTION  
+
+    FUNCTION union WITH PARAMETERS x AND y  
+        SET rootX TO RESULT OF find WITH PARAMETER x  
+        SET rootY TO RESULT OF find WITH PARAMETER y  
+        IF rootX NOT EQUALS rootY  
+            SET element at key rootX of parent TO rootY  
+            DECREMENT count BY one  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION numIslands2 WITH PARAMETERS m WITH TYPE integer AND n WITH TYPE integer AND positions WITH TYPE list of list of integers  
+        FUNCTION is_valid WITH PARAMETERS x AND y  
+            RETURN the EXPRESSION x GREATER THAN OR EQUAL TO zero AND x LESS THAN m AND y GREATER THAN OR EQUAL TO zero AND y LESS THAN n  
+        END FUNCTION  
+
+        SET directions TO list containing four pairs of integers: first pair is one and zero, second pair is minus one and zero, third pair is zero and one, fourth pair is zero and minus one  
+        SET uf TO a new INSTANCE OF UnionFind  
+        SET grid TO a two dimensional list with m ROWS AND n COLUMNS FILLED WITH zeroes  
+        SET result TO empty list  
+
+        FOR each pair r AND c IN positions  
+            IF element at row r and column c of grid EQUALS one  
+                APPEND count of uf TO result  
+                CONTINUE TO next iteration  
+            END IF  
+
+            SET element at row r and column c of grid TO one  
+            CALL make_set OF uf WITH PARAMETER the pair r AND c  
+
+            FOR each pair dr AND dc IN directions  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                IF the RESULT OF is_valid WITH PARAMETERS nr AND nc AND element at row nr and column nc of grid EQUALS one  
+                    CALL union OF uf WITH PARAMETERS the pair r AND c AND the pair nr AND nc  
+                END IF  
+            END FOR  
+
+            APPEND count of uf TO result  
+        END FOR  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

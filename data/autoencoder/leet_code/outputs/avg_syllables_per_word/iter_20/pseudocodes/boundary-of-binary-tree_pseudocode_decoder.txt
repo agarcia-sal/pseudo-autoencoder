@@ -1,0 +1,94 @@
+CLASS TreeNode  
+    FUNCTION __init__ with parameters val EQUALS zero, left EQUALS none, right EQUALS none  
+        SET the property val TO val  
+        SET the property left TO left  
+        SET the property right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node with parameter values of type list  
+    IF values is empty  
+        RETURN none  
+    END IF  
+    SET root TO a new TreeNode with the element at position zero of values  
+    SET i TO one  
+    SET queue TO a new empty double ended queue  
+    APPEND root TO queue  
+    WHILE the LENGTH OF queue is greater than zero  
+        SET node TO the first element REMOVED FROM queue  
+        IF i is less than the LENGTH OF values AND the element at position i of values is not none  
+            SET the property left of node TO a new TreeNode with the element at position i of values  
+            APPEND the property left of node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i is less than the LENGTH OF values AND the element at position i of values is not none  
+            SET the property right of node TO a new TreeNode with the element at position i of values  
+            APPEND the property right of node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree with parameters p and q  
+    IF p is none AND q is none  
+        RETURN true  
+    ELSE IF p is none OR q is none  
+        RETURN false  
+    ELSE IF the property val of p DOES NOT EQUAL the property val of q  
+        RETURN false  
+    ELSE  
+        RETURN the result of is_same_tree with the property left of p AND the property left of q AND the result of is_same_tree with the property right of p AND the property right of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION boundaryOfBinaryTree with parameter root of type Optional TreeNode RETURNS List of integers  
+        IF root is none  
+            RETURN an empty list  
+        END IF  
+        FUNCTION is_leaf with parameter node  
+            RETURN node has property left that is none AND node has property right that is none  
+        END FUNCTION  
+        SET left_boundary TO an empty list  
+        SET current TO the property left of root  
+        WHILE current is not none  
+            IF is_leaf with current RETURNS false  
+                APPEND the property val of current TO left_boundary  
+            END IF  
+            IF the property left of current is not none  
+                SET current TO the property left of current  
+            ELSE  
+                SET current TO the property right of current  
+            END IF  
+        END WHILE  
+        SET right_boundary TO an empty list  
+        SET current TO the property right of root  
+        WHILE current is not none  
+            IF is_leaf with current RETURNS false  
+                APPEND the property val of current TO right_boundary  
+            END IF  
+            IF the property right of current is not none  
+                SET current TO the property right of current  
+            ELSE  
+                SET current TO the property left of current  
+            END IF  
+        END WHILE  
+        SET leaves TO an empty list  
+        FUNCTION collect_leaves with parameter node  
+            IF node is none  
+                RETURN  
+            END IF  
+            IF is_leaf with node RETURNS true  
+                APPEND the property val of node TO leaves  
+            END IF  
+            CALL collect_leaves with the property left of node  
+            CALL collect_leaves with the property right of node  
+        END FUNCTION  
+        CALL collect_leaves with root  
+        IF is_leaf with root RETURNS true  
+            SET leaves TO an empty list  
+        END IF  
+        RETURN a list consisting of the property val of root FOLLOWED BY the elements of left_boundary FOLLOWED BY the elements of leaves FOLLOWED BY the elements of right_boundary in reverse order  
+    END FUNCTION  
+END CLASS

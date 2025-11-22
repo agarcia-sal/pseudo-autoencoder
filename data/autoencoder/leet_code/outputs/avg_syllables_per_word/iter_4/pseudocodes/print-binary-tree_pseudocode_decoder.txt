@@ -1,0 +1,73 @@
+CLASS TreeNode
+    FUNCTION __init__(val = 0, left = None, right = None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values: list)
+    IF values is empty THEN
+        RETURN None
+    END IF
+    SET root TO new TreeNode with values[0]
+    SET i TO 1
+    SET queue TO a new deque
+    APPEND root TO queue
+    WHILE queue is not empty
+        SET node TO queue.popleft()
+        IF i < length of values AND values[i] is not None THEN
+            SET node.left TO new TreeNode with values[i]
+            APPEND node.left TO queue
+        END IF
+        INCREMENT i BY 1
+        IF i < length of values AND values[i] is not None THEN
+            SET node.right TO new TreeNode with values[i]
+            APPEND node.right TO queue
+        END IF
+        INCREMENT i BY 1
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p is None AND q is None THEN
+        RETURN True
+    ELSE IF p is None OR q is None THEN
+        RETURN False
+    ELSE IF p.val not equal to q.val THEN
+        RETURN False
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION printTree(root: Optional[TreeNode]) RETURNS List of List of String
+        FUNCTION getHeight(node)
+            IF node is None THEN
+                RETURN 0
+            END IF
+            SET left_height TO getHeight(node.left)
+            SET right_height TO getHeight(node.right)
+            RETURN 1 + maximum of left_height and right_height
+        END FUNCTION
+
+        SET height TO getHeight(root)
+        SET width TO (2 raised to height) minus 1
+        SET res TO list containing height lists, each with width empty strings
+
+        FUNCTION placeNode(node, row, left, right)
+            IF node is None THEN
+                RETURN
+            END IF
+            SET mid TO integer division of (left + right) by 2
+            SET res[row][mid] TO string representation of node.val
+            CALL placeNode(node.left, row + 1, left, mid)
+            CALL placeNode(node.right, row + 1, mid, right)
+        END FUNCTION
+
+        CALL placeNode(root, 0, 0, width)
+        RETURN res
+    END FUNCTION
+END CLASS

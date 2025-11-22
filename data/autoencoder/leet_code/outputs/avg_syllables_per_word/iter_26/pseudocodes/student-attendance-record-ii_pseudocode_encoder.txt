@@ -1,0 +1,38 @@
+CLASS Solution
+    FUNCTION checkRecord(n)
+        SET MOD TO one billion plus seven
+        
+        COMMENT dp at position i with j As and k trailing Ls counts valid sequences
+        SET dp TO a three dimensional list of zeros with dimensions being n plus one by two by three
+        
+        SET element at position zero of dp with zero As and zero trailing Ls TO one
+        
+        FOR i FROM one TO n INCLUSIVE
+            FOR j FROM zero TO one INCLUSIVE
+                FOR k FROM zero TO two INCLUSIVE
+                    COMMENT adding a P (present)
+                    SET element at position i of dp with j As and zero trailing Ls TO the element at position i of dp with j As and zero trailing Ls PLUS element at position i minus one of dp with j As and k trailing Ls MODULO MOD
+                    
+                    IF j EQUALS zero THEN
+                        COMMENT adding an A (absent) only if no A used before
+                        SET element at position i of dp with one A and zero trailing Ls TO element at position i of dp with one A and zero trailing Ls PLUS element at position i minus one of dp with zero As and k trailing Ls MODULO MOD
+                    END IF
+                    
+                    IF k LESS THAN two THEN
+                        COMMENT adding an L (late) only if fewer than two trailing Ls
+                        SET element at position i of dp with j As and k plus one trailing Ls TO element at position i of dp with j As and k plus one trailing Ls PLUS element at position i minus one of dp with j As and k trailing Ls MODULO MOD
+                    END IF
+                END FOR
+            END FOR
+        END FOR
+        
+        SET result TO zero
+        FOR j FROM zero TO one INCLUSIVE
+            FOR k FROM zero TO two INCLUSIVE
+                SET result TO result PLUS element at position n of dp with j As and k trailing Ls MODULO MOD
+            END FOR
+        END FOR
+        
+        RETURN result
+    END FUNCTION
+END CLASS

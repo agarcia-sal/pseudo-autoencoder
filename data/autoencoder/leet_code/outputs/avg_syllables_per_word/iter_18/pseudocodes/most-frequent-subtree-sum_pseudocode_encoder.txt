@@ -1,0 +1,70 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val EQUALS zero left EQUALS none right EQUALS none  
+        SET self val TO val  
+        SET self left TO left  
+        SET self right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETERS values  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO A NEW TreeNode WITH PARAMETER element at position zero of values  
+    SET i TO one  
+    SET queue TO A NEW deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO THE FIRST element REMOVED FROM queue  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i of values IS NOT none  
+            SET node left TO A NEW TreeNode WITH PARAMETER element at position i of values  
+            APPEND node left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i of values IS NOT none  
+            SET node right TO A NEW TreeNode WITH PARAMETER element at position i of values  
+            APPEND node right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF p val IS NOT EQUALS q val  
+        RETURN false  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETERS p left q left AND is_same_tree WITH PARAMETERS p right q right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION findFrequentTreeSum WITH PARAMETERS self root  
+        FUNCTION subtree_sum WITH PARAMETER node  
+            IF node IS none  
+                RETURN zero  
+            END IF  
+            SET current_sum TO node val PLUS subtree_sum WITH PARAMETER node left PLUS subtree_sum WITH PARAMETER node right  
+            INCREMENT count at key current_sum BY one  
+            RETURN current_sum  
+        END FUNCTION  
+
+        SET count TO A NEW defaultdict WITH integer default  
+        CALL subtree_sum WITH PARAMETER root  
+
+        SET max_freq TO THE MAXIMUM VALUE OF all values IN count OR zero IF count IS empty  
+
+        SET result TO AN EMPTY LIST  
+        FOR each key and freq IN count  
+            IF freq EQUALS max_freq  
+                APPEND key TO result  
+            END IF  
+        END FOR  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

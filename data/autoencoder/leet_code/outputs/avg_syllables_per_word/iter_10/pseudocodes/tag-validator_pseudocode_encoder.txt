@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION isValid(code)  
+        IMPORT re  
+        
+        SET cdata_pattern TO character sequence less than followed by exclamation mark followed by open square bracket followed by CDATA followed by open square bracket followed by any character zero or more times, as few as possible, followed by close square bracket followed by close square bracket followed by greater than  
+        
+        SET code TO the result of replacing all occurrences matching cdata_pattern in code with empty string using regular expression substitution  
+        
+        SET stack TO empty list  
+        
+        SET i TO zero  
+        WHILE i LESS THAN the LENGTH OF code  
+            IF the element at position i of code EQUALS the character less than  
+                SET j TO the position of character greater than IN code STARTING FROM i PLUS one  
+                IF j EQUALS minus one  
+                    RETURN false  
+                END IF  
+                
+                SET tag_content TO the substring of code from position i PLUS one TO position j MINUS one  
+                
+                IF tag_content EQUALS empty string  
+                    RETURN false  
+                END IF  
+                
+                IF the element at position zero of tag_content EQUALS the character slash  
+                    SET tag_name TO the substring of tag_content from position one TO the end  
+                    IF stack IS empty OR the last element of stack NOT EQUALS tag_name  
+                        RETURN false  
+                    END IF  
+                    REMOVE the last element FROM stack  
+                ELSE IF the element at position zero of tag_content EQUALS the character exclamation mark  
+                    RETURN false  
+                ELSE  
+                    IF NOT (the LENGTH OF tag_content GREATER THAN OR EQUAL TO one AND the LENGTH OF tag_content LESS THAN OR EQUAL TO nine AND all characters of tag_content ARE uppercase letters)  
+                        RETURN false  
+                    END IF  
+                    APPEND tag_content TO stack  
+                END IF  
+                
+                SET i TO j PLUS one  
+            ELSE  
+                INCREMENT i BY one  
+            END IF  
+        END WHILE  
+        
+        RETURN stack IS empty AND the NUMBER OF matches for regular expression character less than followed by one or more uppercase letters followed by character greater than followed by any character zero or more times followed by character less than followed by slash followed by one or more uppercase letters followed by character greater than IN code IS GREATER THAN zero  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,97 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS None, right EQUALS None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values)
+    IF values IS NOT present
+        RETURN None
+    END IF
+
+    SET root TO A NEW TreeNode WITH value EQUALS element at position zero OF values
+
+    SET index TO one
+
+    INITIALIZE queue AS AN EMPTY double ended queue
+
+    APPEND root TO queue
+
+    WHILE queue HOLDS
+        SET node TO THE ELEMENT REMOVED FROM THE LEFT OF queue
+
+        IF index IS LESS THAN the LENGTH OF values AND element at position index OF values IS NOT None
+            SET node.left TO A NEW TreeNode WITH value EQUALS element at position index OF values
+            APPEND node.left TO queue
+        END IF
+
+        INCREMENT index BY one
+
+        IF index IS LESS THAN the LENGTH OF values AND element at position index OF values IS NOT None
+            SET node.right TO A NEW TreeNode WITH value EQUALS element at position index OF values
+            APPEND node.right TO queue
+        END IF
+
+        INCREMENT index BY one
+    END WHILE
+
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS NOT present AND q IS NOT present
+        RETURN True
+    ELSE IF p IS NOT present OR q IS NOT present
+        RETURN False
+    ELSE IF p.val IS NOT EQUAL TO q.val
+        RETURN False
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION verticalOrder(self, root)
+        IF root IS NOT present
+            RETURN an EMPTY list
+        END IF
+
+        SET column_table TO A NEW DEFAULT DICTIONARY WITH list AS DEFAULT VALUE
+
+        INITIALIZE queue AS A NEW double ended queue CONTAINING A TUPLE OF root AND zero
+
+        SET min_column TO zero
+
+        SET max_column TO zero
+
+        WHILE queue HOLDS
+            REMOVE THE FIRST ELEMENT FROM queue INTO node AND column_index
+
+            IF node IS present
+                APPEND node.val TO the list AT key column_index IN column_table
+
+                IF column_index IS LESS THAN min_column
+                    SET min_column TO column_index
+                END IF
+
+                IF column_index IS GREATER THAN max_column
+                    SET max_column TO column_index
+                END IF
+
+                APPEND A TUPLE OF node.left AND column_index MINUS one TO queue
+
+                APPEND A TUPLE OF node.right AND column_index PLUS one TO queue
+            END IF
+        END WHILE
+
+        SET result_list TO AN EMPTY list
+
+        FOR column_number FROM min_column TO max_column INCLUSIVE
+            APPEND the list AT key column_number IN column_table TO result_list
+        END FOR
+
+        RETURN result_list
+    END FUNCTION
+END CLASS

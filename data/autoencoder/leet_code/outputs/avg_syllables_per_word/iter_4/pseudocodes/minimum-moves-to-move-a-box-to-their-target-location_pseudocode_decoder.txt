@@ -1,0 +1,39 @@
+CLASS Solution
+    FUNCTION minPushBox(grid)
+        SET directions TO list of tuples [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        FOR i FROM 0 TO LENGTH OF grid MINUS 1
+            FOR j FROM 0 TO LENGTH OF grid[0] MINUS 1
+                IF grid[i][j] EQUALS 'S' THEN
+                    SET player_start TO (i, j)
+                ELSE IF grid[i][j] EQUALS 'B' THEN
+                    SET box_start TO (i, j)
+                ELSE IF grid[i][j] EQUALS 'T' THEN
+                    SET target TO (i, j)
+        INITIALIZE queue AS deque WITH ELEMENT (player_start, box_start, 0)
+        INITIALIZE visited AS empty set
+        ADD (player_start, box_start) TO visited
+        WHILE queue IS NOT EMPTY
+            REMOVE first element FROM queue AND UNPACK INTO player_pos, box_pos, push_count
+            IF box_pos EQUALS target THEN
+                RETURN push_count
+            FOR EACH (dx, dy) IN directions
+                SET new_player_pos TO (player_pos[0] + dx, player_pos[1] + dy)
+                IF is_valid_position(new_player_pos, grid) THEN
+                    IF new_player_pos EQUALS box_pos THEN
+                        SET new_box_pos TO (box_pos[0] + dx, box_pos[1] + dy)
+                        IF is_valid_position(new_box_pos, grid) AND (new_player_pos, new_box_pos) NOT IN visited THEN
+                            ADD (new_player_pos, new_box_pos) TO visited
+                            APPEND (new_player_pos, new_box_pos, push_count + 1) TO queue
+                    ELSE
+                        IF (new_player_pos, box_pos) NOT IN visited THEN
+                            ADD (new_player_pos, box_pos) TO visited
+                            APPEND (new_player_pos, box_pos, push_count) TO queue
+        RETURN -1
+    END FUNCTION
+
+    FUNCTION is_valid_position(position, grid)
+        SET x TO position[0]
+        SET y TO position[1]
+        RETURN (0 <= x AND x < LENGTH OF grid) AND (0 <= y AND y < LENGTH OF grid[0]) AND grid[x][y] IS NOT '#'
+    END FUNCTION
+END CLASS

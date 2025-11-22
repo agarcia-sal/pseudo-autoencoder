@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION minWastedSpace(packages LIST OF INTEGER boxes LIST OF LIST OF INTEGER) RETURNS INTEGER  
+        SET MOD TO one billion PLUS seven  
+        SORT packages IN NON-DECREASING ORDER  
+        SET n TO the LENGTH OF packages  
+        
+        CREATE prefix_sum AS LIST OF INTEGER WITH LENGTH n PLUS one INITIALIZED WITH zero  
+        FOR i FROM zero TO n MINUS one  
+            SET element at position i PLUS one OF prefix_sum TO element at position i OF prefix_sum PLUS element at position i OF packages  
+        END FOR  
+        
+        SET min_wasted_space TO positive infinity  
+        
+        FOR each box IN boxes  
+            SORT box IN NON-DECREASING ORDER  
+            IF element at last position OF box LESS THAN element at last position OF packages THEN  
+                CONTINUE TO NEXT box  
+            END IF  
+            
+            SET total_wasted TO zero  
+            SET last_index TO zero  
+            
+            FOR each box_size IN box  
+                SET index TO last_index  
+                WHILE index LESS THAN n AND element at position index OF packages LESS THAN OR EQUAL TO box_size DO  
+                    INCREMENT index BY one  
+                END WHILE  
+                
+                IF index GREATER THAN last_index THEN  
+                    INCREMENT total_wasted BY (index MINUS last_index) MULTIPLIED BY box_size MINUS (element at position index OF prefix_sum MINUS element at position last_index OF prefix_sum)  
+                    SET last_index TO index  
+                END IF  
+            END FOR  
+            
+            IF last_index EQUALS n THEN  
+                IF total_wasted LESS THAN min_wasted_space THEN  
+                    SET min_wasted_space TO total_wasted  
+                END IF  
+            END IF  
+        END FOR  
+        
+        IF min_wasted_space EQUALS positive infinity THEN  
+            RETURN negative one  
+        ELSE  
+            RETURN min_wasted_space MODULO MOD  
+        END IF  
+    END FUNCTION  
+END CLASS

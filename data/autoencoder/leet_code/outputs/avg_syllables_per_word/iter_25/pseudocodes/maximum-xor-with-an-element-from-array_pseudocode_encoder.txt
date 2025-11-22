@@ -1,0 +1,38 @@
+CLASS Solution  
+    FUNCTION maximizeXor WITH PARAMETERS nums COMMA queries  
+        PERFORM nums SORTED IN NONDECREASING ORDER  
+        SET sorted_queries TO the RESULT OF ENUMERATING queries AND SORTING BY the SECOND ELEMENT OF EACH query AT THE SECOND POSITION OF THE INNER LIST  
+        SET result TO A LIST OF NEGATIVE ONE WITH THE LENGTH EQUAL TO THE LENGTH OF queries  
+        SET trie TO AN EMPTY DICTIONARY  
+        SET num_index TO ZERO  
+        FOR each query_index AND pair OF xi AND mi IN sorted_queries  
+            WHILE num_index IS LESS THAN THE LENGTH OF nums AND THE ELEMENT AT POSITION num_index OF nums IS LESS THAN OR EQUAL TO mi  
+                SET num TO THE ELEMENT AT POSITION num_index OF nums  
+                SET node TO trie  
+                FOR integer i FROM THIRTY ONE DOWN TO ZERO DECREMENTING BY ONE EACH ITERATION  
+                    SET bit TO THE RESULT OF BITWISE RIGHT SHIFT OF num BY i AND BITWISE AND WITH ONE  
+                    IF bit IS NOT A KEY IN node  
+                        SET THE VALUE ASSOCIATED WITH bit IN node TO AN EMPTY DICTIONARY  
+                    SET node TO THE ELEMENT ASSOCIATED WITH bit IN node  
+                INCREMENT num_index BY ONE  
+            END WHILE  
+            IF trie IS EMPTY  
+                CONTINUE TO THE NEXT ITERATION OF THE FOR LOOP  
+            END IF  
+            SET node TO trie  
+            SET max_xor TO ZERO  
+            FOR integer i FROM THIRTY ONE DOWN TO ZERO DECREMENTING BY ONE EACH ITERATION  
+                SET bit TO THE RESULT OF BITWISE RIGHT SHIFT OF xi BY i AND BITWISE AND WITH ONE  
+                SET toggle_bit TO ONE MINUS bit  
+                IF toggle_bit IS A KEY IN node  
+                    SET max_xor TO THE RESULT OF BITWISE OR OF max_xor WITH THE VALUE OF ONE LEFT SHIFTED BY i  
+                    SET node TO THE ELEMENT ASSOCIATED WITH toggle_bit IN node  
+                ELSE  
+                    SET node TO THE ELEMENT ASSOCIATED WITH bit IN node  
+                END IF  
+            END FOR  
+            SET THE ELEMENT AT POSITION query_index OF result TO max_xor  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,51 @@
+CLASS Solution  
+    FUNCTION solveNQueens WITH PARAMETER n  
+        FUNCTION is_not_under_attack WITH PARAMETERS row AND col  
+            RETURN NOT (element at position col OF cols PLUS element at position row MINUS col OF hills PLUS element at position row PLUS col OF dales)  
+        END FUNCTION  
+        
+        FUNCTION place_queen WITH PARAMETERS row AND col  
+            ADD the pair row AND col TO queens  
+            SET element at position col OF cols TO one  
+            SET element at position row MINUS col OF hills TO one  
+            SET element at position row PLUS col OF dales TO one  
+        END FUNCTION  
+        
+        FUNCTION remove_queen WITH PARAMETERS row AND col  
+            REMOVE the pair row AND col FROM queens  
+            SET element at position col OF cols TO zero  
+            SET element at position row MINUS col OF hills TO zero  
+            SET element at position row PLUS col OF dales TO zero  
+        END FUNCTION  
+        
+        FUNCTION add_solution  
+            SET solution TO an empty list  
+            FOR each pair of underscore AND col IN the sorted sequence OF queens  
+                APPEND a string of period repeated col times PLUS letter Q PLUS period repeated n MINUS col MINUS one times TO solution  
+            END FOR  
+            APPEND solution TO output  
+        END FUNCTION  
+        
+        FUNCTION backtrack WITH PARAMETER row EQUAL TO zero  
+            FOR col FROM zero TO n MINUS one  
+                IF is_not_under_attack WITH PARAMETERS row AND col HOLDS  
+                    CALL place_queen WITH PARAMETERS row AND col  
+                    IF row PLUS one EQUALS n  
+                        CALL add_solution  
+                    ELSE  
+                        CALL backtrack WITH PARAMETER row PLUS one  
+                    END IF  
+                    CALL remove_queen WITH PARAMETERS row AND col  
+                END IF  
+            END FOR  
+        END FUNCTION  
+        
+        SET cols TO a list of zeros WITH length n  
+        SET hills TO a list of zeros WITH length two MULTIPLIED BY n MINUS one  
+        SET dales TO a list of zeros WITH length two MULTIPLIED BY n MINUS one  
+        SET queens TO an empty set  
+        SET output TO an empty list  
+        CALL backtrack  
+        RETURN output  
+    END FUNCTION  
+END CLASS

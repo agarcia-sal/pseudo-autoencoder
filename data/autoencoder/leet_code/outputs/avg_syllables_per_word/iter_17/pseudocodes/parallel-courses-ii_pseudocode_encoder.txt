@@ -1,0 +1,47 @@
+CLASS Solution
+    FUNCTION minNumberOfSemesters(n, relations, k)
+        CALL initializeGraph WITH parameters n, relations OUTPUT graph, in_degree
+        
+        CALL initializeQueue WITH parameters in_degree, n OUTPUT queue
+        
+        SET semesters TO zero
+        
+        WHILE queue is not empty holds
+            SET number_of_courses_this_semester TO the MINIMUM OF k AND the LENGTH OF queue
+            FOR index FROM one TO number_of_courses_this_semester
+                CALL removeLeftmostElement FROM queue OUTPUT current_course
+                FOR each next_course IN element at position current_course of graph
+                    DECREMENT element at position next_course of in_degree BY one
+                    IF element at position next_course of in_degree EQUALS zero THEN
+                        CALL append TO queue WITH next_course
+                    END IF
+                END FOR
+            END FOR
+            INCREMENT semesters BY one
+        END WHILE
+        
+        RETURN semesters
+    END FUNCTION
+
+    FUNCTION initializeGraph(n, relations)
+        CREATE graph AS a default dictionary with list as default value
+        CREATE in_degree AS a list of zero repeated n plus one times
+        
+        FOR each pair prevCourse, nextCourse IN relations
+            CALL append TO element at position prevCourse of graph WITH nextCourse
+            INCREMENT element at position nextCourse of in_degree BY one
+        END FOR
+        
+        RETURN graph, in_degree
+    END FUNCTION
+
+    FUNCTION initializeQueue(in_degree, n)
+        CREATE queue AS an empty deque
+        FOR course FROM one TO n
+            IF element at position course of in_degree EQUALS zero THEN
+                CALL append TO queue WITH course
+            END IF
+        END FOR
+        RETURN queue
+    END FUNCTION
+END CLASS

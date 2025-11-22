@@ -1,0 +1,51 @@
+CLASS Solution  
+    FUNCTION shortestPathAllKeys(grid)  
+        SET directions TO list of (0, 1), (0, -1), (1, 0), (-1, 0)  
+        
+        SET m TO number of rows in grid  
+        SET n TO number of columns in grid  
+        SET start TO None  
+        SET num_keys TO 0  
+        
+        FOR i FROM 0 TO m MINUS 1  
+            FOR j FROM 0 TO n MINUS 1  
+                IF grid at position (i, j) EQUALS '@' THEN  
+                    SET start TO tuple (i, j)  
+                ELSE IF grid at position (i, j) IS lowercase letter THEN  
+                    INCREMENT num_keys BY 1  
+        
+        INITIALIZE queue WITH tuple containing start row, start column, 0 keys collected, and 0 steps  
+        INITIALIZE visited SET with tuple of start row, start column, and 0 keys collected  
+        
+        WHILE queue IS NOT empty  
+            REMOVE first element FROM queue AND UNPACK TO x, y, keys, steps  
+            
+            FOR each dx, dy IN directions  
+                SET nx TO x PLUS dx  
+                SET ny TO y PLUS dy  
+                
+                IF nx IS GREATER THAN OR EQUAL TO 0 AND LESS THAN m AND ny IS GREATER THAN OR EQUAL TO 0 AND LESS THAN n THEN  
+                    SET cell TO grid at position (nx, ny)  
+                    
+                    IF cell EQUALS '#' THEN  
+                        CONTINUE to next iteration  
+                    
+                    IF cell IS uppercase letter THEN  
+                        SET key_needed TO 1 LEFT SHIFTED BY (ASCII of lowercase of cell MINUS ASCII of 'a')  
+                        IF bitwise AND of keys AND key_needed EQUALS 0 THEN  
+                            CONTINUE to next iteration  
+                    
+                    IF cell IS lowercase letter THEN  
+                        SET new_keys TO bitwise OR of keys AND 1 LEFT SHIFTED BY (ASCII of cell MINUS ASCII of 'a')  
+                        IF new_keys EQUALS (1 LEFT SHIFTED BY num_keys) MINUS 1 THEN  
+                            RETURN steps PLUS 1  
+                    ELSE  
+                        SET new_keys TO keys  
+                    
+                    IF tuple (nx, ny, new_keys) IS NOT IN visited THEN  
+                        ADD tuple (nx, ny, new_keys) TO visited  
+                        APPEND tuple (nx, ny, new_keys, steps PLUS 1) TO queue  
+        
+        RETURN -1  
+    END FUNCTION  
+END CLASS

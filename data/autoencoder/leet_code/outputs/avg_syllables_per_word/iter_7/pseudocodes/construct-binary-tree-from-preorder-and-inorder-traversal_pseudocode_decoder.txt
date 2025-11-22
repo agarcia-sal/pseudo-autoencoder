@@ -1,0 +1,57 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val SET TO 0, left SET TO None, right SET TO None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN None  
+    END IF  
+    SET root TO new TreeNode WITH values AT position 0  
+    SET i TO 1  
+    SET queue TO empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO element REMOVED FROM front OF queue  
+        IF i IS LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.left TO new TreeNode WITH values AT i  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY 1  
+        IF i IS LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.right TO new TreeNode WITH values AT i  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION buildTree(self, preorder, inorder)  
+        IF preorder IS empty OR inorder IS empty  
+            RETURN None  
+        END IF  
+        SET root_val TO preorder AT position 0  
+        SET root TO new TreeNode WITH root_val  
+        SET root_index_inorder TO position OF root_val IN inorder  
+        SET root.left TO self.buildTree(preorder FROM position 1 TO root_index_inorder INCLUSIVE, inorder FROM start TO root_index_inorder EXCLUSIVE)  
+        SET root.right TO self.buildTree(preorder FROM position root_index_inorder PLUS 1 TO end, inorder FROM position root_index_inorder PLUS 1 TO end)  
+        RETURN root  
+    END FUNCTION  
+END CLASS

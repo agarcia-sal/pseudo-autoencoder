@@ -1,0 +1,111 @@
+CLASS Solution  
+    FUNCTION canMouseWin(grid WITH TYPE List of String, catJump WITH TYPE Integer, mouseJump WITH TYPE Integer) RETURNS Boolean  
+        SET m TO the LENGTH OF grid  
+        SET n TO the LENGTH OF element at position zero of grid  
+        SET cat_start TO zero  
+        SET mouse_start TO zero  
+        SET food TO zero  
+        SET dirs TO list containing negative one, zero, one, zero, negative one in this order  
+        SET g_mouse TO a list containing m MULTIPLIED BY n empty lists  
+        SET g_cat TO a list containing m MULTIPLIED BY n empty lists  
+        FOR i, row AS enumeration index and element IN grid  
+            FOR j, c AS enumeration index and element IN row  
+                IF c EQUALS the symbol representing a wall  
+                    CONTINUE to next iteration  
+                END IF  
+                SET v TO i MULTIPLIED BY n PLUS j  
+                IF c EQUALS the symbol representing cat  
+                    SET cat_start TO v  
+                ELSE IF c EQUALS the symbol representing mouse  
+                    SET mouse_start TO v  
+                ELSE IF c EQUALS the symbol representing food  
+                    SET food TO v  
+                END IF  
+                FOR a, b AS each pair of consecutive elements in dirs using pairwise iteration  
+                    FOR k FROM zero TO mouseJump INCLUSIVE  
+                        SET x TO i PLUS k MULTIPLIED BY a  
+                        SET y TO j PLUS k MULTIPLIED BY b  
+                        IF x LESS THAN zero OR x GREATER THAN OR EQUAL TO m OR y LESS THAN zero OR y GREATER THAN OR EQUAL TO n OR element at position x of grid EQUALS the symbol representing a wall  
+                            BREAK out of current FOR loop  
+                        END IF  
+                        APPEND x MULTIPLIED BY n PLUS y TO the list at position v in g_mouse  
+                    END FOR  
+                    FOR k FROM zero TO catJump INCLUSIVE  
+                        SET x TO i PLUS k MULTIPLIED BY a  
+                        SET y TO j PLUS k MULTIPLIED BY b  
+                        IF x LESS THAN zero OR x GREATER THAN OR EQUAL TO m OR y LESS THAN zero OR y GREATER THAN OR EQUAL TO n OR element at position x of grid EQUALS the symbol representing a wall  
+                            BREAK out of current FOR loop  
+                        END IF  
+                        APPEND x MULTIPLIED BY n PLUS y TO the list at position v in g_cat  
+                    END FOR  
+                END FOR  
+            END FOR  
+        END FOR  
+        RETURN the RESULT OF calling calc WITH parameters g_mouse, g_cat, mouse_start, cat_start, food EQUALS one  
+    END FUNCTION  
+
+    FUNCTION calc(g_mouse WITH TYPE List of List of Integer, g_cat WITH TYPE List of List of Integer, mouse_start WITH TYPE Integer, cat_start WITH TYPE Integer, hole WITH TYPE Integer) RETURNS Integer  
+        FUNCTION get_prev_states(state) RETURNS List of Tuple  
+            SET m TO element at position zero of state  
+            SET c TO element at position one of state  
+            SET t TO element at position two of state  
+            SET pt TO the result of bitwise exclusive OR of t with one  
+            SET pre TO an empty list  
+            IF pt EQUALS one  
+                FOR pc IN the list at position c in g_cat  
+                    IF ans at position m, pc, and one EQUALS zero  
+                        APPEND tuple of m, pc, pt TO pre  
+                    END IF  
+                END FOR  
+            ELSE  
+                FOR pm IN the list at position m in g_mouse  
+                    IF ans at position pm, c, and zero EQUALS zero  
+                        APPEND tuple of pm, c, zero TO pre  
+                    END IF  
+                END FOR  
+            END IF  
+            RETURN pre  
+        END FUNCTION  
+
+        SET n TO the LENGTH OF g_mouse  
+        SET degree TO a three dimensional list with dimensions n BY n BY two filled with zero  
+        FOR i FROM zero TO n MINUS one  
+            FOR j FROM zero TO n MINUS one  
+                SET degree at position i, j, zero TO the LENGTH OF list at position i in g_mouse  
+                SET degree at position i, j, one TO the LENGTH OF list at position j in g_cat  
+            END FOR  
+        END FOR  
+        SET ans TO a three dimensional list with dimensions n BY n BY two filled with zero  
+        SET q TO an empty double ended queue  
+        FOR i FROM zero TO n MINUS one  
+            SET ans at position hole, i, one TO one  
+            SET ans at position i, hole, zero TO two  
+            SET ans at position i, i, one TO two  
+            SET ans at position i, i, zero TO two  
+            APPEND tuple of hole, i, one TO q  
+            APPEND tuple of i, hole, zero TO q  
+            APPEND tuple of i, i, zero TO q  
+            APPEND tuple of i, i, one TO q  
+        END FOR  
+        WHILE the queue q IS NOT empty  
+            SET state TO the element popped from left of q  
+            SET t TO ans at position element at position zero of state, element at position one of state, element at position two of state  
+            FOR prev_state IN the RESULT OF calling get_prev_states WITH argument state  
+                SET pm TO element at position zero of prev_state  
+                SET pc TO element at position one of prev_state  
+                SET pt TO element at position two of prev_state  
+                IF pt EQUALS t MINUS one  
+                    SET ans at position pm, pc, pt TO t  
+                    APPEND prev_state TO q  
+                ELSE  
+                    DECREMENT degree at position pm, pc, pt BY one  
+                    IF degree at position pm, pc, pt EQUALS zero  
+                        SET ans at position pm, pc, pt TO t  
+                        APPEND prev_state TO q  
+                    END IF  
+                END IF  
+            END FOR  
+        END WHILE  
+        RETURN ans at position mouse_start, cat_start, zero  
+    END FUNCTION  
+END CLASS

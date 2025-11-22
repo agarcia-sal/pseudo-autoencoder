@@ -1,0 +1,23 @@
+CLASS Solution  
+    FUNCTION jobScheduling(startTime AS List OF Integer, endTime AS List OF Integer, profit AS List OF Integer) RETURNS Integer  
+        SET jobs TO the LIST OF tuples CREATED FROM pairwise CORRESPONDENCE OF startTime AND endTime AND profit SORTED BY the second ELEMENT OF each tuple  
+        SET end_times TO an EMPTY LIST  
+        FOR each job IN jobs  
+            APPEND the second ELEMENT OF job TO end_times  
+        END FOR  
+        SET dp TO a LIST OF zero REPEATED the LENGTH OF jobs PLUS one TIMES  
+        FOR i FROM one TO the LENGTH OF jobs  
+            SET current_start TO the first ELEMENT OF the job AT position i MINUS one OF jobs  
+            SET j TO the POSITION RETURNED BY PERFORMING BINARY SEARCH TO FIND THE insertion POINT AT WHICH current_start WOULD BE PLACED IN end_times IN SUCH A WAY THAT end_times REMAINS sorted  
+            SET profit_with_current TO the ELEMENT AT position j OF dp PLUS the third ELEMENT OF the job AT position i MINUS one OF jobs  
+            SET dp_at_previous TO the ELEMENT AT position i MINUS one OF dp  
+            IF dp_at_previous GREATER THAN profit_with_current  
+                SET dp_at_i TO dp_at_previous  
+            ELSE  
+                SET dp_at_i TO profit_with_current  
+            END IF  
+            SET the ELEMENT AT position i OF dp TO dp_at_i  
+        END FOR  
+        RETURN the last ELEMENT OF dp  
+    END FUNCTION  
+END CLASS

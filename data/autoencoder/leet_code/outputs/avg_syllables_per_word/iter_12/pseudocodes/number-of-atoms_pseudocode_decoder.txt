@@ -1,0 +1,61 @@
+CLASS Solution  
+    FUNCTION countOfAtoms(formula)  
+        FUNCTION parse(segment)  
+            INITIALIZE atom_count AS empty mapping FROM element TO integer  
+            SET elements TO the list of pairs FOUND BY matching pattern of uppercase letter FOLLOWED BY zero or more lowercase letters AND zero or more digits IN segment  
+            FOR each element, count IN elements  
+                IF count IS NOT empty  
+                    INCREMENT atom_count[element] BY integer value of count  
+                ELSE  
+                    INCREMENT atom_count[element] BY one  
+                END IF  
+            END FOR  
+            RETURN atom_count  
+        END FUNCTION  
+        
+        FUNCTION multiply_counts(counts, multiplier)  
+            FOR each element IN counts  
+                SET counts[element] TO counts[element] MULTIPLIED BY multiplier  
+            END FOR  
+            RETURN counts  
+        END FUNCTION  
+        
+        INITIALIZE stack AS list WITH one empty mapping FROM element TO integer  
+        SET i TO zero  
+        WHILE i LESS THAN the LENGTH OF formula  
+            IF character at position i IN formula EQUALS opening parenthesis  
+                APPEND empty mapping FROM element TO integer TO stack  
+                INCREMENT i BY one  
+            ELSE IF character at position i IN formula EQUALS closing parenthesis  
+                INITIALIZE segment_count AS empty mapping FROM element TO integer  
+                SET j TO i PLUS one  
+                WHILE j LESS THAN LENGTH OF formula AND character at position j IS digit  
+                    INCREMENT j BY one  
+                END WHILE  
+                IF j GREATER THAN i PLUS one  
+                    SET multiplier TO integer value of substring of formula FROM position i PLUS one TO position j  
+                ELSE  
+                    SET multiplier TO one  
+                END IF  
+                SET segment_count TO multiply_counts(POP last mapping FROM stack, multiplier)  
+                FOR each element IN segment_count  
+                    INCREMENT the element's count IN the last mapping OF stack BY segment_count[element]  
+                END FOR  
+                SET i TO j  
+            ELSE  
+                SET j TO i PLUS one  
+                WHILE j LESS THAN LENGTH OF formula AND (character at position j IS lowercase letter OR character at position j IS digit)  
+                    INCREMENT j BY one  
+                END WHILE  
+                SET segment_count TO parse(substring of formula FROM position i TO position j)  
+                FOR each element IN segment_count  
+                    INCREMENT the element's count IN the last mapping OF stack BY segment_count[element]  
+                END FOR  
+                SET i TO j  
+            END IF  
+        END WHILE  
+        
+        SET final_count TO POP last mapping FROM stack  
+        RETURN the concatenation FOR each element IN sorted order OF keys OF final_count of element FOLLOWED BY (string representation of final_count[element] IF final_count[element] GREATER THAN one ELSE empty string)  
+    END FUNCTION  
+END CLASS

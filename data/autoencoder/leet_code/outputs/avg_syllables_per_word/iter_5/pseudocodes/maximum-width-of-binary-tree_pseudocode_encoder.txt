@@ -1,0 +1,62 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val = 0, left = None, right = None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET root TO NEW TreeNode WITH values AT POSITION ZERO  
+    SET i TO 1  
+    SET queue TO NEW deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO queue POP LEFT  
+        IF i IS LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.left TO NEW TreeNode WITH values AT i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i IS LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.right TO NEW TreeNode WITH values AT i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION widthOfBinaryTree(self, root)  
+        IF root IS None  
+            RETURN 0  
+        SET queue TO NEW deque WITH ELEMENT (root, 0)  
+        SET max_width TO 0  
+        WHILE queue IS NOT EMPTY  
+            SET level_length TO LENGTH OF queue  
+            SET first_index TO SECOND ELEMENT OF queue AT POSITION ZERO  
+            FOR each position FROM ZERO TO level_length MINUS ONE  
+                SET node, index TO queue POP LEFT  
+                IF position IS EQUAL TO level_length MINUS ONE  
+                    SET max_width TO MAXIMUM OF max_width AND (index MINUS first_index PLUS ONE)  
+                IF node.left EXISTS  
+                    APPEND (node.left, index MULTIPLIED BY 2) TO queue  
+                IF node.right EXISTS  
+                    APPEND (node.right, index MULTIPLIED BY 2 PLUS ONE) TO queue  
+            END FOR  
+        END WHILE  
+        RETURN max_width  
+    END FUNCTION  
+END CLASS

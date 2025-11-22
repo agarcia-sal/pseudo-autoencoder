@@ -1,0 +1,63 @@
+CLASS UnionFind  
+    FUNCTION __init__(self size)  
+        SET self parent TO list of integers from zero TO size MINUS one  
+        SET self rank TO list of size elements each EQUALS one  
+    END FUNCTION  
+  
+    FUNCTION find(self p)  
+        IF element at position p of self parent NOT EQUALS p  
+            SET element at position p of self parent TO self find(element at position p of self parent)  
+        END IF  
+        RETURN element at position p of self parent  
+    END FUNCTION  
+  
+    FUNCTION union(self p q)  
+        SET rootP TO self find p  
+        SET rootQ TO self find q  
+        IF rootP EQUALS rootQ  
+            RETURN False  
+        END IF  
+        IF element at position rootP of self rank GREATER THAN element at position rootQ of self rank  
+            SET element at position rootQ of self parent TO rootP  
+        ELSE IF element at position rootP of self rank LESS THAN element at position rootQ of self rank  
+            SET element at position rootP of self parent TO rootQ  
+        ELSE  
+            SET element at position rootQ of self parent TO rootP  
+            INCREMENT element at position rootP of self rank BY one  
+        END IF  
+        RETURN True  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION distanceLimitedPathsExist(self n edgeList queries)  
+        SORT edgeList by the third element of each element in ascending order  
+          
+        SET indexedQueries TO empty list  
+        FOR each index i AND element (p q limit) IN queries with enumeration  
+            APPEND tuple of (limit p q i) TO indexedQueries  
+        END FOR  
+        SORT indexedQueries in ascending order based on the first element of each tuple  
+          
+        SET uf TO new UnionFind initialized with n  
+          
+        SET edgeIndex TO zero  
+        SET numEdges TO the LENGTH OF edgeList  
+        SET results TO list of False repeated LENGTH OF queries times  
+          
+        FOR each tuple (limit p q originalIndex) IN indexedQueries  
+            WHILE edgeIndex LESS THAN numEdges AND third element of element at position edgeIndex of edgeList LESS THAN limit  
+                SET u TO first element of element at position edgeIndex of edgeList  
+                SET v TO second element of element at position edgeIndex of edgeList  
+                CALL uf union with u v  
+                INCREMENT edgeIndex BY one  
+            END WHILE  
+              
+            IF uf find p EQUALS uf find q  
+                SET element at position originalIndex of results TO True  
+            END IF  
+        END FOR  
+          
+        RETURN results  
+    END FUNCTION  
+END CLASS

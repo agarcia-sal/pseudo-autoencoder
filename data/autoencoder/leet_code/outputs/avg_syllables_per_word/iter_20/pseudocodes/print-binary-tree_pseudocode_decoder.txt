@@ -1,0 +1,68 @@
+CLASS TreeNode  
+    FUNCTION __init__ with parameters val EQUALS zero left EQUALS none right EQUALS none  
+        SET self dot val TO val  
+        SET self dot left TO left  
+        SET self dot right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node with parameter values list  
+    IF the LENGTH OF values list EQUALS zero  
+        RETURN none  
+    END IF  
+    SET root TO a new instance of TreeNode constructed with the element at position zero of values list  
+    SET i TO one  
+    SET queue TO an empty double ended queue  
+    APPEND root TO queue  
+    WHILE queue is not empty  
+        SET node TO the first element removed from the left of queue  
+        IF i is less than the LENGTH OF values list AND the element at position i of values list is not none  
+            SET node dot left TO a new instance of TreeNode constructed with the element at position i of values list  
+            APPEND node dot left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i is less than the LENGTH OF values list AND the element at position i of values list is not none  
+            SET node dot right TO a new instance of TreeNode constructed with the element at position i of values list  
+            APPEND node dot right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree with parameters p q  
+    IF p is none AND q is none  
+        RETURN True  
+    ELSE IF p is none OR q is none  
+        RETURN False  
+    ELSE IF p dot val is not EQUAL TO q dot val  
+        RETURN False  
+    ELSE  
+        RETURN the value of is_same_tree with p dot left AND q dot left AND the value of is_same_tree with p dot right AND q dot right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION printTree with parameters self root Optional of TreeNode  
+        FUNCTION getHeight with parameter node  
+            IF node is none  
+                RETURN zero  
+            END IF  
+            RETURN one PLUS the maximum value BETWEEN getHeight of node dot left AND getHeight of node dot right  
+        END FUNCTION  
+        SET height TO getHeight of root  
+        SET width TO two RAISED TO THE power of height MINUS one  
+        SET res TO a new list of height elements each a list of width elements each an empty string  
+        FUNCTION placeNode with parameters node row left right  
+            IF node is none  
+                RETURN  
+            END IF  
+            SET mid TO the integer part of left PLUS right DIVIDED BY two  
+            SET the element at position mid of the list at position row of res TO the string representation of node dot val  
+            CALL placeNode with node dot left row PLUS one left mid  
+            CALL placeNode with node dot right row PLUS one mid right  
+        END FUNCTION  
+        CALL placeNode with root zero zero width  
+        RETURN res  
+    END FUNCTION  
+END CLASS

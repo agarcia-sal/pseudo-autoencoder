@@ -1,0 +1,53 @@
+CLASS Solution
+    FUNCTION numDecodings(s)
+        SET MOD TO 1000000007
+        SET dp TO list of zeros with length LENGTH OF s PLUS 1
+        SET dp[0] TO 1
+
+        FUNCTION ways_to_decode_single(char)
+            IF char EQUALS '*'
+                RETURN 9
+            ELSE IF char EQUALS '0'
+                RETURN 0
+            ELSE
+                RETURN 1
+            END IF
+        END FUNCTION
+
+        FUNCTION ways_to_decode_pair(char1, char2)
+            IF char1 EQUALS '*' AND char2 EQUALS '*'
+                RETURN 15
+            ELSE IF char1 EQUALS '*'
+                IF char2 LESS THAN OR EQUAL TO '6'
+                    RETURN 2
+                ELSE
+                    RETURN 1
+                END IF
+            ELSE IF char2 EQUALS '*'
+                IF char1 EQUALS '1'
+                    RETURN 9
+                ELSE IF char1 EQUALS '2'
+                    RETURN 6
+                ELSE
+                    RETURN 0
+                END IF
+            ELSE
+                SET num TO integer value of char1 concatenated with char2
+                IF num GREATER THAN OR EQUAL TO 10 AND num LESS THAN OR EQUAL TO 26
+                    RETURN 1
+                ELSE
+                    RETURN 0
+                END IF
+            END IF
+        END FUNCTION
+
+        FOR i FROM 1 TO LENGTH OF s
+            SET dp[i] TO (dp[i] PLUS dp[i MINUS 1] TIMES ways_to_decode_single(s[i MINUS 1])) MODULO MOD
+            IF i GREATER THAN 1
+                SET dp[i] TO (dp[i] PLUS dp[i MINUS 2] TIMES ways_to_decode_pair(s[i MINUS 2], s[i MINUS 1])) MODULO MOD
+            END IF
+        END FOR
+
+        RETURN dp[LAST ITEM]
+    END FUNCTION
+END CLASS

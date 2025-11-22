@@ -1,0 +1,31 @@
+CLASS Solution  
+    FUNCTION makeArrayIncreasing(arr1 AS List OF Integer, arr2 AS List OF Integer) RETURNS Integer  
+        CALL sort ON arr2  
+        SET dp TO a dictionary with one entry where the key is negative one and the value is zero  
+        
+        FOR each num IN arr1  
+            SET new_dp TO an empty dictionary  
+            FOR each last_num AND ops IN the items of dp  
+                IF num GREATER THAN last_num  
+                    SET current_min_ops TO the value in new_dp at key num OR positive infinity if key does not exist  
+                    SET new_dp at key num TO the smaller value between current_min_ops AND ops  
+                END IF  
+                
+                SET idx TO the position from binary search to find the smallest element in arr2 strictly greater than last_num  
+                IF idx LESS THAN the length of arr2  
+                    SET replacement TO the element at position idx of arr2  
+                    SET current_min_ops_replace TO the value in new_dp at key replacement OR positive infinity if key does not exist  
+                    SET new_dp at key replacement TO the smaller value between current_min_ops_replace AND ops PLUS one  
+                END IF  
+            END FOR  
+            
+            IF new_dp is empty  
+                RETURN negative one  
+            END IF  
+            SET dp TO new_dp  
+        END FOR  
+        
+        SET minimum_operations TO the smallest value among the values in dp  
+        RETURN minimum_operations  
+    END FUNCTION  
+END CLASS

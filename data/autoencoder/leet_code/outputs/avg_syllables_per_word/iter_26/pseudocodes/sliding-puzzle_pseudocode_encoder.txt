@@ -1,0 +1,54 @@
+CLASS Solution
+    FUNCTION slidingPuzzle(board)
+        SET start TO a tuple composed of tuples of each row in board
+        SET target TO a tuple composed of tuples of the sequences one two three and four five zero respectively
+
+        SET neighbors TO a mapping where
+            the key zero maps to the set of positions one and three
+            the key one maps to the set of positions zero two and four
+            the key two maps to the set of positions one and five
+            the key three maps to the set of positions zero and four
+            the key four maps to the set of positions one three and five
+            the key five maps to the set of positions two and four
+
+        FOR i FROM zero TO one INCLUSIVE
+            FOR j FROM zero TO two INCLUSIVE
+                IF the element at position i OF start at position j EQUALS zero
+                    SET zero_pos TO i MULTIPLIED BY three PLUS j
+                END IF
+            END FOR
+        END FOR
+
+        SET queue TO a double ended queue initialized with a tuple containing start, zero_pos, and zero
+        SET visited TO a set initialized with start
+
+        WHILE queue IS NOT EMPTY
+            SET state, zero_pos, moves TO the first element REMOVED FROM queue
+
+            IF state EQUALS target
+                RETURN moves
+            END IF
+
+            FOR each neighbor IN the set mapped FROM zero_pos IN neighbors
+                SET new_state TO a list conversion of each list conversion of each tuple in state
+                SET i TO zero_pos DIVIDED BY three
+                SET j TO zero_pos MODULO three
+                SET ni TO neighbor DIVIDED BY three
+                SET nj TO neighbor MODULO three
+
+                SET temporary TO the element at position ni OF new_state at position nj
+                SET the element at position ni OF new_state at position nj TO the element at position i OF new_state at position j
+                SET the element at position i OF new_state at position j TO temporary
+
+                SET new_tuple_state TO a tuple composed of tuples of each row in new_state
+
+                IF new_tuple_state NOT IN visited
+                    ADD new_tuple_state TO visited
+                    ADD the tuple containing new_tuple_state, neighbor, and moves PLUS one TO the END OF queue
+                END IF
+            END FOR
+        END WHILE
+
+        RETURN negative one
+    END FUNCTION
+END CLASS

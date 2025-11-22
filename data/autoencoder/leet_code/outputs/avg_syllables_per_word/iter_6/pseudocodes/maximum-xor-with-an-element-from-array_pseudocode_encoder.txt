@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION maximizeXor(nums, queries)  
+        CALL nums SORT  
+        
+        SET sorted_queries TO sorted enumeration of queries by second element of each query  
+        
+        SET result TO list of length equal to queries initialized with value MINUS ONE  
+        
+        SET trie TO empty dictionary  
+        
+        SET num_index TO zero  
+        
+        FOR each query_index, (xi, mi) IN sorted_queries  
+            WHILE num_index LESS THAN LENGTH OF nums AND nums AT num_index LESS THAN OR EQUAL TO mi  
+                SET num TO nums AT num_index  
+                SET node TO trie  
+                
+                FOR i FROM 31 DOWN TO 0  
+                    SET bit TO bit at position i of num (num DIVIDED BY (two to the power i) MODULO two)  
+                    IF bit NOT IN node  
+                        SET node AT bit TO empty dictionary  
+                    SET node TO node AT bit  
+                
+                INCREMENT num_index BY one  
+            
+            IF trie IS empty  
+                CONTINUE  
+            
+            SET node TO trie  
+            SET max_xor TO zero  
+            
+            FOR i FROM 31 DOWN TO 0  
+                SET bit TO bit at position i of xi (xi DIVIDED BY (two to the power i) MODULO two)  
+                SET toggle_bit TO one MINUS bit  
+                
+                IF toggle_bit IN node  
+                    SET max_xor TO max_xor PLUS (two to the power i)  
+                    SET node TO node AT toggle_bit  
+                ELSE  
+                    SET node TO node AT bit  
+            
+            SET result AT query_index TO max_xor  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION gridIllumination(n, lamps, queries)  
+        SET row_count TO a default dictionary with integer default value  
+        SET col_count TO a default dictionary with integer default value  
+        SET diag_count TO a default dictionary with integer default value  
+        SET anti_diag_count TO a default dictionary with integer default value  
+        
+        SET lamp_positions TO an empty set  
+        
+        FOR each pair r AND c IN lamps  
+            IF pair r AND c IS NOT IN lamp_positions  
+                APPEND pair r AND c TO lamp_positions  
+                INCREMENT the value at key r in row_count BY one  
+                INCREMENT the value at key c in col_count BY one  
+                INCREMENT the value at key obtained by subtracting c FROM r in diag_count BY one  
+                INCREMENT the value at key obtained by adding r AND c in anti_diag_count BY one  
+            END IF  
+        END FOR  
+        
+        SET directions TO the list of nine pairs consisting of minus one AND minus one, minus one AND zero, minus one AND one, zero AND minus one, zero AND zero, zero AND one, one AND minus one, one AND zero, one AND one  
+        
+        SET result TO an empty list  
+        
+        FOR each pair r AND c IN queries  
+            IF the value at key r in row_count IS GREATER THAN zero OR the value at key c in col_count IS GREATER THAN zero OR the value at key obtained by subtracting c FROM r in diag_count IS GREATER THAN zero OR the value at key obtained by adding r AND c in anti_diag_count IS GREATER THAN zero  
+                APPEND the number one TO result  
+            ELSE  
+                APPEND the number zero TO result  
+            END IF  
+            
+            FOR each pair dr AND dc IN directions  
+                SET nr TO the sum of r AND dr  
+                SET nc TO the sum of c AND dc  
+                IF the pair nr AND nc IS IN lamp_positions  
+                    REMOVE the pair nr AND nc FROM lamp_positions  
+                    DECREMENT the value at key nr in row_count BY one  
+                    DECREMENT the value at key nc in col_count BY one  
+                    DECREMENT the value at key obtained by subtracting nc FROM nr in diag_count BY one  
+                    DECREMENT the value at key obtained by adding nr AND nc in anti_diag_count BY one  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

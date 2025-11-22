@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION ladderLength(beginWord, endWord, wordList)  
+        IF endWord IS NOT IN wordList THEN  
+            RETURN zero  
+        END IF  
+
+        SET word_dict TO CALL create_default_dictionary_with_list_values()  
+        SET word_length TO LENGTH OF beginWord  
+
+        FOR each word IN wordList  
+            FOR index FROM zero TO word_length MINUS one  
+                SET intermediate_word TO CONCATENATE substring FROM zero TO index OF word WITH asterisk WITH substring FROM index PLUS one TO END OF word  
+                APPEND word TO the LIST AT intermediate_word IN word_dict  
+            END FOR  
+        END FOR  
+
+        SET queue TO CALL create_double_ended_queue_with_element CONSISTING OF beginWord AND one  
+        SET visited TO SET CONTAINING beginWord  
+
+        WHILE queue IS NOT EMPTY  
+            SET current_word AND current_length TO REMOVE FIRST ELEMENT FROM queue  
+
+            FOR index FROM zero TO word_length MINUS one  
+                SET intermediate_word TO CONCATENATE substring FROM zero TO index OF current_word WITH asterisk WITH substring FROM index PLUS one TO END OF current_word  
+
+                FOR each word IN the LIST AT intermediate_word IN word_dict  
+                    IF word IS EQUAL TO endWord THEN  
+                        RETURN current_length PLUS one  
+                    END IF  
+                    IF word IS NOT IN visited THEN  
+                        ADD word TO visited  
+                        APPEND word AND current_length PLUS one TO queue  
+                    END IF  
+                END FOR  
+            END FOR  
+        END WHILE  
+
+        RETURN zero  
+    END FUNCTION  
+END CLASS

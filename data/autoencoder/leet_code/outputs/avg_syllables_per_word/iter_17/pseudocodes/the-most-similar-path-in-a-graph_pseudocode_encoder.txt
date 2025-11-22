@@ -1,0 +1,50 @@
+CLASS Solution
+    FUNCTION mostSimilar(n, roads, names, targetPath)
+        CALL initialize_graph AS graph WITH DEFAULT LIST
+        
+        FOR each pair of cities u AND v IN roads
+            APPEND v TO the LIST at position u IN graph
+            APPEND u TO the LIST at position v IN graph
+        END FOR
+
+        SET path_length TO the LENGTH OF targetPath
+
+        FUNCTION dp(i, j)
+            IF i EQUALS zero THEN
+                IF element at position j of names NOT EQUALS element at position i of targetPath THEN
+                    RETURN one, A LIST containing j
+                ELSE
+                    RETURN zero, A LIST containing j
+                END IF
+            END IF
+
+            SET minimum_cost TO infinity
+            SET minimum_path TO an EMPTY LIST
+
+            FOR each city k IN the LIST at position j IN graph
+                CALL dp WITH parameters i MINUS one AND k ASSIGNING TO cost AND path
+                IF cost LESS THAN minimum_cost THEN
+                    SET minimum_cost TO cost
+                    SET minimum_path TO path
+                END IF
+            END FOR
+
+            SET current_cost TO minimum_cost PLUS
+                IF element at position j of names NOT EQUALS element at position i of targetPath THEN one ELSE zero
+            RETURN current_cost, minimum_path APPENDED WITH j
+        END FUNCTION
+
+        SET minimum_total_cost TO infinity
+        SET minimum_total_path TO an EMPTY LIST
+
+        FOR index j FROM zero TO n MINUS one
+            CALL dp WITH parameters path_length MINUS one AND j ASSIGNING TO cost AND path
+            IF cost LESS THAN minimum_total_cost THEN
+                SET minimum_total_cost TO cost
+                SET minimum_total_path TO path
+            END IF
+        END FOR
+
+        RETURN minimum_total_path
+    END FUNCTION
+END CLASS

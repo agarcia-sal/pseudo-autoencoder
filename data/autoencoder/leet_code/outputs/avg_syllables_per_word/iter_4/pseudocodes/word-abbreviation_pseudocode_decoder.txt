@@ -1,0 +1,59 @@
+CLASS Solution
+    FUNCTION wordsAbbreviation(words: List of String) RETURNS List of String
+        FUNCTION abbreviate(word: String, prefix_length: Integer) RETURNS String
+            IF LENGTH OF word MINUS prefix_length IS LESS THAN OR EQUAL TO 2 THEN
+                RETURN word
+            END IF
+            SET abbreviation TO CONCATENATION OF:
+                SUBSTRING OF word FROM START TO prefix_length,
+                STRING OF (LENGTH OF word MINUS prefix_length MINUS 1),
+                LAST CHARACTER OF word
+            RETURN abbreviation
+        END FUNCTION
+
+        FUNCTION get_unique_abbreviations(words_with_indices: List of (Integer, String), prefix_length: Integer) RETURNS Map of String TO List of (Integer, String)
+            SET abbs TO EMPTY MAP WITH DEFAULT VALUE AS EMPTY LIST
+            FOR EACH (index, word) IN words_with_indices DO
+                SET abbrev TO abbreviate(word, prefix_length)
+                APPEND (index, word) TO abbs[abbrev]
+            END FOR
+            RETURN abbs
+        END FUNCTION
+
+        SET n TO LENGTH OF words
+        SET ans TO LIST OF EMPTY STRINGS OF SIZE n
+        SET words_with_indices TO LIST OF PAIRS (index, word) FOR EACH index AND word IN words
+        
+        SET abbs TO get_unique_abbreviations(words_with_indices, 1)
+
+        FOR EACH (abb, group) IN abbs DO
+            IF LENGTH OF group IS 1 THEN
+                SET (index, word) TO FIRST ELEMENT OF group
+                SET ans[index] TO abb
+            ELSE
+                SET new_group TO EMPTY LIST
+                FOR EACH (index, word) IN group DO
+                    APPEND (index, word) TO new_group
+                END FOR
+                SET prefix_length TO 2
+                WHILE LENGTH OF new_group IS GREATER THAN 0 DO
+                    SET new_abbs TO get_unique_abbreviations(new_group, prefix_length)
+                    SET new_group TO EMPTY LIST
+                    FOR EACH (new_abb, new_group_items) IN new_abbs DO
+                        IF LENGTH OF new_group_items IS 1 THEN
+                            SET (index, word) TO FIRST ELEMENT OF new_group_items
+                            SET ans[index] TO new_abb
+                        ELSE
+                            FOR EACH item IN new_group_items DO
+                                APPEND item TO new_group
+                            END FOR
+                        END IF
+                    END FOR
+                    INCREMENT prefix_length BY 1
+                END WHILE
+            END IF
+        END FOR
+
+        RETURN ans
+    END FUNCTION
+END CLASS

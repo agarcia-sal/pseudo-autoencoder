@@ -1,0 +1,50 @@
+CLASS Solution  
+    FUNCTION checkWays(pairs)  
+        SET graph TO an empty mapping with default value as an empty set  
+
+        FOR each element LIST containing exactly two elements x AND y IN pairs  
+            ADD element y TO the set mapped by element x in graph  
+            ADD element x TO the set mapped by element y in graph  
+        END FOR  
+
+        SET max_degree TO the element in graph with the maximum count of connected elements  
+        SET n TO the count of unique keys in graph  
+
+        IF the count of connected elements mapped by max_degree in graph NOT EQUALS n MINUS one  
+            RETURN zero  
+        END IF  
+
+        FUNCTION can_be_parent(u, v)  
+            RETURN true IF for every connected neighbor of element v in graph the neighbor is contained in the connected elements mapped by u OR the neighbor EQUALS u  
+            OTHERWISE RETURN false  
+        END FUNCTION  
+
+        SET ways TO one  
+
+        FOR each element u IN graph  
+            IF element u EQUALS max_degree  
+                CONTINUE to next iteration  
+            END IF  
+
+            SET parent TO null  
+
+            FOR each element v IN the connected elements mapped by u in graph  
+                IF element v is a key in graph AND the count of connected elements mapped by v in graph GREATER THAN OR EQUAL TO the count of connected elements mapped by u in graph AND can_be_parent of element v with parameter u RETURNS true  
+                    IF parent IS null OR the count of connected elements mapped by v in graph LESS THAN the count of connected elements mapped by parent in graph  
+                        SET parent TO v  
+                    END IF  
+                END IF  
+            END FOR  
+
+            IF parent IS null  
+                RETURN zero  
+            END IF  
+
+            IF the count of connected elements mapped by parent in graph EQUALS the count of connected elements mapped by u in graph  
+                SET ways TO two  
+            END IF  
+        END FOR  
+
+        RETURN ways  
+    END FUNCTION  
+END CLASS

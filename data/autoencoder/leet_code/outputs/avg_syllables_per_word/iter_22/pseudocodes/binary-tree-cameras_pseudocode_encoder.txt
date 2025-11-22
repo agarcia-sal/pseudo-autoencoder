@@ -1,0 +1,61 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS None, right EQUALS None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF the LENGTH OF values EQUALS zero THEN  
+        RETURN None  
+    END IF  
+    SET root TO a new TreeNode initialized with the element at position one of values  
+    SET i TO one  
+    SET queue TO a new empty deque collection  
+    APPEND root TO queue  
+    WHILE the LENGTH OF queue GREATER THAN zero  
+        SET node TO the first element REMOVED FROM queue  
+        IF i LESS THAN the LENGTH OF values AND the element at position i of values NOT EQUALS None THEN  
+            SET node.left TO a new TreeNode initialized with the element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN the LENGTH OF values AND the element at position i of values NOT EQUALS None THEN  
+            SET node.right TO a new TreeNode initialized with the element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p EQUALS None AND q EQUALS None THEN  
+        RETURN True  
+    ELSE IF p EQUALS None OR q EQUALS None THEN  
+        RETURN False  
+    ELSE IF the value of p NOT EQUALS the value of q THEN  
+        RETURN False  
+    ELSE  
+        RETURN the result of is_same_tree with the left child of p and the left child of q AND the result of is_same_tree with the right child of p and the right child of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION minCameraCover(self, root)  
+        FUNCTION dfs(node)  
+            IF node EQUALS None THEN  
+                RETURN zero FOR no camera, zero FOR monitored, and infinity FOR camera  
+            END IF  
+            SET left_no_camera, left_monitored, left_camera TO the result of dfs with the left child of node  
+            SET right_no_camera, right_monitored, right_camera TO the result of dfs with the right child of node  
+            SET no_camera TO left_monitored PLUS right_monitored  
+            SET monitored TO the minimum AMONG these three values: left_camera PLUS the minimum BETWEEN right_monitored AND right_camera, right_camera PLUS the minimum BETWEEN left_monitored AND left_camera, and left_camera PLUS right_camera  
+            SET camera TO one PLUS the minimum AMONG left_no_camera, left_monitored, and left_camera PLUS the minimum AMONG right_no_camera, right_monitored, and right_camera  
+            RETURN the tuple no_camera, monitored, camera  
+        END FUNCTION  
+        SET root_no_camera, root_monitored, root_camera TO the result of dfs with root  
+        RETURN the minimum BETWEEN root_monitored AND root_camera  
+    END FUNCTION  
+END CLASS

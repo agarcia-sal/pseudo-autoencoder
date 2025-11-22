@@ -1,0 +1,53 @@
+CLASS Trie
+    FUNCTION __init__()
+        SET self.children TO a list of 26 None elements
+        SET self.is_end TO False
+    END FUNCTION
+
+    FUNCTION insert(w)
+        SET node TO self
+        FOR each character c IN w
+            SET idx TO position of c in alphabet (c minus 'a')
+            IF node.children at idx IS None
+                SET node.children at idx TO new Trie instance
+            SET node TO node.children at idx
+        END FOR
+        SET node.is_end TO True
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION findAllConcatenatedWordsInADict(words)
+        FUNCTION dfs(w, start)
+            IF start EQUALS length of w
+                RETURN True
+            END IF
+            SET node TO trie
+            FOR i FROM start TO length of w MINUS 1
+                SET idx TO position of w[i] in alphabet (w[i] minus 'a')
+                IF node.children at idx IS None
+                    RETURN False
+                END IF
+                SET node TO node.children at idx
+                IF node.is_end IS True AND dfs(w, i + 1) IS True
+                    RETURN True
+                END IF
+            END FOR
+            RETURN False
+        END FUNCTION
+
+        SET trie TO new Trie instance
+        SET ans TO empty list
+        SORT words BY length in ascending order
+        FOR each word w IN words
+            IF w is not empty
+                IF dfs(w, 0) IS True
+                    APPEND w TO ans
+                ELSE
+                    CALL trie.insert(w)
+                END IF
+            END IF
+        END FOR
+        RETURN ans
+    END FUNCTION
+END CLASS

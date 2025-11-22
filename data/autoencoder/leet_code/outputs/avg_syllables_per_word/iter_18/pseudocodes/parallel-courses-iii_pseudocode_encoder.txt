@@ -1,0 +1,31 @@
+CLASS Solution  
+    FUNCTION minimumTime WITH PARAMETERS n relations time  
+        SET graph TO a new mapping with default value as an empty list  
+        FOR each prevCourse AND nextCourse IN relations  
+            APPEND prevCourse TO element at key nextCourse IN graph  
+        END FOR  
+        SET memo TO a list of negative one repeated one PLUS n times  
+        FUNCTION dfs WITH PARAMETER course  
+            IF element at position course OF memo DOES NOT EQUAL negative one  
+                RETURN element at position course OF memo  
+            END IF  
+            SET max_prerequisite_time TO zero  
+            FOR each prevCourse IN element at key course IN graph  
+                SET candidate_time TO CALL dfs WITH ARGUMENT prevCourse  
+                IF candidate_time IS GREATER THAN max_prerequisite_time  
+                    SET max_prerequisite_time TO candidate_time  
+                END IF  
+            END FOR  
+            SET element at position course OF memo TO max_prerequisite_time PLUS element at position course MINUS one OF time  
+            RETURN element at position course OF memo  
+        END FUNCTION  
+        SET total_minimum_time TO zero  
+        FOR course FROM one TO n inclusive  
+            SET candidate_total TO CALL dfs WITH ARGUMENT course  
+            IF candidate_total IS GREATER THAN total_minimum_time  
+                SET total_minimum_time TO candidate_total  
+            END IF  
+        END FOR  
+        RETURN total_minimum_time  
+    END FUNCTION  
+END CLASS

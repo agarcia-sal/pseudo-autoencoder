@@ -1,0 +1,69 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS None, right EQUALS None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(list_of_values)
+    IF list_of_values IS empty
+        RETURN None
+    END IF
+    SET root TO CALL TreeNode WITH element at position zero of list_of_values
+    SET i TO one
+    CREATE queue AS CALL deque WITH no parameters
+    CALL APPEND root TO queue
+    WHILE queue IS NOT empty
+        SET node TO CALL popleft FROM queue
+        IF i LESS THAN the LENGTH OF list_of_values AND element at position i of list_of_values IS NOT None
+            SET node.left TO CALL TreeNode WITH element at position i of list_of_values
+            CALL APPEND node.left TO queue
+        END IF
+        INCREMENT i BY one
+        IF i LESS THAN the LENGTH OF list_of_values AND element at position i of list_of_values IS NOT None
+            SET node.right TO CALL TreeNode WITH element at position i of list_of_values
+            CALL APPEND node.right TO queue
+        END IF
+        INCREMENT i BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(node_p, node_q)
+    IF node_p IS None AND node_q IS None
+        RETURN True
+    ELSE IF node_p IS None OR node_q IS None
+        RETURN False
+    ELSE IF node_p.val IS NOT EQUAL TO node_q.val
+        RETURN False
+    ELSE
+        RETURN CALL is_same_tree WITH node_p.left AND node_q.left AND CALL is_same_tree WITH node_p.right AND node_q.right
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION rightSideView(root)
+        IF root IS None
+            RETURN empty list
+        END IF
+        CREATE right_side_view AS empty list
+        CREATE queue AS CALL deque WITH list containing root
+        WHILE queue IS NOT empty
+            SET level_length TO the LENGTH OF queue
+            FOR i FROM zero TO level_length MINUS one
+                SET node TO CALL popleft FROM queue
+                IF i EQUALS level_length MINUS one
+                    CALL APPEND node.val TO right_side_view
+                END IF
+                IF node.left IS NOT None
+                    CALL APPEND node.left TO queue
+                END IF
+                IF node.right IS NOT None
+                    CALL APPEND node.right TO queue
+                END IF
+            END FOR
+        END WHILE
+        RETURN right_side_view
+    END FUNCTION
+END CLASS

@@ -1,0 +1,63 @@
+```
+CLASS Solution
+    FUNCTION evaluate(expression)
+        FUNCTION get_tokens(expression)
+            SET tokens TO empty list
+            SET buf TO empty string
+            SET depth TO 0
+            FOR each char IN expression
+                IF char IS space AND depth IS 0 THEN
+                    APPEND buf TO tokens
+                    SET buf TO empty string
+                ELSE
+                    IF char IS '(' THEN
+                        INCREMENT depth BY 1
+                    ELSE IF char IS ')' THEN
+                        DECREMENT depth BY 1
+                    END IF
+                    APPEND char TO buf
+                END IF
+            END FOR
+            IF buf IS NOT empty THEN
+                APPEND buf TO tokens
+            END IF
+            RETURN tokens
+        END FUNCTION
+
+        FUNCTION evaluate_expression(tokens, context)
+            IF tokens[0] IS 'add' THEN
+                RETURN evaluate_expression(tokens[1], context) PLUS evaluate_expression(tokens[2], context)
+            ELSE IF tokens[0] IS 'mult' THEN
+                RETURN evaluate_expression(tokens[1], context) TIMES evaluate_expression(tokens[2], context)
+            ELSE IF tokens[0] IS 'let' THEN
+                SET new_context TO COPY OF context
+                SET i TO 1
+                WHILE i LESS THAN LENGTH OF tokens MINUS 1
+                    SET var TO tokens[i]
+                    SET expr TO tokens[i PLUS 1]
+                    SET new_context[var] TO evaluate_expression(expr, new_context)
+                    INCREMENT i BY 2
+                END WHILE
+                RETURN evaluate_expression(tokens[LAST], new_context)
+            ELSE
+                TRY
+                    RETURN CONVERT tokens[0] TO integer
+                CATCH failure
+                    RETURN context[tokens[0]]
+                END TRY
+            END IF
+        END FUNCTION
+
+        FUNCTION parse_expression(expression)
+            IF FIRST CHARACTER OF expression IS NOT '(' THEN
+                RETURN expression
+            END IF
+            SET tokens TO get_tokens(SUBSTRING OF expression FROM SECOND TO SECOND LAST CHARACTER)
+            RETURN LIST OF parse_expression(token) FOR EACH token IN tokens
+        END FUNCTION
+
+        SET parsed_expression TO parse_expression(expression)
+        RETURN evaluate_expression(parsed_expression, EMPTY DICTIONARY)
+    END FUNCTION
+END CLASS
+```

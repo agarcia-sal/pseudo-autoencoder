@@ -1,0 +1,61 @@
+CLASS Solution  
+    FUNCTION rectangleArea(self, rectangles)  
+        SET MOD TO ten raised to the power of nine PLUS seven  
+        
+        SET y_coords TO empty set  
+        FOR each rectangle IN rectangles  
+            UNPACK rectangle INTO x1, y1, x2, y2  
+            ADD y1 TO y_coords  
+            ADD y2 TO y_coords  
+        END FOR  
+        
+        SET y_coords TO list of y_coords sorted in ascending order  
+        
+        SET y_index TO empty map  
+        FOR each y WITH index i IN y_coords  
+            SET y_index[y] TO i  
+        END FOR  
+        
+        SET count TO list of zeros of length equal to length of y_coords  
+        
+        SET events TO empty list  
+        FOR each rectangle IN rectangles  
+            UNPACK rectangle INTO x1, y1, x2, y2  
+            APPEND tuple of x1, one, y1, y2 TO events  
+            APPEND tuple of x2, negative one, y1, y2 TO events  
+        END FOR  
+        
+        SORT events by first element of each tuple in ascending order  
+        
+        SET prev_x TO zero  
+        SET area TO zero  
+        
+        FOR each event IN events  
+            UNPACK event INTO x, eventType, y1, y2  
+            
+            SET current_length TO zero  
+            FOR i FROM one TO length of count MINUS one  
+                IF count at position i MINUS one GREATER THAN zero THEN  
+                    INCREMENT current_length BY difference of y_coords at position i MINUS y_coords at position i MINUS one  
+                END IF  
+            END FOR  
+            
+            INCREMENT area BY current_length MULTIPLIED BY difference of x MINUS prev_x  
+            SET area TO area modulo MOD  
+            
+            IF eventType EQUALS one THEN  
+                FOR i FROM y_index at y1 TO y_index at y2 MINUS one  
+                    INCREMENT count at position i BY one  
+                END FOR  
+            ELSE  
+                FOR i FROM y_index at y1 TO y_index at y2 MINUS one  
+                    DECREMENT count at position i BY one  
+                END FOR  
+            END IF  
+            
+            SET prev_x TO x  
+        END FOR  
+        
+        RETURN area  
+    END FUNCTION  
+END CLASS

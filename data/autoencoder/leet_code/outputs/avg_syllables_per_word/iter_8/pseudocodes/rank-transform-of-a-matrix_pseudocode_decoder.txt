@@ -1,0 +1,61 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.parent TO list of integers from 0 to size MINUS 1  
+    END FUNCTION  
+
+    FUNCTION find(self, u)  
+        IF self.parent at u IS NOT EQUAL TO u THEN  
+            SET self.parent at u TO RESULT OF self.find(self.parent at u)  
+        END IF  
+        RETURN self.parent at u  
+    END FUNCTION  
+
+    FUNCTION union(self, u, v)  
+        SET root_u TO RESULT OF self.find(u)  
+        SET root_v TO RESULT OF self.find(v)  
+        IF root_u IS NOT EQUAL TO root_v THEN  
+            SET self.parent at root_u TO root_v  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION matrixRankTransform(self, matrix)  
+        SET m TO LENGTH OF matrix  
+        SET n TO LENGTH OF matrix at 0  
+        SET value_to_indices TO a map with default list  
+
+        FOR r FROM 0 TO m MINUS 1  
+            FOR c FROM 0 TO n MINUS 1  
+                APPEND tuple (r, c) TO value_to_indices at matrix[r][c]  
+            END FOR  
+        END FOR  
+
+        SET row_rank TO list of zeros with length m  
+        SET col_rank TO list of zeros with length n  
+        SET result TO list of lists of zeros with m rows and n columns  
+
+        FOR value IN sorted keys of value_to_indices DO  
+            SET uf TO new UnionFind with size m PLUS n  
+            SET rank TO a map with default integer zero  
+
+            FOR each (r, c) IN value_to_indices at value DO  
+                CALL uf.union with r AND c PLUS m  
+            END FOR  
+
+            FOR each (r, c) IN value_to_indices at value DO  
+                SET root TO uf.find(r)  
+                SET rank at root TO maximum of rank at root AND maximum of row_rank at r AND col_rank at c PLUS 1  
+            END FOR  
+
+            FOR each (r, c) IN value_to_indices at value DO  
+                SET root TO uf.find(r)  
+                SET result at r and c TO rank at root  
+                SET row_rank at r TO rank at root  
+                SET col_rank at c TO rank at root  
+            END FOR  
+        END FOR  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,90 @@
+CLASS TrieNode  
+    FUNCTION __init__()  
+        SET children TO a new default dictionary that creates TrieNode objects  
+        SET count TO zero  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION maxGeneticDifference(parents, queries)  
+        SET tree TO a new default dictionary of empty lists  
+        FOR each index i AND parent IN parents  
+            IF parent IS NOT EQUAL TO negative one  
+                APPEND i TO the list at position parent in tree  
+            END IF  
+        END FOR  
+
+        SET node_queries TO a new default dictionary of empty lists  
+        FOR each element IN queries  
+            LET node BE the element at position zero of element  
+            LET val BE the element at position one of element  
+            APPEND val TO the list at position node in node_queries  
+        END FOR  
+
+        SET root TO a new TrieNode object  
+        SET result TO a list of zeros with the length equal to the length of queries  
+
+        FUNCTION dfs(node)  
+            CALL insert WITH trie_root SET TO root AND value SET TO node  
+
+            FOR each val IN the list at position node in node_queries  
+                SET result at position query_idx of the tuple consisting of node AND val TO  
+                CALL max_xor WITH trie_root SET TO root AND value SET TO val  
+            END FOR  
+
+            FOR each child IN the list at position node in tree  
+                CALL dfs WITH argument child  
+            END FOR  
+
+            CALL erase WITH trie_root SET TO root AND value SET TO node  
+        END FUNCTION  
+
+        FUNCTION insert(trie_root, value)  
+            SET node TO trie_root  
+            FOR i FROM seventeen DOWNTO zero  
+                SET bit TO the integer quotient of value DIVIDED BY two raised to the power i MINUS the integer quotient of value DIVIDED BY two raised to the power i PLUS one MULTIPLIED BY two  
+                IF bit IS NOT IN node.children  
+                    ASSIGN the result of creating a new TrieNode object TO the position at bit in node.children  
+                END IF  
+                SET node TO the node at position bit in node.children  
+                INCREMENT node.count BY one  
+            END FOR  
+        END FUNCTION  
+
+        FUNCTION erase(trie_root, value)  
+            SET node TO trie_root  
+            FOR i FROM seventeen DOWNTO zero  
+                SET bit TO the integer quotient of value DIVIDED BY two raised to the power i MINUS the integer quotient of value DIVIDED BY two raised to the power i PLUS one MULTIPLIED BY two  
+                SET node TO the node at position bit in node.children  
+                DECREMENT node.count BY one  
+            END FOR  
+        END FUNCTION  
+
+        FUNCTION max_xor(trie_root, value)  
+            SET node TO trie_root  
+            SET max_xor_val TO zero  
+            FOR i FROM seventeen DOWNTO zero  
+                SET bit TO the integer quotient of value DIVIDED BY two raised to the power i MINUS the integer quotient of value DIVIDED BY two raised to the power i PLUS one MULTIPLIED BY two  
+                SET toggled_bit TO one MINUS bit  
+                IF toggled_bit IS IN node.children AND the count of node.children at position toggled_bit IS GREATER THAN zero  
+                    SET max_xor_val TO max_xor_val PLUS two RAISED TO THE POWER i  
+                    SET node TO the node at position toggled_bit in node.children  
+                ELSE  
+                    SET node TO the node at position bit in node.children  
+                END IF  
+            END FOR  
+            RETURN max_xor_val  
+        END FUNCTION  
+
+        SET query_idx TO a dictionary mapping each tuple of node AND value in queries to its index position  
+
+        FOR each index i AND parent IN parents  
+            IF parent IS EQUAL TO negative one  
+                CALL dfs WITH argument i  
+                BREAK  
+            END IF  
+        END FOR  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

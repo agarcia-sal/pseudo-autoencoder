@@ -1,0 +1,53 @@
+CLASS Solution  
+    FUNCTION openLock(deadends WITH TYPE List OF string, target WITH TYPE string) RETURNS integer  
+        SET deadends_set TO an empty set  
+        FOR each deadend_element IN deadends  
+            ADD deadend_element TO deadends_set  
+        END FOR  
+  
+        IF the string representing four zeros EXISTS IN deadends_set  
+            RETURN the integer negative one  
+        END IF  
+  
+        IF target EQUALS the string representing four zeros  
+            RETURN zero  
+        END IF  
+  
+        SET queue TO an empty double ended queue containing a tuple whose first element is the string representing four zeros AND second element is zero  
+        SET visited TO an empty set  
+        ADD the string representing four zeros TO visited  
+  
+        FUNCTION neighbors(state WITH TYPE string) RETURNS list  
+            SET result TO an empty list  
+            FOR index i FROM zero TO three  
+                SET digit TO the numerical value represented by the character at position i of state  
+                FOR each move_value IN the list containing negative one AND positive one  
+                    SET new_digit TO the value of digit PLUS move_value  
+                    IF new_digit LESS THAN zero  
+                        SET new_digit TO new_digit PLUS ten  
+                    ELSE IF new_digit GREATER THAN OR EQUAL TO ten  
+                        SET new_digit TO new_digit MINUS ten  
+                    END IF  
+                    SET new_state TO the concatenation of the substring from position zero TO position i MINUS one of state AND the string representation of new_digit AND the substring from position i PLUS one TO the end of state  
+                    APPEND new_state TO result  
+                END FOR  
+            END FOR  
+            RETURN result  
+        END FUNCTION  
+  
+        WHILE the length of queue IS GREATER THAN zero  
+            REMOVE the first element from queue AND ASSIGN its first element TO current_state AND its second element TO steps  
+            FOR each neighbor_state IN neighbors(current_state)  
+                IF neighbor_state NOT IN visited AND neighbor_state NOT IN deadends_set  
+                    IF neighbor_state EQUALS target  
+                        RETURN steps PLUS one  
+                    END IF  
+                    ADD neighbor_state TO visited  
+                    APPEND a tuple containing neighbor_state AND steps PLUS one TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+  
+        RETURN the integer negative one  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,42 @@
+CLASS Solution  
+    FUNCTION maxTaskAssign(tasks, workers, pills, strength)  
+        CALL tasks.sort WITH NO PARAMETERS  
+        CALL workers.sort WITH NO PARAMETERS  
+        
+        FUNCTION canAssignTasks(k)  
+            SET available_workers TO the list of elements from position LENGTH OF workers MINUS k TO the end OF workers  
+            SET pills_used TO zero  
+            
+            FOR i FROM k MINUS one DOWN TO zero  
+                SET task TO the element at position i OF tasks  
+                CALL bisect_left WITH PARAMETERS available_workers AND task AND ASSIGN result TO worker_idx  
+                IF worker_idx LESS THAN the LENGTH OF available_workers THEN  
+                    CALL available_workers.pop WITH PARAMETER worker_idx TO REMOVE the element at position worker_idx OF available_workers  
+                ELSE IF pills_used LESS THAN pills THEN  
+                    CALL bisect_left WITH PARAMETERS available_workers AND task MINUS strength AND ASSIGN result TO worker_idx  
+                    IF worker_idx LESS THAN the LENGTH OF available_workers THEN  
+                        CALL available_workers.pop WITH PARAMETER worker_idx TO REMOVE the element at position worker_idx OF available_workers  
+                        INCREMENT pills_used BY one  
+                    ELSE  
+                        RETURN False  
+                    END IF  
+                ELSE  
+                    RETURN False  
+                END IF  
+            END FOR  
+            RETURN True  
+        END FUNCTION  
+        
+        SET left TO zero  
+        SET right TO the minimum OF the LENGTH OF tasks AND the LENGTH OF workers PLUS one  
+        WHILE left LESS THAN right  
+            SET mid TO the integer division of the sum OF left AND right BY two  
+            IF calling canAssignTasks WITH PARAMETER mid RETURNS True THEN  
+                SET left TO mid PLUS one  
+            ELSE  
+                SET right TO mid  
+            END IF  
+        END WHILE  
+        RETURN left MINUS one  
+    END FUNCTION  
+END CLASS

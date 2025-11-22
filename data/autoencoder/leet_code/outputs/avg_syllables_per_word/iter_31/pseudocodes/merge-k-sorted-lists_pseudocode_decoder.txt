@@ -1,0 +1,54 @@
+CLASS ListNode  
+    FUNCTION __init__(self, val EQUALS zero, next EQUALS none)  
+        SET self.val TO val  
+        SET self.next TO next  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION list_node(values)  
+    IF values EQUALS none OR THE LENGTH OF values EQUALS zero  
+        RETURN none  
+    END IF  
+    SET head TO NEW ListNode WITH the element at position one of values  
+    SET p TO head  
+    FOR each val IN the elements from position two TO THE END of values  
+        SET node TO NEW ListNode WITH val  
+        SET p.next TO node  
+        SET p TO node  
+    END FOR  
+    RETURN head  
+END FUNCTION  
+
+FUNCTION is_same_list(p1, p2)  
+    IF p1 EQUALS none AND p2 EQUALS none  
+        RETURN true  
+    END IF  
+    IF p1 EQUALS none OR p2 EQUALS none  
+        RETURN false  
+    END IF  
+    RETURN (p1.val EQUALS p2.val) AND is_same_list(p1.next, p2.next)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION mergeKLists(self, lists)  
+        SET min_heap TO an empty list  
+        FOR i FROM one TO the LENGTH OF lists  
+            SET lst TO the element at position i of lists  
+            IF lst IS NOT none  
+                CALL heap push ON min_heap WITH the triple composed of lst.val, i, lst  
+            END IF  
+        END FOR  
+        SET dummy TO NEW ListNode WITH default values  
+        SET current TO dummy  
+        WHILE THE LENGTH OF min_heap IS GREATER THAN zero  
+            SET triple TO CALL heap pop ON min_heap  
+            DESTRUCTURE triple INTO val, i, node  
+            SET current.next TO node  
+            SET current TO current.next  
+            IF node.next IS NOT none  
+                CALL heap push ON min_heap WITH the triple composed of node.next.val, i, node.next  
+            END IF  
+        END WHILE  
+        RETURN dummy.next  
+    END FUNCTION  
+END CLASS

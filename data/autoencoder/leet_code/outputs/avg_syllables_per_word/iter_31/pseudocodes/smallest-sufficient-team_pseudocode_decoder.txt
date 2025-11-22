@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION smallestSufficientTeam(req_skills, people)  
+        SET skill_to_index TO an empty mapping from skill to index  
+        FOR index FROM zero TO the length of req_skills MINUS one  
+            ASSIGN skill_to_index at the element at position index of req_skills TO index  
+        END FOR  
+        SET total_skills TO the length of req_skills  
+        SET total_people TO the length of people  
+        SET people_skills_mask TO a list of zeroes with length total_people  
+        FOR person_index FROM zero TO total_people MINUS one  
+            FOR each skill IN the element at position person_index of people  
+                SET people_skills_mask at person_index TO the bitwise OR of its current value AND one left shifted by the value of skill_to_index at skill  
+            END FOR  
+        END FOR  
+        SET max_state TO one left shifted by total_skills  
+        SET minimum_team_size TO a list of infinite values with length max_state  
+        SET chosen_person TO a list of zeroes with length max_state  
+        SET previous_state TO a list of zeroes with length max_state  
+        SET minimum_team_size at zero TO zero  
+        FOR current_state FROM zero TO max_state MINUS one  
+            IF minimum_team_size at current_state EQUALS infinite THEN  
+                CONTINUE to the next iteration  
+            END IF  
+            FOR person_index FROM zero TO total_people MINUS one  
+                SET combined_state TO the bitwise OR of current_state AND the element at person_index of people_skills_mask  
+                IF minimum_team_size at current_state PLUS one LESS THAN minimum_team_size at combined_state THEN  
+                    SET minimum_team_size at combined_state TO minimum_team_size at current_state PLUS one  
+                    SET chosen_person at combined_state TO person_index  
+                    SET previous_state at combined_state TO current_state  
+                END IF  
+            END FOR  
+        END FOR  
+        SET final_state TO max_state MINUS one  
+        SET answer TO an empty list  
+        WHILE final_state NOT EQUALS zero  
+            APPEND the element at final_state of chosen_person TO answer  
+            SET final_state TO the element at final_state of previous_state  
+        END WHILE  
+        RETURN answer  
+    END FUNCTION  
+END CLASS

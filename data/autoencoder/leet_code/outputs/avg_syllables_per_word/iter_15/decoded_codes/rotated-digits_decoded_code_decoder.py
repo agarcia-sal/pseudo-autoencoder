@@ -1,0 +1,16 @@
+from typing import Set
+
+class Solution:
+    def rotatedDigits(self, n: int) -> int:
+        change_digits: Set[str] = {'2', '5', '6', '9'}
+        same_digits: Set[str] = {'0', '1', '8'}
+
+        def is_good_number(num: int) -> bool:
+            num_str = str(num)
+            if all(d in change_digits or d in same_digits for d in num_str):
+                if any(d in change_digits for d in num_str):
+                    return True
+            return False
+
+        good_count = sum(is_good_number(i) for i in range(1, n + 1))
+        return good_count

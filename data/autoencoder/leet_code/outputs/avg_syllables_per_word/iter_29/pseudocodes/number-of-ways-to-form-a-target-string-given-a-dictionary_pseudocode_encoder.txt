@@ -1,0 +1,37 @@
+CLASS Solution  
+    FUNCTION numWays(words parameter AS list_of_strings target parameter AS string) RETURNS integer  
+        SET MODULO_DIVISOR TO ten POWERED BY nine PLUS seven  
+        SET length_of_word TO the LENGTH OF element at position zero of words  
+        SET length_of_target TO the LENGTH OF target  
+        
+        SET list_of_frequency_maps TO a new list containing length_of_word elements each initialized as a new map from character TO integer with default zero  
+        
+        FOR each word IN words  
+            FOR each position INDEX and character CHARACTER IN word  
+                INCREMENT the value associated with CHARACTER in the frequency map at position INDEX in list_of_frequency_maps BY one  
+            END FOR  
+        END FOR  
+        
+        SET dp_table TO a new two dimensional list of size length_of_target PLUS one BY length_of_word PLUS one with all elements initialized TO zero  
+        
+        FOR each index FROM zero TO length_of_word  
+            SET element at row zero column index in dp_table TO one  
+        END FOR  
+        
+        FOR each target_position FROM one TO length_of_target  
+            FOR each word_position FROM one TO length_of_word  
+                SET element at row target_position column word_position in dp_table TO the value at row target_position column word_position MINUS one in dp_table  
+                
+                SET current_target_character TO the character at position target_position MINUS one of target  
+                SET current_frequency TO the value associated with current_target_character in the frequency map at position word_position MINUS one in list_of_frequency_maps  
+                
+                IF current_frequency GREATER THAN zero THEN  
+                    INCREMENT element at row target_position column word_position in dp_table BY the product of the value at row target_position MINUS one column word_position MINUS one in dp_table AND current_frequency  
+                    SET element at row target_position column word_position in dp_table TO the remainder when element at row target_position column word_position in dp_table is DIVIDED BY MODULO_DIVISOR  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        RETURN element at row length_of_target column length_of_word in dp_table  
+    END FUNCTION  
+END CLASS

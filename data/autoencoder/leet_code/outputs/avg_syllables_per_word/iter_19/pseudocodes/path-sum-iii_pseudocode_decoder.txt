@@ -1,0 +1,62 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS
+
+FUNCTION tree_node(values)  
+    IF the LENGTH OF values EQUALS zero THEN  
+        RETURN absence of value  
+    END IF  
+    ASSIGN pointer TO a NEW TreeNode with value equal to element at position one of values, left equal to absence of value, right equal to absence of value  
+    SET i TO one  
+    ASSIGN queue TO an empty double ended queue  
+    APPEND pointer TO queue  
+    WHILE queue is not empty  
+        SET node TO element removed from the left side of queue  
+        IF i LESS THAN the LENGTH OF values AND element at position i of values IS NOT absence of value THEN  
+            ASSIGN node.left TO a NEW TreeNode with value equal to element at position i of values, left equal to absence of value, right equal to absence of value  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN the LENGTH OF values AND element at position i of values IS NOT absence of value THEN  
+            ASSIGN node.right TO a NEW TreeNode with value equal to element at position i of values, left equal to absence of value, right equal to absence of value  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN pointer  
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS absence of value AND q IS absence of value THEN  
+        RETURN true  
+    ELSE IF p IS absence of value OR q IS absence of value THEN  
+        RETURN false  
+    ELSE IF the value at attribute val of p NOT EQUALS the value at attribute val of q THEN  
+        RETURN false  
+    ELSE  
+        RETURN the logical AND of the result of calling is_same_tree with parameters the attribute left of p and the attribute left of q AND the result of calling is_same_tree with parameters the attribute right of p and the attribute right of q  
+    END IF  
+END FUNCTION
+
+CLASS Solution  
+    FUNCTION pathSum(self, root, targetSum)  
+        FUNCTION helper(node, current_sum, prefix_sums)  
+            IF node IS absence of value THEN  
+                RETURN zero  
+            END IF  
+            INCREMENT current_sum BY the value at attribute val of node  
+            SET paths_to_here TO value retrieved by key current_sum MINUS targetSum in prefix_sums if present otherwise zero  
+            SET value at key current_sum in prefix_sums TO value retrieved by key current_sum in prefix_sums if present otherwise zero PLUS one  
+            SET paths_in_left TO the result of calling helper with parameters the attribute left of node, current_sum, prefix_sums  
+            SET paths_in_right TO the result of calling helper with parameters the attribute right of node, current_sum, prefix_sums  
+            DECREMENT value at key current_sum in prefix_sums BY one  
+            RETURN the sum of paths_to_here PLUS paths_in_left PLUS paths_in_right  
+        END FUNCTION  
+        ASSIGN prefix_sums TO a dictionary with a single key zero mapping to value one  
+        RETURN the result of calling helper with parameters root, zero, prefix_sums  
+    END FUNCTION  
+END CLASS

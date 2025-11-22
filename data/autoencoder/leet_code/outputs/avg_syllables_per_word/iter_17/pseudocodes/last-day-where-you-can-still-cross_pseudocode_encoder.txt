@@ -1,0 +1,67 @@
+CLASS UnionFind
+    FUNCTION __init__(n)
+        SET self.parent TO list of integers from zero TO n MINUS one
+        SET self.rank TO list of zero repeated n times
+    END FUNCTION
+
+    FUNCTION find(x)
+        IF element at position x of self.parent IS NOT EQUALS TO x
+            SET element at position x of self.parent TO CALL find WITH argument element at position x of self.parent
+        END IF
+        RETURN element at position x of self.parent
+    END FUNCTION
+
+    FUNCTION union(x, y)
+        SET rootX TO CALL find WITH argument x
+        SET rootY TO CALL find WITH argument y
+        IF rootX IS NOT EQUALS TO rootY
+            IF element at position rootX of self.rank GREATER THAN element at position rootY of self.rank
+                SET element at position rootY of self.parent TO rootX
+            ELSE IF element at position rootX of self.rank LESS THAN element at position rootY of self.rank
+                SET element at position rootX of self.parent TO rootY
+            ELSE
+                SET element at position rootY of self.parent TO rootX
+                INCREMENT element at position rootX of self.rank BY one
+            END IF
+        END IF
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION latestDayToCross(row, col, cells)
+        SET grid TO list of lists each containing one repeated col times repeated row times
+        SET uf TO NEW UnionFind WITH parameter row MULTIPLIED BY col PLUS two
+        SET TOP TO row MULTIPLIED BY col
+        SET BOTTOM TO row MULTIPLIED BY col PLUS one
+        SET directions TO list containing tuples of negative one and zero, one and zero, zero and negative one, zero and one
+
+        FOR day FROM the LENGTH OF cells MINUS one DOWN TO zero
+            SET r, c TO element at position day of cells
+            DECREMENT r BY one
+            DECREMENT c BY one
+            SET element at position r of grid, element at position c TO zero
+
+            FOR each dr, dc IN directions
+                SET nr TO r PLUS dr
+                SET nc TO c PLUS dc
+                IF nr GREATER THAN OR EQUAL TO zero AND nr LESS THAN row AND nc GREATER THAN OR EQUAL TO zero AND nc LESS THAN col AND element at position nr of grid, element at position nc EQUALS zero
+                    CALL uf.union WITH parameters r MULTIPLIED BY col PLUS c, nr MULTIPLIED BY col PLUS nc
+                END IF
+            END FOR
+
+            IF r EQUALS zero
+                CALL uf.union WITH parameters r MULTIPLIED BY col PLUS c, TOP
+            END IF
+
+            IF r EQUALS row MINUS one
+                CALL uf.union WITH parameters r MULTIPLIED BY col PLUS c, BOTTOM
+            END IF
+
+            IF CALL uf.find WITH parameter TOP EQUALS CALL uf.find WITH parameter BOTTOM
+                RETURN day
+            END IF
+        END FOR
+
+        RETURN zero
+    END FUNCTION
+END CLASS

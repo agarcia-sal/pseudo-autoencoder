@@ -1,0 +1,69 @@
+CLASS TreeNode  
+    FUNCTION __init__(val = 0, left = None, right = None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty THEN  
+        RETURN None  
+    SET root TO new TreeNode with values at position zero  
+    SET i TO 1  
+    SET queue TO empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty DO  
+        SET node TO element popped from left of queue  
+        IF i IS LESS THAN length of values AND values at i IS NOT None THEN  
+            SET node.left TO new TreeNode with values at i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i IS LESS THAN length of values AND values at i IS NOT None THEN  
+            SET node.right TO new TreeNode with values at i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None THEN  
+        RETURN True  
+    ELSE IF p IS None OR q IS None THEN  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val THEN  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION findClosestLeaf(root, k)  
+        IF root.left IS None AND root.right IS None THEN  
+            RETURN root.val  
+        SET graph TO default dictionary of lists  
+        FUNCTION dfs(node, parent = None)  
+            IF parent IS NOT None THEN  
+                APPEND parent.val TO graph at node.val  
+                APPEND node.val TO graph at parent.val  
+            IF node.left IS NOT None THEN  
+                CALL dfs(node.left, node)  
+            IF node.right IS NOT None THEN  
+                CALL dfs(node.right, node)  
+        END FUNCTION  
+        CALL dfs(root)  
+        SET queue TO deque containing k  
+        SET visited TO empty set  
+        WHILE queue IS NOT empty DO  
+            SET current TO element popped from left of queue  
+            ADD current TO visited  
+            IF length of graph at current IS EQUAL TO 1 AND current IS NOT root.val THEN  
+                RETURN current  
+            FOR each neighbor IN graph at current DO  
+                IF neighbor NOT IN visited THEN  
+                    APPEND neighbor TO queue  
+        END WHILE  
+        RETURN minus one  
+    END FUNCTION  
+END CLASS

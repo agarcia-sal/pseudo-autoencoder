@@ -1,0 +1,44 @@
+CLASS Solution  
+    FUNCTION dieSimulator(n roll_count INTEGER, rollMax list_of_max_consecutive_rolls LIST OF INTEGER) RETURNS INTEGER  
+        SET MODULO_VALUE TO one billion PLUS seven  
+        
+        CREATE a three dimensional collection named dp to hold counts of ways  
+        THE FIRST dimension represents the number of rolls from zero UP TO roll_count  
+        THE SECOND dimension represents the face value from zero UP TO five inclusive representing six faces  
+        THE THIRD dimension represents the count of consecutive occurrences of the face value from zero UP TO the maximum consecutive allowed for any face PLUS one  
+        INITIALIZE all elements of dp to zero  
+        
+        FOR each face_index FROM zero TO five inclusive  
+            SET the count of ways to roll one time ending with the face_index and exactly one consecutive occurrence TO one  
+        END FOR  
+        
+        FOR roll_index FROM two TO roll_count inclusive  
+            FOR face_index FROM zero TO five inclusive  
+                FOR consecutive_count FROM one TO the maximum consecutive allowed for the face_index inclusive  
+                    IF the consecutive_count is GREATER THAN one  
+                        SET the count of ways to roll roll_index times ending with face_index and consecutive_count occurrences TO the count at one less roll_index with face_index and one less consecutive_count  
+                    ELSE  
+                        SET the count to zero initially  
+                        FOR other_face FROM zero TO five inclusive  
+                            IF other_face IS NOT EQUAL TO face_index  
+                                FOR other_consecutive_count FROM one TO the maximum consecutive allowed for other_face inclusive  
+                                    ADD the count of ways to roll one less roll_index times ending with other_face and other_consecutive_count to the count  
+                                END FOR  
+                            END IF  
+                        END FOR  
+                        SET the count of ways to roll roll_index times ending with face_index and one consecutive occurrence TO the count MODULO modulo_value  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+        
+        SET total_ways TO zero  
+        FOR face_index FROM zero TO five inclusive  
+            FOR consecutive_count FROM one TO the maximum consecutive allowed for face_index inclusive  
+                ADD the count of ways to roll roll_count times ending with face_index and consecutive_count occurrences TO total_ways  
+            END FOR  
+        END FOR  
+        
+        RETURN the total_ways MODULO modulo_value  
+    END FUNCTION  
+END CLASS

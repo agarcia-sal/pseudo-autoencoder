@@ -1,0 +1,39 @@
+CLASS Solution  
+    FUNCTION frogPosition(n, edges, t, target)  
+        IF n EQUALS 1 THEN  
+            RETURN 1.0  
+        END IF  
+
+        SET graph TO new mapping from key to list  
+        FOR each pair (u, v) IN edges  
+            APPEND v TO graph at key u  
+            APPEND u TO graph at key v  
+        END FOR  
+
+        SET queue TO new double-ended queue containing (1, 1.0, 0)  
+        SET visited TO new set containing 1  
+
+        WHILE queue IS NOT EMPTY  
+            REMOVE first element FROM queue AND UNPACK TO current_node, current_probability, current_time  
+
+            IF current_time EQUALS t OR (current_node IS NOT 1 AND LENGTH OF graph at current_node EQUALS 1) THEN  
+                IF current_node EQUALS target THEN  
+                    RETURN current_probability  
+                ELSE  
+                    CONTINUE TO NEXT ITERATION  
+                END IF  
+            END IF  
+
+            SET possible_moves TO LENGTH OF graph at current_node MINUS (1 IF current_node IS NOT 1 OTHERWISE 0)  
+
+            FOR each neighbor IN graph at current_node  
+                IF neighbor IS NOT IN visited THEN  
+                    ADD neighbor TO visited  
+                    APPEND (neighbor, current_probability DIVIDED BY possible_moves, current_time PLUS 1) TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+
+        RETURN 0.0  
+    END FUNCTION  
+END CLASS

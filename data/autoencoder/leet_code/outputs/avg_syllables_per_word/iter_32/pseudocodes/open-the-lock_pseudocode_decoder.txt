@@ -1,0 +1,49 @@
+CLASS Solution  
+    FUNCTION openLock(deadends, target)  
+        SET deadends_set TO empty set  
+        FOR each deadend IN deadends  
+            ADD deadend TO deadends_set  
+        END FOR  
+          
+        IF deadends_set CONTAINS the string consisting of four zeroes  
+            RETURN negative one  
+        END IF  
+          
+        IF target EQUALS the string consisting of four zeroes  
+            RETURN zero  
+        END IF  
+          
+        SET queue TO empty double ended queue  
+        APPEND a tuple consisting of the string consisting of four zeroes AND zero TO queue  
+        SET visited TO empty set  
+        ADD the string consisting of four zeroes TO visited  
+          
+        FUNCTION neighbors(state)  
+            SET result TO empty list  
+            FOR index FROM zero TO three  
+                SET digit TO the integer value of the character at position index of state  
+                FOR each move IN the list consisting of negative one AND one  
+                    SET new_digit TO the remainder of the sum of digit AND move DIVIDED BY ten  
+                    SET new_state TO the concatenation of the substring of state from position zero TO position index MINUS one, the string representation of new_digit, AND the substring of state from position index PLUS one TO the end  
+                    APPEND new_state TO result  
+                END FOR  
+            END FOR  
+            RETURN result  
+        END FUNCTION  
+          
+        WHILE the LENGTH OF queue IS GREATER THAN zero  
+            REMOVE the first element from queue AND ASSIGN it TO current_state AND steps  
+            FOR each neighbor IN neighbors(current_state)  
+                IF neighbor NOT IN visited AND neighbor NOT IN deadends_set  
+                    IF neighbor EQUALS target  
+                        RETURN steps PLUS one  
+                    END IF  
+                    ADD neighbor TO visited  
+                    APPEND a tuple consisting of neighbor AND steps PLUS one TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+          
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

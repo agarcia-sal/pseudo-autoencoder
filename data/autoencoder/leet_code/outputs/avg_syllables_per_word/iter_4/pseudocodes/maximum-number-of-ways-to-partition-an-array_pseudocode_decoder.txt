@@ -1,0 +1,31 @@
+CLASS Solution
+    FUNCTION waysToPartition(nums, k)
+        SET total_sum TO sum of nums
+        SET n TO length of nums
+
+        CREATE left_diff AS empty dictionary with default integer values
+        CREATE right_diff AS empty dictionary with default integer values
+
+        SET current_sum TO 0
+        FOR i FROM 0 TO n - 2
+            INCREMENT current_sum BY nums[i]
+            SET diff TO total_sum MINUS 2 TIMES current_sum
+            INCREMENT right_diff[diff] BY 1
+
+        SET max_ways TO right_diff[0]
+
+        SET current_sum TO 0
+        FOR i FROM 0 TO n - 1
+            INCREMENT current_sum BY nums[i]
+            SET diff_change TO k MINUS nums[i]
+
+            SET new_ways TO left_diff[-diff_change] PLUS right_diff[diff_change]
+            SET max_ways TO MAXIMUM OF max_ways AND new_ways
+
+            SET diff TO total_sum MINUS 2 TIMES current_sum
+            DECREMENT right_diff[diff] BY 1
+            INCREMENT left_diff[diff] BY 1
+
+        RETURN max_ways
+    END FUNCTION
+END CLASS

@@ -1,0 +1,52 @@
+CLASS Solution  
+    FUNCTION minWastedSpace(self, packages, boxes)  
+        SET MOD TO one billion plus seven  
+        SORT packages in ascending order  
+        SET n TO number of elements in packages  
+        
+        CALL prefix_sum_initialization WITH n  
+        
+        FUNCTION prefix_sum_initialization(n)  
+            SET prefix_sum TO list of zeros with length n plus one  
+            FOR i FROM zero TO n minus one  
+                SET prefix_sum at position i plus one TO prefix_sum at position i PLUS packages at position i  
+            END FOR  
+            RETURN prefix_sum  
+        END FUNCTION  
+        
+        SET prefix_sum TO result of prefix_sum_initialization WITH n  
+        SET min_wasted_space TO positive infinity  
+        
+        FOR each box IN boxes  
+            SORT box in ascending order  
+            IF last element of box LESS THAN last element of packages THEN  
+                CONTINUE to next iteration of boxes loop  
+            END IF  
+            
+            SET total_wasted TO zero  
+            SET last_index TO zero  
+            
+            FOR each box_size IN box  
+                SET index TO last_index  
+                WHILE index LESS THAN n AND packages at position index LESS THAN OR EQUAL TO box_size  
+                    INCREMENT index BY one  
+                END WHILE  
+                
+                IF index GREATER THAN last_index THEN  
+                    SET total_wasted TO total_wasted PLUS (index MINUS last_index) MULTIPLIED BY box_size MINUS (prefix_sum at position index MINUS prefix_sum at position last_index)  
+                    SET last_index TO index  
+                END IF  
+            END FOR  
+            
+            IF last_index EQUALS n THEN  
+                SET min_wasted_space TO minimum of min_wasted_space AND total_wasted  
+            END IF  
+        END FOR  
+        
+        IF min_wasted_space NOT EQUAL TO positive infinity THEN  
+            RETURN min_wasted_space MODULO MOD  
+        ELSE  
+            RETURN negative one  
+        END IF  
+    END FUNCTION  
+END CLASS

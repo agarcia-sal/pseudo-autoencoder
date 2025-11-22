@@ -1,0 +1,55 @@
+CLASS Solution  
+    FUNCTION totalStrength(strength)  
+        SET MOD TO one billion PLUS seven  
+        SET n TO the LENGTH OF strength  
+        
+        SET prefix TO a list of zero repeated n PLUS one times  
+        FOR index FROM zero TO n MINUS one  
+            SET element at position index PLUS one of prefix TO the SUM of element at position index of prefix PLUS element at position index of strength FOLLOWED BY MODULO MOD  
+        END FOR  
+        
+        SET prefix_prefix TO a list of zero repeated n PLUS two times  
+        FOR index FROM zero TO n  
+            SET element at position index PLUS one of prefix_prefix TO the SUM of element at position index of prefix_prefix PLUS element at position index of prefix FOLLOWED BY MODULO MOD  
+        END FOR  
+        
+        SET prev_smaller TO a list of negative one repeated n times  
+        SET next_smaller_or_equal TO a list of n repeated n times  
+        
+        SET stack TO an empty list  
+        FOR index FROM zero TO n MINUS one  
+            WHILE the LENGTH OF stack is greater than zero AND element at position at the last element of stack in strength is GREATER THAN OR EQUAL TO element at position index of strength  
+                REMOVE the last element FROM stack  
+            END WHILE  
+            IF LENGTH OF stack is greater than zero  
+                SET element at position index of prev_smaller TO the last element of stack  
+            END IF  
+            APPEND index TO stack  
+        END FOR  
+        
+        CALL the METHOD clear ON stack  
+        FOR index FROM n MINUS one DOWN TO zero  
+            WHILE the LENGTH OF stack is greater than zero AND element at position at the last element of stack in strength is GREATER THAN element at position index of strength  
+                REMOVE the last element FROM stack  
+            END WHILE  
+            IF LENGTH OF stack is greater than zero  
+                SET element at position index of next_smaller_or_equal TO the last element of stack  
+            END IF  
+            APPEND index TO stack  
+        END FOR  
+        
+        SET total_strength TO zero  
+        FOR index FROM zero TO n MINUS one  
+            SET left TO element at position index of prev_smaller PLUS one  
+            SET right TO element at position index of next_smaller_or_equal  
+            
+            SET sum_left TO the PRODUCT of the DIFFERENCE of index MINUS left PLUS one AND the DIFFERENCE of element at position right PLUS one of prefix_prefix MINUS element at position index PLUS one of prefix_prefix FOLLOWED BY MODULO MOD  
+            SET sum_right TO the PRODUCT of the DIFFERENCE of right MINUS index AND the DIFFERENCE of element at position index PLUS one of prefix_prefix MINUS element at position left of prefix_prefix FOLLOWED BY MODULO MOD  
+            
+            SET contribution TO the PRODUCT of element at position index of strength AND the DIFFERENCE of sum_left MINUS sum_right FOLLOWED BY MODULO MOD  
+            SET total_strength TO the SUM of total_strength PLUS contribution FOLLOWED BY MODULO MOD  
+        END FOR  
+        
+        RETURN total_strength  
+    END FUNCTION  
+END CLASS

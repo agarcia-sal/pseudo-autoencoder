@@ -1,0 +1,36 @@
+CLASS Solution
+    FUNCTION getSkyline(list_of_buildings)
+        SET list_of_events TO an empty list
+        FOR each building IN list_of_buildings
+            DESTRUCTURE building INTO left_edge position, right_edge position, building_height
+            APPEND a tuple of left_edge position, negative building_height, right_edge position TO list_of_events
+            APPEND a tuple of right_edge position, zero, zero TO list_of_events
+        END FOR
+        CALL the sort METHOD ON list_of_events
+
+        SET list_of_key_points TO a list containing a single list of zero and zero
+        SET max_heap TO a list containing a single tuple of zero and positive infinity
+
+        FOR each event IN list_of_events
+            DESTRUCTURE event INTO coordinate_x, negative_height, right_edge_r
+
+            WHILE element at position zero of max_heap AT position one IS LESS THAN OR EQUAL TO coordinate_x
+                CALL the heap pop FUNCTION ON max_heap
+            END WHILE
+
+            IF negative_height IS NOT EQUAL TO zero
+                CALL the heap push FUNCTION ON max_heap WITH tuple of negative_height and right_edge_r
+            END IF
+
+            IF the second element of the last list in list_of_key_points IS NOT EQUAL TO the negative of the first element at position zero of max_heap
+                APPEND a list of coordinate_x and the negative of the first element at position zero of max_heap TO list_of_key_points
+            END IF
+        END FOR
+
+        IF the first element of list_of_key_points IS EQUAL TO a list of zero and zero
+            REMOVE the first element FROM list_of_key_points
+        END IF
+
+        RETURN list_of_key_points
+    END FUNCTION
+END CLASS

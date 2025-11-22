@@ -1,0 +1,28 @@
+CLASS Solution  
+    FUNCTION exclusiveTime(n number_of_functions logs list_of_log_strings)  
+        SET exclusive_time_list TO a new list of zero repeated number_of_functions times  
+        SET call_stack TO an empty list  
+        
+        FOR each log_entry IN logs  
+            SPLIT log_entry INTO function_identifier action_type and time_stamp at each occurrence of the delimiter colon  
+            CONVERT function_identifier TO number  
+            CONVERT time_stamp TO number  
+            
+            IF action_type EQUALS the word start  
+                IF call_stack IS NOT empty  
+                    SET previous_function_identifier AND previous_time_stamp TO the last element of call_stack  
+                    INCREMENT the element at position previous_function_identifier of exclusive_time_list BY time_stamp MINUS previous_time_stamp  
+                END IF  
+                APPEND the tuple of function_identifier and time_stamp TO call_stack  
+            ELSE  
+                SET previous_function_identifier AND previous_time_stamp TO the last element of call_stack REMOVING that element from call_stack  
+                INCREMENT the element at position previous_function_identifier of exclusive_time_list BY time_stamp MINUS previous_time_stamp PLUS one  
+                IF call_stack IS NOT empty  
+                    SET the last element of call_stack TO a tuple of the first element of the last element of call_stack AND time_stamp PLUS one  
+                END IF  
+            END IF  
+        END FOR  
+        
+        RETURN exclusive_time_list  
+    END FUNCTION  
+END CLASS

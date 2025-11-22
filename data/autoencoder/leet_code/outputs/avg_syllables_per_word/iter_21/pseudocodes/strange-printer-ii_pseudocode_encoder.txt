@@ -1,0 +1,51 @@
+CLASS Solution  
+    FUNCTION isPrintable(targetGrid)  
+        SET color_bounds TO CALL defaultdict WITH PARAMETERS a FUNCTION THAT RETURNS a LIST consisting of infinity, infinity, negative infinity, negative infinity  
+        
+        FOR r FROM zero TO the LENGTH OF targetGrid MINUS one  
+            FOR c FROM zero TO the LENGTH OF element at position zero OF targetGrid MINUS one  
+                SET color TO element at position r OF targetGrid at position c  
+                SET element at position zero OF element at position color OF color_bounds TO the MINIMUM OF element at position zero OF element at position color OF color_bounds AND r  
+                SET element at position one OF element at position color OF color_bounds TO the MINIMUM OF element at position one OF element at position color OF color_bounds AND c  
+                SET element at position two OF element at position color OF color_bounds TO the MAXIMUM OF element at position two OF element at position color OF color_bounds AND r  
+                SET element at position three OF element at position color OF color_bounds TO the MAXIMUM OF element at position three OF element at position color OF color_bounds AND c  
+            END FOR  
+        END FOR  
+        
+        SET graph TO CALL defaultdict WITH PARAMETERS a FUNCTION THAT RETURNS an empty LIST  
+        SET in_degree TO CALL defaultdict WITH PARAMETERS a FUNCTION THAT RETURNS zero  
+        
+        FOR each color AND bounding_box IN color_bounds  
+            SET minr TO element at position zero OF bounding_box  
+            SET minc TO element at position one OF bounding_box  
+            SET maxr TO element at position two OF bounding_box  
+            SET maxc TO element at position three OF bounding_box  
+            
+            FOR r FROM minr TO maxr  
+                FOR c FROM minc TO maxc  
+                    IF element at position r OF targetGrid at position c NOT EQUALS color THEN  
+                        SET other_color TO element at position r OF targetGrid at position c  
+                        APPEND color TO element at position other_color OF graph  
+                        INCREMENT element at position color OF in_degree BY one  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+        
+        SET queue TO CALL deque WITH PARAMETERS a LIST of all colors FROM color_bounds for which element at position color OF in_degree EQUALS zero  
+        SET visited_colors TO zero  
+        
+        WHILE queue HOLDS  
+            SET color TO the FIRST element REMOVED FROM queue  
+            INCREMENT visited_colors BY one  
+            FOR each next_color IN element at position color OF graph  
+                DECREMENT element at position next_color OF in_degree BY one  
+                IF element at position next_color OF in_degree EQUALS zero THEN  
+                    APPEND next_color TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN visited_colors EQUALS the LENGTH OF color_bounds  
+    END FUNCTION  
+END CLASS

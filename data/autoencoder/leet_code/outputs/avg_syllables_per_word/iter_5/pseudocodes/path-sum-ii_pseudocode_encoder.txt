@@ -1,0 +1,58 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val SET TO 0, left SET TO None, right SET TO None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET root TO TreeNode with values at position zero  
+    SET i TO 1  
+    SET queue TO empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO REMOVE FIRST ELEMENT FROM queue  
+        IF i IS LESS THAN LENGTH OF values AND values at i IS NOT None  
+            SET node.left TO TreeNode with values at i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i IS LESS THAN LENGTH OF values AND values at i IS NOT None  
+            SET node.right TO TreeNode with values at i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION pathSum(self, root, targetSum)  
+        FUNCTION dfs(node, current_sum, path)  
+            IF node IS None  
+                RETURN  
+            APPEND node.val TO path  
+            SET current_sum TO current_sum PLUS node.val  
+            IF node.left IS None AND node.right IS None AND current_sum IS EQUAL TO targetSum  
+                APPEND COPY OF path TO result  
+            CALL dfs WITH node.left, current_sum, path  
+            CALL dfs WITH node.right, current_sum, path  
+            REMOVE LAST ELEMENT FROM path  
+        END FUNCTION  
+        SET result TO empty list  
+        CALL dfs WITH root, 0, empty list  
+        RETURN result  
+    END FUNCTION  
+END CLASS

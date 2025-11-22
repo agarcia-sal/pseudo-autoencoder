@@ -1,0 +1,47 @@
+CLASS Solution  
+    FUNCTION numWays(steps, arrLen)  
+        SET MOD TO one billion PLUS seven  
+        SET max_index TO the minimum OF (steps DIVIDED BY two) AND (arrLen MINUS one)  
+        CALL initialize_dp_list WITH PARAMETERS max_index ASSIGNING RESULT TO dp  
+        CALL set_initial_dp_state WITH PARAMETERS dp  
+        FOR step FROM one TO steps  
+            CALL create_copy_of_dp WITH PARAMETERS dp ASSIGNING RESULT TO prev_dp  
+            FOR i FROM zero TO max_index  
+                CALL set_dp_same_position WITH PARAMETERS dp, prev_dp, i  
+                IF i GREATER THAN zero THEN  
+                    CALL add_left_position_ways WITH PARAMETERS dp, prev_dp, i, MOD  
+                END IF  
+                IF i LESS THAN max_index THEN  
+                    CALL add_right_position_ways WITH PARAMETERS dp, prev_dp, i, MOD  
+                END IF  
+            END FOR  
+        END FOR  
+        RETURN element at position zero OF dp  
+    END FUNCTION  
+
+    FUNCTION initialize_dp_list(max_index)  
+        SET dp_list TO a list OF zeros WITH length max_index PLUS one  
+        RETURN dp_list  
+    END FUNCTION  
+
+    FUNCTION set_initial_dp_state(dp)  
+        SET element at position zero OF dp TO one  
+    END FUNCTION  
+
+    FUNCTION create_copy_of_dp(dp)  
+        SET copy_dp TO a new list that is a copy OF dp  
+        RETURN copy_dp  
+    END FUNCTION  
+
+    FUNCTION set_dp_same_position(dp, prev_dp, i)  
+        SET element at position i OF dp TO element at position i OF prev_dp  
+    END FUNCTION  
+
+    FUNCTION add_left_position_ways(dp, prev_dp, i, MOD)  
+        SET element at position i OF dp TO (element at position i OF dp PLUS element at position i MINUS one OF prev_dp) MODULO MOD  
+    END FUNCTION  
+
+    FUNCTION add_right_position_ways(dp, prev_dp, i, MOD)  
+        SET element at position i OF dp TO (element at position i OF dp PLUS element at position i PLUS one OF prev_dp) MODULO MOD  
+    END FUNCTION  
+END CLASS

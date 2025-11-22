@@ -1,0 +1,62 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS None, right EQUALS None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF the LENGTH OF values EQUALS zero THEN  
+        RETURN None  
+    END IF  
+    SET root TO NEW TreeNode WITH PARAMETERS element at position zero OF values  
+    SET i TO one  
+    ASSIGN reference TO a new empty double ended queue TO queue  
+    CALL method append ON queue WITH PARAMETERS root  
+    WHILE the LENGTH OF queue IS GREATER THAN zero HOLDS  
+        CALL method popleft ON queue AND ASSIGN THE RESULT TO node  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i OF values IS NOT None THEN  
+            SET node.left TO NEW TreeNode WITH PARAMETERS element at position i OF values  
+            CALL method append ON queue WITH PARAMETERS node.left  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i OF values IS NOT None THEN  
+            SET node.right TO NEW TreeNode WITH PARAMETERS element at position i OF values  
+            CALL method append ON queue WITH PARAMETERS node.right  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None THEN  
+        RETURN True  
+    ELSE IF p IS None OR q IS None THEN  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val THEN  
+        RETURN False  
+    ELSE  
+        RETURN the result of CALLING is_same_tree WITH PARAMETERS p.left AND q.left AND the result of CALLING is_same_tree WITH PARAMETERS p.right AND q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION pathSum(self, root, targetSum)  
+        FUNCTION helper(node, current_sum, prefix_sums)  
+            IF node IS None THEN  
+                RETURN zero  
+            END IF  
+            SET current_sum TO current_sum PLUS node.val  
+            SET paths_to_here TO the NUMBER ASSOCIATED WITH key current_sum MINUS targetSum IN prefix_sums OR zero IF key DOES NOT EXIST  
+            SET prefix_sums[current_sum] TO the NUMBER ASSOCIATED WITH key current_sum IN prefix_sums OR zero IF key DOES NOT EXIST PLUS one  
+            SET paths_in_left TO CALL helper WITH PARAMETERS node.left, current_sum, prefix_sums  
+            SET paths_in_right TO CALL helper WITH PARAMETERS node.right, current_sum, prefix_sums  
+            DECREMENT prefix_sums[current_sum] BY one  
+            RETURN paths_to_here PLUS paths_in_left PLUS paths_in_right  
+        END FUNCTION  
+        SET prefix_sums TO a DICTIONARY WITH THE SINGLE KEY zero AND VALUE one  
+        RETURN CALL helper WITH PARAMETERS root, zero, prefix_sums  
+    END FUNCTION  
+END CLASS

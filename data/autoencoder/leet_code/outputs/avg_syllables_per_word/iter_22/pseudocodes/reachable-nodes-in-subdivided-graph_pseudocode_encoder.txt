@@ -1,0 +1,47 @@
+CLASS Solution  
+    FUNCTION reachableNodes(edges WITH TYPE List of List of integer, maxMoves WITH TYPE integer, n WITH TYPE integer) RETURNS integer  
+        SET graph TO empty dictionary with keys from zero TO n MINUS one AND values as empty lists  
+        FOR each triple consisting of u AND v AND cnt IN edges  
+            APPEND tuple of neighbor v AND count cnt TO the list at key u in graph  
+            APPEND tuple of neighbor u AND count cnt TO the list at key v in graph  
+        END FOR  
+
+        SET distances TO list containing infinity repeated n times  
+        SET element at position zero of distances TO zero  
+        SET priority_queue TO list containing tuple of zero AND zero  
+
+        WHILE priority_queue IS NOT empty  
+            REMOVE the tuple with minimum first element from priority_queue AND DESTRUCTURE into dist AND node  
+            IF dist IS GREATER THAN distance at position node in distances  
+                CONTINUE to next iteration  
+            END IF  
+            FOR each tuple neighbor AND cnt IN the list at key node in graph  
+                SET new_dist TO dist PLUS cnt PLUS one  
+                IF new_dist IS LESS THAN distance at position neighbor in distances  
+                    SET distance at position neighbor in distances TO new_dist  
+                    INSERT tuple new_dist AND neighbor INTO priority_queue maintaining heap property  
+                END IF  
+            END FOR  
+        END WHILE  
+
+        SET reachable_nodes TO zero  
+
+        FOR each d IN distances  
+            IF d IS LESS THAN OR EQUAL TO maxMoves  
+                INCREMENT reachable_nodes BY one  
+            END IF  
+        END FOR  
+
+        SET used_edges TO empty dictionary  
+
+        FOR each triple u AND v AND cnt IN edges  
+            SET moves_u TO zero IF maxMoves MINUS distance at position u in distances IS LESS THAN zero OTHERWISE maxMoves MINUS distance at position u in distances  
+            SET moves_v TO zero IF maxMoves MINUS distance at position v in distances IS LESS THAN zero OTHERWISE maxMoves MINUS distance at position v in distances  
+            SET reachable_new_nodes TO minimum of cnt AND moves_u PLUS moves_v  
+            INCREMENT reachable_nodes BY reachable_new_nodes  
+            SET key consisting of tuple u AND v in used_edges TO reachable_new_nodes  
+        END FOR  
+
+        RETURN reachable_nodes  
+    END FUNCTION  
+END CLASS

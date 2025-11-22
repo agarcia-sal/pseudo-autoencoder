@@ -1,0 +1,64 @@
+CLASS TreeNode  
+    FUNCTION __init__ with parameters self val left right  
+        SET self dot val TO val  
+        SET self dot left TO left  
+        SET self dot right TO right  
+    END FUNCTION  
+END CLASS
+
+FUNCTION tree_node with parameter values  
+    IF values EQUALS empty  
+        RETURN None  
+    END IF  
+    SET root TO NEW TreeNode initialized with element at position zero of values  
+    SET i TO one  
+    SET queue TO an empty double ended queue  
+    CALL append method of queue with argument root  
+    WHILE the LENGTH OF queue GREATER THAN zero  
+        SET node TO result of call to method popleft of queue  
+        IF i LESS THAN the LENGTH OF values AND element at position i of values NOT EQUALS None  
+            SET node dot left TO NEW TreeNode initialized with element at position i of values  
+            CALL append method of queue with argument node dot left  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN the LENGTH OF values AND element at position i of values NOT EQUALS None  
+            SET node dot right TO NEW TreeNode initialized with element at position i of values  
+            CALL append method of queue with argument node dot right  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION
+
+FUNCTION is_same_tree with parameters p q  
+    IF p EQUALS False AND q EQUALS False  
+        RETURN True  
+    ELSE IF p EQUALS False OR q EQUALS False  
+        RETURN False  
+    ELSE IF p dot val NOT EQUALS q dot val  
+        RETURN False  
+    ELSE  
+        RETURN the result of is_same_tree called with p dot left AND q dot left AND the result of is_same_tree called with p dot right AND q dot right  
+    END IF  
+END FUNCTION
+
+CLASS Solution  
+    FUNCTION pathSum with parameters self root targetSum  
+        FUNCTION dfs with parameters node current_sum path  
+            IF node EQUALS False  
+                RETURN  
+            END IF  
+            CALL append method of path with argument node dot val  
+            SET current_sum TO current_sum PLUS node dot val  
+            IF node dot left EQUALS False AND node dot right EQUALS False AND current_sum EQUALS targetSum  
+                CALL append method of result with a copy of path  
+            END IF  
+            CALL dfs with arguments node dot left current_sum path  
+            CALL dfs with arguments node dot right current_sum path  
+            CALL remove last element method of path  
+        END FUNCTION  
+        SET result TO an empty list  
+        CALL dfs with arguments root zero an empty list  
+        RETURN result  
+    END FUNCTION  
+END CLASS

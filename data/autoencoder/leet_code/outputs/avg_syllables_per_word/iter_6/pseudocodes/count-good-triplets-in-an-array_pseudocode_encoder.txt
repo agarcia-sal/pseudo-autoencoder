@@ -1,0 +1,59 @@
+CLASS BIT  
+    FUNCTION __init__(self, n)  
+        SET self.size TO n  
+        INITIALIZE self.tree AS list of zeros with length n PLUS 1  
+    END FUNCTION  
+  
+    FUNCTION update(self, idx, delta)  
+        WHILE idx IS LESS THAN OR EQUAL TO self.size  
+            INCREMENT self.tree at idx BY delta  
+            INCREMENT idx BY idx BITWISE AND NEGATION OF idx  
+        END WHILE  
+    END FUNCTION  
+  
+    FUNCTION query(self, idx)  
+        SET result TO 0  
+        WHILE idx IS GREATER THAN 0  
+            INCREMENT result BY self.tree at idx  
+            DECREMENT idx BY idx BITWISE AND NEGATION OF idx  
+        END WHILE  
+        RETURN result  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION goodTriplets(self, nums1, nums2)  
+        SET n TO LENGTH OF nums1  
+        
+        INITIALIZE pos AS list of zeros with length n  
+        FOR index i FROM 0 TO n MINUS 1  
+            SET pos at nums1 element at i TO i  
+        END FOR  
+        
+        INITIALIZE compressed AS list where each element corresponds to pos at nums2 element  
+        
+        SET bit TO new BIT instance initialized with n  
+        
+        INITIALIZE smaller_count AS list of zeros with length n  
+        INITIALIZE larger_count AS list of zeros with length n  
+        
+        FOR index i FROM 0 TO n MINUS 1  
+            SET smaller_count at i TO CALL bit.query WITH compressed at i  
+            CALL bit.update WITH compressed at i PLUS 1 AND 1  
+        END FOR  
+        
+        SET bit TO new BIT instance initialized with n  
+        
+        FOR index i FROM n MINUS 1 DOWN TO 0  
+            SET larger_count at i TO CALL bit.query WITH n MINUS CALL bit.query WITH compressed at i PLUS 1  
+            CALL bit.update WITH compressed at i PLUS 1 AND 1  
+        END FOR  
+        
+        SET good_triplets TO 0  
+        FOR index i FROM 0 TO n MINUS 1  
+            INCREMENT good_triplets BY smaller_count at i MULTIPLIED BY larger_count at i  
+        END FOR  
+        
+        RETURN good_triplets  
+    END FUNCTION  
+END CLASS

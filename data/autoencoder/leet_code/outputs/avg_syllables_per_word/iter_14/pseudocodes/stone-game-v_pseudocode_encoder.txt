@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION stoneGameV(stoneValue)  
+        DEFINE FUNCTION get_range_sum(left, right)  
+            RETURN element at position right PLUS one OF prefix_sum MINUS element at position left OF prefix_sum  
+        END FUNCTION  
+
+        DEFINE FUNCTION dp(left, right)  
+            IF left IS EQUAL TO right THEN  
+                RETURN zero  
+            END IF  
+            SET max_score TO zero  
+            FOR i FROM left TO right MINUS one  
+                SET left_sum TO get_range_sum(left, i)  
+                SET right_sum TO get_range_sum(i PLUS one, right)  
+                IF left_sum IS LESS THAN right_sum THEN  
+                    IF max_score IS LESS THAN left_sum PLUS dp(left, i) THEN  
+                        SET max_score TO left_sum PLUS dp(left, i)  
+                    END IF  
+                ELSE IF left_sum IS GREATER THAN right_sum THEN  
+                    IF max_score IS LESS THAN right_sum PLUS dp(i PLUS one, right) THEN  
+                        SET max_score TO right_sum PLUS dp(i PLUS one, right)  
+                    END IF  
+                ELSE  
+                    IF max_score IS LESS THAN left_sum PLUS dp(left, i) THEN  
+                        SET max_score TO left_sum PLUS dp(left, i)  
+                    END IF  
+                    IF max_score IS LESS THAN right_sum PLUS dp(i PLUS one, right) THEN  
+                        SET max_score TO right_sum PLUS dp(i PLUS one, right)  
+                    END IF  
+                END IF  
+            END FOR  
+            RETURN max_score  
+        END FUNCTION  
+
+        SET prefix_sum TO a list of zero elements with the LENGTH OF stoneValue PLUS one  
+        FOR i FROM zero TO LENGTH OF stoneValue MINUS one  
+            SET element at position i PLUS one OF prefix_sum TO element at position i OF prefix_sum PLUS element at position i OF stoneValue  
+        END FOR  
+        RETURN dp(zero, LENGTH OF stoneValue MINUS one)  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,44 @@
+CLASS Solution  
+    FUNCTION findMinStep(board, hand)  
+        FUNCTION clean(board)  
+            SET stack TO empty list  
+            FOR each ball IN board  
+                IF stack is not empty AND stack last element's ball IS NOT EQUAL TO ball AND stack last element's count IS GREATER THAN OR EQUAL TO 3  
+                    REMOVE last element FROM stack  
+                IF stack is empty OR stack last element's ball IS NOT EQUAL TO ball  
+                    APPEND [ball, 1] TO stack  
+                ELSE  
+                    INCREMENT stack last element's count BY 1  
+            IF stack is not empty AND stack last element's count IS GREATER THAN OR EQUAL TO 3  
+                REMOVE last element FROM stack  
+            RETURN concatenation of each ball repeated count times FROM stack  
+        END FUNCTION  
+
+        FUNCTION dfs(board, hand_counter)  
+            IF board IS empty  
+                RETURN 0  
+            SET min_steps TO infinity  
+            SET i TO 0  
+            WHILE i IS LESS THAN length of board  
+                SET j TO i plus 1  
+                WHILE j IS LESS THAN length of board AND board character at j IS EQUAL TO board character at i  
+                    INCREMENT j BY 1  
+                SET increment TO 3 MINUS (j MINUS i)  
+                IF hand_counter value for board character at i IS GREATER THAN OR EQUAL TO increment  
+                    SET new_hand_counter TO copy of hand_counter  
+                    DECREMENT new_hand_counter value for board character at i BY increment  
+                    SET new_board TO clean(concatenation of board substring before i and board substring from j onwards)  
+                    SET steps TO dfs(new_board, new_hand_counter)  
+                    IF steps IS GREATER THAN OR EQUAL TO 0  
+                        SET min_steps TO minimum of min_steps AND steps plus increment  
+                SET i TO j  
+            IF min_steps IS EQUAL TO infinity  
+                RETURN -1  
+            ELSE  
+                RETURN min_steps  
+        END FUNCTION  
+
+        SET hand_counter TO count occurrences of each character in hand  
+        RETURN dfs(board, hand_counter)  
+    END FUNCTION  
+END CLASS

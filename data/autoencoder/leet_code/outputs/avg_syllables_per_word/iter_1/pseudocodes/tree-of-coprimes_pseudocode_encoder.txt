@@ -1,0 +1,30 @@
+```
+nums, edges → n, tree
+for u,v in edges: tree[u] += v; tree[v] += u
+
+coprime = 51x51 matrix of (gcd(i,j) ==1) for i,j in [1..50]
+
+result = [-1]*n
+ancestor_stack = [None]*51
+
+dfs(node, parent, depth):
+    closest_ancestor, max_depth = -1, -1
+    for val in 1..50:
+        if coprime[nums[node]][val] and ancestor_stack[val] != None:
+            anc, d = ancestor_stack[val]
+            if d > max_depth:
+                closest_ancestor, max_depth = anc, d
+    result[node] = closest_ancestor
+
+    original = ancestor_stack[nums[node]]
+    ancestor_stack[nums[node]] = (node, depth)
+
+    for child in tree[node]:
+        if child != parent:
+            dfs(child, node, depth+1)
+
+    ancestor_stack[nums[node]] = original
+
+dfs(0, -1, 0)
+return result
+```

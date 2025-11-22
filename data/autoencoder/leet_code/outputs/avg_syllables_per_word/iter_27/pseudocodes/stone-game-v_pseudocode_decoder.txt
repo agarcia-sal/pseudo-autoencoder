@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION stoneGameV(stoneValue)  
+        SET prefix_sum TO a list of zeros with the LENGTH OF stoneValue PLUS one  
+        FOR index FROM zero TO the LENGTH OF stoneValue MINUS one  
+            SET element at position index PLUS one of prefix_sum TO element at position index of prefix_sum PLUS element at position index of stoneValue  
+        END FOR  
+        
+        FUNCTION get_range_sum(left, right)  
+            RETURN element at position right PLUS one of prefix_sum MINUS element at position left of prefix_sum  
+        END FUNCTION  
+        
+        FUNCTION dp(left, right)  
+            IF left EQUALS right THEN  
+                RETURN zero  
+            END IF  
+            SET max_score TO zero  
+            FOR index FROM left TO right MINUS one  
+                SET left_sum TO get_range_sum(left, index)  
+                SET right_sum TO get_range_sum(index PLUS one, right)  
+                IF left_sum LESS THAN right_sum THEN  
+                    SET candidate_score TO left_sum PLUS dp(left, index)  
+                    IF candidate_score GREATER THAN max_score THEN  
+                        SET max_score TO candidate_score  
+                    END IF  
+                ELSE IF left_sum GREATER THAN right_sum THEN  
+                    SET candidate_score TO right_sum PLUS dp(index PLUS one, right)  
+                    IF candidate_score GREATER THAN max_score THEN  
+                        SET max_score TO candidate_score  
+                    END IF  
+                ELSE  
+                    SET candidate_score_left TO left_sum PLUS dp(left, index)  
+                    SET candidate_score_right TO right_sum PLUS dp(index PLUS one, right)  
+                    IF candidate_score_left GREATER THAN max_score THEN  
+                        SET max_score TO candidate_score_left  
+                    END IF  
+                    IF candidate_score_right GREATER THAN max_score THEN  
+                        SET max_score TO candidate_score_right  
+                    END IF  
+                END IF  
+            END FOR  
+            RETURN max_score  
+        END FUNCTION  
+        
+        RETURN dp(zero, the LENGTH OF stoneValue MINUS one)  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION smallestSufficientTeam WITH PARAMETERS self req_skills AS List of strings people AS List of List of strings RETURNING List of integers  
+        SET mapping_skills_to_indices TO RESULT OF invoking auxiliary FUNCTION create_mapping_of_skills_to_indices WITH PARAMETER req_skills  
+        SET number_of_skills TO the LENGTH OF req_skills  
+        SET number_of_people TO the LENGTH OF people  
+        SET skill_bitmasks_for_people TO A list OF number_of_people elements EACH SET TO zero  
+        FOR each index_of_person AND skill_set IN people WITH their order  
+            FOR each skill IN skill_set  
+                SET skill_bitmasks_for_people AT position index_of_person TO skill_bitmasks_for_people AT position index_of_person BITWISE OR WITH ONE BITWISE LEFT SHIFTED BY mapping_skills_to_indices AT key skill  
+            END FOR  
+        END FOR  
+        SET minimum_team_size_dp TO A list OF TWO RAISED TO THE POWER number_of_skills elements EACH SET TO infinite value  
+        SET previous_person_for_state_dp TO A list OF TWO RAISED TO THE POWER number_of_skills elements EACH SET TO zero  
+        SET previous_state_dp TO A list OF TWO RAISED TO THE POWER number_of_skills elements EACH SET TO zero  
+        SET minimum_team_size_dp AT position zero TO zero  
+        FOR each state FROM zero TO ONE LESS THAN TWO RAISED TO THE POWER number_of_skills  
+            IF minimum_team_size_dp AT position state IS EQUAL TO infinite value THEN  
+                CONTINUE TO next iteration  
+            END IF  
+            FOR each person_index FROM zero TO number_of_people MINUS one  
+                SET combined_state TO state BITWISE OR WITH skill_bitmasks_for_people AT position person_index  
+                IF minimum_team_size_dp AT position state PLUS one IS LESS THAN minimum_team_size_dp AT position combined_state THEN  
+                    SET minimum_team_size_dp AT position combined_state TO minimum_team_size_dp AT position state PLUS one  
+                    SET previous_person_for_state_dp AT position combined_state TO person_index  
+                    SET previous_state_dp AT position combined_state TO state  
+                END IF  
+            END FOR  
+        END FOR  
+        SET current_state TO ONE LESS THAN TWO RAISED TO THE POWER number_of_skills  
+        SET answer_team_indices TO an empty list  
+        WHILE current_state HOLDS a value greater than zero  
+            APPEND previous_person_for_state_dp AT position current_state TO answer_team_indices  
+            SET current_state TO previous_state_dp AT position current_state  
+        END WHILE  
+        RETURN answer_team_indices  
+    END FUNCTION  
+
+    FUNCTION create_mapping_of_skills_to_indices WITH PARAMETER req_skills RETURNING mapping FROM string TO integer  
+        DESCRIBE process AS creating a mapping FROM each skill in req_skills TO its ordinal position starting from zero  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,39 @@
+CLASS Solution
+    FUNCTION alienOrder(words)
+        SET graph TO a mapping from character to set of characters
+        SET indegree TO a mapping from character to integer
+
+        SET all_chars TO the set of all characters in all words combined
+
+        FOR i FROM 0 TO length of words MINUS 2
+            SET word1 TO words[i]
+            SET word2 TO words[i + 1]
+            SET min_length TO minimum of length of word1 and word2
+            SET found TO false
+            FOR j FROM 0 TO min_length MINUS 1
+                IF character at position j in word1 IS NOT EQUAL TO character at position j in word2
+                    IF character at position j in word2 IS NOT IN graph at character word1[j]
+                        ADD character word2[j] TO graph[word1[j]]
+                        INCREMENT indegree[word2[j]] BY 1
+                    SET found TO true
+                    BREAK loop
+            IF found IS false AND length of word1 IS GREATER THAN length of word2
+                RETURN empty string
+
+        SET queue TO a deque containing all characters in all_chars with indegree equal to 0
+        SET result TO empty list
+
+        WHILE queue IS NOT empty
+            SET char TO first element popped from queue
+            APPEND char TO result
+            FOR each neighbor IN graph at char
+                DECREMENT indegree[neighbor] BY 1
+                IF indegree[neighbor] IS 0
+                    APPEND neighbor TO queue
+
+        IF length of result IS NOT EQUAL TO length of all_chars
+            RETURN empty string
+
+        RETURN concatenation of characters in result
+    END FUNCTION
+END CLASS

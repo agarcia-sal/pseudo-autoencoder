@@ -1,0 +1,57 @@
+CLASS Solution  
+    FUNCTION reorganizeString(s)  
+        CALL count_frequency WITH PARAMETERS s AND ASSIGN RESULT TO count  
+        CALL build_max_heap WITH PARAMETERS count AND ASSIGN RESULT TO max_heap
+        
+        SET prev_char TO nothing  
+        SET prev_freq TO zero  
+        SET result TO empty list  
+        
+        WHILE max_heap IS NOT empty OR prev_freq LESS THAN zero HOLDS  
+            IF max_heap IS empty AND prev_freq LESS THAN zero HOLDS  
+                RETURN empty string  
+            END IF  
+            
+            CALL pop_from_heap WITH PARAMETERS max_heap AND ASSIGN RESULT TO freq AND char  
+            APPEND char TO result  
+            
+            INCREMENT freq BY one  
+            
+            IF prev_freq LESS THAN zero HOLDS  
+                CALL push_to_heap WITH PARAMETERS max_heap AND prev_freq AND prev_char  
+            END IF  
+            
+            SET prev_char TO char  
+            SET prev_freq TO freq  
+        END WHILE  
+        
+        CALL join_characters OF list result AND RETURN THE RESULT  
+    END FUNCTION  
+    
+    FUNCTION count_frequency(s)  
+        CREATE a mapping of characters TO their frequencies FROM s  
+        RETURN the mapping  
+    END FUNCTION  
+    
+    FUNCTION build_max_heap(count)  
+        CREATE a list max_heap  
+        FOR each character AND its frequency IN count  
+            APPEND the tuple of negative frequency AND character TO max_heap  
+        END FOR  
+        CALL heapify ON max_heap  
+        RETURN max_heap  
+    END FUNCTION  
+    
+    FUNCTION pop_from_heap(max_heap)  
+        REMOVE the smallest element FROM max_heap BASED ON priority AND RETURN IT AS freq AND char  
+    END FUNCTION  
+    
+    FUNCTION push_to_heap(max_heap, freq, char)  
+        INSERT the tuple of freq AND char INTO max_heap  
+    END FUNCTION  
+    
+    FUNCTION join_characters(list_of_characters)  
+        CREATE a string by concatenating all characters in list_of_characters IN ORDER  
+        RETURN the string  
+    END FUNCTION  
+END CLASS

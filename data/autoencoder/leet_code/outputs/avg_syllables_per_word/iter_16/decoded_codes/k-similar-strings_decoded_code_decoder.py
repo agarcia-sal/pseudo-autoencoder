@@ -1,0 +1,25 @@
+from collections import deque
+
+class Solution:
+    def kSimilarity(self, s1: str, s2: str) -> int:
+        def neighbors(s: str):
+            i = 0
+            length = len(s)
+            while i < length and s[i] == s2[i]:
+                i += 1
+            for j in range(i + 1, length):
+                if s[j] == s2[i] and s[j] != s2[j]:
+                    # swap characters at positions i and j in s
+                    yield s[:i] + s[j] + s[i+1:j] + s[i] + s[j+1:]
+
+        queue = deque([(s1, 0)])
+        visited = {s1}
+
+        while queue:
+            s, swaps = queue.popleft()
+            if s == s2:
+                return swaps
+            for neighbor in neighbors(s):
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    queue.append((neighbor, swaps + 1))

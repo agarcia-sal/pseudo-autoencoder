@@ -1,0 +1,51 @@
+CLASS Solution  
+    FUNCTION minOperationsToFlip(expression)  
+        SET stack TO empty list  
+
+        FOR each element e IN expression  
+            IF e EQUALS any of '(' OR '&' OR '|'  
+                APPEND tuple of e and 0 TO stack  
+                CONTINUE  
+            END IF  
+
+            IF e EQUALS ')'  
+                SET lastPair TO result of popping from stack  
+                POP from stack to remove '('  
+            ELSE  
+                SET lastPair TO tuple of e and 1  
+            END IF  
+
+            IF stack is not empty AND last element's first item IN stack EQUALS any of '&' OR '|'  
+                SET op TO result of popping first item from stack  
+                SET a, costA TO result of popping from stack  
+                SET b, costB TO lastPair  
+
+                IF op EQUALS '&'  
+                    IF a EQUALS '0' AND b EQUALS '0'  
+                        SET lastPair TO tuple of '0' and 1 PLUS minimum of costA and costB  
+                    ELSE IF a EQUALS '0' AND b EQUALS '1'  
+                        SET lastPair TO tuple of '0' and 1  
+                    ELSE IF a EQUALS '1' AND b EQUALS '0'  
+                        SET lastPair TO tuple of '0' and 1  
+                    ELSE  
+                        SET lastPair TO tuple of '1' and minimum of costA and costB  
+                    END IF  
+                ELSE  # op EQUALS '|'  
+                    IF a EQUALS '0' AND b EQUALS '0'  
+                        SET lastPair TO tuple of '0' and minimum of costA and costB  
+                    ELSE IF a EQUALS '0' AND b EQUALS '1'  
+                        SET lastPair TO tuple of '1' and 1  
+                    ELSE IF a EQUALS '1' AND b EQUALS '0'  
+                        SET lastPair TO tuple of '1' and 1  
+                    ELSE  
+                        SET lastPair TO tuple of '1' and 1 PLUS minimum of costA and costB  
+                    END IF  
+                END IF  
+            END IF  
+
+            APPEND lastPair TO stack  
+        END FOR  
+
+        RETURN second item of last element in stack  
+    END FUNCTION  
+END CLASS

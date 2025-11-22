@@ -1,0 +1,37 @@
+CLASS Solution
+    FUNCTION criticalConnections(n: integer, connections: list of list of integer) RETURNS list of list of integer
+        FUNCTION dfs(node: integer, parent: integer, disc: list of integer, low: list of integer, time: list of integer, graph: list of list of integer, critical: list of list of integer)
+            SET disc[node] TO time[0]
+            SET low[node] TO time[0]
+            INCREMENT time[0] BY 1
+
+            FOR each neighbor IN graph[node]
+                IF disc[neighbor] EQUALS -1 THEN
+                    CALL dfs(neighbor, node, disc, low, time, graph, critical)
+                    SET low[node] TO MINIMUM OF low[node] AND low[neighbor]
+                    IF low[neighbor] GREATER THAN disc[node] THEN
+                        APPEND [node, neighbor] TO critical
+                ELSE IF neighbor NOT EQUAL TO parent THEN
+                    SET low[node] TO MINIMUM OF low[node] AND disc[neighbor]
+            END FOR
+        END FUNCTION
+
+        SET graph TO list of n empty lists
+        FOR each pair u, v IN connections
+            APPEND v TO graph[u]
+            APPEND u TO graph[v]
+        END FOR
+
+        SET disc TO list of n elements all -1
+        SET low TO list of n elements all -1
+        SET time TO list containing 0
+        SET critical TO empty list
+
+        FOR node FROM 0 TO n MINUS 1
+            IF disc[node] EQUALS -1 THEN
+                CALL dfs(node, -1, disc, low, time, graph, critical)
+        END FOR
+
+        RETURN critical
+    END FUNCTION
+END CLASS

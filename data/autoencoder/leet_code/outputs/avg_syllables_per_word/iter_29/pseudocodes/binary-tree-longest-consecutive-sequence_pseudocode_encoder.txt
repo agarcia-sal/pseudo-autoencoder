@@ -1,0 +1,70 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self dot val TO val  
+        SET self dot left TO left  
+        SET self dot right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN nothing  
+    END IF  
+    SET root TO new TreeNode with value element at position one of values and left nothing and right nothing  
+    SET i TO one  
+    SET queue TO a new empty double ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO the element obtained by removing from the front of queue  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT nothing  
+            SET node dot left TO new TreeNode with value element at position i of values and left nothing and right nothing  
+            APPEND node dot left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT nothing  
+            SET node dot right TO new TreeNode with value element at position i of values and left nothing and right nothing  
+            APPEND node dot right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS nothing AND q IS nothing  
+        RETURN true  
+    ELSE IF p IS nothing OR q IS nothing  
+        RETURN false  
+    ELSE IF the value of p IS NOT EQUALS TO the value of q  
+        RETURN false  
+    ELSE  
+        RETURN the result of calling is_same_tree with arguments p dot left and q dot left AND the result of calling is_same_tree with arguments p dot right and q dot right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION longestConsecutive(root)  
+        IF root IS nothing  
+            RETURN zero  
+        END IF  
+
+        FUNCTION dfs(node, parent, current_length)  
+            IF node IS nothing  
+                RETURN current_length  
+            END IF  
+
+            IF parent IS NOT nothing AND the value of node IS EQUALS TO parent PLUS one  
+                INCREMENT current_length BY one  
+            ELSE  
+                SET current_length TO one  
+            END IF  
+
+            SET left_length TO the result of calling dfs with arguments node dot left, the value of node, and current_length  
+            SET right_length TO the result of calling dfs with arguments node dot right, the value of node, and current_length  
+
+            RETURN the greatest value among current_length and left_length and right_length  
+        END FUNCTION  
+
+        RETURN the result of calling dfs with arguments root, nothing, and zero  
+    END FUNCTION  
+END CLASS

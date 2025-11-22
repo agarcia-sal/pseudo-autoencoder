@@ -1,0 +1,30 @@
+CLASS Solution  
+    FUNCTION minChanges(nums, k)  
+        SET groups TO default dictionary of lists  
+        FOR i FROM 0 TO LENGTH OF nums MINUS 1  
+            APPEND nums AT i TO groups AT key i MODULO k  
+        
+        SET freq TO list of default dictionaries of int WITH LENGTH k  
+        SET min_size TO list of infinity values WITH LENGTH k  
+        FOR i FROM 0 TO k MINUS 1  
+            FOR each num IN groups AT i  
+                INCREMENT freq AT i FOR key num BY 1  
+            SET min_size AT i TO LENGTH OF groups AT i  
+        
+        SET dp TO list of infinity values WITH LENGTH 2 RAISED TO 10  
+        SET dp AT 0 TO 0  
+        
+        FOR i FROM 0 TO k MINUS 1  
+            SET new_dp TO list of infinity values WITH LENGTH 2 RAISED TO 10  
+            SET min_dp TO MINIMUM VALUE IN dp  
+            FOR j FROM 0 TO (2 RAISED TO 10) MINUS 1  
+                SET new_dp AT j TO min_dp PLUS min_size AT i  
+                FOR each num, count IN freq AT i ITEMS  
+                    SET candidate TO dp AT (j XOR num) PLUS min_size AT i MINUS count  
+                    IF candidate LESS THAN new_dp AT j  
+                        SET new_dp AT j TO candidate  
+            SET dp TO new_dp  
+        
+        RETURN dp AT 0  
+    END FUNCTION  
+END CLASS

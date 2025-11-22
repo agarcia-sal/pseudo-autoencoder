@@ -1,0 +1,84 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val defaulted TO zero left defaulted TO None right defaulted TO None  
+        SET self dot val TO val  
+        SET self dot left TO left  
+        SET self dot right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values AS list  
+    IF values IS empty  
+        RETURN None  
+    END IF  
+    SET root TO a new instance of TreeNode WITH parameter element at position zero of values  
+    SET i TO one  
+    SET queue TO a new double ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO the element removed from the left of queue  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT None  
+            SET node dot left TO a new instance of TreeNode WITH parameter element at position i of values  
+            APPEND node dot left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT None  
+            SET node dot right TO a new instance of TreeNode WITH parameter element at position i of values  
+            APPEND node dot right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p dot val IS NOT EQUALS TO q dot val  
+        RETURN False  
+    ELSE  
+        RETURN the result of is_same_tree WITH PARAMETERS p dot left q dot left AND the result of is_same_tree WITH PARAMETERS p dot right q dot right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION findClosestLeaf WITH PARAMETERS self root k  
+        IF root dot left IS None AND root dot right IS None  
+            RETURN root dot val  
+        END IF  
+        SET graph TO a new default dictionary OF lists  
+
+        FUNCTION dfs WITH PARAMETERS node parent defaulted TO None  
+            IF parent IS NOT None  
+                APPEND parent dot val TO the list at key node dot val IN graph  
+                APPEND node dot val TO the list at key parent dot val IN graph  
+            END IF  
+            IF node dot left IS NOT None  
+                CALL dfs WITH node dot left AND node  
+            END IF  
+            IF node dot right IS NOT None  
+                CALL dfs WITH node dot right AND node  
+            END IF  
+        END FUNCTION  
+
+        CALL dfs WITH root  
+
+        SET queue TO a new double ended queue INITIALIZED WITH element k  
+        SET visited TO an empty set  
+
+        WHILE queue IS NOT empty  
+            SET current TO the element removed from the left of queue  
+            ADD current TO visited  
+            IF the LENGTH OF the list at key current IN graph IS EQUALS TO one AND current IS NOT EQUALS TO root dot val  
+                RETURN current  
+            END IF  
+            FOR each neighbor IN the list at key current IN graph  
+                IF neighbor IS NOT IN visited  
+                    APPEND neighbor TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

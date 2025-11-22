@@ -1,0 +1,37 @@
+CLASS Solution  
+    FUNCTION countSmaller(nums)  
+        SET sorted_nums TO the sorted list of unique elements in nums  
+        SET rank TO an empty mapping from number TO position  
+        SET index TO zero  
+        FOR each value IN sorted_nums  
+            INCREMENT index BY one  
+            ASSIGN the position index TO the mapping for the value in rank  
+        END FOR  
+        SET bit TO a list of zeros with length equal to the length of sorted_nums PLUS one  
+        
+        FUNCTION get_sum(idx)  
+            SET res TO zero  
+            WHILE idx IS GREATER THAN zero  
+                INCREMENT res BY element at position idx of bit  
+                SET idx TO idx MINUS the bitwise AND of idx and the negative of idx  
+            END WHILE  
+            RETURN res  
+        END FUNCTION  
+        
+        FUNCTION update(idx, delta)  
+            WHILE idx IS LESS THAN the LENGTH OF bit  
+                INCREMENT element at position idx of bit BY delta  
+                SET idx TO idx PLUS the bitwise AND of idx and the negative of idx  
+            END WHILE  
+        END FUNCTION  
+        
+        SET counts TO an empty list  
+        FOR each num IN nums taken in reverse order  
+            SET r TO the element in rank at key num  
+            APPEND the result of get_sum with parameter r MINUS one TO counts  
+            CALL update with parameters r and one  
+        END FOR  
+        
+        RETURN the reverse of counts  
+    END FUNCTION  
+END CLASS

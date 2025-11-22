@@ -1,0 +1,59 @@
+CLASS BIT  
+    FUNCTION __init__(self, n)  
+        SET self.size TO n  
+        SET self.tree TO a list of zero of length n PLUS one  
+    END FUNCTION  
+
+    FUNCTION update(self, idx, delta)  
+        WHILE idx IS LESS THAN OR EQUAL TO self.size  
+            INCREMENT element at position idx of self.tree BY delta  
+            SET idx TO idx PLUS the result of bitwise AND of idx AND negative idx  
+        END WHILE  
+    END FUNCTION  
+
+    FUNCTION query(self, idx)  
+        SET result TO zero  
+        WHILE idx IS GREATER THAN zero  
+            INCREMENT result BY element at position idx of self.tree  
+            SET idx TO idx MINUS the result of bitwise AND of idx AND negative idx  
+        END WHILE  
+        RETURN result  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION goodTriplets(self, nums1, nums2)  
+        SET n TO the LENGTH OF nums1  
+
+        SET pos TO a list of zero of length n  
+        FOR each index i AND number num IN the enumeration of nums1  
+            SET element at position num of pos TO i  
+        END FOR  
+
+        SET compressed TO a list constructed by taking element at position num of pos FOR each num IN nums2  
+
+        SET bit TO a new instance of BIT initialized with n  
+
+        SET smaller_count TO a list of zero of length n  
+        SET larger_count TO a list of zero of length n  
+
+        FOR index i FROM zero TO n MINUS one  
+            SET element at position i of smaller_count TO the result of bit.query at element at position i of compressed  
+            CALL bit.update with parameters element at position i of compressed PLUS one and one  
+        END FOR  
+
+        SET bit TO a new instance of BIT initialized with n  
+
+        FOR index i FROM n MINUS one TO zero, DECREASING BY one  
+            SET element at position i of larger_count TO the result of bit.query at n MINUS the result of bit.query at element at position i of compressed PLUS one  
+            CALL bit.update with parameters element at position i of compressed PLUS one and one  
+        END FOR  
+
+        SET good_triplets TO zero  
+        FOR index i FROM zero TO n MINUS one  
+            INCREMENT good_triplets BY element at position i of smaller_count MULTIPLIED BY element at position i of larger_count  
+        END FOR  
+
+        RETURN good_triplets  
+    END FUNCTION  
+END CLASS

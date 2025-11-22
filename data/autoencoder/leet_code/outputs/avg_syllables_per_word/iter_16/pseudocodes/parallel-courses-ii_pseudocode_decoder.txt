@@ -1,0 +1,36 @@
+CLASS Solution  
+    FUNCTION minNumberOfSemesters WITH PARAMETERS n INTEGER relations LIST OF LIST OF INTEGER k INTEGER  
+        SET graph TO a new default dictionary with list as default value  
+        SET in_degree TO a list of zeros with length equal to n plus one  
+        
+        FOR each pair of prevCourse AND nextCourse IN relations  
+            APPEND nextCourse TO the list at key prevCourse IN graph  
+            INCREMENT the element at position nextCourse of in_degree BY one  
+        END FOR  
+        
+        SET queue TO a new double ended queue  
+        FOR each course FROM one TO n  
+            IF the element at position course of in_degree EQUALS zero THEN  
+                APPEND course TO queue  
+            END IF  
+        END FOR  
+        
+        SET semesters TO zero  
+        
+        WHILE the queue is not empty  
+            SET limit TO the minimum of k AND the length of queue  
+            FOR each iteration FROM one TO limit  
+                SET current_course TO the element removed from the left end of queue  
+                FOR each next_course IN the list at key current_course IN graph  
+                    DECREMENT the element at position next_course of in_degree BY one  
+                    IF the element at position next_course of in_degree EQUALS zero THEN  
+                        APPEND next_course TO queue  
+                    END IF  
+                END FOR  
+            END FOR  
+            INCREMENT semesters BY one  
+        END WHILE  
+        
+        RETURN semesters  
+    END FUNCTION  
+END CLASS

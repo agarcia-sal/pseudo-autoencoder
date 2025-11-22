@@ -1,0 +1,59 @@
+CLASS Solution  
+    FUNCTION smallestMissingValueSubtree(self, parents, nums)  
+        SET n TO length of parents  
+        SET tree TO a new mapping from a node to a list of child nodes  
+        
+        FOR i FROM 1 TO n MINUS 1  
+            APPEND i TO tree AT key parents AT i  
+        END FOR  
+        
+        SET node_with_one TO negative one  
+        FOR i FROM 0 TO n MINUS 1  
+            IF nums AT i EQUALS one THEN  
+                SET node_with_one TO i  
+                BREAK  
+            END IF  
+        END FOR  
+        
+        IF node_with_one EQUALS negative one THEN  
+            RETURN a list of length n FILLED WITH one  
+        END IF  
+        
+        SET result TO a list of length n FILLED WITH one  
+        
+        DEFINE FUNCTION dfs(node)  
+            ADD node TO visited  
+            SET genetic_values TO a new set CONTAINING nums AT node  
+            FOR each child IN tree AT node  
+                IF child NOT IN visited THEN  
+                    SET genetic_values TO the union of genetic_values AND the result of dfs(child)  
+                END IF  
+            END FOR  
+            SET smallest_missing TO one  
+            WHILE smallest_missing IS IN genetic_values DO  
+                INCREMENT smallest_missing BY one  
+            END WHILE  
+            SET result AT node TO smallest_missing  
+            RETURN genetic_values  
+        END FUNCTION  
+        
+        SET visited TO an empty set  
+        
+        SET path TO an empty list  
+        SET current TO node_with_one  
+        WHILE current NOT EQUALS negative one DO  
+            APPEND current TO path  
+            SET current TO parents AT current  
+        END WHILE  
+        
+        SET path_set TO a new set CONTAINING all elements of path  
+        FOR each node IN path IN reverse order  
+            IF node IN visited THEN  
+                CONTINUE  
+            END IF  
+            CALL dfs(node)  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

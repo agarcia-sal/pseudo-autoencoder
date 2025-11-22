@@ -1,0 +1,101 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF the LENGTH OF values EQUALS zero THEN  
+        RETURN none  
+    END IF  
+    SET root TO a new TreeNode initialized with the element at position zero of values  
+    SET i TO one  
+    INITIALIZE queue AS an empty double ended queue  
+    APPEND root TO queue  
+    WHILE the LENGTH OF queue GREATER THAN zero DO  
+        REMOVE the first element FROM queue AND ASSIGN it TO node  
+        IF i LESS THAN the LENGTH OF values AND the element at position i of values NOT EQUALS none THEN  
+            SET node.left TO a new TreeNode initialized with the element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN the LENGTH OF values AND the element at position i of values NOT EQUALS none THEN  
+            SET node.right TO a new TreeNode initialized with the element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p EQUALS none AND q EQUALS none THEN  
+        RETURN true  
+    ELSE IF p EQUALS none OR q EQUALS none THEN  
+        RETURN false  
+    ELSE IF the val property of p NOT EQUALS the val property of q THEN  
+        RETURN false  
+    ELSE  
+        RETURN the result of is_same_tree called with the left property of p and the left property of q AND the result of is_same_tree called with the right property of p and the right property of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION boundaryOfBinaryTree(self, root)  
+        IF root EQUALS none THEN  
+            RETURN an empty list  
+        END IF  
+
+        FUNCTION is_leaf(node)  
+            RETURN node.left EQUALS none AND node.right EQUALS none  
+        END FUNCTION  
+
+        INITIALIZE left_boundary AS an empty list  
+        SET current TO the left property of root  
+        WHILE current NOT EQUALS none DO  
+            IF is_leaf called with current EQUALS false THEN  
+                APPEND the val property of current TO left_boundary  
+            END IF  
+            IF the left property of current NOT EQUALS none THEN  
+                SET current TO the left property of current  
+            ELSE  
+                SET current TO the right property of current  
+            END IF  
+        END WHILE  
+
+        INITIALIZE right_boundary AS an empty list  
+        SET current TO the right property of root  
+        WHILE current NOT EQUALS none DO  
+            IF is_leaf called with current EQUALS false THEN  
+                APPEND the val property of current TO right_boundary  
+            END IF  
+            IF the right property of current NOT EQUALS none THEN  
+                SET current TO the right property of current  
+            ELSE  
+                SET current TO the left property of current  
+            END IF  
+        END WHILE  
+
+        INITIALIZE leaves AS an empty list  
+        FUNCTION collect_leaves(node)  
+            IF node EQUALS none THEN  
+                RETURN  
+            END IF  
+            IF is_leaf called with node EQUALS true THEN  
+                APPEND the val property of node TO leaves  
+            END IF  
+            CALL collect_leaves with the left property of node  
+            CALL collect_leaves with the right property of node  
+        END FUNCTION  
+
+        CALL collect_leaves with root  
+
+        IF is_leaf called with root EQUALS true THEN  
+            SET leaves TO an empty list  
+        END IF  
+
+        RETURN a list composed of the val property of root followed by all elements of left_boundary followed by all elements of leaves followed by all elements of right_boundary in reverse order  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,54 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val WITH DEFAULT 0, left WITH DEFAULT None, right WITH DEFAULT None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET root TO NEW TreeNode WITH values AT index 0  
+    SET i TO 1  
+    SET queue TO NEW deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO REMOVE FIRST ELEMENT FROM queue  
+        IF i LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.left TO NEW TreeNode WITH values AT i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.right TO NEW TreeNode WITH values AT i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val NOT EQUAL q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION lowestCommonAncestor(self, root, p, q)  
+        IF root IS None OR root EQUALS p OR root EQUALS q  
+            RETURN root  
+        SET left TO self.lowestCommonAncestor(root.left, p, q)  
+        SET right TO self.lowestCommonAncestor(root.right, p, q)  
+        IF left IS NOT None AND right IS NOT None  
+            RETURN root  
+        IF left IS NOT None  
+            RETURN left  
+        ELSE  
+            RETURN right  
+    END FUNCTION  
+END CLASS

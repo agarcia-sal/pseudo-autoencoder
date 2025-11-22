@@ -1,0 +1,51 @@
+CLASS Solution  
+    FUNCTION checkWays(pairs)  
+        SET graph TO an empty default dictionary with set as default value  
+        FOR each pair consisting of x and y IN pairs  
+            ADD y TO the set at key x in graph  
+            ADD x TO the set at key y in graph  
+        END FOR  
+        
+        SET max_degree TO the key in graph for which the size of the set at that key is the greatest  
+        SET n TO the size of graph  
+        
+        IF the size of the set at key max_degree in graph IS NOT EQUAL TO n MINUS one  
+            RETURN zero  
+        END IF  
+        
+        FUNCTION can_be_parent(u, v)  
+            FOR each neighbor IN the set at key v in graph  
+                IF neighbor IS NOT IN the set at key u in graph AND neighbor IS NOT EQUAL TO u  
+                    RETURN false  
+                END IF  
+            END FOR  
+            RETURN true  
+        END FUNCTION  
+        
+        SET ways TO one  
+        
+        FOR each u IN keys of graph  
+            IF u IS EQUAL TO max_degree  
+                CONTINUE to next iteration  
+            END IF  
+            SET parent TO none  
+            FOR each v IN the set at key u in graph  
+                IF v IS IN graph AND the size of the set at key v in graph IS GREATER THAN OR EQUAL TO the size of the set at key u in graph AND can_be_parent WITH arguments v and u RETURNS true  
+                    IF parent IS none OR the size of the set at key v in graph IS LESS THAN the size of the set at key parent in graph  
+                        SET parent TO v  
+                    END IF  
+                END IF  
+            END FOR  
+            
+            IF parent IS none  
+                RETURN zero  
+            END IF  
+            
+            IF the size of the set at key parent in graph IS EQUAL TO the size of the set at key u in graph  
+                SET ways TO two  
+            END IF  
+        END FOR  
+        
+        RETURN ways  
+    END FUNCTION  
+END CLASS

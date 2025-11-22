@@ -1,0 +1,79 @@
+CLASS Solution
+    FUNCTION scoreOfStudents(s, answers)
+        FUNCTION evaluate_expression(expression)
+            SET tokens TO an empty list
+            SET number TO zero
+            FOR each character IN expression
+                IF character IS A DIGIT
+                    SET number TO number MULTIPLIED BY ten PLUS the integer value of character
+                ELSE
+                    APPEND number TO tokens
+                    APPEND character TO tokens
+                    SET number TO zero
+                END IF
+            END FOR
+            APPEND number TO tokens
+            
+            SET index TO one
+            WHILE index LESS THAN the LENGTH OF tokens
+                IF element at position index of tokens EQUALS the character times
+                    SET element at position index minus one of tokens TO element at position index minus one of tokens MULTIPLIED BY element at position index plus one of tokens
+                    REMOVE elements from position index TO index plus two of tokens
+                ELSE
+                    INCREMENT index BY one
+                END IF
+            END WHILE
+            
+            SET result TO element at position zero of tokens
+            SET index TO one
+            WHILE index LESS THAN the LENGTH OF tokens
+                IF element at position index of tokens EQUALS the character plus
+                    SET result TO result PLUS element at position index plus one of tokens
+                END IF
+                INCREMENT index BY two
+            END WHILE
+            
+            RETURN result
+        END FUNCTION
+        
+        FUNCTION get_possible_answers(expression)
+            IF expression CONSISTS ONLY OF DIGITS
+                RETURN a set containing the integer value of expression
+            END IF
+            
+            SET results TO an empty set
+            FOR index FROM one TO LENGTH OF expression MINUS two STEP two
+                SET left_results TO CALL get_possible_answers WITH the substring from position zero TO index of expression
+                SET right_results TO CALL get_possible_answers WITH the substring from position index plus one TO the end of expression
+                FOR each left IN left_results
+                    FOR each right IN right_results
+                        IF element at position index of expression EQUALS the character plus
+                            SET result TO left PLUS right
+                        ELSE
+                            SET result TO left MULTIPLIED BY right
+                        END IF
+                        IF result LESS THAN OR EQUAL TO one thousand
+                            ADD result TO results
+                        END IF
+                    END FOR
+                END FOR
+            END FOR
+            
+            RETURN results
+        END FUNCTION
+        
+        SET correct_answer TO CALL evaluate_expression WITH parameter s
+        SET possible_answers TO CALL get_possible_answers WITH parameter s
+        
+        SET points TO zero
+        FOR each answer IN answers
+            IF answer EQUALS correct_answer
+                INCREMENT points BY five
+            ELSE IF answer IS IN possible_answers
+                INCREMENT points BY two
+            END IF
+        END FOR
+        
+        RETURN points
+    END FUNCTION
+END CLASS

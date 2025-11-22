@@ -1,0 +1,43 @@
+```
+unique_chars ← set(all chars in words + result)
+return False if |unique_chars| > 10
+
+non_zero ← {first char of each word with length>1} ∪ {first char of result if length>1}
+
+char_to_digit, digit_to_char ← {}, {}
+
+can_assign(c,d) ← c ∉ char_to_digit ∧ (d ∉ digit_to_char ∨ digit_to_char[d] = c)
+assign(c,d): char_to_digit[c] ← d; digit_to_char[d] ← c
+unassign(c,d): remove c from char_to_digit; remove d from digit_to_char
+
+backtrack(i, col, carry):
+  max_len ← max(len(w) for w in words)
+  if col ≥ max_len ∧ col ≥ len(result): return carry = 0
+  if i = len(words):
+    if col < len(result):
+      c ← result[len(result)-1-col]
+      digit ← carry mod 10
+      if c in char_to_digit:
+        if char_to_digit[c] ≠ digit: return False
+        return backtrack(0, col+1, carry div 10)
+      if can_assign(c,digit) ∧ (digit ≠ 0 ∨ c ∉ non_zero):
+        assign(c,digit)
+        if backtrack(0, col+1, carry div 10): return True
+        unassign(c,digit)
+    else:
+      return carry = 0
+    return False
+
+  w ← words[i]
+  if col ≥ len(w): return backtrack(i+1, col, carry)
+  c ← w[len(w)-1-col]
+  if c in char_to_digit: return backtrack(i+1, col, carry + char_to_digit[c])
+  for d in 0..9:
+    if can_assign(c,d) ∧ (d ≠ 0 ∨ c ∉ non_zero):
+      assign(c,d)
+      if backtrack(i+1, col, carry + d): return True
+      unassign(c,d)
+  return False
+
+return backtrack(0, 0, 0)
+```

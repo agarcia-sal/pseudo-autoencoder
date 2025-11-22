@@ -1,0 +1,53 @@
+CLASS TrieNode  
+    FUNCTION __init__()  
+        SET children TO a default mapping that creates new TrieNode when accessed with missing key  
+        SET deleted TO false  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION deleteDuplicateFolder(paths)  
+        SET ans TO an empty list  
+        SET root TO a new TrieNode  
+        SET subtreeToNodes TO a default mapping of lists  
+
+        FOR each path IN the list of paths sorted in lexicographical order  
+            SET node TO root  
+            FOR each folder_name IN path  
+                SET node TO the child node of node corresponding to folder_name  
+            END FOR  
+        END FOR  
+
+        FUNCTION buildSubtreeToRoots(node)  
+            SET subtree TO an open parenthesis concatenated with the concatenation for each child_name IN the keys of the children of node of child_name concatenated with the result of buildSubtreeToRoots called on the child node corresponding to child_name concatenated with a close parenthesis  
+            IF subtree IS NOT EQUAL TO a pair of empty parentheses  
+                APPEND node TO the list corresponding to subtree key in subtreeToNodes  
+            END IF  
+            RETURN subtree  
+        END FUNCTION  
+
+        CALL buildSubtreeToRoots with root as argument  
+
+        FOR each nodes_list IN the values of subtreeToNodes  
+            IF the length of nodes_list IS GREATER THAN one  
+                FOR each node_element IN nodes_list  
+                    SET the deleted attribute of node_element TO true  
+                END FOR  
+            END IF  
+        END FOR  
+
+        FUNCTION constructPath(node, path)  
+            FOR each pair of child_name and child_node IN the children of node  
+                IF the deleted attribute of child_node IS false  
+                    CALL constructPath with child_node and the concatenation of path with a list containing child_name as arguments  
+                END IF  
+            END FOR  
+            IF path IS NOT empty  
+                APPEND path TO ans  
+            END IF  
+        END FUNCTION  
+
+        CALL constructPath with root and an empty list as arguments  
+        RETURN ans  
+    END FUNCTION  
+END CLASS

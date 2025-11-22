@@ -1,0 +1,79 @@
+```
+CLASS UnionFind
+    FUNCTION __init__(size)
+        SET parent TO list of integers from 0 to size - 1
+        SET rank TO list of zeros with length size
+        SET size TO list of ones with length size
+    END FUNCTION
+
+    FUNCTION find(u)
+        IF parent[u] IS NOT u
+            SET parent[u] TO find(parent[u])
+        RETURN parent[u]
+    END FUNCTION
+
+    FUNCTION union(u, v)
+        SET rootU TO find(u)
+        SET rootV TO find(v)
+        IF rootU IS NOT rootV
+            IF rank[rootU] > rank[rootV]
+                SET parent[rootV] TO rootU
+                INCREMENT size[rootU] BY size[rootV]
+            ELSE IF rank[rootU] < rank[rootV]
+                SET parent[rootU] TO rootV
+                INCREMENT size[rootV] BY size[rootU]
+            ELSE
+                SET parent[rootV] TO rootU
+                INCREMENT size[rootU] BY size[rootV]
+                INCREMENT rank[rootU] BY 1
+END CLASS
+
+CLASS Solution
+    FUNCTION groupStrings(words)
+        FUNCTION bitmask(word)
+            SET mask TO 0
+            FOR each char IN word
+                SET mask TO mask OR (1 SHIFTED LEFT BY (ASCII value of char MINUS ASCII value of 'a'))
+            RETURN mask
+        END FUNCTION
+
+        SET word_map TO an empty mapping from integers to list of integers
+        SET n TO LENGTH OF words
+        SET uf TO NEW UnionFind(n)
+
+        FOR i FROM 0 TO n - 1
+            SET mask TO bitmask(words[i])
+            APPEND i TO word_map[mask]
+
+        FOR i FROM 0 TO n - 1
+            SET mask TO bitmask(words[i])
+            FOR j FROM 0 TO 25
+                SET new_mask TO mask XOR (1 SHIFTED LEFT BY j)  # Delete one letter
+                IF new_mask IS IN word_map
+                    FOR each k IN word_map[new_mask]
+                        CALL uf.union(i, k)
+                IF (mask AND (1 SHIFTED LEFT BY j)) IS 0  # Add one letter
+                    SET new_mask TO mask OR (1 SHIFTED LEFT BY j)
+                    IF new_mask IS IN word_map
+                        FOR each k IN word_map[new_mask]
+                            CALL uf.union(i, k)
+                IF (mask AND (1 SHIFTED LEFT BY j)) IS NOT 0  # Replace one letter
+                    FOR k FROM 0 TO 25
+                        IF (mask AND (1 SHIFTED LEFT BY k)) IS 0
+                            SET new_mask TO (mask XOR (1 SHIFTED LEFT BY j)) OR (1 SHIFTED LEFT BY k)
+                            IF new_mask IS IN word_map
+                                FOR each l IN word_map[new_mask]
+                                    CALL uf.union(i, l)
+
+        SET root_sizes TO an empty mapping from integers to integers
+        FOR i FROM 0 TO n - 1
+            SET root TO uf.find(i)
+            INCREMENT root_sizes[root] BY 1
+        
+        SET max_group_size TO MAXIMUM VALUE IN root_sizes
+        SET num_groups TO NUMBER OF KEYS IN root_sizes
+
+        RETURN list containing num_groups AND max_group_size
+    END FUNCTION
+END CLASS
+```

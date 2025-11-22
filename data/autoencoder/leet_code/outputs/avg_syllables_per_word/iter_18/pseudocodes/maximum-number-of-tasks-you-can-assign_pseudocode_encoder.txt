@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION maxTaskAssign(tasks AS List OF integers, workers AS List OF integers, pills AS integer, strength AS integer) RETURNS integer  
+        PERFORM tasks SORTED IN ASCENDING ORDER  
+        PERFORM workers SORTED IN ASCENDING ORDER  
+
+        FUNCTION canAssignTasks(k AS integer) RETURNS boolean  
+            SET available_workers TO the last k elements of workers  
+            SET pills_used TO zero  
+
+            FOR each integer i FROM k MINUS one DOWNTO zero  
+                SET task TO the element at position i of tasks  
+
+                SET worker_idx TO the position of the smallest element IN available_workers GREATER THAN OR EQUAL TO task  
+                IF worker_idx IS LESS THAN the LENGTH OF available_workers THEN  
+                    REMOVE element at position worker_idx FROM available_workers  
+                ELSE IF pills_used IS LESS THAN pills THEN  
+                    SET worker_idx TO the position of the smallest element IN available_workers GREATER THAN OR EQUAL TO task MINUS strength  
+                    IF worker_idx IS LESS THAN the LENGTH OF available_workers THEN  
+                        REMOVE element at position worker_idx FROM available_workers  
+                        INCREMENT pills_used BY one  
+                    ELSE  
+                        RETURN false  
+                    END IF  
+                ELSE  
+                    RETURN false  
+                END IF  
+            END FOR  
+
+            RETURN true  
+        END FUNCTION  
+
+        SET left TO zero  
+        SET right TO the MINIMUM OF the LENGTH OF tasks AND the LENGTH OF workers PLUS one  
+
+        WHILE left IS LESS THAN right  
+            SET mid TO the INTEGER DIVISION RESULT OF left PLUS right DIVIDED BY two  
+            IF canAssignTasks(mid) THEN  
+                SET left TO mid PLUS one  
+            ELSE  
+                SET right TO mid  
+            END IF  
+        END WHILE  
+
+        RETURN left MINUS one  
+    END FUNCTION  
+END CLASS

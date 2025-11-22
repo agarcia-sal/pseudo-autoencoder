@@ -1,0 +1,69 @@
+CLASS Solution
+    FUNCTION alienOrder(list_of_words)
+        CALL InitializeGraphAndIndegree
+            RETURNS graph_mapping AND indegree_mapping
+        
+        CALL InitializeAllCharacters
+            WITH list_of_words
+            RETURNS set_of_all_characters
+        
+        FOR index FROM zero TO the LENGTH OF list_of_words MINUS one
+            SET word_one TO element at position index of list_of_words
+            SET word_two TO element at position index PLUS one of list_of_words
+            CALL DetermineMinimumLength
+                WITH the LENGTH OF word_one AND the LENGTH OF word_two
+                RETURNS minimum_length
+            SET found_difference TO false
+            
+            FOR position FROM zero TO minimum_length MINUS one
+                CALL CheckIfCharactersNotEqual
+                    WITH element at position of word_one AND element at position of word_two
+                    RETURNS boolean_not_equal
+                IF boolean_not_equal IS true
+                    CALL CheckIfNeighborAbsentInGraph
+                        WITH graph_mapping, element at position of word_one, element at position of word_two
+                        RETURNS boolean_is_absent
+                    IF boolean_is_absent IS true
+                        CALL AddNeighborToGraph
+                            WITH graph_mapping, element at position of word_one, element at position of word_two
+                        CALL IncrementIndegree
+                            WITH indegree_mapping, element at position of word_two, one
+                    SET found_difference TO true
+                    BREAK THE FOR LOOP
+                END IF
+            END FOR
+            
+            IF found_difference IS false AND the LENGTH OF word_one GREATER THAN the LENGTH OF word_two
+                RETURN empty_string
+            END IF
+        END FOR
+        
+        CALL InitializeQueue
+            WITH all characters in set_of_all_characters WHERE indegree_mapping OF character EQUALS zero
+            RETURNS queue_structure
+        INITIALIZE empty list result_order
+        
+        WHILE queue_structure IS NOT empty
+            CALL PopLeftFromQueue
+                WITH queue_structure
+                RETURNS current_character
+            CALL AppendItemToList
+                WITH result_order, current_character
+            FOR each neighbor_character IN graph_mapping AT current_character
+                CALL DecrementIndegree
+                    WITH indegree_mapping, neighbor_character, one
+                IF indegree_mapping AT neighbor_character EQUALS zero
+                    CALL AppendItemToQueue
+                        WITH queue_structure, neighbor_character
+                END IF
+            END FOR
+        END WHILE
+        
+        IF the LENGTH OF result_order NOT EQUALS the LENGTH OF set_of_all_characters
+            RETURN empty_string
+        END IF
+        
+        RETURN CallJoinCharacters
+            WITH result_order
+    END FUNCTION
+END CLASS

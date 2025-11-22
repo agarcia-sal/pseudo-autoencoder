@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION largestPathValue(colors, edges)  
+        SET n TO the LENGTH OF colors  
+        SET graph TO a mapping from default empty list  
+        SET in_degree TO a list of zeros with LENGTH n  
+        
+        FOR each pair u and v IN edges  
+            APPEND v TO the list at key u in graph  
+            INCREMENT the element at position v of in_degree BY one  
+        END FOR  
+        
+        SET queue TO a double-ended queue containing each element i in the range from zero TO n MINUS one WHERE the element at position i of in_degree EQUALS zero  
+        SET dp TO a list containing n lists each with twenty-six zeros  
+        SET visited TO zero  
+        SET max_color_value TO zero  
+        
+        WHILE queue is not empty  
+            SET node TO the element removed from the left end of queue  
+            INCREMENT the element at position (the numeric code of the element at position node of colors MINUS the numeric code of the lowercase letter a) of the list at position node of dp BY one  
+            SET max_color_value TO the greater value BETWEEN max_color_value AND the element at position (the numeric code of the element at position node of colors MINUS the numeric code of the lowercase letter a) of the list at position node of dp  
+            INCREMENT visited BY one  
+            
+            FOR each neighbor IN the list at key node in graph  
+                FOR c FROM zero TO twenty-five  
+                    SET the element at position c of the list at position neighbor of dp TO the greater value BETWEEN the element at position c of the list at position neighbor of dp AND the element at position c of the list at position node of dp  
+                END FOR  
+                DECREMENT the element at position neighbor of in_degree BY one  
+                IF the element at position neighbor of in_degree EQUALS zero  
+                    APPEND neighbor TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        IF visited EQUALS n  
+            RETURN max_color_value  
+        ELSE  
+            RETURN negative one  
+        END IF  
+    END FUNCTION  
+END CLASS

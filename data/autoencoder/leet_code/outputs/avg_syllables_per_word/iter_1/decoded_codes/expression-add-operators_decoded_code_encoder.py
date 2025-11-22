@@ -1,0 +1,19 @@
+def addOperators(num, target):
+    result = []
+    def dfs(i, expr, val, prev):
+        if i == len(num) and val == target:
+            result.append(expr)
+            return
+        for j in range(i + 1, len(num) + 1):
+            op = num[i:j]
+            if len(op) > 1 and op[0] == '0':
+                continue
+            n = int(op)
+            if i == 0:
+                dfs(j, op, n, n)
+            else:
+                dfs(j, expr + '+' + op, val + n, n)
+                dfs(j, expr + '-' + op, val - n, -n)
+                dfs(j, expr + '*' + op, val - prev + prev * n, prev * n)
+    dfs(0, "", 0, 0)
+    return result

@@ -1,0 +1,27 @@
+```
+MOD = 10^9+7
+n = len(s)
+init next_occ[4][n] = -1, prev_occ[4][n] = -1
+for c in 0..3:
+    ch = 'a'+c
+    last = -1
+    for i in 0..n-1: prev_occ[c][i] = i if s[i]==ch else last; if s[i]==ch: last=i
+    last = -1
+    for i in n-1..0: next_occ[c][i] = i if s[i]==ch else last; if s[i]==ch: last=i
+
+dp[n][n] = 0
+for i in 0..n-1: dp[i][i] = 1
+
+for length in 2..n:
+    for i in 0..n-length:
+        j = i+length-1
+        for c in 0..3:
+            l = next_occ[c][i]
+            r = prev_occ[c][j]
+            if l>j or r<i: continue
+            else if l==r: dp[i][j] += 1
+            else: dp[i][j] += dp[l+1][r-1] + 2
+            dp[i][j] %= MOD
+
+return dp[0][n-1]
+```

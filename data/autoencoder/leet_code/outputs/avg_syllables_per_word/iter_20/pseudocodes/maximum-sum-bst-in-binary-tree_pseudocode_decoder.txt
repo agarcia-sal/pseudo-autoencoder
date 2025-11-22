@@ -1,0 +1,70 @@
+CLASS TreeNode  
+    FUNCTION __init__ with parameters val EQUALS zero, left EQUALS none, right EQUALS none  
+        SET the property val OF this object TO val  
+        SET the property left OF this object TO left  
+        SET the property right OF this object TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node with parameter values AS list  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO a new TreeNode initialized WITH the element at position zero of values  
+    SET i TO one  
+    INITIALIZE a new empty queue named queue  
+    APPEND root TO queue  
+    WHILE queue IS not empty  
+        REMOVE and SET node TO the first element removed FROM queue  
+        IF i IS less than the LENGTH OF values AND the element at position i of values IS not none  
+            SET the property left OF node TO a new TreeNode initialized WITH the element at position i of values  
+            APPEND the property left OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS less than the LENGTH OF values AND the element at position i of values IS not none  
+            SET the property right OF node TO a new TreeNode initialized WITH the element at position i of values  
+            APPEND the property right OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree with parameters p AND q  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF the property val OF p IS NOT EQUALS TO the property val OF q  
+        RETURN False  
+    ELSE  
+        RETURN the logical AND of the result of calling is_same_tree WITH parameters the property left OF p AND the property left OF q AND the result of calling is_same_tree WITH parameters the property right OF p AND the property right OF q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION maxSumBST with parameter root AS optional TreeNode  
+        SET the property max_sum OF this object TO zero  
+          
+        FUNCTION helper with parameter node  
+            IF node IS none  
+                RETURN True, zero, positive infinity, negative infinity  
+            END IF  
+            SET left_is_bst, left_sum, left_min, left_max TO the result of calling helper WITH parameter the property left OF node  
+            SET right_is_bst, right_sum, right_min, right_max TO the result of calling helper WITH parameter the property right OF node  
+           
+            IF left_is_bst IS True AND right_is_bst IS True AND left_max IS LESS THAN the property val OF node AND the property val OF node IS LESS THAN right_min  
+                SET current_sum TO left_sum PLUS right_sum PLUS the property val OF node  
+                SET current_min TO the minimum OF the property val OF node AND left_min  
+                SET current_max TO the maximum OF the property val OF node AND right_max  
+                SET the property max_sum OF this object TO the maximum OF the property max_sum OF this object AND current_sum  
+                RETURN True, current_sum, current_min, current_max  
+            END IF  
+            
+            RETURN False, zero, positive infinity, negative infinity  
+        END FUNCTION  
+          
+        CALL helper WITH parameter root  
+        RETURN the property max_sum OF this object  
+    END FUNCTION  
+END CLASS

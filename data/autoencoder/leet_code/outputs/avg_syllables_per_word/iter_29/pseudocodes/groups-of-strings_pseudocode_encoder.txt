@@ -1,0 +1,98 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self dot parent TO the list of all integers FROM zero TO size MINUS one  
+        SET self dot rank TO the list of zero repeated size times  
+        SET self dot size TO the list of one repeated size times  
+    END FUNCTION  
+      
+    FUNCTION find(self, u)  
+        IF the element at position u of self dot parent NOT EQUALS u THEN  
+            SET the element at position u of self dot parent TO the result of calling self dot find with the element at position u of self dot parent  
+        END IF  
+        RETURN the element at position u of self dot parent  
+    END FUNCTION  
+      
+    FUNCTION union(self, u, v)  
+        SET rootU TO the result of calling self dot find with u  
+        SET rootV TO the result of calling self dot find with v  
+        IF rootU NOT EQUALS rootV THEN  
+            IF the element at position rootU of self dot rank GREATER THAN the element at position rootV of self dot rank THEN  
+                SET the element at position rootV of self dot parent TO rootU  
+                INCREMENT the element at position rootU of self dot size BY the element at position rootV of self dot size  
+            ELSE IF the element at position rootU of self dot rank LESS THAN the element at position rootV of self dot rank THEN  
+                SET the element at position rootU of self dot parent TO rootV  
+                INCREMENT the element at position rootV of self dot size BY the element at position rootU of self dot size  
+            ELSE  
+                SET the element at position rootV of self dot parent TO rootU  
+                INCREMENT the element at position rootU of self dot size BY the element at position rootV of self dot size  
+                INCREMENT the element at position rootU of self dot rank BY one  
+            END ELSE IF  
+        END IF  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION groupStrings(self, words)  
+        FUNCTION bitmask(word)  
+            SET mask TO zero  
+            FOR each character IN word  
+                SET mask TO mask OR one LEFT SHIFTED BY the difference of the unicode code point of character MINUS the unicode code point of the character a  
+            END FOR  
+            RETURN mask  
+        END FUNCTION  
+          
+        SET word_map TO a new default dictionary with list as default value  
+        SET n TO the length of words  
+        SET uf TO a new instance of UnionFind initialized with n  
+          
+        FOR each index i and word IN words with enumeration  
+            SET mask TO the result of calling bitmask with word  
+            APPEND i TO the list at key mask in word_map  
+        END FOR  
+          
+        FOR each index i and word IN words with enumeration  
+            SET mask TO the result of calling bitmask with word  
+            FOR j FROM zero TO twenty five  
+                SET new_mask TO mask XOR one LEFT SHIFTED BY j  
+                IF new_mask is a key in word_map THEN  
+                    FOR each element k IN the list at key new_mask in word_map  
+                        CALL uf dot union with i and k  
+                    END FOR  
+                END IF  
+                  
+                IF the result of bitwise AND of mask and one LEFT SHIFTED BY j EQUALS zero THEN  
+                    SET new_mask TO mask OR one LEFT SHIFTED BY j  
+                    IF new_mask is a key in word_map THEN  
+                        FOR each element k IN the list at key new_mask in word_map  
+                            CALL uf dot union with i and k  
+                        END FOR  
+                    END IF  
+                END IF  
+                  
+                IF the result of bitwise AND of mask and one LEFT SHIFTED BY j NOT EQUALS zero THEN  
+                    FOR k FROM zero TO twenty five  
+                        IF the result of bitwise AND of mask and one LEFT SHIFTED BY k EQUALS zero THEN  
+                            SET new_mask TO the result of bitwise OR of (mask XOR one LEFT SHIFTED BY j) and one LEFT SHIFTED BY k  
+                            IF new_mask is a key in word_map THEN  
+                                FOR each element l IN the list at key new_mask in word_map  
+                                    CALL uf dot union with i and l  
+                                END FOR  
+                            END IF  
+                        END IF  
+                    END FOR  
+                END IF  
+            END FOR  
+        END FOR  
+          
+        SET root_sizes TO a new default dictionary with integer as default value  
+        FOR i FROM zero TO n MINUS one  
+            SET root TO the result of calling uf dot find with i  
+            INCREMENT the value at key root in root_sizes BY one  
+        END FOR  
+          
+        SET max_group_size TO the maximum value among all values of root_sizes  
+        SET num_groups TO the number of keys in root_sizes  
+          
+        RETURN a list containing num_groups and max_group_size  
+    END FUNCTION  
+END CLASS

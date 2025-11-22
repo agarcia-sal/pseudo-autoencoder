@@ -1,0 +1,50 @@
+CLASS Solution  
+    FUNCTION mostSimilar(n, roads, names, targetPath)  
+        SET graph TO an empty mapping from keys to lists  
+        FOR each pair of cities u and v IN roads  
+            APPEND city v TO the list of connected cities at key u in graph  
+            APPEND city u TO the list of connected cities at key v in graph  
+        END FOR  
+        
+        SET m TO the number of elements in targetPath  
+        
+        DEFINE FUNCTION dp(i, j)  
+            IF i EQUALS zero THEN  
+                IF element at position j of names NOT EQUALS element at position i of targetPath THEN  
+                    RETURN the pair consisting of one and a list containing j  
+                ELSE  
+                    RETURN the pair consisting of zero and a list containing j  
+                END IF  
+            END IF  
+            
+            SET minimum cost TO infinity  
+            SET minimum path TO an empty list  
+            FOR each city k IN the list of connected cities at key j in graph  
+                CALL dp with parameters i decremented by one and k and ASSIGN the returned pair to cost and path  
+                IF cost LESS THAN minimum cost THEN  
+                    SET minimum cost TO cost  
+                    SET minimum path TO path  
+                END IF  
+            END FOR  
+            
+            IF element at position j of names NOT EQUALS element at position i of targetPath THEN  
+                SET current cost TO minimum cost PLUS one  
+            ELSE  
+                SET current cost TO minimum cost  
+            END IF  
+            RETURN the pair consisting of current cost and the result of appending j to minimum path  
+        END FUNCTION  
+        
+        SET minimum cost TO infinity  
+        SET minimum path TO an empty list  
+        FOR index j FROM zero TO n MINUS one  
+            CALL dp with parameters m MINUS one and j and ASSIGN the returned pair to cost and path  
+            IF cost LESS THAN minimum cost THEN  
+                SET minimum cost TO cost  
+                SET minimum path TO path  
+            END IF  
+        END FOR  
+        
+        RETURN minimum path  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,62 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty THEN  
+        RETURN None  
+    END IF  
+    SET root TO new TreeNode WITH val AS first element of values, left AS None, right AS None  
+    SET i TO 1  
+    SET queue TO an empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty DO  
+        SET node TO first element removed from queue  
+        IF i LESS THAN length of values AND values at index i IS NOT None THEN  
+            SET node.left TO new TreeNode WITH val AS values at index i, left AS None, right AS None  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY 1  
+        IF i LESS THAN length of values AND values at index i IS NOT None THEN  
+            SET node.right TO new TreeNode WITH val AS values at index i, left AS None, right AS None  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None THEN  
+        RETURN True  
+    ELSE IF p IS None OR q IS None THEN  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val THEN  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION convertBST(self, root)  
+        SET self.sum TO 0  
+        
+        FUNCTION traverse(node)  
+            IF node IS None THEN  
+                RETURN  
+            END IF  
+            CALL traverse WITH node.right  
+            SET self.sum TO self.sum PLUS node.val  
+            SET node.val TO self.sum  
+            CALL traverse WITH node.left  
+        END FUNCTION  
+
+        CALL traverse WITH root  
+        RETURN root  
+    END FUNCTION  
+END CLASS

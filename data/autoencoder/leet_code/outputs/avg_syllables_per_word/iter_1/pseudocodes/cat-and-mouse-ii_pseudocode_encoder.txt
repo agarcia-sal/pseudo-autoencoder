@@ -1,0 +1,65 @@
+```
+m, n ← grid dims
+dirs ← (-1,0,1,0,-1)
+cat_start = mouse_start = food = 0
+g_mouse, g_cat ← arrays of size m*n with empty lists
+
+for i in [0..m-1]:
+  for j in [0..n-1]:
+    if grid[i][j] == "#": continue
+    v ← i*n + j
+    if grid[i][j] == "C": cat_start ← v
+    elif grid[i][j] == "M": mouse_start ← v
+    elif grid[i][j] == "F": food ← v
+    for (a,b) in pairwise(dirs):
+      for k in [0..mouseJump]:
+        x,y ← i+k*a, j+k*b
+        if not in_bounds(x,y) or grid[x][y] == "#": break
+        g_mouse[v].append(x*n+y)
+      for k in [0..catJump]:
+        x,y ← i+k*a, j+k*b
+        if not in_bounds(x,y) or grid[x][y] == "#": break
+        g_cat[v].append(x*n+y)
+
+define get_prev_states(m,c,t):
+  pt ← t ^ 1
+  pre ← []
+  if pt == 1:
+    for pc in g_cat[c]:
+      if ans[m][pc][1] == 0: pre.append((m, pc, pt))
+  else:
+    for pm in g_mouse[m]:
+      if ans[pm][c][0] == 0: pre.append((pm, c, 0))
+  return pre
+
+n ← len(g_mouse)
+degree ← 3D array n x n x 2
+for i in [0..n-1]:
+  for j in [0..n-1]:
+    degree[i][j][0] ← len(g_mouse[i])
+    degree[i][j][1] ← len(g_cat[j])
+
+ans ← 3D array n x n x 2 all 0
+q ← empty queue
+for i in [0..n-1]:
+  ans[food][i][1] ← 1
+  ans[i][food][0] ← 2
+  ans[i][i][0] ← 2
+  ans[i][i][1] ← 2
+  enqueue q with (food, i, 1), (i, food, 0), (i, i, 0), (i, i, 1)
+
+while q not empty:
+  state ← dequeue q
+  t ← ans[state.m][state.c][state.t]
+  for (pm, pc, pt) in get_prev_states(state):
+    if pt == t - 1:
+      ans[pm][pc][pt] ← t
+      enqueue q (pm, pc, pt)
+    else:
+      degree[pm][pc][pt] -= 1
+      if degree[pm][pc][pt] == 0:
+        ans[pm][pc][pt] ← t
+        enqueue q (pm, pc, pt)
+
+return ans[mouse_start][cat_start][0] == 1
+```

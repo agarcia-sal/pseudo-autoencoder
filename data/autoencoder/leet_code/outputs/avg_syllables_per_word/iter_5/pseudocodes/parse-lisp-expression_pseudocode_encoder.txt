@@ -1,0 +1,61 @@
+CLASS Solution  
+    FUNCTION evaluate(expression)  
+        FUNCTION get_tokens(expression)  
+            SET tokens TO empty list  
+            SET buf TO empty string  
+            SET depth TO 0  
+            FOR each char IN expression  
+                IF char EQUALS space AND depth EQUALS 0 THEN  
+                    APPEND buf TO tokens  
+                    SET buf TO empty string  
+                ELSE  
+                    IF char EQUALS '(' THEN  
+                        INCREMENT depth BY 1  
+                    ELSE IF char EQUALS ')' THEN  
+                        DECREMENT depth BY 1  
+                    END IF  
+                    APPEND char TO buf  
+                END IF  
+            END FOR  
+            IF buf IS NOT empty THEN  
+                APPEND buf TO tokens  
+            END IF  
+            RETURN tokens  
+        END FUNCTION  
+  
+        FUNCTION evaluate_expression(tokens, context)  
+            IF tokens AT index 0 EQUALS 'add' THEN  
+                RETURN evaluate_expression(tokens AT index 1, context) PLUS evaluate_expression(tokens AT index 2, context)  
+            ELSE IF tokens AT index 0 EQUALS 'mult' THEN  
+                RETURN evaluate_expression(tokens AT index 1, context) TIMES evaluate_expression(tokens AT index 2, context)  
+            ELSE IF tokens AT index 0 EQUALS 'let' THEN  
+                SET new_context TO copy of context  
+                SET i TO 1  
+                WHILE i LESS THAN LENGTH OF tokens MINUS 1 DO  
+                    SET var TO tokens AT index i  
+                    SET expr TO tokens AT index i PLUS 1  
+                    SET new_context AT key var TO evaluate_expression(expr, new_context)  
+                    INCREMENT i BY 2  
+                END WHILE  
+                RETURN evaluate_expression(tokens AT last index, new_context)  
+            ELSE  
+                TRY  
+                    RETURN integer conversion of tokens AT index 0  
+                EXCEPT value error THEN  
+                    RETURN context VALUE FOR key tokens AT index 0  
+                END TRY  
+            END IF  
+        END FUNCTION  
+  
+        FUNCTION parse_expression(expression)  
+            IF character AT index 0 OF expression IS NOT '(' THEN  
+                RETURN expression  
+            END IF  
+            SET tokens TO get_tokens(substring of expression FROM index 1 TO length MINUS 1)  
+            RETURN list formed by applying parse_expression TO each token IN tokens  
+        END FUNCTION  
+  
+        SET parsed_expression TO parse_expression(expression)  
+        RETURN evaluate_expression(parsed_expression, empty dictionary)  
+    END FUNCTION  
+END CLASS

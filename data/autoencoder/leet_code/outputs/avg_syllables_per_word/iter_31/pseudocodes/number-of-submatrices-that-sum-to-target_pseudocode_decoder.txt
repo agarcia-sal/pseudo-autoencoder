@@ -1,0 +1,36 @@
+CLASS Solution  
+    FUNCTION numSubmatrixSumTarget(matrix parameter LIST OF LIST OF integer comma target parameter integer) RETURNS integer  
+        FUNCTION subarraySum(nums parameter LIST OF integer comma target parameter integer) RETURNS integer  
+            SET count TO zero  
+            SET seen_sums TO a mapping with default value zero for integer keys  
+            SET cumulative_sum TO zero  
+            FOR each num IN nums  
+                SET cumulative_sum TO cumulative_sum PLUS num  
+                IF cumulative_sum EQUALS target THEN  
+                    INCREMENT count BY one  
+                END IF  
+                IF the value cumulative_sum MINUS target IS A KEY IN seen_sums THEN  
+                    INCREMENT count BY the value corresponding to the key cumulative_sum MINUS target IN seen_sums  
+                END IF  
+                INCREMENT the value corresponding to the key cumulative_sum IN seen_sums BY one  
+            END FOR  
+            RETURN count  
+        END FUNCTION  
+        
+        SET rows TO the LENGTH OF matrix  
+        SET cols TO the LENGTH OF element at position zero of matrix  
+        SET total_count TO zero  
+        
+        FOR top FROM zero TO rows MINUS one  
+            SET current_cols TO a list of zero repeated cols times  
+            FOR bottom FROM top TO rows MINUS one  
+                FOR col FROM zero TO cols MINUS one  
+                    SET element at position col of current_cols TO element at position col of current_cols PLUS element at position col of element at position bottom of matrix  
+                END FOR  
+                SET total_count TO total_count PLUS CALL subarraySum WITH current_cols AND target  
+            END FOR  
+        END FOR  
+        
+        RETURN total_count  
+    END FUNCTION  
+END CLASS

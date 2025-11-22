@@ -1,0 +1,62 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val EQUALS zero left EQUALS none right EQUALS none  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO A new TreeNode INITIALIZED WITH element at position zero of values  
+    SET i TO one  
+    INITIALIZE queue AS A new double ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO REMOVE element FROM LEFT OF queue  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT none  
+            SET node.left TO A new TreeNode INITIALIZED WITH element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT none  
+            SET node.right TO A new TreeNode INITIALIZED WITH element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF the val property of p IS NOT EQUAL TO the val property of q  
+        RETURN false  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETERS the left property of p AND the left property of q  
+        AND is_same_tree WITH PARAMETERS the right property of p AND the right property of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION sumNumbers WITH PARAMETERS self root  
+        FUNCTION dfs WITH PARAMETERS node current_number  
+            IF node IS none  
+                RETURN zero  
+            END IF  
+            SET current_number TO current_number MULTIPLIED BY ten PLUS the val property of node  
+            IF the left property of node IS none AND the right property of node IS none  
+                RETURN current_number  
+            END IF  
+            SET left_sum TO dfs WITH PARAMETERS the left property of node AND current_number  
+            SET right_sum TO dfs WITH PARAMETERS the right property of node AND current_number  
+            RETURN left_sum PLUS right_sum  
+        END FUNCTION  
+        RETURN dfs WITH PARAMETERS root AND zero  
+    END FUNCTION  
+END CLASS

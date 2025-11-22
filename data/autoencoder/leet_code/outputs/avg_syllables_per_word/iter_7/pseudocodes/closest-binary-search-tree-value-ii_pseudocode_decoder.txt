@@ -1,0 +1,61 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val SET TO 0, left SET TO None, right SET TO None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET root TO new TreeNode WITH val SET TO first element of values  
+    SET i TO 1  
+    SET queue TO empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO POP left FROM queue  
+        IF i LESS THAN LENGTH OF values AND values at i IS NOT None  
+            SET node.left TO new TreeNode WITH val SET TO values at i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i LESS THAN LENGTH OF values AND values at i IS NOT None  
+            SET node.right TO new TreeNode WITH val SET TO values at i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION closestKValues(self, root, target, k)  
+        FUNCTION inorder_traversal(node)  
+            IF node IS None  
+                RETURN  
+            CALL inorder_traversal WITH node.left  
+            IF LENGTH OF result IS LESS THAN k  
+                APPEND node.val TO result  
+            ELSE  
+                IF absolute value of node.val MINUS target IS LESS THAN absolute value of first element in result MINUS target  
+                    REMOVE first element FROM result  
+                    APPEND node.val TO result  
+                ELSE  
+                    RETURN  
+            CALL inorder_traversal WITH node.right  
+        END FUNCTION  
+
+        SET result TO empty deque  
+        CALL inorder_traversal WITH root  
+        RETURN result converted TO list  
+    END FUNCTION  
+END CLASS

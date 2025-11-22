@@ -1,0 +1,64 @@
+CLASS UnionFind
+    FUNCTION __init__
+        SET parent TO an empty dictionary
+        SET count TO zero
+    END FUNCTION
+
+    FUNCTION make_set(x)
+        IF x IS NOT IN the KEYS OF parent
+            SET element at key x of parent TO x
+            INCREMENT count BY one
+        END IF
+    END FUNCTION
+
+    FUNCTION find(x)
+        IF element at key x of parent IS NOT EQUALS x
+            SET element at key x of parent TO CALL find WITH the element at key x of parent of parent
+        END IF
+        RETURN element at key x of parent
+    END FUNCTION
+
+    FUNCTION union(x, y)
+        SET rootX TO CALL find WITH x
+        SET rootY TO CALL find WITH y
+        IF rootX IS NOT EQUALS rootY
+            SET element at key rootX of parent TO rootY
+            DECREMENT count BY one
+        END IF
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION numIslands2(m, n, positions)
+        FUNCTION is_valid(x, y)
+            RETURN x GREATER THAN OR EQUAL TO zero AND x LESS THAN m AND y GREATER THAN OR EQUAL TO zero AND y LESS THAN n
+        END FUNCTION
+
+        SET directions TO a list of tuples consisting of one zero one zero minus one zero and zero minus one
+        ASSIGN pointer uf TO a new INSTANCE OF UnionFind
+        SET grid TO auxiliary FUNCTION to initialize two dimensional list WITH zero MULTIPLIED BY n FOR range FROM zero TO m
+        SET result TO an empty list
+
+        FOR each pair r and c IN positions
+            IF element at position r of grid THEN element at position c IS EQUALS one
+                APPEND uf count TO result
+                CONTINUE to next iteration
+            END IF
+
+            SET element at position r of grid THEN element at position c TO one
+            CALL uf make_set WITH tuple consisting of r and c
+
+            FOR each pair dr and dc IN directions
+                SET nr TO r PLUS dr
+                SET nc TO c PLUS dc
+                IF CALL is_valid WITH parameters nr and nc AND element at position nr of grid THEN element at position nc IS EQUALS one
+                    CALL uf union WITH tuples consisting of r and c AND nr and nc
+                END IF
+            END FOR
+
+            APPEND uf count TO result
+        END FOR
+
+        RETURN result
+    END FUNCTION
+END CLASS

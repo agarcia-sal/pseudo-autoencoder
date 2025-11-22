@@ -1,0 +1,41 @@
+```
+define BIT(n):
+    size ← n
+    tree ← array of zeros length n+1
+    update(idx, delta):
+        while idx ≤ size:
+            tree[idx] += delta
+            idx += idx & -idx
+    query(idx):
+        res ← 0
+        while idx > 0:
+            res += tree[idx]
+            idx -= idx & -idx
+        return res
+
+goodTriplets(nums1, nums2):
+    n ← length of nums1
+    pos ← array length n
+    for i,num in enumerate(nums1):
+        pos[num] ← i
+    compressed ← [pos[num] for num in nums2]
+
+    bit ← BIT(n)
+    smaller_count ← array length n zeros
+    larger_count ← array length n zeros
+
+    for i in 0 to n-1:
+        smaller_count[i] ← bit.query(compressed[i])
+        bit.update(compressed[i]+1, 1)
+
+    bit ← BIT(n)
+    for i in n-1 down to 0:
+        larger_count[i] ← bit.query(n) - bit.query(compressed[i]+1)
+        bit.update(compressed[i]+1, 1)
+
+    res ← 0
+    for i in 0 to n-1:
+        res += smaller_count[i] * larger_count[i]
+
+    return res
+```

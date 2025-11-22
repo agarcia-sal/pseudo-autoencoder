@@ -1,0 +1,45 @@
+CLASS Solution  
+    FUNCTION openLock(deadends AS List OF string, target AS string) RETURNS integer  
+        SET deadends_set TO CONVERT deadends TO A SET FOR OPTIMAL MEMBERSHIP CHECKING  
+        
+        IF the string consisting of digit zero repeated four times IS IN deadends_set  
+            RETURN minus one  
+        END IF  
+        
+        IF target EQUALS the string consisting of digit zero repeated four times  
+            RETURN zero  
+        END IF  
+        
+        SET queue TO A DOUBLE ENDED QUEUE INITIALIZED WITH A TUPLE CONTAINING the string consisting of digit zero repeated four times AND zero  
+        SET visited TO A SET INITIALIZED WITH the string consisting of digit zero repeated four times  
+        
+        FUNCTION neighbors(state AS string) RETURNS list of strings  
+            SET result TO an empty list  
+            FOR index FROM zero TO three  
+                SET digit TO THE INTEGER VALUE OF the character at position index of state  
+                FOR move IN the list containing minus one and one  
+                    SET new_digit TO the remainder of the sum of digit and move when divided BY ten  
+                    SET new_state TO the concatenation of the substring from position zero TO index minus one of state AND the string representation of new_digit AND the substring from position index plus one TO the end of state  
+                    APPEND new_state TO result  
+                END FOR  
+            END FOR  
+            RETURN result  
+        END FUNCTION  
+        
+        WHILE queue IS NOT EMPTY  
+            SET current_state AND steps TO THE ELEMENT REMOVED FROM THE FRONT OF queue  
+            
+            FOR neighbor IN neighbors(current_state)  
+                IF neighbor IS NOT IN visited AND neighbor IS NOT IN deadends_set  
+                    IF neighbor EQUALS target  
+                        RETURN steps PLUS one  
+                    END IF  
+                    ADD neighbor TO visited  
+                    APPEND THE TUPLE CONTAINING neighbor AND steps PLUS one TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN minus one  
+    END FUNCTION  
+END CLASS

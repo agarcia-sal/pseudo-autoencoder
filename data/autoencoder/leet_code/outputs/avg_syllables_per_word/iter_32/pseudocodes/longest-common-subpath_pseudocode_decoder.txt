@@ -1,0 +1,50 @@
+CLASS Solution  
+    FUNCTION longestCommonSubpath(n, paths)  
+        FUNCTION hash_subpaths(path, length)  
+            SET base TO one hundred thirteen  
+            SET modulus TO one billion plus seven  
+            SET hash_value TO zero  
+            SET power TO one  
+            FOR index FROM zero TO length MINUS one  
+                SET hash_value TO hash_value MULTIPLIED BY base PLUS element at position index of path  
+                SET hash_value TO hash_value MODULO modulus  
+                SET power TO power MULTIPLIED BY base  
+                SET power TO power MODULO modulus  
+            END FOR  
+            SET hashes TO a set containing hash_value  
+            FOR index FROM length TO the LENGTH OF path MINUS one  
+                SET hash_value TO hash_value MULTIPLIED BY base PLUS element at position index of path MINUS element at position index MINUS length of path MULTIPLIED BY power  
+                SET hash_value TO hash_value MODULO modulus  
+                ADD hash_value TO hashes  
+            END FOR  
+            RETURN hashes  
+        END FUNCTION  
+
+        FUNCTION check_common_subpath(length)  
+            IF length EQUALS zero THEN  
+                RETURN True  
+            END IF  
+            SET common_hashes TO hash_subpaths(element at position zero of paths, length)  
+            FOR each path IN elements of paths starting from position one  
+                SET current_hashes TO hash_subpaths(path, length)  
+                SET common_hashes TO intersection of common_hashes AND current_hashes  
+                IF the LENGTH OF common_hashes EQUALS zero THEN  
+                    RETURN False  
+                END IF  
+            END FOR  
+            RETURN the LENGTH OF common_hashes GREATER THAN zero  
+        END FUNCTION  
+
+        SET left TO zero  
+        SET right TO the minimum LENGTH OF each path in paths  
+        WHILE left LESS THAN right  
+            SET mid TO the integer division of left PLUS right PLUS one BY two  
+            IF check_common_subpath(mid) THEN  
+                SET left TO mid  
+            ELSE  
+                SET right TO right MINUS one  
+            END IF  
+        END WHILE  
+        RETURN left  
+    END FUNCTION  
+END CLASS

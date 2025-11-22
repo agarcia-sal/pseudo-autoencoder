@@ -1,0 +1,49 @@
+CLASS Solution  
+    FUNCTION minFlips(mat)  
+        FUNCTION flip(matrix, x, y)  
+            SET directions TO list containing the pairs negative one zero one zero zero one zero  
+            FOR each pair dx dy IN directions  
+                SET nx TO x PLUS dx  
+                SET ny TO y PLUS dy  
+                IF nx IS GREATER THAN OR EQUAL TO zero AND nx IS LESS THAN m AND ny IS GREATER THAN OR EQUAL TO zero AND ny IS LESS THAN n  
+                    SET element at position nx OF matrix AT position ny TO one MINUS element at position nx OF matrix AT position ny  
+                END IF  
+            END FOR  
+        END FUNCTION  
+
+        FUNCTION matrix_to_tuple(matrix)  
+            RETURN tuple constructed by converting each row of matrix into a tuple  
+        END FUNCTION  
+
+        SET m TO the LENGTH OF mat  
+        SET n TO the LENGTH OF element at position zero OF mat  
+        SET target TO tuple constructed by m tuples each containing n zeros  
+        SET initial_state TO CALL matrix_to_tuple WITH PARAMETERS mat  
+        SET queue TO list containing the pair initial_state zero  
+        SET visited TO empty set  
+        ADD initial_state TO visited  
+
+        WHILE the LENGTH OF queue IS GREATER THAN zero HOLDS  
+            REMOVE first element FROM queue AND SET AS current_state AND steps  
+            IF current_state EQUALS target  
+                RETURN steps  
+            END IF  
+
+            SET current_matrix TO list constructed by converting each tuple row OF current_state INTO a list  
+
+            FOR i FROM zero TO m MINUS one  
+                FOR j FROM zero TO n MINUS one  
+                    SET next_matrix TO a deep copy OF current_matrix  
+                    CALL flip WITH PARAMETERS next_matrix i j  
+                    SET next_state TO CALL matrix_to_tuple WITH PARAMETERS next_matrix  
+                    IF next_state IS NOT IN visited  
+                        ADD next_state TO visited  
+                        APPEND the pair next_state steps PLUS one TO queue  
+                    END IF  
+                END FOR  
+            END FOR  
+        END WHILE  
+
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

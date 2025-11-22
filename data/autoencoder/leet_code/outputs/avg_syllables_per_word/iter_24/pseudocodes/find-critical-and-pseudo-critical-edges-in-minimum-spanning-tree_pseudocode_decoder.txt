@@ -1,0 +1,85 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, n)  
+        SET self.parent TO list of integers from zero TO n MINUS one  
+        SET self.rank TO list of ones with length n  
+    END FUNCTION
+
+    FUNCTION find(self, u)  
+        IF element at position u of self.parent NOT EQUALS u  
+            SET element at position u of self.parent TO the result of calling self.find on element at position u of self.parent  
+        END IF  
+        RETURN element at position u of self.parent  
+    END FUNCTION
+
+    FUNCTION union(self, u, v)  
+        SET rootU TO the result of calling self.find on u  
+        SET rootV TO the result of calling self.find on v  
+
+        IF rootU NOT EQUALS rootV  
+            IF element at position rootU of self.rank GREATER THAN element at position rootV of self.rank  
+                SET element at position rootV of self.parent TO rootU  
+            ELSE IF element at position rootU of self.rank LESS THAN element at position rootV of self.rank  
+                SET element at position rootU of self.parent TO rootV  
+            ELSE  
+                SET element at position rootV of self.parent TO rootU  
+                INCREMENT element at position rootU of self.rank BY one  
+            END IF  
+            RETURN True  
+        END IF  
+        RETURN False  
+    END FUNCTION  
+END CLASS
+
+CLASS Solution  
+    FUNCTION findCriticalAndPseudoCriticalEdges(self, n, edges)  
+        FOR each index i AND each edge IN edges  
+            APPEND i TO edge  
+        END FOR  
+
+        SORT edges BY the element at position two of each edge  
+
+        FUNCTION mst(exclude=None, include=None)  
+            SET uf TO a new UnionFind object initialized with n  
+            SET weight TO zero  
+
+            IF include IS NOT None  
+                CALL uf.union with first element of include AND second element of include  
+                INCREMENT weight BY third element of include  
+            END IF  
+
+            FOR each u, v, w, idx IN edges  
+                IF idx EQUALS exclude  
+                    CONTINUE to next iteration  
+                END IF  
+                IF CALL uf.union with u AND v RETURNS True  
+                    INCREMENT weight BY w  
+                END IF  
+            END FOR  
+
+            SET root TO the result of calling uf.find on zero  
+
+            FOR each integer i FROM zero TO n MINUS one  
+                IF the result of calling uf.find on i NOT EQUALS root  
+                    RETURN infinite value  
+                END IF  
+            END FOR  
+
+            RETURN weight  
+        END FUNCTION  
+
+        SET mst_weight TO the result of calling mst with no arguments  
+
+        SET critical TO empty list  
+        SET pseudo_critical TO empty list  
+
+        FOR each u, v, w, idx IN edges  
+            IF the result of calling mst with exclude equal to idx GREATER THAN mst_weight  
+                APPEND idx TO critical  
+            ELSE IF the result of calling mst with include set to tuple of u, v, w EQUALS mst_weight  
+                APPEND idx TO pseudo_critical  
+            END IF  
+        END FOR  
+
+        RETURN list containing critical AND pseudo_critical  
+    END FUNCTION  
+END CLASS

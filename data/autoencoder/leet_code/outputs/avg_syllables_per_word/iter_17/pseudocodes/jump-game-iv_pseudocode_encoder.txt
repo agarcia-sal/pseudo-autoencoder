@@ -1,0 +1,78 @@
+CLASS Solution
+    FUNCTION minJumps(arr)
+        SET n TO the LENGTH OF arr
+        IF n EQUALS one
+            RETURN zero
+        END IF
+
+        CALL create_value_indices WITH arr RETURNING value_indices
+
+        CALL create_queue WITH zero and zero RETURNING queue
+        CALL create_set WITH zero RETURNING visited
+
+        WHILE queue IS NOT empty
+            CALL dequeue_left FROM queue RETURNING current_index AND steps
+
+            IF current_index EQUALS n MINUS one
+                RETURN steps
+            END IF
+
+            CALL get_next_indices WITH current_index AND n AND value_indices AND arr RETURNING next_indices
+
+            FOR each next_index IN next_indices
+                IF next_index IS GREATER THAN OR EQUAL TO zero AND next_index IS LESS THAN n AND next_index IS NOT IN visited
+                    CALL add_to_set next_index TO visited
+                    CALL enqueue_right next_index AND steps PLUS one TO queue
+                END IF
+            END FOR
+
+            CALL clear_value_indices FOR current_index AND value_indices AND arr
+        END WHILE
+
+        RETURN negative one
+    END FUNCTION
+
+    FUNCTION create_value_indices(arr)
+        INITIALIZE value_indices AS an empty mapping FROM values TO lists
+        FOR index FROM zero TO the LENGTH OF arr MINUS one
+            SET value TO element at position index of arr
+            CALL append index TO the list AT key value IN value_indices
+        END FOR
+        RETURN value_indices
+    END FUNCTION
+
+    FUNCTION create_queue(start_index, start_steps)
+        INITIALIZE queue AS a double ended queue WITH tuple start_index AND start_steps
+        RETURN queue
+    END FUNCTION
+
+    FUNCTION create_set(initial_element)
+        INITIALIZE visited AS a set CONTAINING initial_element
+        RETURN visited
+    END FUNCTION
+
+    FUNCTION dequeue_left(queue)
+        REMOVE AND RETURN the element from the left of queue AS current_index AND steps
+        RETURN current_index AND steps
+    END FUNCTION
+
+    FUNCTION get_next_indices(current_index, n, value_indices, arr)
+        INITIALIZE next_indices AS a list CONTAINING current_index PLUS one AND current_index MINUS one
+        SET value TO element at position current_index of arr
+        EXTEND next_indices BY the list AT key value IN value_indices
+        RETURN next_indices
+    END FUNCTION
+
+    FUNCTION add_to_set(element, set_collection)
+        ADD element TO set_collection
+    END FUNCTION
+
+    FUNCTION enqueue_right(element, steps, queue)
+        APPEND tuple element AND steps TO the right of queue
+    END FUNCTION
+
+    FUNCTION clear_value_indices(current_index, value_indices, arr)
+        SET value TO element at position current_index of arr
+        SET the list AT key value IN value_indices TO an empty list
+    END FUNCTION
+END CLASS

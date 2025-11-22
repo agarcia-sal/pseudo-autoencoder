@@ -1,0 +1,54 @@
+CLASS Trie
+    FUNCTION __init__(self)
+        SET self.children TO a list of None elements of length twenty six
+        SET self.is_end TO False
+    END FUNCTION
+
+    FUNCTION insert(self, w)
+        ASSIGN node TO self
+        FOR each character IN w
+            SET idx TO the Unicode code point of character MINUS the Unicode code point of lowercase a
+            IF the element at position idx OF node.children EQUALS None THEN
+                ASSIGN the element at position idx OF node.children TO a new instance of Trie
+            END IF
+            ASSIGN node TO the element at position idx OF node.children
+        END FOR
+        SET node.is_end TO True
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION findAllConcatenatedWordsInADict(self, words)
+        FUNCTION dfs(w, start)
+            IF start EQUALS the LENGTH OF w THEN
+                RETURN True
+            END IF
+            ASSIGN node TO trie
+            FOR index FROM start TO the LENGTH OF w MINUS one INCLUSIVE
+                SET idx TO the Unicode code point of the element at position index OF w MINUS the Unicode code point of lowercase a
+                IF the element at position idx OF node.children EQUALS None THEN
+                    RETURN False
+                END IF
+                ASSIGN node TO the element at position idx OF node.children
+                IF node.is_end EQUALS True AND dfs(w, index PLUS one) EQUALS True THEN
+                    RETURN True
+                END IF
+            END FOR
+            RETURN False
+        END FUNCTION
+
+        ASSIGN trie TO a new instance of Trie
+        SET ans TO an empty list
+        SORT words in ascending order BY the LENGTH OF each element
+        FOR each w IN words
+            IF w NOT EQUALS empty string THEN
+                IF dfs(w, zero) EQUALS True THEN
+                    APPEND w TO ans
+                ELSE
+                    CALL trie.insert WITH w
+                END IF
+            END IF
+        END FOR
+        RETURN ans
+    END FUNCTION
+END CLASS

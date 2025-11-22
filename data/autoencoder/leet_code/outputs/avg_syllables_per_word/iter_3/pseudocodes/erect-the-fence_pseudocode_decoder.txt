@@ -1,0 +1,43 @@
+CLASS Solution
+    FUNCTION outerTrees(trees: List of List of Integer) RETURNS List of List of Integer
+        FUNCTION cross(i, j, k)
+            SET a TO trees[i]
+            SET b TO trees[j]
+            SET c TO trees[k]
+            RETURN (b[0] MINUS a[0]) TIMES (c[1] MINUS b[1]) MINUS (b[1] MINUS a[1]) TIMES (c[0] MINUS b[0])
+        END FUNCTION
+
+        SET n TO LENGTH OF trees
+        IF n LESS THAN 4 THEN
+            RETURN trees
+        END IF
+
+        SORT trees in ascending order
+        SET vis TO list of False of length n
+        SET stk TO list containing 0
+
+        FOR i FROM 1 TO n MINUS 1 DO
+            WHILE LENGTH OF stk GREATER THAN 1 AND cross(stk SECOND LAST, stk LAST, i) LESS THAN 0 DO
+                SET vis VALUE AT stk LAST TO False
+                REMOVE last element from stk
+            END WHILE
+            SET vis VALUE AT i TO True
+            APPEND i TO stk
+        END FOR
+
+        SET m TO LENGTH OF stk
+
+        FOR i FROM n MINUS 2 DOWN TO 0 DO
+            IF vis VALUE AT i IS True THEN
+                CONTINUE TO next iteration
+            END IF
+            WHILE LENGTH OF stk GREATER THAN m AND cross(stk SECOND LAST, stk LAST, i) LESS THAN 0 DO
+                REMOVE last element from stk
+            END WHILE
+            APPEND i TO stk
+        END FOR
+
+        REMOVE last element from stk
+        RETURN list of trees ELEMENTS AT indices in stk
+    END FUNCTION
+END CLASS

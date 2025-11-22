@@ -1,0 +1,64 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN None  
+    END IF  
+    SET root TO new TreeNode with value at position one of values WITH left as None WITH right as None  
+    SET i TO one  
+    SET queue TO new empty double ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO the element removed from the front of queue  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT None  
+            SET node.left TO new TreeNode with value at position i of values WITH left as None WITH right as None  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT None  
+            SET node.right TO new TreeNode with value at position i of values WITH left as None WITH right as None  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF the value of p IS NOT EQUAL TO the value of q  
+        RETURN False  
+    ELSE  
+        RETURN the result of is_same_tree with the left child of p AND the left child of q AND the result of is_same_tree with the right child of p AND the right child of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION countUnivalSubtrees(self, root)  
+        FUNCTION helper(node)  
+            IF node IS None  
+                RETURN True AND zero  
+            END IF  
+            SET is_left_unival AND left_count TO the result of helper with the left child of node  
+            SET is_right_unival AND right_count TO the result of helper with the right child of node  
+            IF is_left_unival AND is_right_unival  
+                IF node.left IS None OR the value of node.left EQUALS the value of node  
+                  AND node.right IS None OR the value of node.right EQUALS the value of node  
+                    RETURN True AND left_count PLUS right_count PLUS one  
+                END IF  
+            END IF  
+            RETURN False AND left_count PLUS right_count  
+        END FUNCTION  
+        SET underscore AND count TO the result of helper with root  
+        RETURN count  
+    END FUNCTION  
+END CLASS

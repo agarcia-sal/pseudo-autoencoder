@@ -1,0 +1,64 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETER val EQUALS zero AND left EQUALS none AND right EQUALS none  
+        SET self dot val TO val  
+        SET self dot left TO left  
+        SET self dot right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF the collection values is empty  
+        RETURN none  
+    END IF  
+    SET root TO new instance of TreeNode WITH values at position zero of values  
+    SET index_counter TO one  
+    SET node_queue TO new empty double ended queue  
+    APPEND root TO node_queue  
+    WHILE the condition that node_queue is not empty holds  
+        SET current_node TO the first element removed from the left side of node_queue  
+        IF index_counter is less than the LENGTH OF values AND the element at position index_counter of values is not none  
+            SET current_node dot left TO new instance of TreeNode WITH the element at position index_counter of values  
+            APPEND current_node dot left TO node_queue  
+        END IF  
+        INCREMENT index_counter BY one  
+        IF index_counter is less than the LENGTH OF values AND the element at position index_counter of values is not none  
+            SET current_node dot right TO new instance of TreeNode WITH the element at position index_counter of values  
+            APPEND current_node dot right TO node_queue  
+        END IF  
+        INCREMENT index_counter BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p AND q  
+    IF p is none AND q is none  
+        RETURN true  
+    ELSE IF p is none OR q is none  
+        RETURN false  
+    ELSE IF the value of p dot val is NOT EQUALS the value of q dot val  
+        RETURN false  
+    ELSE  
+        RETURN the function call is_same_tree WITH ARGUMENTS p dot left AND q dot left AND AND the function call is_same_tree WITH ARGUMENTS p dot right AND q dot right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION findLeaves WITH PARAMETER root  
+        FUNCTION collectLeaves WITH PARAMETER node  
+            IF node is none  
+                RETURN negative one  
+            END IF  
+            SET left_height TO the function call collectLeaves WITH ARGUMENT node dot left  
+            SET right_height TO the function call collectLeaves WITH ARGUMENT node dot right  
+            SET current_height TO the GREATER OF left_height AND right_height PLUS one  
+            IF current_height IS GREATER THAN OR EQUAL TO the LENGTH OF result  
+                APPEND new empty list TO result  
+            END IF  
+            APPEND node dot val TO the collection at position current_height of result  
+            RETURN current_height  
+        END FUNCTION  
+        SET result TO new empty list  
+        CALL collectLeaves WITH ARGUMENT root  
+        RETURN result  
+    END FUNCTION  
+END CLASS

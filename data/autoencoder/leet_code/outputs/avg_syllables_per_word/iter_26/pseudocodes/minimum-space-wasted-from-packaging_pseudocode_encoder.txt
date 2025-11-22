@@ -1,0 +1,52 @@
+CLASS Solution
+    FUNCTION minWastedSpace(packages AS List OF integers, boxes AS List OF List OF integers)
+        SET MODULO TO ten TO THE POWER OF nine PLUS one
+
+        SORT packages IN ascending order
+
+        SET total_packages TO the LENGTH OF packages
+
+        INITIALIZE prefix_sum AS a list OF zeroes WITH length total_packages PLUS one
+
+        FOR index FROM zero TO total_packages MINUS one INCLUSIVE
+            SET element at position index PLUS one OF prefix_sum TO element at position index OF prefix_sum PLUS element at position index OF packages
+        END FOR
+
+        SET minimum_wasted_space TO infinity
+
+        FOR each box_list IN boxes
+            SORT box_list IN ascending order
+
+            IF element at the last position OF box_list LESS THAN element at the last position OF packages
+                CONTINUE to the next iteration of the loop
+            END IF
+
+            SET total_wasted_space TO zero
+
+            SET last_package_index TO zero
+
+            FOR each box_size IN box_list
+                SET current_index TO last_package_index
+
+                WHILE current_index LESS THAN total_packages AND element at position current_index OF packages LESS THAN OR EQUAL TO box_size HOLDS
+                    INCREMENT current_index BY one
+                END WHILE
+
+                IF current_index GREATER THAN last_package_index
+                    INCREMENT total_wasted_space BY current_index MINUS last_package_index MULTIPLIED BY box_size MINUS element at position current_index OF prefix_sum MINUS element at position last_package_index OF prefix_sum
+                    SET last_package_index TO current_index
+                END IF
+            END FOR
+
+            IF last_package_index EQUALS total_packages
+                SET minimum_wasted_space TO the MINIMUM OF minimum_wasted_space AND total_wasted_space
+            END IF
+        END FOR
+
+        IF minimum_wasted_space NOT EQUALS infinity
+            RETURN minimum_wasted_space MODULO MODULO
+        ELSE
+            RETURN negative one
+        END IF
+    END FUNCTION
+END CLASS

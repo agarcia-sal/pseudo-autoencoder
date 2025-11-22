@@ -1,0 +1,57 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values)
+    IF values IS EMPTY
+        RETURN none
+    END IF
+    ASSIGN root TO A NEW TreeNode WITH value EQUALS element at position zero OF values
+    SET i TO one
+    ASSIGN queue TO A NEW deque
+    APPEND root TO queue
+    WHILE queue IS NOT EMPTY HOLDS
+        ASSIGN node TO THE FIRST element REMOVED FROM queue
+        IF i IS LESS THAN the LENGTH OF values AND element at position i OF values IS NOT none
+            SET node.left TO A NEW TreeNode WITH value EQUALS element at position i OF values
+            APPEND node.left TO queue
+        END IF
+        INCREMENT i BY one
+        IF i IS LESS THAN the LENGTH OF values AND element at position i OF values IS NOT none
+            SET node.right TO A NEW TreeNode WITH value EQUALS element at position i OF values
+            APPEND node.right TO queue
+        END IF
+        INCREMENT i BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS none AND q IS none
+        RETURN true
+    ELSE IF p IS none OR q IS none
+        RETURN false
+    ELSE IF p.val IS NOT EQUAL TO q.val
+        RETURN false
+    ELSE
+        RETURN the RESULT OF is_same_tree WITH PARAMETERS p.left AND q.left AND THE RESULT OF is_same_tree WITH PARAMETERS p.right AND q.right
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION buildTree(self, preorder, inorder)
+        IF preorder IS EMPTY OR inorder IS EMPTY
+            RETURN none
+        END IF
+        SET root_val TO element at position zero OF preorder
+        ASSIGN root TO A NEW TreeNode WITH value EQUALS root_val
+        SET root_index_inorder TO THE POSITION OF root_val IN inorder
+        SET root.left TO THE RESULT OF self.buildTree WITH PARAMETERS THE SUBLIST OF preorder FROM position one TO position root_index_inorder PLUS one EXCLUSIVE AND THE SUBLIST OF inorder FROM position zero TO position root_index_inorder EXCLUSIVE
+        SET root.right TO THE RESULT OF self.buildTree WITH PARAMETERS THE SUBLIST OF preorder FROM position root_index_inorder PLUS one TO THE END AND THE SUBLIST OF inorder FROM position root_index_inorder PLUS one TO THE END
+        RETURN root
+    END FUNCTION
+END CLASS

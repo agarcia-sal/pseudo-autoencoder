@@ -1,0 +1,54 @@
+CLASS Solution  
+    FUNCTION maxStudents(self, seats)  
+        SET m TO length of seats  
+        SET n TO length of first element in seats  
+        
+        FUNCTION broken_bitmask()  
+            CREATE list broken with m elements all set to zero  
+            FOR i FROM zero TO m MINUS one  
+                FOR j FROM zero TO n MINUS one  
+                    IF seats at position i and j EQUALS '#' THEN  
+                        SET broken at position i TO broken at position i OR one shifted left by j  
+                    END IF  
+                END FOR  
+            END FOR  
+            RETURN broken  
+        END FUNCTION  
+        
+        SET broken TO result of broken_bitmask()  
+        
+        FUNCTION is_valid(arrangement)  
+            RETURN arrangement AND arrangement shifted right by one EQUALS zero  
+        END FUNCTION  
+        
+        CREATE list dp with m elements each as empty dictionary  
+        
+        FOR arrangement FROM zero TO two raised to the power n MINUS one  
+            IF is_valid(arrangement) AND arrangement AND broken at zero EQUALS zero THEN  
+                SET dp at zero with key arrangement TO count of ones in binary representation of arrangement  
+            END IF  
+        END FOR  
+        
+        FOR i FROM one TO m MINUS one  
+            FOR arrangement FROM zero TO two raised to the power n MINUS one  
+                IF is_valid(arrangement) AND arrangement AND broken at i EQUALS zero THEN  
+                    SET max_students TO zero  
+                    FOR each prev_arrangement IN keys of dp at i MINUS one  
+                        IF arrangement AND prev_arrangement shifted right by one EQUALS zero AND arrangement AND prev_arrangement shifted left by one EQUALS zero THEN  
+                            IF dp at i MINUS one with key prev_arrangement GREATER THAN max_students THEN  
+                                SET max_students TO dp at i MINUS one with key prev_arrangement  
+                            END IF  
+                        END IF  
+                    END FOR  
+                    SET dp at i with key arrangement TO max_students PLUS count of ones in binary representation of arrangement  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        IF dp at last index IS NOT empty THEN  
+            RETURN maximum value in dp at last index  
+        ELSE  
+            RETURN zero  
+        END IF  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,46 @@
+```
+build tree: node→children from parents
+group queries by node: node_queries[node] = [vals]
+init trie root
+result = array(len(queries))
+map queries to idx: query_idx[(node,val)] = idx
+
+define insert(value):
+  cur = root
+  for i in 17..0:
+    bit = (value >> i) & 1
+    cur = cur.children[bit]
+    cur.count += 1
+
+define erase(value):
+  cur = root
+  for i in 17..0:
+    bit = (value >> i) & 1
+    cur = cur.children[bit]
+    cur.count -= 1
+
+define max_xor(value):
+  cur = root
+  res = 0
+  for i in 17..0:
+    bit = (value>>i)&1
+    flip = 1-bit
+    if flip in cur.children and cur.children[flip].count>0:
+      res |= (1<<i)
+      cur = cur.children[flip]
+    else:
+      cur = cur.children[bit]
+  return res
+
+define dfs(node):
+  insert(node)
+  for val in node_queries[node]:
+    result[query_idx[(node,val)]] = max_xor(val)
+  for child in tree[node]:
+    dfs(child)
+  erase(node)
+
+find root node r where parents[r] == -1
+dfs(r)
+return result
+```

@@ -1,0 +1,51 @@
+CLASS Solution
+    FUNCTION maxStudents(seats)
+        SET m TO the LENGTH OF seats
+        SET n TO the LENGTH OF element at position zero of seats
+        
+        SET broken TO a list of zero repeated m times
+        
+        FOR i FROM zero TO m MINUS one
+            FOR j FROM zero TO n MINUS one
+                IF element at position j of element at position i of seats EQUALS the character hash
+                    SET element at position i of broken TO element at position i of broken OR the value one LEFT SHIFTED BY j
+                END IF
+            END FOR
+        END FOR
+        
+        FUNCTION is_valid(arrangement)
+            RETURN the result of bitwise AND of arrangement AND the result of arrangement RIGHT SHIFTED BY one EQUALS zero
+        END FUNCTION
+        
+        SET dp TO a list containing empty dictionaries repeated m times
+        
+        FOR arrangement FROM zero TO the value one LEFT SHIFTED BY n MINUS one
+            IF is_valid(arrangement) AND the result of bitwise AND of arrangement AND element at position zero of broken EQUALS zero
+                SET element at position zero of dp AT KEY arrangement TO the COUNT OF ones in the binary representation of arrangement
+            END IF
+        END FOR
+        
+        FOR i FROM one TO m MINUS one
+            FOR arrangement FROM zero TO the value one LEFT SHIFTED BY n MINUS one
+                IF is_valid(arrangement) AND the result of bitwise AND of arrangement AND element at position i of broken EQUALS zero
+                    SET max_students TO zero
+                    FOR each prev_arrangement IN the keys of element at position i MINUS one of dp
+                        IF the result of bitwise AND of arrangement AND the result of prev_arrangement RIGHT SHIFTED BY one EQUALS zero
+                        AND the result of bitwise AND of arrangement AND the result of prev_arrangement LEFT SHIFTED BY one EQUALS zero
+                            IF element at position i MINUS one of dp AT KEY prev_arrangement GREATER THAN max_students
+                                SET max_students TO element at position i MINUS one of dp AT KEY prev_arrangement
+                            END IF
+                        END IF
+                    END FOR
+                    SET element at position i of dp AT KEY arrangement TO max_students PLUS the COUNT OF ones in the binary representation of arrangement
+                END IF
+            END FOR
+        END FOR
+        
+        IF element at last position of dp IS NOT empty
+            RETURN the maximum value among the values of element at last position of dp
+        ELSE
+            RETURN zero
+        END IF
+    END FUNCTION
+END CLASS

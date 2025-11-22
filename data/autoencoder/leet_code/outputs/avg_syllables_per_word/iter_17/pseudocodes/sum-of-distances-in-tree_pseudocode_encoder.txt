@@ -1,0 +1,38 @@
+CLASS Solution
+    FUNCTION sumOfDistancesInTree(n, edges)
+        SET graph TO CALL create_default_dictionary_of_lists FUNCTION
+        
+        FOR each pair a, b IN edges
+            CALL APPEND element b TO element at position a OF graph
+            CALL APPEND element a TO element at position b OF graph
+        END FOR
+        
+        SET count TO list_of size n FILLED WITH one
+        SET dist TO list_of size n FILLED WITH zero
+        
+        FUNCTION dfs1(u, p)
+            FOR each element v IN element at position u OF graph
+                IF v IS NOT EQUAL TO p
+                    CALL dfs1 WITH parameters v, u
+                    INCREMENT element at position u OF count BY element at position v OF count
+                    INCREMENT element at position u OF dist BY element at position v OF dist PLUS element at position v OF count
+                END IF
+            END FOR
+        END FUNCTION
+        
+        CALL dfs1 WITH parameters zero, negative one
+        
+        FUNCTION dfs2(u, p)
+            FOR each element v IN element at position u OF graph
+                IF v IS NOT EQUAL TO p
+                    SET element at position v OF dist TO element at position u OF dist MINUS element at position v OF count PLUS n MINUS element at position v OF count
+                    CALL dfs2 WITH parameters v, u
+                END IF
+            END FOR
+        END FUNCTION
+        
+        CALL dfs2 WITH parameters zero, negative one
+        
+        RETURN dist
+    END FUNCTION
+END CLASS

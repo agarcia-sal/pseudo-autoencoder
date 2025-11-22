@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION encode WITH PARAMETER s  
+        FUNCTION get_encoded_length WITH PARAMETERS count AND substring  
+            RETURN the LENGTH OF the STRING REPRESENTATION OF count PLUS the LENGTH OF substring PLUS two to represent the opening bracket AND closing bracket  
+        END FUNCTION  
+        
+        FUNCTION dp WITH PARAMETERS i AND j  
+            SET substring TO the portion of s FROM position i TO position j inclusive  
+            SET n TO j MINUS i PLUS one  
+            IF n LESS THAN five THEN  
+                RETURN substring  
+            END IF  
+            
+            SET shortest TO substring  
+            FOR k FROM one TO the INTEGER DIVISION OF n BY two PLUS one  
+                IF n MODULO k EQUALS zero THEN  
+                    SET repeat_count TO n DIVIDED BY k  
+                    IF substring EQUALS the substring FROM position zero TO position k MINUS one REPEATED repeat_count TIMES THEN  
+                        SET encoded_candidate TO the string representation of repeat_count FOLLOWED BY the opening bracket FOLLOWED BY the result of dp WITH PARAMETERS i AND i PLUS k MINUS one FOLLOWED BY the closing bracket  
+                        IF the LENGTH OF encoded_candidate LESS THAN the LENGTH OF shortest THEN  
+                            SET shortest TO encoded_candidate  
+                        END IF  
+                    END IF  
+                END IF  
+            END FOR  
+            
+            FOR k FROM i TO j MINUS one  
+                SET left_encoded TO the result of dp WITH PARAMETERS i AND k  
+                SET right_encoded TO the result of dp WITH PARAMETERS k PLUS one AND j  
+                SET combined TO left_encoded CONCATENATED WITH right_encoded  
+                IF the LENGTH OF combined LESS THAN the LENGTH OF shortest THEN  
+                    SET shortest TO combined  
+                END IF  
+            END FOR  
+            
+            RETURN shortest  
+        END FUNCTION  
+        
+        RETURN the result of dp WITH PARAMETERS zero AND the LENGTH OF s MINUS one  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,12 @@
+def isOneEditDistance(s, t):
+    if len(s) > len(t):
+        return isOneEditDistance(t, s)
+    diff = len(t) - len(s)
+    if diff > 1:
+        return False
+    if diff == 0:
+        return sum(c1 != c2 for c1, c2 in zip(s, t)) == 1
+    for i in range(len(s)):
+        if s[i] != t[i]:
+            return s[i:] == t[i+1:]
+    return True

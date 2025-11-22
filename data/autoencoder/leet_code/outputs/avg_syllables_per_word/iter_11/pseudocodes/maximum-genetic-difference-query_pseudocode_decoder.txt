@@ -1,0 +1,92 @@
+CLASS TrieNode  
+    FUNCTION __init__()  
+        SET children TO a default dictionary with TrieNode as default value  
+        SET count TO zero  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION maxGeneticDifference(parents, queries)  
+        SET tree TO a default dictionary with list as default value  
+        FOR index FROM zero TO the LENGTH OF parents MINUS one  
+            SET parent TO element at position index of parents  
+            IF parent NOT EQUALS minus one  
+                APPEND index TO the list at tree[parent]  
+            END IF  
+        END FOR  
+
+        SET node_queries TO a default dictionary with list as default value  
+        FOR each element IN queries  
+            SET node TO the first element of element  
+            SET val TO the second element of element  
+            APPEND val TO the list at node_queries[node]  
+        END FOR  
+
+        SET root TO a new instance of TrieNode  
+        SET result TO a list of zero repeated the LENGTH OF queries times  
+
+        FUNCTION insert(trie_root, value)  
+            SET node TO trie_root  
+            FOR i FROM seventeen DOWNTO zero  
+                SET bit TO the integer division of value DIVIDED BY two RAISED TO THE POWER OF i MODULO two  
+                SET node TO the child at children indexed by bit of node  
+                INCREMENT count of node BY one  
+            END FOR  
+        END FUNCTION  
+
+        FUNCTION erase(trie_root, value)  
+            SET node TO trie_root  
+            FOR i FROM seventeen DOWNTO zero  
+                SET bit TO the integer division of value DIVIDED BY two RAISED TO THE POWER OF i MODULO two  
+                SET node TO the child at children indexed by bit of node  
+                DECREMENT count of node BY one  
+            END FOR  
+        END FUNCTION  
+
+        FUNCTION max_xor(trie_root, value)  
+            SET node TO trie_root  
+            SET max_xor_val TO zero  
+            FOR i FROM seventeen DOWNTO zero  
+                SET bit TO the integer division of value DIVIDED BY two RAISED TO THE POWER OF i MODULO two  
+                SET toggled_bit TO one MINUS bit  
+                IF toggled_bit IS IN children of node AND the count of the child at toggled_bit IS GREATER THAN zero  
+                    SET max_xor_val TO max_xor_val PLUS two RAISED TO THE POWER OF i  
+                    SET node TO the child at children indexed by toggled_bit of node  
+                ELSE  
+                    SET node TO the child at children indexed by bit of node  
+                END IF  
+            END FOR  
+            RETURN max_xor_val  
+        END FUNCTION  
+
+        SET query_idx TO an empty dictionary  
+        SET idx TO zero  
+        FOR each element IN queries  
+            SET node TO the first element of element  
+            SET val TO the second element of element  
+            MAP the tuple of node and val TO idx in query_idx  
+            INCREMENT idx BY one  
+        END FOR  
+
+        FUNCTION dfs(node)  
+            CALL insert WITH trie_root AS root AND value AS node  
+            FOR each val IN node_queries[node]  
+                SET index TO the value at query_idx for the tuple of node and val  
+                SET element at position index of result TO the return value of max_xor WITH trie_root AS root AND value AS val  
+            END FOR  
+            FOR each child IN tree[node]  
+                CALL dfs WITH node AS child  
+            END FOR  
+            CALL erase WITH trie_root AS root AND value AS node  
+        END FUNCTION  
+
+        FOR i FROM zero TO the LENGTH OF parents MINUS one  
+            IF element at position i of parents EQUALS minus one  
+                CALL dfs WITH node AS i  
+                BREAK the loop  
+            END IF  
+        END FOR  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

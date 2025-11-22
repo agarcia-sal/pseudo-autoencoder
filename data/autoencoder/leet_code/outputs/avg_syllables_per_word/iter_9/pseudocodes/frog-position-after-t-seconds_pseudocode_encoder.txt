@@ -1,0 +1,43 @@
+CLASS Solution  
+    FUNCTION frogPosition(self, n, edges, t, target)  
+        IF n EQUALS 1 THEN  
+            RETURN 1 point 0  
+        END IF  
+        
+        FUNCTION constructGraph(edges)  
+            INITIALIZE graph AS a mapping from element to list of elements  
+            FOR each edge IN edges  
+                APPEND second element OF edge TO graph at first element OF edge  
+                APPEND first element OF edge TO graph at second element OF edge  
+            END FOR  
+            RETURN graph  
+        END FUNCTION  
+        
+        SET graph TO constructGraph(edges)  
+        INITIALIZE queue AS a double-ended queue containing tuple of (1, 1 point 0, 0)  
+        INITIALIZE visited AS a set containing 1  
+        
+        WHILE queue IS NOT empty  
+            REMOVE first element FROM queue AND UNPACK INTO current_node, current_probability, current_time  
+            
+            IF current_time EQUALS t OR (current_node NOT EQUALS 1 AND LENGTH of graph at current_node EQUALS 1) THEN  
+                IF current_node EQUALS target THEN  
+                    RETURN current_probability  
+                ELSE  
+                    CONTINUE to next iteration of WHILE  
+                END IF  
+            END IF  
+            
+            SET possible_moves TO LENGTH of graph at current_node MINUS (1 IF current_node NOT EQUALS 1 ELSE 0)  
+            
+            FOR each neighbor IN graph at current_node  
+                IF neighbor NOT IN visited THEN  
+                    ADD neighbor TO visited  
+                    APPEND tuple of (neighbor, current_probability DIVIDED BY possible_moves, current_time PLUS 1) TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN 0 point 0  
+    END FUNCTION  
+END CLASS

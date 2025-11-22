@@ -1,0 +1,35 @@
+CLASS Solution
+    FUNCTION validIPAddress(queryIP)
+        FUNCTION is_valid_ipv4_block(block)
+            IF block CONTAINS ONLY DIGITS THEN
+                SET num TO INTEGER VALUE OF block
+                IF num IS LESS THAN OR EQUAL TO 255 AND STRING VALUE OF num EQUALS block THEN
+                    RETURN TRUE
+                ELSE
+                    RETURN FALSE
+            ELSE
+                RETURN FALSE
+        END FUNCTION
+
+        FUNCTION is_valid_ipv6_block(block)
+            IF LENGTH OF block IS AT LEAST 1 AND AT MOST 4 THEN
+                TRY
+                    CONVERT block TO INTEGER WITH BASE 16
+                    RETURN TRUE
+                EXCEPT VALUE ERROR
+                    RETURN FALSE
+            ELSE
+                RETURN FALSE
+        END FUNCTION
+
+        SET parts_ipv4 TO SPLIT queryIP BY '.'
+        SET parts_ipv6 TO SPLIT queryIP BY ':'
+
+        IF LENGTH OF parts_ipv4 IS 4 AND ALL parts IN parts_ipv4 SATISFY is_valid_ipv4_block THEN
+            RETURN "IPv4"
+        ELSE IF LENGTH OF parts_ipv6 IS 8 AND ALL parts IN parts_ipv6 SATISFY is_valid_ipv6_block THEN
+            RETURN "IPv6"
+        ELSE
+            RETURN "Neither"
+    END FUNCTION
+END CLASS

@@ -1,0 +1,55 @@
+CLASS Solution  
+    FUNCTION mostSimilar(n targetNumber OF type integer, roads list OF list OF integer, names list OF string, targetPath list OF string) RETURNS list OF integer  
+        SET graph TO a mapping from integer to list initialised empty  
+        FOR each pair_of_cities IN roads  
+            SET first_city TO the first element of pair_of_cities  
+            SET second_city TO the second element of pair_of_cities  
+            APPEND second_city TO the list at key first_city in graph  
+            APPEND first_city TO the list at key second_city in graph  
+        END FOR  
+        
+        SET path_length TO the LENGTH OF targetPath  
+        
+        FUNCTION dp(i index OF type integer, j current_city OF type integer) RETURNS a pair of integer and list OF integer  
+            IF i index EQUALS zero  
+                IF the name at position j current_city in names IS NOT EQUAL TO the element at position i index in targetPath  
+                    SET mismatch_cost TO one  
+                ELSE  
+                    SET mismatch_cost TO zero  
+                END IF  
+                RETURN mismatch_cost AND a list containing j current_city  
+            END IF  
+            
+            SET minimum_cost TO a very large number representing infinity  
+            SET minimum_path TO an empty list  
+            FOR each neighbor_city IN the list at key j current_city in graph  
+                CALL dp with parameters i index MINUS one AND neighbor_city, RECEIVE cost_result AND path_result  
+                IF cost_result IS LESS THAN minimum_cost  
+                    SET minimum_cost TO cost_result  
+                    SET minimum_path TO path_result  
+                END IF  
+            END FOR  
+            
+            IF the name at position j current_city in names IS NOT EQUAL TO the element at position i index in targetPath  
+                SET current_city_cost TO one  
+            ELSE  
+                SET current_city_cost TO zero  
+            END IF  
+            SET total_cost TO minimum_cost PLUS current_city_cost  
+            SET total_path TO minimum_path concatenated with j current_city  
+            RETURN total_cost AND total_path  
+        END FUNCTION  
+        
+        SET overall_min_cost TO a very large number representing infinity  
+        SET overall_min_path TO an empty list  
+        FOR j city_index FROM zero TO n targetNumber MINUS one  
+            CALL dp with parameters path_length MINUS one AND j city_index, RECEIVE cost_candidate AND path_candidate  
+            IF cost_candidate IS LESS THAN overall_min_cost  
+                SET overall_min_cost TO cost_candidate  
+                SET overall_min_path TO path_candidate  
+            END IF  
+        END FOR  
+        
+        RETURN overall_min_path  
+    END FUNCTION  
+END CLASS

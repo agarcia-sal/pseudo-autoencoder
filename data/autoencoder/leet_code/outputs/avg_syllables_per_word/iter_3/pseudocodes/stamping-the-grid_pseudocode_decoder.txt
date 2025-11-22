@@ -1,0 +1,39 @@
+CLASS Solution
+    FUNCTION possibleToStamp(grid, stampHeight, stampWidth)
+        SET m TO LENGTH OF grid
+        SET n TO LENGTH OF grid[0]
+
+        FUNCTION prefix_sum(matrix)
+            SET p TO 2D array of zeros with dimensions (m + 1) by (n + 1)
+            FOR r FROM 1 TO m
+                FOR c FROM 1 TO n
+                    SET p[r][c] TO matrix[r - 1][c - 1] + p[r - 1][c] + p[r][c - 1] - p[r - 1][c - 1]
+            RETURN p
+        END FUNCTION
+
+        FUNCTION submatrix_sum(p, r1, c1, r2, c2)
+            RETURN p[r2 + 1][c2 + 1] - p[r2 + 1][c1] - p[r1][c2 + 1] + p[r1][c1]
+        END FUNCTION
+
+        SET p_grid TO prefix_sum(grid)
+
+        SET p_stamps TO 2D array of zeros with dimensions (m + 1) by (n + 1)
+
+        FOR r FROM 0 TO m - 1
+            FOR c FROM 0 TO n - 1
+                IF grid[r][c] EQUALS 0 THEN
+                    IF r + stampHeight <= m AND c + stampWidth <= n THEN
+                        IF submatrix_sum(p_grid, r, c, r + stampHeight - 1, c + stampWidth - 1) EQUALS 0 THEN
+                            INCREMENT p_stamps[r][c] BY 1
+        SET p_stamps TO prefix_sum(p_stamps)
+
+        FOR r FROM 0 TO m - 1
+            FOR c FROM 0 TO n - 1
+                IF grid[r][c] EQUALS 0 THEN
+                    SET r_start TO MAXIMUM OF 0 AND (r - stampHeight + 1)
+                    SET c_start TO MAXIMUM OF 0 AND (c - stampWidth + 1)
+                    IF submatrix_sum(p_stamps, r_start, c_start, r, c) EQUALS 0 THEN
+                        RETURN False
+        RETURN True
+    END FUNCTION
+END CLASS

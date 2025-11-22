@@ -1,0 +1,18 @@
+from typing import List
+
+class Solution:
+    def maxRotateFunction(self, nums: List[int]) -> int:
+        n = len(nums)
+        if n == 1:
+            return 0
+
+        total_sum = sum(nums)
+        current_sum = sum(i * num for i, num in enumerate(nums))
+        max_value = current_sum
+
+        for k in range(1, n):
+            current_sum += total_sum - n * nums[n - k]
+            if max_value < current_sum:
+                max_value = current_sum
+
+        return max_value

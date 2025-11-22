@@ -1,0 +1,27 @@
+CLASS Solution  
+    FUNCTION maximumCost(n, highways, k)  
+        CREATE graph AS a mapping with default empty list  
+        FOR each city1, city2, toll IN highways  
+            APPEND pair (city2, toll) TO graph AT key city1  
+            APPEND pair (city1, toll) TO graph AT key city2  
+  
+        SET max_cost TO -1  
+  
+        FUNCTION dfs(city, visited, cost, highways_used)  
+            IF highways_used EQUALS k THEN  
+                SET max_cost TO the greater value between max_cost and cost  
+                RETURN  
+            FOR each neighbor, toll IN graph AT key city  
+                IF neighbor NOT IN visited THEN  
+                    ADD neighbor TO visited  
+                    CALL dfs WITH neighbor, visited, cost plus toll, highways_used plus 1  
+                    REMOVE neighbor FROM visited  
+        END FUNCTION  
+  
+        FOR each start_city FROM 0 TO n MINUS 1  
+            CREATE visited AS a set containing start_city  
+            CALL dfs WITH start_city, visited, 0, 0  
+  
+        RETURN max_cost  
+    END FUNCTION  
+END CLASS

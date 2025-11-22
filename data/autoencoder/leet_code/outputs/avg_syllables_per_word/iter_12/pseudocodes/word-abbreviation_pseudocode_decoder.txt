@@ -1,0 +1,52 @@
+CLASS Solution  
+    FUNCTION wordsAbbreviation(words)  
+        FUNCTION abbreviate(word, prefix_length)  
+            IF the LENGTH OF word MINUS prefix_length LESS THAN OR EQUAL TO two  
+                RETURN word  
+            END IF  
+            RETURN the SUBSTRING of word FROM start TO position prefix_length CONCATENATED WITH the STRING of the LENGTH OF word MINUS prefix_length MINUS one CONCATENATED WITH the LAST CHARACTER of word  
+        END FUNCTION  
+
+        FUNCTION get_unique_abbreviations(words_with_indices, prefix_length)  
+            SET abbs TO a new DEFAULTDICT of list  
+            FOR each index, word IN words_with_indices  
+                APPEND the PAIR of index AND word TO the LIST in abbs at the KEY abbreviate(word, prefix_length)  
+            END FOR  
+            RETURN abbs  
+        END FUNCTION  
+
+        SET n TO the LENGTH OF words  
+        SET ans TO a LIST of empty strings of size n  
+        SET words_with_indices TO a LIST of PAIRS index, word FOR each index, word FROM ENUMERATE words  
+
+        SET abbs TO get_unique_abbreviations(words_with_indices, one)  
+
+        FOR each abb, group IN abbs ITEMS  
+            IF the LENGTH OF group EQUALS one  
+                SET index, word TO the FIRST ELEMENT of group  
+                SET ans at position index TO abb  
+            ELSE  
+                SET new_group TO an empty LIST  
+                FOR each index, word IN group  
+                    APPEND the PAIR of index AND word TO new_group  
+                END FOR  
+                SET prefix_length TO two  
+                WHILE the LENGTH OF new_group GREATER THAN zero  
+                    SET new_abbs TO get_unique_abbreviations(new_group, prefix_length)  
+                    SET new_group TO an empty LIST  
+                    FOR each new_abb, new_group_items IN new_abbs ITEMS  
+                        IF the LENGTH OF new_group_items EQUALS one  
+                            SET index, word TO the FIRST ELEMENT of new_group_items  
+                            SET ans at position index TO new_abb  
+                        ELSE  
+                            EXTEND new_group BY new_group_items  
+                        END IF  
+                    END FOR  
+                    INCREMENT prefix_length BY one  
+                END WHILE  
+            END IF  
+        END FOR  
+
+        RETURN ans  
+    END FUNCTION  
+END CLASS

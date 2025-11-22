@@ -1,0 +1,47 @@
+CLASS Solution  
+    FUNCTION maxHappyGroups(batchSize, groups)  
+        IF batchSize IS EQUAL TO one  
+            RETURN the LENGTH OF groups  
+        END IF  
+        
+        SET remainder_count TO a list of batchSize elements all SET TO zero  
+        
+        FOR each group IN groups  
+            INCREMENT element at position group MODULO batchSize OF remainder_count BY one  
+        END FOR  
+        
+        FUNCTION dp(remainder, variable number of remainder_count_arguments)  
+            SET remainder_count TO a list CONSTRUCTED FROM remainder_count_arguments  
+            SET max_happy TO zero  
+            
+            FOR i FROM zero TO batchSize MINUS one  
+                IF element at position i OF remainder_count IS EQUAL TO zero  
+                    CONTINUE TO the next iteration  
+                END IF  
+                
+                DECREMENT element at position i OF remainder_count BY one  
+                SET new_remainder TO remainder MINUS i  
+                IF new_remainder IS LESS THAN zero  
+                    SET new_remainder TO new_remainder PLUS batchSize  
+                END IF  
+                SET new_remainder TO new_remainder MODULO batchSize  
+                
+                IF remainder IS EQUAL TO zero  
+                    SET happy_groups TO one PLUS dp WITH arguments new_remainder AND all elements OF remainder_count  
+                ELSE  
+                    SET happy_groups TO dp WITH arguments new_remainder AND all elements OF remainder_count  
+                END IF  
+                
+                IF happy_groups IS GREATER THAN max_happy  
+                    SET max_happy TO happy_groups  
+                END IF  
+                
+                INCREMENT element at position i OF remainder_count BY one  
+            END FOR  
+            
+            RETURN max_happy  
+        END FUNCTION  
+        
+        RETURN dp WITH arguments zero AND all elements OF remainder_count  
+    END FUNCTION  
+END CLASS

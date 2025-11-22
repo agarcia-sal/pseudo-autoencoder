@@ -1,0 +1,59 @@
+CLASS BIT
+    FUNCTION __init__(self, n)
+        SET self.size TO n
+        SET self.tree TO list of zeros with length n + 1
+    END FUNCTION
+
+    FUNCTION update(self, idx, delta)
+        WHILE idx <= self.size
+            INCREMENT self.tree[idx] BY delta
+            SET idx TO idx PLUS (idx BITWISE AND NEGATION OF idx)
+        END WHILE
+    END FUNCTION
+
+    FUNCTION query(self, idx)
+        SET result TO 0
+        WHILE idx > 0
+            INCREMENT result BY self.tree[idx]
+            SET idx TO idx MINUS (idx BITWISE AND NEGATION OF idx)
+        END WHILE
+        RETURN result
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION goodTriplets(self, nums1: List[int], nums2: List[int]) -> int
+        SET n TO LENGTH OF nums1
+        SET pos TO list of zeros with length n
+        FOR i, num IN ENUMERATE nums1
+            SET pos[num] TO i
+        END FOR
+
+        SET compressed TO empty list
+        FOR num IN nums2
+            APPEND pos[num] TO compressed
+        END FOR
+
+        SET bit TO NEW BIT(n)
+        SET smaller_count TO list of zeros with length n
+        SET larger_count TO list of zeros with length n
+
+        FOR i FROM 0 TO n - 1
+            SET smaller_count[i] TO bit.query(compressed[i])
+            CALL bit.update(compressed[i] PLUS 1, 1)
+        END FOR
+
+        SET bit TO NEW BIT(n)
+        FOR i FROM n - 1 DOWNTO 0
+            SET larger_count[i] TO bit.query(n) MINUS bit.query(compressed[i] PLUS 1)
+            CALL bit.update(compressed[i] PLUS 1, 1)
+        END FOR
+
+        SET good_triplets TO 0
+        FOR i FROM 0 TO n - 1
+            INCREMENT good_triplets BY smaller_count[i] TIMES larger_count[i]
+        END FOR
+
+        RETURN good_triplets
+    END FUNCTION
+END CLASS

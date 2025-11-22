@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION gridIllumination(n, lamps, queries)  
+        CREATE row_count AS a dictionary mapping integers to integers with all values initially zero  
+        CREATE col_count AS a dictionary mapping integers to integers with all values initially zero  
+        CREATE diag_count AS a dictionary mapping integers to integers with all values initially zero  
+        CREATE anti_diag_count AS a dictionary mapping integers to integers with all values initially zero  
+        
+        CREATE lamp_positions AS an empty set of position pairs  
+        
+        FOR each pair r c IN lamps  
+            IF the pair r c is NOT IN lamp_positions THEN  
+                ADD the pair r c TO lamp_positions  
+                INCREMENT the value associated with r IN row_count BY one  
+                INCREMENT the value associated with c IN col_count BY one  
+                INCREMENT the value associated with r MINUS c IN diag_count BY one  
+                INCREMENT the value associated with r PLUS c IN anti_diag_count BY one  
+            END IF  
+        END FOR  
+        
+        CREATE directions AS the list of pairs consisting of negative one negative one negative one zero negative one one zero negative one zero zero zero one one negative one one zero one one one  
+        
+        CREATE result AS an empty list  
+        
+        FOR each pair r c IN queries  
+            IF the value associated with r IN row_count IS GREATER THAN zero OR the value associated with c IN col_count IS GREATER THAN zero OR the value associated with r MINUS c IN diag_count IS GREATER THAN zero OR the value associated with r PLUS c IN anti_diag_count IS GREATER THAN zero THEN  
+                APPEND one TO result  
+            ELSE  
+                APPEND zero TO result  
+            END IF  
+            
+            FOR each pair dr dc IN directions  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                IF the pair nr nc IS IN lamp_positions THEN  
+                    REMOVE the pair nr nc FROM lamp_positions  
+                    DECREMENT the value associated with nr IN row_count BY one  
+                    DECREMENT the value associated with nc IN col_count BY one  
+                    DECREMENT the value associated with nr MINUS nc IN diag_count BY one  
+                    DECREMENT the value associated with nr PLUS nc IN anti_diag_count BY one  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

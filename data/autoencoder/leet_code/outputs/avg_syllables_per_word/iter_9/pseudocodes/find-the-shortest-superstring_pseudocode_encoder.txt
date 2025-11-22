@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION shortestSuperstring(self, words)  
+        SET n TO length of words  
+        
+        FUNCTION overlap(i, j)  
+            FOR k FROM minimum of length of words at i AND length of words at j DOWNTO one  
+                IF substring of words at i from negative k TO end EQUALS substring of words at j from start TO k THEN  
+                    RETURN k  
+                END IF  
+            END FOR  
+            RETURN zero  
+        END FUNCTION  
+        
+        FUNCTION dp(mask, i)  
+            IF mask EQUALS power of two MULTIPLIED BY n MINUS one THEN  
+                RETURN tuple of zero AND empty string  
+            END IF  
+            
+            SET min_len TO infinity  
+            SET best_path TO empty string  
+            FOR j FROM zero TO n MINUS one  
+                IF mask DOES NOT CONTAIN bit j THEN  
+                    SET length, path TO dp(mask including bit j, j)  
+                    SET length TO length PLUS length of words at j MINUS overlap(i, j)  
+                    IF length LESS THAN min_len THEN  
+                        SET min_len TO length  
+                        SET best_path TO substring of words at j from overlap(i, j) TO end CONCATENATED WITH path  
+                    END IF  
+                END IF  
+            END FOR  
+            
+            RETURN tuple of min_len AND best_path  
+        END FUNCTION  
+        
+        SET min_len TO infinity  
+        SET shortest_path TO empty string  
+        FOR i FROM zero TO n MINUS one  
+            SET length, path TO dp(bit representing i, i)  
+            SET length TO length PLUS length of words at i  
+            IF length LESS THAN min_len THEN  
+                SET min_len TO length  
+                SET shortest_path TO words at i CONCATENATED WITH path  
+            END IF  
+        END FOR  
+        
+        RETURN shortest_path  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,73 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(list_of_values)  
+    IF list_of_values IS empty THEN  
+        RETURN none  
+    END IF  
+    SET root_node TO A NEW TreeNode WITH value equal TO element at position one of list_of_values AND left equal TO none AND right equal TO none  
+    SET index_counter TO one  
+    SET node_queue TO A NEW double ended queue  
+    APPEND root_node TO node_queue  
+    WHILE node_queue IS NOT empty DO  
+        SET current_node TO REMOVE leftmost element FROM node_queue  
+        IF index_counter IS LESS THAN OR EQUAL TO the LENGTH OF list_of_values AND element at position index_counter of list_of_values IS NOT none THEN  
+            SET left_child TO A NEW TreeNode WITH value equal TO element at position index_counter of list_of_values AND left equal TO none AND right equal TO none  
+            SET current_node.left TO left_child  
+            APPEND left_child TO node_queue  
+        END IF  
+        INCREMENT index_counter BY one  
+        IF index_counter IS LESS THAN OR EQUAL TO the LENGTH OF list_of_values AND element at position index_counter of list_of_values IS NOT none THEN  
+            SET right_child TO A NEW TreeNode WITH value equal TO element at position index_counter of list_of_values AND left equal TO none AND right equal TO none  
+            SET current_node.right TO right_child  
+            APPEND right_child TO node_queue  
+        END IF  
+        INCREMENT index_counter BY one  
+    END WHILE  
+    RETURN root_node  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS none AND q IS none THEN  
+        RETURN true  
+    ELSE IF p IS none OR q IS none THEN  
+        RETURN false  
+    ELSE IF p.val NOT EQUALS q.val THEN  
+        RETURN false  
+    ELSE  
+        RETURN the result of is_same_tree WITH arguments p.left AND q.left AND the result of is_same_tree WITH arguments p.right AND q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION pathSum(self, root, targetSum)  
+        FUNCTION helper(node, current_sum, prefix_sums)  
+            IF node IS none THEN  
+                RETURN zero  
+            END IF  
+            SET current_sum TO current_sum PLUS node.val  
+            SET needed_sum TO current_sum MINUS targetSum  
+            IF needed_sum IS A KEY IN prefix_sums THEN  
+                SET paths_to_here TO value ASSOCIATED WITH needed_sum IN prefix_sums  
+            ELSE  
+                SET paths_to_here TO zero  
+            END IF  
+            IF current_sum IS A KEY IN prefix_sums THEN  
+                SET prefix_sums[current_sum] TO prefix_sums[current_sum] PLUS one  
+            ELSE  
+                SET prefix_sums[current_sum] TO one  
+            END IF  
+            SET paths_in_left TO helper WITH arguments node.left AND current_sum AND prefix_sums  
+            SET paths_in_right TO helper WITH arguments node.right AND current_sum AND prefix_sums  
+            SET prefix_sums[current_sum] TO prefix_sums[current_sum] MINUS one  
+            RETURN paths_to_here PLUS paths_in_left PLUS paths_in_right  
+        END FUNCTION  
+        SET initial_prefix_sums TO A NEW DICTIONARY WITH key zero AND value one  
+        RETURN helper WITH arguments root AND zero AND initial_prefix_sums  
+    END FUNCTION  
+END CLASS

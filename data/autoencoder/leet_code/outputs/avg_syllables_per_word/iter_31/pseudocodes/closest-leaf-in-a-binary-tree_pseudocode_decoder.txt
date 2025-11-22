@@ -1,0 +1,86 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN no value  
+    END IF  
+    SET root TO a new TreeNode with value element at position one of values AND left no value AND right no value  
+    SET i TO one  
+    SET queue TO an empty double ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO the element popped from the left side of queue  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT no value  
+            SET node.left TO a new TreeNode with value element at position i of values AND left no value AND right no value  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT no value  
+            SET node.right TO a new TreeNode with value element at position i of values AND left no value AND right no value  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS no value AND q IS no value  
+        RETURN True  
+    ELSE IF p IS no value OR q IS no value  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION findClosestLeaf(self, root, k)  
+        IF root.left IS no value AND root.right IS no value  
+            RETURN root.val  
+        END IF  
+
+        SET graph TO a new default dictionary of lists  
+
+        FUNCTION dfs(node, parent)  
+            IF parent IS NOT no value  
+                APPEND parent.val TO the list in graph at key node.val  
+                APPEND node.val TO the list in graph at key parent.val  
+            END IF  
+            IF node.left IS NOT no value  
+                CALL dfs with node.left AND node as arguments  
+            END IF  
+            IF node.right IS NOT no value  
+                CALL dfs with node.right AND node as arguments  
+            END IF  
+        END FUNCTION  
+
+        CALL dfs with root AND no value as arguments  
+
+        SET queue TO a new double ended queue initialized with k  
+        SET visited TO an empty set  
+
+        WHILE queue IS NOT EMPTY  
+            SET current TO the element popped from the left side of queue  
+            ADD current TO visited  
+            IF the number of elements in the list at graph with key current IS EQUALS one AND current IS NOT EQUALS root.val  
+                RETURN current  
+            END IF  
+            FOR each neighbor IN the list at graph with key current  
+                IF neighbor IS NOT IN visited  
+                    APPEND neighbor TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+
+        RETURN the negative value one  
+    END FUNCTION  
+END CLASS

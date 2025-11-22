@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION jobScheduling(startTime, endTime, profit)  
+        CALL create_jobs_list WITH PARAMETERS startTime endTime profit  
+        CALL sort_jobs_by_end_time  
+        CALL extract_end_times FROM jobs TO end_times  
+        CALL initialize_dp_array WITH THE LENGTH OF jobs PLUS one  
+        FOR index FROM one TO THE LENGTH OF jobs  
+            CALL find_latest_non_conflicting_job_index USING end_times AND the start time OF the job at position index MINUS one  
+            CALL calculate_maximum_profit WITH PARAMETERS index j dp jobs  
+        END FOR  
+        RETURN the last element OF dp  
+    END FUNCTION  
+  
+    FUNCTION create_jobs_list WITH PARAMETERS startTime endTime profit  
+        SET jobs TO the list OF tuples formed by pairing elements at the same positions OF startTime endTime AND profit  
+    END FUNCTION  
+  
+    FUNCTION sort_jobs_by_end_time  
+        SET jobs TO jobs sorted IN ascending order BY the second element OF each tuple  
+    END FUNCTION  
+  
+    FUNCTION extract_end_times FROM jobs TO end_times  
+        SET end_times TO a list formed BY extracting the second element OF each tuple IN jobs  
+    END FUNCTION  
+  
+    FUNCTION initialize_dp_array WITH THE LENGTH OF jobs PLUS one  
+        SET dp TO a list OF zeros WITH size EQUAL TO the LENGTH OF jobs PLUS one  
+    END FUNCTION  
+  
+    FUNCTION find_latest_non_conflicting_job_index USING end_times AND current_job_start  
+        CALL bisect_right WITH PARAMETERS end_times current_job_start  
+        SET result TO the returned value  
+        RETURN result  
+    END FUNCTION  
+  
+    FUNCTION calculate_maximum_profit WITH PARAMETERS index j dp jobs  
+        SET profit_if_taken TO the element at position j OF dp PLUS the third element OF the job at position index MINUS one OF jobs  
+        SET profit_if_skipped TO the element at position index MINUS one OF dp  
+        SET dp at position index TO the greater value BETWEEN profit_if_taken AND profit_if_skipped  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,32 @@
+CLASS Solution
+    FUNCTION smallestSufficientTeam(req_skills, people)
+        SET skill_index_map TO empty map
+        FOR each skill WITH index i IN req_skills
+            SET skill_index_map[skill] TO i
+        SET m TO LENGTH OF req_skills
+        SET n TO LENGTH OF people
+        SET people_skills TO list of size n with all elements 0
+        FOR i FROM 0 TO n - 1
+            FOR each skill IN people[i]
+                SET people_skills[i] TO people_skills[i] BITWISE OR (1 SHIFTED LEFT BY skill_index_map[skill])
+        SET min_team_size TO list of size (2 TO THE POWER m) with all elements infinity
+        SET chosen_person TO list of size (2 TO THE POWER m) with all elements 0
+        SET previous_state TO list of size (2 TO THE POWER m) with all elements 0
+        SET min_team_size[0] TO 0
+        FOR skill_set FROM 0 TO (2 TO THE POWER m) - 1
+            IF min_team_size[skill_set] IS infinity
+                CONTINUE
+            FOR person_index FROM 0 TO n - 1
+                SET combined_skills TO skill_set BITWISE OR people_skills[person_index]
+                IF min_team_size[skill_set] + 1 < min_team_size[combined_skills]
+                    SET min_team_size[combined_skills] TO min_team_size[skill_set] + 1
+                    SET chosen_person[combined_skills] TO person_index
+                    SET previous_state[combined_skills] TO skill_set
+        SET current_state TO (2 TO THE POWER m) - 1
+        SET answer TO empty list
+        WHILE current_state IS NOT 0
+            APPEND chosen_person[current_state] TO answer
+            SET current_state TO previous_state[current_state]
+        RETURN answer
+    END FUNCTION
+END CLASS

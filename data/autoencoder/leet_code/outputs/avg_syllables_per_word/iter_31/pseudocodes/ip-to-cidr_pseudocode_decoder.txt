@@ -1,0 +1,47 @@
+CLASS Solution  
+    FUNCTION ipToCIDR(ip STRING_PARAMETER ip COMMA INTEGER_PARAMETER n) RETURNS LIST OF STRING  
+        FUNCTION ip_to_int(ip STRING_PARAMETER ip) RETURNS INTEGER  
+            SET parts TO the LIST created by CONVERTING each SUBSTRING of ip SPLIT BY the PERIOD WORD TO INTEGER  
+            SET res TO zero  
+            FOR each part IN parts  
+                SET res TO res MULTIPLIED BY two HUNDRED FIFTY SIX PLUS part  
+            END FOR  
+            RETURN res  
+        END FUNCTION  
+        
+        FUNCTION int_to_ip(num INTEGER_PARAMETER num) RETURNS STRING  
+            SET result_parts TO an EMPTY LIST  
+            FOR i FROM three DOWN TO zero  
+                SET shifted_value TO num DIVIDED BY two TO THE POWER OF eight MULTIPLIED BY i  
+                SET current_part TO shifted_value MODULO two HUNDRED FIFTY SIX  
+                CONVERT current_part TO STRING AND APPEND TO result_parts  
+            END FOR  
+            RETURN the SINGLE STRING CREATED BY JOINING result_parts WITH the PERIOD WORD  
+        END FUNCTION  
+        
+        FUNCTION largest_cidr_size(start INTEGER_PARAMETER start COMMA n INTEGER_PARAMETER n) RETURNS INTEGER  
+            IF the BITWISE AND of start AND one EQUALS one  
+                RETURN one  
+            END IF  
+            SET x TO one  
+            WHILE x LESS THAN OR EQUAL TO n AND the BITWISE AND of start AND x MINUS one EQUALS zero  
+                SET x TO x MULTIPLIED BY two  
+            END WHILE  
+            RETURN x DIVIDED BY two  
+        END FUNCTION  
+        
+        SET result TO an EMPTY LIST  
+        SET start_ip TO the RETURN VALUE OF ip_to_int WITH ip AS ARGUMENT  
+        
+        WHILE n GREATER THAN zero  
+            SET size TO the RETURN VALUE OF largest_cidr_size WITH start_ip AND n AS ARGUMENTS  
+            SET prefix_length TO thirty TWO MINUS the BIT LENGTH OF size MINUS one  
+            SET cidr_string TO a STRING CREATED BY CONCATENATING int_to_ip RESULT FOR start_ip THEN the SLASH WORD THEN prefix_length  
+            APPEND cidr_string TO result  
+            SET start_ip TO start_ip PLUS size  
+            SET n TO n MINUS size  
+        END WHILE  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

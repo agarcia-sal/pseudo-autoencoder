@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION minOperations(target, arr)  
+        CALL create_index_map WITH target RETURNING index_map  
+        CALL transform_arr WITH arr AND index_map RETURNING transformed_arr  
+        CALL find_lis_length WITH transformed_arr RETURNING lis_length  
+        SET min_operations TO LENGTH OF target MINUS lis_length  
+        RETURN min_operations  
+    END FUNCTION  
+
+    FUNCTION create_index_map(target)  
+        SET index_map TO EMPTY MAP  
+        FOR index FROM 0 TO LENGTH OF target MINUS 1  
+            SET value TO ELEMENT AT index IN target  
+            SET index_map[value] TO index  
+        RETURN index_map  
+    END FUNCTION  
+
+    FUNCTION transform_arr(arr, index_map)  
+        SET transformed_arr TO EMPTY LIST  
+        FOR each value IN arr  
+            IF value IS IN index_map  
+                APPEND index_map[value] TO transformed_arr  
+        RETURN transformed_arr  
+    END FUNCTION  
+
+    FUNCTION find_lis_length(transformed_arr)  
+        SET lis TO EMPTY LIST  
+        FOR each num IN transformed_arr  
+            CALL find_position WITH lis AND num RETURNING pos  
+            IF pos EQUALS LENGTH OF lis  
+                APPEND num TO lis  
+            ELSE  
+                SET ELEMENT AT pos IN lis TO num  
+        RETURN LENGTH OF lis  
+    END FUNCTION  
+
+    FUNCTION find_position(lis, num)  
+        SET left TO 0  
+        SET right TO LENGTH OF lis MINUS 1  
+        WHILE left LESS THAN OR EQUAL TO right  
+            SET mid TO left PLUS right MINUS left DIVIDED BY 2  
+            IF ELEMENT AT mid IN lis GREATER THAN OR EQUAL TO num  
+                SET right TO mid MINUS 1  
+            ELSE  
+                SET left TO mid PLUS 1  
+        RETURN left  
+    END FUNCTION  
+END CLASS

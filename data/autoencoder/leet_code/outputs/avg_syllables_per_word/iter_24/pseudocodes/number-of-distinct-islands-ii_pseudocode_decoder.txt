@@ -1,0 +1,55 @@
+CLASS Solution  
+    FUNCTION numDistinctIslands2(grid)  
+        FUNCTION dfs(x, y, island)  
+            IF x LESS THAN zero OR x GREATER THAN OR EQUAL TO the LENGTH OF grid OR y LESS THAN zero OR y GREATER THAN OR EQUAL TO the LENGTH OF element at position zero of grid OR the element at position x of grid at position y EQUALS zero  
+                RETURN  
+            END IF  
+            SET the element at position x of grid at position y TO zero  
+            APPEND tuple of x and y TO island  
+            CALL dfs WITH x PLUS one, y, island  
+            CALL dfs WITH x MINUS one, y, island  
+            CALL dfs WITH x, y PLUS one, island  
+            CALL dfs WITH x, y MINUS one, island  
+        END FUNCTION  
+  
+        FUNCTION normalize(island)  
+            SET shapes TO empty list  
+            FOR each tuple of dx and dy IN list containing tuple one and one, tuple one and minus one, tuple minus one and one, tuple minus one and minus one  
+                SET new_island TO empty list  
+                FOR each tuple of x and y IN island  
+                    APPEND tuple of x MULTIPLIED BY dx and y MULTIPLIED BY dy TO new_island  
+                END FOR  
+                SORT new_island  
+                SET min_x TO the minimum x among all tuples of x and y in new_island  
+                SET min_y TO the minimum y among all tuples of x and y in new_island  
+                SET normalized_shape TO empty list  
+                FOR each tuple of x and y IN new_island  
+                    APPEND tuple of x MINUS min_x and y MINUS min_y TO normalized_shape  
+                END FOR  
+                APPEND the tuple conversion of normalized_shape TO shapes  
+            END FOR  
+            SET original_length TO the LENGTH OF shapes  
+            FOR i FROM zero TO original_length MINUS one  
+                SET rotated_shape TO empty list  
+                FOR each tuple of x and y IN the element at position i of shapes  
+                    APPEND tuple of y and the negation of x TO rotated_shape  
+                END FOR  
+                APPEND the tuple conversion of rotated_shape TO shapes  
+            END FOR  
+            RETURN the minimum element of shapes  
+        END FUNCTION  
+  
+        SET islands TO empty set  
+        FOR i FROM zero TO the LENGTH OF grid MINUS one  
+            FOR j FROM zero TO the LENGTH OF element at position zero of grid MINUS one  
+                IF the element at position i of grid at position j EQUALS one  
+                    SET island TO empty list  
+                    CALL dfs WITH i, j, island  
+                    ADD the result of normalize called with island TO islands  
+                END IF  
+            END FOR  
+        END FOR  
+  
+        RETURN the LENGTH OF islands  
+    END FUNCTION  
+END CLASS

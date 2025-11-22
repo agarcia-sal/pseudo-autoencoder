@@ -1,0 +1,64 @@
+CLASS Solution  
+    FUNCTION evaluate(expression)  
+        FUNCTION get_tokens(expression)  
+            SET tokens TO empty list  
+            SET buf TO empty string  
+            SET depth TO zero  
+            FOR each character IN expression  
+                IF character EQUALS a space AND depth EQUALS zero  
+                    APPEND buf TO tokens  
+                    SET buf TO empty string  
+                ELSE IF character EQUALS an opening parenthesis  
+                    INCREMENT depth BY one  
+                    APPEND character TO buf  
+                ELSE IF character EQUALS a closing parenthesis  
+                    DECREMENT depth BY one  
+                    APPEND character TO buf  
+                ELSE  
+                    APPEND character TO buf  
+                END IF  
+            END FOR  
+            IF buf IS NOT empty  
+                APPEND buf TO tokens  
+            END IF  
+            RETURN tokens  
+        END FUNCTION  
+
+        FUNCTION evaluate_expression(tokens, context)  
+            IF element at position zero of tokens EQUALS the word add  
+                RETURN evaluate_expression(element at position one of tokens, context) PLUS evaluate_expression(element at position two of tokens, context)  
+            ELSE IF element at position zero of tokens EQUALS the word mult  
+                RETURN evaluate_expression(element at position one of tokens, context) MULTIPLIED BY evaluate_expression(element at position two of tokens, context)  
+            ELSE IF element at position zero of tokens EQUALS the word let  
+                SET new_context TO a copy of context  
+                SET i TO one  
+                WHILE i LESS THAN the LENGTH OF tokens MINUS one  
+                    SET var TO element at position i of tokens  
+                    SET expr TO element at position i PLUS one of tokens  
+                    SET value TO evaluate_expression(expr, new_context)  
+                    ASSIGN value TO key var IN new_context  
+                    INCREMENT i BY two  
+                END WHILE  
+                RETURN evaluate_expression(element at the last position of tokens, new_context)  
+            ELSE  
+                TRY  
+                    RETURN integer conversion of element at position zero of tokens  
+                EXCEPT failure of integer conversion  
+                    RETURN value associated with key element at position zero of tokens in context  
+                END TRY  
+            END IF  
+        END FUNCTION  
+
+        FUNCTION parse_expression(expression)  
+            IF element at position zero of expression NOT EQUALS an opening parenthesis  
+                RETURN expression  
+            END IF  
+            SET inner_expression TO substring of expression from position one TO position minus one  
+            SET tokens TO get_tokens(inner_expression)  
+            RETURN list constructed by applying parse_expression to each element in tokens  
+        END FUNCTION  
+
+        SET parsed_expression TO parse_expression(expression)  
+        RETURN evaluate_expression(parsed_expression, empty dictionary)  
+    END FUNCTION  
+END CLASS

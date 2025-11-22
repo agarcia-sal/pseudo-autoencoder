@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION minWindow(s, t)  
+        CALL import Counter FROM collections  
+        
+        SET t_count TO CALL Counter WITH t  
+        SET required TO LENGTH OF t_count  
+        
+        SET left TO 0  
+        SET right TO 0  
+        SET formed TO 0  
+        SET window_counts TO CALL Counter WITH NOTHING  
+        
+        SET min_length TO positive infinity  
+        SET min_start TO 0  
+        
+        WHILE right LESS THAN LENGTH OF s  
+            INCREMENT count of s[right] IN window_counts BY 1  
+            
+            IF s[right] IS IN t_count AND window_counts[s[right]] EQUALS t_count[s[right]] THEN  
+                INCREMENT formed BY 1  
+            END IF  
+            
+            WHILE left LESS THAN OR EQUAL TO right AND formed EQUALS required  
+                SET char TO s[left]  
+                
+                IF right MINUS left PLUS 1 LESS THAN min_length THEN  
+                    SET min_length TO right MINUS left PLUS 1  
+                    SET min_start TO left  
+                END IF  
+                
+                DECREMENT count of char IN window_counts BY 1  
+                IF char IS IN t_count AND window_counts[char] LESS THAN t_count[char] THEN  
+                    DECREMENT formed BY 1  
+                END IF  
+                
+                INCREMENT left BY 1  
+            END WHILE  
+            
+            INCREMENT right BY 1  
+        END WHILE  
+        
+        IF min_length EQUALS positive infinity THEN  
+            RETURN empty string  
+        ELSE  
+            RETURN substring of s FROM min_start TO min_start PLUS min_length  
+        END IF  
+    END FUNCTION  
+END CLASS

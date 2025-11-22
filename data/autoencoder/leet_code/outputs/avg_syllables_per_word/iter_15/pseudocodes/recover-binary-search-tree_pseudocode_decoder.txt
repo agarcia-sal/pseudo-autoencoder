@@ -1,0 +1,88 @@
+CLASS TreeNode  
+    FUNCTION __init__ with parameters self val default zero left default None right default None  
+        SET self dot val TO val  
+        SET self dot left TO left  
+        SET self dot right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node with parameter values list  
+    IF values list is empty  
+        RETURN None  
+    END IF  
+    SET root TO a new TreeNode constructed with element at position zero of values list  
+    SET i TO one  
+    CREATE an empty double ended queue named queue  
+    APPEND root TO queue  
+    WHILE queue is not empty  
+        SET node TO the element removed from the left end of queue  
+        IF i is less than the length of values list AND element at position i of values list is not None  
+            SET node dot left TO a new TreeNode constructed with element at position i of values list  
+            APPEND node dot left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i is less than the length of values list AND element at position i of values list is not None  
+            SET node dot right TO a new TreeNode constructed with element at position i of values list  
+            APPEND node dot right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree with parameters p q  
+    IF p is None AND q is None  
+        RETURN True  
+    ELSE IF p is None OR q is None  
+        RETURN False  
+    ELSE IF the value of p dot val is not equal to the value of q dot val  
+        RETURN False  
+    ELSE  
+        RETURN the value of is_same_tree with parameters p dot left q dot left AND the value of is_same_tree with parameters p dot right q dot right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION recoverTree with parameters self root optional TreeNode  
+        SET first TO None  
+        SET second TO None  
+        SET prev TO None  
+        SET curr TO root  
+        WHILE curr is not None  
+            IF curr dot left is None  
+                IF prev is not None AND prev dot val is greater than curr dot val  
+                    IF first is None  
+                        SET first TO prev  
+                    END IF  
+                    SET second TO curr  
+                END IF  
+                SET prev TO curr  
+                SET curr TO curr dot right  
+            ELSE  
+                SET pred TO curr dot left  
+                WHILE pred dot right is not None AND pred dot right is not curr  
+                    SET pred TO pred dot right  
+                END WHILE  
+                IF pred dot right is None  
+                    SET pred dot right TO curr  
+                    SET curr TO curr dot left  
+                ELSE  
+                    SET pred dot right TO None  
+                    IF prev is not None AND prev dot val is greater than curr dot val  
+                        IF first is None  
+                            SET first TO prev  
+                        END IF  
+                        SET second TO curr  
+                    END IF  
+                    SET prev TO curr  
+                    SET curr TO curr dot right  
+                END IF  
+            END IF  
+        END WHILE  
+        IF first is not None AND second is not None  
+            SET temporary variable temp TO first dot val  
+            SET first dot val TO second dot val  
+            SET second dot val TO temp  
+        END IF  
+    END FUNCTION  
+END CLASS

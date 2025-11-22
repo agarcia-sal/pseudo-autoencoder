@@ -1,0 +1,57 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val EQUALS zero left EQUALS None right EQUALS None  
+        SET the val PROPERTY TO val  
+        SET the left PROPERTY TO left  
+        SET the right PROPERTY TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values of TYPE list  
+    IF values IS EMPTY  
+        RETURN None  
+    END IF  
+    SET root TO A NEW TreeNode INITIALIZED WITH the element at position zero of values  
+    SET i TO one  
+    SET queue TO A NEW double ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO THE FIRST ELEMENT REMOVED FROM queue  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT None  
+            SET node.left TO A NEW TreeNode INITIALIZED WITH the element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT None  
+            SET node.right TO A NEW TreeNode INITIALIZED WITH the element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF the val PROPERTY OF p IS NOT EQUAL TO the val PROPERTY OF q  
+        RETURN False  
+    ELSE  
+        RETURN THE LOGICAL AND OF THE RESULT OF is_same_tree CALLED WITH PARAMETERS the left PROPERTY OF p AND the left PROPERTY OF q AND THE RESULT OF is_same_tree CALLED WITH PARAMETERS the right PROPERTY OF p AND the right PROPERTY OF q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION buildTree WITH PARAMETERS self inorder of TYPE List of integers postorder of TYPE List of integers RETURNS Optional TreeNode  
+        IF inorder IS EMPTY OR postorder IS EMPTY  
+            RETURN None  
+        END IF  
+        SET root_val TO THE LAST ELEMENT REMOVED FROM postorder  
+        SET root TO A NEW TreeNode INITIALIZED WITH root_val  
+        SET root_index TO THE POSITION OF root_val IN inorder  
+        SET root.right TO THE RESULT OF buildTree CALLED WITH PARAMETERS THE SUBLIST OF inorder FROM THE POSITION root_index PLUS one TO THE END AND postorder  
+        SET root.left TO THE RESULT OF buildTree CALLED WITH PARAMETERS THE SUBLIST OF inorder FROM THE START TO THE POSITION root_index MINUS one PLUS one AND postorder  
+        RETURN root  
+    END FUNCTION  
+END CLASS

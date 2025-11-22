@@ -1,0 +1,59 @@
+CLASS TreeNode  
+    FUNCTION __init__(val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET root TO NEW TreeNode WITH val AS values AT position zero  
+    SET i TO 1  
+    SET queue TO new empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO REMOVE first element FROM queue  
+        IF i LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.left TO NEW TreeNode WITH val AS values AT i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.right TO NEW TreeNode WITH val AS values AT i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN CALL is_same_tree WITH p.left AND q.left AND CALL is_same_tree WITH p.right AND q.right  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION findFrequentTreeSum(root)  
+        FUNCTION subtree_sum(node)  
+            IF node IS None  
+                RETURN 0  
+            SET current_sum TO node.val PLUS CALL subtree_sum WITH node.left PLUS CALL subtree_sum WITH node.right  
+            INCREMENT count AT current_sum BY 1  
+            RETURN current_sum  
+        END FUNCTION  
+        
+        SET count TO new mapping with default integer zero  
+        CALL subtree_sum WITH root  
+        SET max_freq TO maximum value IN count values WITH default zero  
+        SET result TO empty list  
+        FOR each key, freq IN count items  
+            IF freq EQUALS max_freq  
+                APPEND key TO result  
+        RETURN result  
+    END FUNCTION  
+END CLASS

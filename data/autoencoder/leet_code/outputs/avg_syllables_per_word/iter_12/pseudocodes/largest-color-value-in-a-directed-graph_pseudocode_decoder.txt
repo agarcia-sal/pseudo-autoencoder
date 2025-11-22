@@ -1,0 +1,44 @@
+CLASS Solution  
+    FUNCTION largestPathValue(colors, edges)  
+        SET n TO LENGTH OF colors  
+        SET graph TO the result of calling function defaultdict with list  
+        SET in_degree TO a list of zero repeated n times  
+          
+        FOR each pair u, v IN edges  
+            APPEND element v TO the list at graph[u]  
+            INCREMENT element at position v of in_degree BY one  
+        END FOR  
+          
+        SET queue TO the result of calling function deque with a list of elements i FOR index i FROM zero TO n MINUS one WHERE element at position i of in_degree EQUALS zero  
+        SET dp TO a list containing n lists each of length twenty six filled with zero  
+        SET visited TO zero  
+        SET max_color_value TO zero  
+          
+        WHILE queue is not empty  
+            REMOVE first element FROM queue AND SET TO node  
+            INCREMENT element at position (ORDINAL VALUE of element at position node of colors MINUS ORDINAL VALUE of letter a) in list at dp[node] BY one  
+            IF max_color_value LESS THAN element at position (ORDINAL VALUE of element at position node of colors MINUS ORDINAL VALUE of letter a) in list at dp[node]  
+                SET max_color_value TO element at position (ORDINAL VALUE of element at position node of colors MINUS ORDINAL VALUE of letter a) in list at dp[node]  
+            END IF  
+            INCREMENT visited BY one  
+              
+            FOR each neighbor IN graph[node]  
+                FOR c FROM zero TO twenty five  
+                    IF element at position c in list at dp[neighbor] LESS THAN element at position c in list at dp[node]  
+                        SET element at position c in list at dp[neighbor] TO element at position c in list at dp[node]  
+                    END IF  
+                END FOR  
+                DECREMENT element at position neighbor of in_degree BY one  
+                IF element at position neighbor of in_degree EQUALS zero  
+                    APPEND neighbor TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+          
+        IF visited EQUALS n  
+            RETURN max_color_value  
+        ELSE  
+            RETURN negative one  
+        END IF  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,50 @@
+CLASS Solution
+    FUNCTION shortestPathAllKeys(grid)
+        SET directions TO [(0, 1), (0, -1), (1, 0), (-1, 0)]
+        SET m TO LENGTH OF grid
+        SET n TO LENGTH OF grid[0]
+        SET start TO None
+        SET num_keys TO 0
+        
+        FOR i FROM 0 TO m - 1
+            FOR j FROM 0 TO n - 1
+                IF grid[i][j] IS '@' THEN
+                    SET start TO (i, j)
+                ELSE IF grid[i][j] IS lowercase letter THEN
+                    INCREMENT num_keys BY 1
+        
+        INITIALIZE queue WITH (start_x, start_y, 0, 0)
+        INITIALIZE visited WITH (start_x, start_y, 0)
+        
+        WHILE queue IS NOT EMPTY
+            REMOVE front element FROM queue INTO (x, y, keys, steps)
+            
+            FOR EACH (dx, dy) IN directions
+                SET nx TO x PLUS dx
+                SET ny TO y PLUS dy
+                
+                IF nx IS WITHIN [0, m) AND ny IS WITHIN [0, n) THEN
+                    SET cell TO grid[nx][ny]
+                    
+                    IF cell IS '#' THEN
+                        CONTINUE TO NEXT iteration
+                    
+                    IF cell IS uppercase letter THEN
+                        SET key_needed TO BITMASK FOR LOWERCASE OF cell
+                        IF keys AND key_needed IS ZERO THEN
+                            CONTINUE TO NEXT iteration
+                    
+                    IF cell IS lowercase letter THEN
+                        SET new_keys TO keys WITH BIT FOR cell SET
+                        IF new_keys EQUALS BITMASK WITH ALL keys SET THEN
+                            RETURN steps PLUS 1
+                    ELSE
+                        SET new_keys TO keys
+                    
+                    IF (nx, ny, new_keys) IS NOT IN visited THEN
+                        ADD (nx, ny, new_keys) TO visited
+                        APPEND (nx, ny, new_keys, steps PLUS 1) TO queue
+        
+        RETURN -1
+    END FUNCTION
+END CLASS

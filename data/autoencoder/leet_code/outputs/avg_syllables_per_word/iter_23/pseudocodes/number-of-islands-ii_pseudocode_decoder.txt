@@ -1,0 +1,64 @@
+CLASS UnionFind  
+    FUNCTION __init__(self)  
+        SET self.parent TO empty mapping  
+        SET self.count TO zero  
+    END FUNCTION  
+  
+    FUNCTION make_set(self, x)  
+        IF x NOT IN self.parent  
+            SET the element at key x in self.parent TO x  
+            INCREMENT self.count BY one  
+        END IF  
+    END FUNCTION  
+  
+    FUNCTION find(self, x)  
+        IF the element at key x in self.parent NOT EQUALS x  
+            SET the element at key x in self.parent TO the result of calling find with the element at key x in self.parent as argument  
+        END IF  
+        RETURN the element at key x in self.parent  
+    END FUNCTION  
+  
+    FUNCTION union(self, x, y)  
+        SET rootX TO the result of calling find with x as argument  
+        SET rootY TO the result of calling find with y as argument  
+        IF rootX NOT EQUALS rootY  
+            SET the element at key rootX in self.parent TO rootY  
+            DECREMENT self.count BY one  
+        END IF  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION numIslands2(self, m, n, positions)  
+        FUNCTION is_valid(x, y)  
+            RETURN the condition that zero LESS THAN OR EQUAL TO x AND x LESS THAN m AND zero LESS THAN OR EQUAL TO y AND y LESS THAN n  
+        END FUNCTION  
+  
+        SET directions TO the list containing the element consisting of one and zero, the element consisting of negative one and zero, the element consisting of zero and one, the element consisting of zero and negative one  
+        ASSIGN reference uf TO a new UnionFind object  
+        SET grid TO a list constructed by repeating n times the zero value and repeating this list m times  
+        SET result TO empty list  
+  
+        FOR each element consisting of r and c IN positions  
+            IF the element at position r of grid and then position c of that element EQUALS one  
+                APPEND uf.count TO result  
+                CONTINUE to the next iteration of the enclosing loop  
+            END IF  
+  
+            SET the element at position r of grid and then position c of that element TO one  
+            CALL the make_set method of uf with the element consisting of r and c as argument  
+  
+            FOR each element consisting of dr and dc IN directions  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                IF the result of calling is_valid with nr and nc as arguments AND the element at position nr of grid and then position nc of that element EQUALS one  
+                    CALL the union method of uf with the element consisting of r and c and the element consisting of nr and nc as arguments  
+                END IF  
+            END FOR  
+  
+            APPEND uf.count TO result  
+        END FOR  
+  
+        RETURN result  
+    END FUNCTION  
+END CLASS

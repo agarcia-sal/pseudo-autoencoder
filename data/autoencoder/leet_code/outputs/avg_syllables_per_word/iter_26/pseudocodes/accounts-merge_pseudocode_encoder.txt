@@ -1,0 +1,62 @@
+CLASS UnionFind
+    FUNCTION __init__(self, size)
+        SET self DOT root TO a new list formed by each integer element starting from zero UP TO size MINUS one INCLUSIVE
+        SET self DOT rank TO a new list containing the natural number one repeated size times
+    END FUNCTION
+
+    FUNCTION find(self, x)
+        IF the element at position x OF self DOT root EQUALS x THEN
+            RETURN x
+        END IF
+        SET the element at position x OF self DOT root TO the result of calling self DOT find WITH the element at position x OF self DOT root
+        RETURN the element at position x OF self DOT root
+    END FUNCTION
+
+    FUNCTION union(self, x, y)
+        SET rootX TO the result of calling self DOT find WITH x
+        SET rootY TO the result of calling self DOT find WITH y
+        IF rootX NOT EQUALS rootY THEN
+            IF the element at position rootX OF self DOT rank GREATER THAN the element at position rootY OF self DOT rank THEN
+                SET the element at position rootY OF self DOT root TO rootX
+            ELSE IF the element at position rootX OF self DOT rank LESS THAN the element at position rootY OF self DOT rank THEN
+                SET the element at position rootX OF self DOT root TO rootY
+            ELSE
+                SET the element at position rootY OF self DOT root TO rootX
+                INCREMENT the element at position rootX OF self DOT rank BY one
+            END IF
+        END IF
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION accountsMerge(self, accounts)
+        SET email_to_id TO a new empty mapping from keys to values
+        SET uf TO a new instance of UnionFind initiated with the LENGTH OF accounts
+
+        FOR index i FROM zero TO the LENGTH OF accounts MINUS one INCLUSIVE
+            DESTRUCTURE the element at position i OF accounts INTO a variable discarding the first element AND a list named emails containing the rest
+            FOR each email IN emails
+                IF email NOT IN the keys of email_to_id THEN
+                    SET the value at key email IN email_to_id TO i
+                ELSE
+                    CALL uf DOT union WITH arguments i AND the value at key email IN email_to_id
+                END IF
+            END FOR
+        END FOR
+
+        SET merged_emails TO a new mapping from keys to empty lists by default
+        FOR each pair of email AND account_id IN email_to_id
+            SET root_id TO the result of calling uf DOT find WITH account_id
+            APPEND email TO the list corresponding to key root_id IN merged_emails
+        END FOR
+
+        SET result TO a new empty list
+        FOR each pair of account_id AND emails IN merged_emails
+            SET name TO the element at position zero OF the element at position account_id OF accounts
+            SET sorted_emails TO the list emails sorted in ascending alphabetical order
+            APPEND a new list formed by concatenating name AS the first element AND sorted_emails AS the following elements TO result
+        END FOR
+
+        RETURN result
+    END FUNCTION
+END CLASS

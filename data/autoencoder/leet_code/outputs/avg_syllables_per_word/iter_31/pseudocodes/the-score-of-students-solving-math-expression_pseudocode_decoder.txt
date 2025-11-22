@@ -1,0 +1,78 @@
+CLASS Solution  
+    FUNCTION scoreOfStudents(s, answers)  
+        FUNCTION evaluate_expression(expression)  
+            SET tokens TO empty list  
+            SET num TO zero  
+            FOR each character IN expression  
+                IF character represents a digit THEN  
+                    SET num TO num MULTIPLIED BY ten PLUS the numeric value of character  
+                ELSE  
+                    APPEND num TO tokens  
+                    APPEND character TO tokens  
+                    SET num TO zero  
+                END IF  
+            END FOR  
+            APPEND num TO tokens  
+            
+            SET i TO one  
+            WHILE i LESS THAN the LENGTH OF tokens DO  
+                IF element at position i of tokens EQUALS the multiplication symbol THEN  
+                    SET element at position i MINUS one of tokens TO element at position i MINUS one of tokens MULTIPLIED BY element at position i PLUS one of tokens  
+                    REMOVE the elements at positions i TO i PLUS one FROM tokens  
+                ELSE  
+                    INCREMENT i BY one  
+                END IF  
+            END WHILE  
+            
+            SET result TO element at position zero of tokens  
+            SET i TO one  
+            WHILE i LESS THAN the LENGTH OF tokens DO  
+                IF element at position i of tokens EQUALS the addition symbol THEN  
+                    SET result TO result PLUS element at position i PLUS one of tokens  
+                END IF  
+                INCREMENT i BY two  
+            END WHILE  
+            
+            RETURN result  
+        END FUNCTION  
+        
+        FUNCTION get_possible_answers(expression)  
+            IF expression contains only digits THEN  
+                RETURN a set containing the numeric value of expression  
+            END IF  
+            
+            SET results TO empty set  
+            FOR index FROM one TO the LENGTH OF expression MINUS one, stepping by two DO  
+                SET left_results TO get_possible_answers(substring from position zero TO position index MINUS one of expression)  
+                SET right_results TO get_possible_answers(substring from position index PLUS one TO the end of expression)  
+                FOR each left IN left_results  
+                    FOR each right IN right_results  
+                        IF element at position index of expression EQUALS the addition symbol THEN  
+                            SET result TO left PLUS right  
+                        ELSE  
+                            SET result TO left MULTIPLIED BY right  
+                        END IF  
+                        IF result LESS THAN OR EQUAL TO one thousand THEN  
+                            ADD result TO results  
+                        END IF  
+                    END FOR  
+                END FOR  
+            END FOR  
+            RETURN results  
+        END FUNCTION  
+        
+        SET correct_answer TO evaluate_expression(s)  
+        SET possible_answers TO get_possible_answers(s)  
+        
+        SET points TO zero  
+        FOR each answer IN answers  
+            IF answer EQUALS correct_answer THEN  
+                INCREMENT points BY five  
+            ELSE IF answer IS IN possible_answers THEN  
+                INCREMENT points BY two  
+            END IF  
+        END FOR  
+        
+        RETURN points  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,82 @@
+CLASS Solution
+    FUNCTION frogPosition(n, edges, t, target)
+        IF n EQUALS one
+            RETURN one point zero
+        END IF
+
+        CALL build_graph FROM edges RETURNING graph
+
+        CALL initialize_queue WITH starting_node one current_probability one point zero current_time zero RETURNING queue
+
+        CALL initialize_visited WITH starting_node one RETURNING visited
+
+        WHILE queue IS NOT empty
+            CALL dequeue FROM queue RETURNING current_node current_probability current_time
+
+            IF current_time EQUALS t OR (current_node NOT EQUALS one AND CALL size_of_list FROM element_at_position current_node OF graph EQUALS one)
+                IF current_node EQUALS target
+                    RETURN current_probability
+                ELSE
+                    CONTINUE
+                END IF
+            END IF
+
+            CALL calculate_possible_moves WITH graph current_node RETURNING possible_moves
+
+            FOR each neighbor IN element_at_position current_node OF graph
+                IF neighbor NOT IN visited
+                    CALL add_element TO visited WITH neighbor
+                    CALL enqueue TO queue WITH neighbor current_probability DIVIDED BY possible_moves current_time PLUS one
+                END IF
+            END FOR
+        END WHILE
+
+        RETURN zero point zero
+    END FUNCTION
+
+    FUNCTION build_graph(edges)
+        SET graph TO defaultdict WITH empty list VALUES
+        FOR each edge IN edges
+            SET u TO element at position zero OF edge
+            SET v TO element at position one OF edge
+            CALL append TO element_at_position u OF graph WITH v
+            CALL append TO element_at_position v OF graph WITH u
+        END FOR
+        RETURN graph
+    END FUNCTION
+
+    FUNCTION initialize_queue(starting_node current_probability current_time)
+        SET queue TO deque WITH tuple of starting_node current_probability current_time
+        RETURN queue
+    END FUNCTION
+
+    FUNCTION initialize_visited(starting_node)
+        SET visited TO set WITH starting_node
+        RETURN visited
+    END FUNCTION
+
+    FUNCTION size_of_list(list_object)
+        RETURN the NUMBER OF elements IN list_object
+    END FUNCTION
+
+    FUNCTION calculate_possible_moves(graph current_node)
+        IF current_node EQUALS one
+            SET possible_moves TO the NUMBER OF elements IN element at position current_node OF graph
+        ELSE
+            SET possible_moves TO the NUMBER OF elements IN element at position current_node OF graph MINUS one
+        END IF
+        RETURN possible_moves
+    END FUNCTION
+
+    FUNCTION dequeue(queue)
+        RETURN CALL popleft ON queue
+    END FUNCTION
+
+    FUNCTION enqueue(queue neighbor probability time)
+        CALL append TO queue WITH tuple of neighbor probability time
+    END FUNCTION
+
+    FUNCTION add_element(collection element)
+        CALL add TO collection WITH element
+    END FUNCTION
+END CLASS

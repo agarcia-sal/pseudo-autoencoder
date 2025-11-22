@@ -1,0 +1,51 @@
+CLASS TreeNode
+    FUNCTION __init__(val = 0, left = None, right = None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values: list)
+    IF values IS EMPTY
+        RETURN None
+    SET root TO TreeNode(values[0])
+    SET i TO 1
+    SET queue TO deque()
+    APPEND root TO queue
+    WHILE queue IS NOT EMPTY
+        SET node TO queue.popleft()
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.left TO TreeNode(values[i])
+            APPEND node.left TO queue
+        INCREMENT i BY 1
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.right TO TreeNode(values[i])
+            APPEND node.right TO queue
+        INCREMENT i BY 1
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val IS NOT EQUAL TO q.val
+        RETURN False
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+END FUNCTION
+
+CLASS Solution
+    FUNCTION constructMaximumBinaryTree(nums: List[int]) -> Optional[TreeNode]
+        IF nums IS EMPTY
+            RETURN None
+        SET max_val TO MAXIMUM VALUE IN nums
+        SET max_index TO INDEX OF max_val IN nums
+        SET root TO TreeNode(max_val)
+        SET root.left TO self.constructMaximumBinaryTree(SUBLIST OF nums FROM START TO max_index EXCLUSIVE)
+        SET root.right TO self.constructMaximumBinaryTree(SUBLIST OF nums FROM max_index + 1 TO END)
+        RETURN root
+    END FUNCTION
+END CLASS

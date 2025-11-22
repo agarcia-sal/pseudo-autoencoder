@@ -1,0 +1,54 @@
+CLASS Solution
+    FUNCTION numWays(words_list, target_string)
+        SET MODULO_VALUE TO ten POWERED BY nine PLUS seven
+        SET word_length TO the LENGTH OF element at position zero of words_list
+        SET target_length TO the LENGTH OF target_string
+
+        SET frequency_list TO CALL initialize_frequency_list WITH word_length
+
+        FOR each word IN words_list
+            FOR position FROM zero TO word_length MINUS one
+                SET character TO element at position position of word
+                INCREMENT element at position position of frequency_list FOR key character BY one
+            END FOR
+        END FOR
+
+        SET dp_table TO CALL initialize_dp_table WITH target_length PLUS one AND word_length PLUS one
+
+        FOR column_index FROM zero TO word_length
+            SET element at position zero of element at position column_index of dp_table TO one
+        END FOR
+
+        FOR i FROM one TO target_length
+            FOR j FROM one TO word_length
+                SET element at position i of element at position j of dp_table TO element at position i of element at position j MINUS one of dp_table
+                IF element at position j MINUS one of frequency_list FOR key element at position i MINUS one of target_string IS GREATER THAN zero
+                    SET element at position i of element at position j of dp_table TO element at position i of element at position j PLUS element at position i MINUS one of element at position j MINUS one of dp_table MULTIPLIED BY element at position j MINUS one of frequency_list FOR key element at position i MINUS one of target_string
+                    SET element at position i of element at position j of dp_table TO element at position i of element at position j MODULO MODULO_VALUE
+                END IF
+            END FOR
+        END FOR
+
+        RETURN element at position target_length of element at position word_length of dp_table
+    END FUNCTION
+
+    FUNCTION initialize_frequency_list(length_of_words)
+        SET list_of_maps TO empty list
+        FOR index FROM zero TO length_of_words MINUS one
+            APPEND empty map of default integer TO list_of_maps
+        END FOR
+        RETURN list_of_maps
+    END FUNCTION
+
+    FUNCTION initialize_dp_table(rows, columns)
+        SET table TO empty list
+        FOR each row_index FROM zero TO rows MINUS one
+            SET row_list TO empty list
+            FOR each column_index FROM zero TO columns MINUS one
+                APPEND zero TO row_list
+            END FOR
+            APPEND row_list TO table
+        END FOR
+        RETURN table
+    END FUNCTION
+END CLASS

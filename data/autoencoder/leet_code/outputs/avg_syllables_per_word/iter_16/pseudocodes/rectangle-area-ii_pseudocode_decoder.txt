@@ -1,0 +1,57 @@
+CLASS Solution  
+    FUNCTION rectangleArea(rectangles)  
+        SET MOD TO one billion PLUS seven  
+        SET y_coords TO an empty set  
+        FOR each rectangle in rectangles  
+            ASSIGN x1 TO element at position zero of rectangle  
+            ASSIGN y1 TO element at position one of rectangle  
+            ASSIGN x2 TO element at position two of rectangle  
+            ASSIGN y2 TO element at position three of rectangle  
+            ADD y1 TO the set y_coords  
+            ADD y2 TO the set y_coords  
+        END FOR  
+        SET y_coords TO the list of elements in y_coords sorted in ascending order  
+        SET y_index TO an empty mapping from numbers to indices  
+        FOR each index and y_value taken from enumeration of y_coords  
+            SET element at key y_value of y_index TO index  
+        END FOR  
+        SET count TO a list of zeros of the same length as y_coords  
+        SET events TO an empty list  
+        FOR each rectangle IN rectangles  
+            ASSIGN x1 TO element at position zero of rectangle  
+            ASSIGN y1 TO element at position one of rectangle  
+            ASSIGN x2 TO element at position two of rectangle  
+            ASSIGN y2 TO element at position three of rectangle  
+            APPEND a tuple of x1, one, y1, y2 TO events  
+            APPEND a tuple of x2, minus one, y1, y2 TO events  
+        END FOR  
+        SORT the list events in ascending order by the first element of each tuple  
+        SET prev_x TO zero  
+        SET area TO zero  
+        FOR each event IN events  
+            ASSIGN x TO element at position zero of event  
+            ASSIGN eventType TO element at position one of event  
+            ASSIGN y1 TO element at position two of event  
+            ASSIGN y2 TO element at position three of event  
+            SET current_length TO zero  
+            FOR i FROM one TO the length of count MINUS one  
+                IF the element at position i MINUS one of count IS GREATER THAN zero THEN  
+                    INCREMENT current_length BY the element at position i of y_coords MINUS the element at position i MINUS one of y_coords  
+                END IF  
+            END FOR  
+            INCREMENT area BY current_length MULTIPLIED BY the difference of x MINUS prev_x  
+            SET area TO the remainder of area DIVIDED BY MODULO MOD  
+            IF eventType EQUALS one THEN  
+                FOR i FROM the element at key y1 of y_index TO the element at key y2 of y_index MINUS one  
+                    INCREMENT the element at position i of count BY one  
+                END FOR  
+            ELSE  
+                FOR i FROM the element at key y1 of y_index TO the element at key y2 of y_index MINUS one  
+                    DECREMENT the element at position i of count BY one  
+                END FOR  
+            END IF  
+            SET prev_x TO x  
+        END FOR  
+        RETURN area  
+    END FUNCTION  
+END CLASS

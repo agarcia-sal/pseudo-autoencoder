@@ -1,0 +1,66 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY THEN  
+        RETURN None  
+    END IF  
+
+    SET root TO new TreeNode with value as first element of values, and left and right as None  
+    SET i TO 1  
+    SET queue TO new empty double-ended queue  
+    APPEND root TO queue  
+
+    WHILE queue IS NOT EMPTY DO  
+        SET node TO first element REMOVED FROM FRONT of queue  
+
+        IF i IS LESS THAN length of values AND values AT i IS NOT None THEN  
+            SET node.left TO new TreeNode with value values AT i, and left and right as None  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY 1  
+
+        IF i IS LESS THAN length of values AND values AT i IS NOT None THEN  
+            SET node.right TO new TreeNode with value values AT i, and left and right as None  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY 1  
+    END WHILE  
+
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None THEN  
+        RETURN True  
+    ELSE IF p IS None OR q IS None THEN  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val THEN  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION constructMaximumBinaryTree(self, nums)  
+        IF nums IS EMPTY THEN  
+            RETURN None  
+        END IF  
+
+        SET max_val TO maximum value IN nums  
+        SET max_index TO index OF max_val IN nums  
+
+        SET root TO new TreeNode with value max_val, and left and right as None  
+
+        SET root.left TO self.constructMaximumBinaryTree(sublist of nums FROM start TO max_index EXCLUSIVE)  
+        SET root.right TO self.constructMaximumBinaryTree(sublist of nums FROM max_index PLUS one TO end)  
+
+        RETURN root  
+    END FUNCTION  
+END CLASS

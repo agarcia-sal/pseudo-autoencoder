@@ -1,0 +1,70 @@
+CLASS Solution  
+    FUNCTION colorTheGrid(m INTEGER_PARAMETER n INTEGER_PARAMETER) RETURNS INTEGER  
+        SET MOD TO ten RAISED TO THE POWER OF nine PLUS one  
+        
+        FUNCTION generate_valid_columns(prev_col PARAMETER) RETURNS LIST  
+            SET colors TO list containing one AND two AND three  
+            SET valid_cols TO empty list  
+            
+            FUNCTION backtrack(col PARAMETER row PARAMETER)  
+                IF row EQUALS m THEN  
+                    APPEND col converted to a tuple TO valid_cols  
+                    RETURN  
+                END IF  
+                FOR each color IN colors  
+                    IF col IS empty OR element at position the LENGTH OF col MINUS one of col NOT EQUALS color THEN  
+                        IF prev_col IS NOT None AND element at position row of prev_col EQUALS color THEN  
+                            CONTINUE TO next iteration of FOR  
+                        END IF  
+                        APPEND color TO col  
+                        CALL backtrack WITH col AND row PLUS one  
+                        REMOVE last element FROM col  
+                    END IF  
+                END FOR  
+            END FUNCTION  
+            
+            CALL backtrack WITH empty list AND zero  
+            RETURN valid_cols  
+        END FUNCTION  
+        
+        SET all_valid_cols TO CALL generate_valid_columns WITH None  
+        SET num_valid_cols TO the LENGTH OF all_valid_cols  
+        
+        CREATE dictionary compatible_cols MAPPING each integer i FROM zero TO num_valid_cols MINUS one TO empty list  
+        FOR i FROM zero TO num_valid_cols MINUS one  
+            FOR j FROM zero TO num_valid_cols MINUS one  
+                SET condition_met TO True  
+                FOR k FROM zero TO m MINUS one  
+                    IF element at position k of element at position i of all_valid_cols EQUALS element at position k of element at position j of all_valid_cols THEN  
+                        SET condition_met TO False  
+                        BREAK out of inner FOR loop  
+                    END IF  
+                END FOR  
+                IF condition_met IS True THEN  
+                   APPEND j TO compatible_cols AT key i  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET dp TO list of length num_valid_cols WITH all elements set to one  
+        
+        FOR _ FROM one TO n MINUS one  
+            SET next_dp TO list of length num_valid_cols WITH all elements set to zero  
+            FOR i FROM zero TO num_valid_cols MINUS one  
+                FOR each j IN compatible_cols AT key i  
+                    SET next_dp at position j TO next_dp at position j PLUS dp at position i  
+                    SET next_dp at position j TO next_dp at position j MODULO MOD  
+                END FOR  
+            END FOR  
+            SET dp TO next_dp  
+        END FOR  
+        
+        SET total_ways TO zero  
+        FOR each value IN dp  
+            INCREMENT total_ways BY value  
+        END FOR  
+        SET total_ways TO total_ways MODULO MOD  
+        
+        RETURN total_ways  
+    END FUNCTION  
+END CLASS

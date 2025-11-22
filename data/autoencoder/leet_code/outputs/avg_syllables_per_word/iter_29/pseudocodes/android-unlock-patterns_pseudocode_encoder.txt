@@ -1,0 +1,52 @@
+CLASS Solution  
+    FUNCTION numberOfPatterns(m length_lower_bound n length_upper_bound) RETURNS integer  
+        SET jump_table TO a mapping of pairs of dots TO intermediate dot that must be visited  
+            WHERE the pairs and intermediate dots are  
+                pair of dot at position one AND dot at position three MAPS TO dot at position two  
+                pair of dot at position one AND dot at position seven MAPS TO dot at position four  
+                pair of dot at position one AND dot at position nine MAPS TO dot at position five  
+                pair of dot at position two AND dot at position eight MAPS TO dot at position five  
+                pair of dot at position three AND dot at position one MAPS TO dot at position two  
+                pair of dot at position three AND dot at position seven MAPS TO dot at position five  
+                pair of dot at position three AND dot at position nine MAPS TO dot at position six  
+                pair of dot at position four AND dot at position six MAPS TO dot at position five  
+                pair of dot at position five AND dot at position five MAPS TO dot at position five  
+                pair of dot at position six AND dot at position four MAPS TO dot at position five  
+                pair of dot at position seven AND dot at position one MAPS TO dot at position four  
+                pair of dot at position seven AND dot at position three MAPS TO dot at position five  
+                pair of dot at position seven AND dot at position nine MAPS TO dot at position eight  
+                pair of dot at position eight AND dot at position two MAPS TO dot at position five  
+                pair of dot at position nine AND dot at position one MAPS TO dot at position five  
+                pair of dot at position nine AND dot at position three MAPS TO dot at position six  
+                pair of dot at position nine AND dot at position seven MAPS TO dot at position eight  
+
+        FUNCTION countPatternsFromDot(current_dot visited_map current_length) RETURNS integer  
+            IF current_length EQUALS length_upper_bound THEN  
+                RETURN one  
+            END IF  
+            SET count TO one IF current_length IS GREATER THAN OR EQUAL TO length_lower_bound OTHERWISE zero  
+            FOR next_dot FROM one TO nine  
+                IF the visited_map AT position next_dot IS false THEN  
+                    SET required_jump_dot TO jump_table AT pair of current_dot AND next_dot IF EXISTS OTHERWISE no dot  
+                    IF the required_jump_dot DOES NOT EXIST OR the visited_map AT position required_jump_dot IS true THEN  
+                        SET the visited_map AT position next_dot TO true  
+                        INCREMENT count BY the RESULT OF countPatternsFromDot WITH PARAMETERS next_dot visited_map current_length PLUS one  
+                        SET the visited_map AT position next_dot TO false  
+                    END IF  
+                END IF  
+            END FOR  
+            RETURN count  
+        END FUNCTION  
+
+        SET visited_map TO a list of ten false values representing dots from zero to nine with zero unused  
+        SET total_patterns TO zero  
+
+        FOR dot_index FROM one TO nine  
+            SET the visited_map AT position dot_index TO true  
+            INCREMENT total_patterns BY the RESULT OF countPatternsFromDot WITH PARAMETERS dot_index visited_map one  
+            SET the visited_map AT position dot_index TO false  
+        END FOR  
+
+        RETURN total_patterns  
+    END FUNCTION  
+END CLASS

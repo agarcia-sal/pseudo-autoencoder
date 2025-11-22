@@ -1,0 +1,47 @@
+CLASS Solution
+    FUNCTION minWindow(s, t)
+        SET t_count TO frequency count of characters in t
+        SET required TO number of unique characters in t_count
+        
+        SET left TO 0
+        SET right TO 0
+        SET formed TO 0
+        SET window_counts TO empty frequency count
+        
+        SET min_length TO infinity
+        SET min_start TO 0
+        
+        WHILE right < LENGTH OF s
+            INCREMENT window_counts[s[right]] BY 1
+            
+            IF s[right] IS IN t_count AND window_counts[s[right]] EQUALS t_count[s[right]]
+                INCREMENT formed BY 1
+            END IF
+            
+            WHILE left <= right AND formed EQUALS required
+                SET char TO s[left]
+                
+                IF right - left + 1 < min_length
+                    SET min_length TO right - left + 1
+                    SET min_start TO left
+                END IF
+                
+                DECREMENT window_counts[char] BY 1
+                
+                IF char IS IN t_count AND window_counts[char] < t_count[char]
+                    DECREMENT formed BY 1
+                END IF
+                
+                INCREMENT left BY 1
+            END WHILE
+            
+            INCREMENT right BY 1
+        END WHILE
+        
+        IF min_length EQUALS infinity
+            RETURN empty string
+        ELSE
+            RETURN substring of s FROM min_start TO min_start + min_length
+        END IF
+    END FUNCTION
+END CLASS

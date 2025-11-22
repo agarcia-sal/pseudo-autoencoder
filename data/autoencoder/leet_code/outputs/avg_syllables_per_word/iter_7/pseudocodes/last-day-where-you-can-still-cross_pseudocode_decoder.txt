@@ -1,0 +1,67 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, n)  
+        SET self.parent TO list of integers from 0 to n minus 1  
+        SET self.rank TO list of zeros with length n  
+    END FUNCTION  
+  
+    FUNCTION find(self, x)  
+        IF self.parent at index x is not equal to x THEN  
+            SET self.parent at index x TO result of self.find with argument self.parent at index x  
+        END IF  
+        RETURN self.parent at index x  
+    END FUNCTION  
+  
+    FUNCTION union(self, x, y)  
+        SET rootX TO result of self.find with argument x  
+        SET rootY TO result of self.find with argument y  
+        IF rootX is not equal to rootY THEN  
+            IF self.rank at index rootX is greater than self.rank at index rootY THEN  
+                SET self.parent at index rootY TO rootX  
+            ELSE IF self.rank at index rootX is less than self.rank at index rootY THEN  
+                SET self.parent at index rootX TO rootY  
+            ELSE  
+                SET self.parent at index rootY TO rootX  
+                INCREMENT self.rank at index rootX BY 1  
+            END IF  
+        END IF  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION latestDayToCross(self, row, col, cells)  
+        SET grid TO matrix of size row by col filled with 1  
+        CREATE UnionFind instance uf with size row multiplied by col plus 2  
+        SET TOP TO row multiplied by col  
+        SET BOTTOM TO row multiplied by col plus 1  
+        SET directions TO list of tuples [(-1, 0), (1, 0), (0, -1), (0, 1)]  
+  
+        FOR day FROM length of cells minus 1 DOWNTO 0 DO  
+            SET r, c TO values at cells at index day  
+            DECREMENT r BY 1  
+            DECREMENT c BY 1  
+            SET grid at row r and column c TO 0  
+  
+            FOR each dr, dc IN directions DO  
+                SET nr TO r plus dr  
+                SET nc TO c plus dc  
+                IF nr greater than or equal to 0 AND nr less than row AND nc greater than or equal to 0 AND nc less than col AND grid at row nr and column nc equals 0 THEN  
+                    CALL uf.union with arguments r multiplied by col plus c, and nr multiplied by col plus nc  
+                END IF  
+            END FOR  
+  
+            IF r equals 0 THEN  
+                CALL uf.union with arguments r multiplied by col plus c AND TOP  
+            END IF  
+  
+            IF r equals row minus 1 THEN  
+                CALL uf.union with arguments r multiplied by col plus c AND BOTTOM  
+            END IF  
+  
+            IF result of uf.find with argument TOP equals result of uf.find with argument BOTTOM THEN  
+                RETURN day  
+            END IF  
+        END FOR  
+  
+        RETURN 0  
+    END FUNCTION  
+END CLASS

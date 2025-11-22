@@ -1,0 +1,64 @@
+CLASS UnionFind  
+    FUNCTION __init__(self)  
+        SET self.parent TO empty dictionary  
+        SET self.count TO zero  
+    END FUNCTION  
+  
+    FUNCTION make_set(self, x)  
+        IF x NOT IN self.parent THEN  
+            SET self.parent at key x TO x  
+            INCREMENT self.count BY one  
+        END IF  
+    END FUNCTION  
+  
+    FUNCTION find(self, x)  
+        IF self.parent at key x NOT EQUALS x THEN  
+            SET self.parent at key x TO the result of self.find with argument self.parent at key x  
+        END IF  
+        RETURN self.parent at key x  
+    END FUNCTION  
+  
+    FUNCTION union(self, x, y)  
+        SET rootX TO the result of self.find with argument x  
+        SET rootY TO the result of self.find with argument y  
+        IF rootX NOT EQUALS rootY THEN  
+            SET self.parent at key rootX TO rootY  
+            DECREMENT self.count BY one  
+        END IF  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION numIslands2(self, m, n, positions)  
+        FUNCTION is_valid(x, y)  
+            RETURN x GREATER THAN OR EQUAL TO zero AND x LESS THAN m AND y GREATER THAN OR EQUAL TO zero AND y LESS THAN n  
+        END FUNCTION  
+  
+        SET directions TO list containing tuple one zero, tuple negative one zero, tuple zero one, tuple zero negative one  
+        SET uf TO new instance of UnionFind  
+        SET grid TO list containing m times the list containing n times zero  
+        SET result TO empty list  
+  
+        FOR each element pair r c IN positions  
+            IF element at position r and c OF grid EQUALS one THEN  
+                APPEND uf.count TO result  
+                CONTINUE  
+            END IF  
+  
+            SET element at position r and c OF grid TO one  
+            CALL uf.make_set with argument tuple r c  
+  
+            FOR each element pair dr dc IN directions  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                IF is_valid with arguments nr nc AND element at position nr and nc OF grid EQUALS one THEN  
+                    CALL uf.union with arguments tuple r c AND tuple nr nc  
+                END IF  
+            END FOR  
+  
+            APPEND uf.count TO result  
+        END FOR  
+  
+        RETURN result  
+    END FUNCTION  
+END CLASS

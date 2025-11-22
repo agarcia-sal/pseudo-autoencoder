@@ -1,0 +1,81 @@
+CLASS TrieNode  
+    FUNCTION __init__(self)  
+        SET self.children TO a mapping with default value of new TrieNode  
+        SET self.count TO zero  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION maxGeneticDifference(self parents LIST OF INTEGER queries LIST OF LIST OF INTEGER) RETURNS LIST OF INTEGER  
+        SET tree TO a mapping with default value of empty list  
+        FOR each index i WITH corresponding value parent IN parents  
+            IF parent NOT EQUALS negative one  
+                APPEND i TO element at key parent of tree  
+            END IF  
+        END FOR  
+
+        SET node_queries TO a mapping with default value of empty list  
+        FOR each pair node and val IN queries  
+            APPEND val TO element at key node of node_queries  
+        END FOR  
+
+        SET root TO a new instance of TrieNode  
+        SET result TO a list of zeros with length equal to the length of queries  
+
+        FUNCTION dfs(node INTEGER)  
+            CALL insert with trie_root root value node  
+            FOR each val IN element at key node of node_queries  
+                SET element at position element at key pair of query_idx with pair node val in result TO CALL max_xor with trie_root root value val  
+            END FOR  
+            FOR each child IN element at key node of tree  
+                CALL dfs with child  
+            END FOR  
+            CALL erase with trie_root root value node  
+        END FUNCTION  
+
+        FUNCTION insert(trie_root TrieNode value INTEGER)  
+            SET node TO trie_root  
+            FOR i FROM seventeen DOWN TO zero  
+                SET bit TO the element at position i of the binary representation of value  
+                SET node TO element at key bit of node.children  
+                INCREMENT node.count BY one  
+            END FOR  
+        END FUNCTION  
+
+        FUNCTION erase(trie_root TrieNode value INTEGER)  
+            SET node TO trie_root  
+            FOR i FROM seventeen DOWN TO zero  
+                SET bit TO the element at position i of the binary representation of value  
+                SET node TO element at key bit of node.children  
+                DECREMENT node.count BY one  
+            END FOR  
+        END FUNCTION  
+
+        FUNCTION max_xor(trie_root TrieNode value INTEGER) RETURNS INTEGER  
+            SET node TO trie_root  
+            SET max_xor_val TO zero  
+            FOR i FROM seventeen DOWN TO zero  
+                SET bit TO the element at position i of the binary representation of value  
+                SET toggled_bit TO one MINUS bit  
+                IF element at key toggled_bit of node.children exists AND element at key toggled_bit of node.children.count GREATER THAN zero  
+                    SET max_xor_val TO max_xor_val PLUS two RAISED TO THE POWER OF i  
+                    SET node TO element at key toggled_bit of node.children  
+                ELSE  
+                    SET node TO element at key bit of node.children  
+                END IF  
+            END FOR  
+            RETURN max_xor_val  
+        END FUNCTION  
+
+        SET query_idx TO a mapping constructed by assigning each pair node val from queries to its index in queries  
+
+        FOR each index i WITH corresponding value parent IN parents  
+            IF parent EQUALS negative one  
+                CALL dfs with i  
+                BREAK the loop  
+            END IF  
+        END FOR  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

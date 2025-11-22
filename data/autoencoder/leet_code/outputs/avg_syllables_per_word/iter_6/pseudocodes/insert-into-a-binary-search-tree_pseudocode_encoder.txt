@@ -1,0 +1,54 @@
+CLASS TreeNode  
+    FUNCTION __init__(val WITH DEFAULT 0, left WITH DEFAULT None, right WITH DEFAULT None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET root TO NEW TreeNode WITH val AS first element OF values  
+    SET i TO 1  
+    SET queue TO new empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO REMOVE first element FROM queue  
+        IF i LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.left TO NEW TreeNode WITH val AS values AT i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.right TO NEW TreeNode WITH val AS values AT i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN CALL is_same_tree WITH p.left AND q.left AND CALL is_same_tree WITH p.right AND q.right  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION insertIntoBST(root, val)  
+        FUNCTION dfs(root)  
+            IF root IS None  
+                RETURN NEW TreeNode WITH val AS val  
+            IF root.val LESS THAN val  
+                SET root.right TO CALL dfs WITH root.right  
+            ELSE  
+                SET root.left TO CALL dfs WITH root.left  
+            RETURN root  
+        END FUNCTION  
+        RETURN CALL dfs WITH root  
+    END FUNCTION  
+END CLASS

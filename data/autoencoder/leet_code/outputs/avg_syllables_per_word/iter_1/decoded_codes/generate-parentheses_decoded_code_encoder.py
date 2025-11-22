@@ -1,0 +1,12 @@
+def generateParenthesis(n):
+    result = []
+    def backtrack(s="", l=0, r=0):
+        if len(s) == 2 * n:
+            result.append(s)
+            return
+        if l < n:
+            backtrack(s + "(", l + 1, r)
+        if r < l:
+            backtrack(s + ")", l, r + 1)
+    backtrack()
+    return result

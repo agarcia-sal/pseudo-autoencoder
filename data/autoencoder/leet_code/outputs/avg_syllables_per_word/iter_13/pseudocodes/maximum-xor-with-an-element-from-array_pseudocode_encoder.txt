@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION maximizeXor(nums AS List of integers, queries AS List of List of integers) RETURNS List of integers  
+        CALL sort ON nums IN ASCENDING ORDER  
+        
+        SET sorted_queries TO A LIST of pairs consisting of the original index and the query elements FROM enumerating queries SORTED BY the second element of the query which is the maximum value mi IN ASCENDING ORDER  
+        
+        SET result TO A LIST containing negative one REPEATED as many times as THE LENGTH OF queries  
+        
+        SET trie TO an EMPTY DICTIONARY representing the root of the Trie  
+        
+        SET num_index TO zero to track the current position in nums  
+        
+        FOR each pair query_index and a sublist containing xi and mi IN sorted_queries  
+            WHILE num_index IS LESS THAN the LENGTH OF nums AND the element at position num_index of nums IS LESS THAN OR EQUAL TO mi  
+                SET num TO the element at position num_index of nums  
+                SET node TO trie  
+                FOR index i FROM thirty one DOWN TO zero DECREMENTING BY one  
+                    SET bit TO THE RESULT of the bit in position i of num obtained BY shifting num RIGHT BY i positions THEN AND WITH one  
+                    IF bit IS NOT a key in node  
+                        SET the entry for bit in node TO an EMPTY DICTIONARY  
+                    SET node TO the dictionary AT entry bit in node  
+                END FOR  
+                INCREMENT num_index BY one  
+            END WHILE  
+            
+            IF trie IS EMPTY  
+                CONTINUE TO NEXT iteration of the FOR loop  
+            END IF  
+            
+            SET node TO trie  
+            SET max_xor TO zero  
+            FOR index i FROM thirty one DOWN TO zero DECREMENTING BY one  
+                SET bit TO THE RESULT of the bit in position i of xi obtained BY shifting xi RIGHT BY i positions THEN AND WITH one  
+                SET toggle_bit TO one MINUS bit  
+                IF toggle_bit IS a key in node  
+                    SET max_xor TO max_xor PLUS the value of one SHIFTED LEFT BY i positions  
+                    SET node TO the dictionary AT entry toggle_bit in node  
+                ELSE  
+                    SET node TO the dictionary AT entry bit in node  
+                END IF  
+            END FOR  
+            
+            SET the element at position query_index of result TO max_xor  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

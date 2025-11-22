@@ -1,0 +1,41 @@
+from collections import deque
+from copy import deepcopy
+
+class Solution:
+    def minFlips(self, matrix_of_integers):
+        m = len(matrix_of_integers)
+        n = len(matrix_of_integers[0])
+
+        def flip(matrix, x, y):
+            directions = [(-1, 0), (1, 0), (0, -1), (0, 1), (0, 0)]
+            for dx, dy in directions:
+                nx, ny = x + dx, y + dy
+                if 0 <= nx < m and 0 <= ny < n:
+                    matrix[nx][ny] = 1 - matrix[nx][ny]
+
+        def matrix_to_tuple(matrix):
+            return tuple(tuple(row) for row in matrix)
+
+        def tuple_to_matrix(t):
+            return [list(row) for row in t]
+
+        target = tuple(tuple(0 for _ in range(n)) for _ in range(m))
+        initial_state = matrix_to_tuple(matrix_of_integers)
+        queue = deque([(initial_state, 0)])
+        visited = {initial_state}
+
+        while queue:
+            current_state, steps = queue.popleft()
+            if current_state == target:
+                return steps
+
+            current_matrix = tuple_to_matrix(current_state)
+            for i in range(m):
+                for j in range(n):
+                    next_matrix = deepcopy(current_matrix)
+                    flip(next_matrix, i, j)
+                    next_state = matrix_to_tuple(next_matrix)
+                    if next_state not in visited:
+                        visited.add(next_state)
+                        queue.append((next_state, steps + 1))
+        return -1

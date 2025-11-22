@@ -1,0 +1,54 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.root TO list of integers from zero TO size MINUS one  
+        SET self.rank TO list of size elements each initialized TO one  
+    END FUNCTION  
+
+    FUNCTION find(self, x)  
+        IF self.root at position x EQUALS x THEN  
+            RETURN x  
+        SET self.root at position x TO CALL self.find WITH argument self.root at position x  
+        RETURN self.root at position x  
+    END FUNCTION  
+
+    FUNCTION union(self, x, y)  
+        SET rootX TO CALL self.find WITH argument x  
+        SET rootY TO CALL self.find WITH argument y  
+        IF rootX NOT EQUALS rootY THEN  
+            IF self.rank at position rootX GREATER THAN self.rank at position rootY THEN  
+                SET self.root at position rootY TO rootX  
+            ELSE IF self.rank at position rootX LESS THAN self.rank at position rootY THEN  
+                SET self.root at position rootX TO rootY  
+            ELSE  
+                SET self.root at position rootY TO rootX  
+                INCREMENT self.rank at position rootX BY one  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION accountsMerge(self, accounts)  
+        SET email_to_id TO empty mapping  
+        SET uf TO new UnionFind initialized WITH length of accounts  
+
+        FOR index i FROM zero TO length of accounts MINUS one  
+            SET current_account TO accounts at position i  
+            FOR each email IN all elements of current_account EXCLUDING the first element  
+                IF email NOT IN email_to_id THEN  
+                    SET email_to_id at email TO i  
+                ELSE  
+                    CALL uf.union WITH arguments i AND email_to_id at email  
+
+        SET merged_emails TO empty mapping defaulting to empty list  
+        FOR each email, account_id IN email_to_id  
+            SET root_id TO CALL uf.find WITH argument account_id  
+            APPEND email TO merged_emails at root_id  
+
+        SET result TO empty list  
+        FOR each account_id, emails IN merged_emails  
+            SET name TO first element of accounts at position account_id  
+            SET sorted_emails TO emails sorted in ascending order  
+            APPEND list composed of name followed by elements of sorted_emails TO result  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

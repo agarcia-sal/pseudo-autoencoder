@@ -1,0 +1,26 @@
+from collections import defaultdict
+from typing import List, Dict, DefaultDict
+
+class Solution:
+    def pyramidTransition(self, bottom: str, allowed: List[str]) -> bool:
+        allowed_map: DefaultDict[str, DefaultDict[str, List[str]]] = defaultdict(lambda: defaultdict(list))
+        for rule in allowed:
+            left, right, top = rule[0], rule[1], rule[2]
+            allowed_map[left][right].append(top)
+
+        def can_build_pyramid(current_bottom: str, current_top: List[str]) -> bool:
+            if len(current_bottom) == 1:
+                return True
+            if len(current_top) == len(current_bottom) - 1:
+                # Join current_top chars to string for next recursion call
+                return can_build_pyramid("".join(current_top), [])
+            index = len(current_top)
+            left = current_bottom[index]
+            right = current_bottom[index + 1]
+            if left in allowed_map and right in allowed_map[left]:
+                for top in allowed_map[left][right]:
+                    if can_build_pyramid(current_bottom, current_top + [top]):
+                        return True
+            return False
+
+        return can_build_pyramid(bottom, [])

@@ -1,0 +1,79 @@
+CLASS Solution  
+    FUNCTION minimumOperations(self, grid)  
+        FUNCTION bfs()  
+            SET queue TO empty double-ended queue  
+            FOR u FROM zero TO n MINUS one  
+                IF match at position u EQUALS minus one THEN  
+                    SET dist at position u TO zero  
+                    APPEND u TO queue  
+                ELSE  
+                    SET dist at position u TO infinity  
+                END IF  
+            END FOR  
+            SET dist at position minus one TO infinity  
+            WHILE queue is not empty  
+                SET u TO first element removed from queue  
+                IF dist at position u LESS THAN dist at position minus one THEN  
+                    FOR each v IN graph at position u  
+                        IF dist at position match at position v EQUALS infinity THEN  
+                            SET dist at position match at position v TO dist at position u PLUS one  
+                            APPEND match at position v TO queue  
+                        END IF  
+                    END FOR  
+                END IF  
+            END WHILE  
+            RETURN dist at position minus one LESS THAN infinity  
+        END FUNCTION  
+  
+        FUNCTION dfs(u)  
+            IF u NOT EQUALS minus one THEN  
+                FOR each v IN graph at position u  
+                    IF dist at position match at position v EQUALS dist at position u PLUS one THEN  
+                        IF dfs(match at position v) THEN  
+                            SET match at position v TO u  
+                            SET match at position u TO v  
+                            RETURN True  
+                        END IF  
+                    END IF  
+                END FOR  
+                SET dist at position u TO infinity  
+                RETURN False  
+            END IF  
+            RETURN True  
+        END FUNCTION  
+  
+        SET rows TO length of grid  
+        SET cols TO length of first element in grid  
+        SET n TO rows MULTIPLIED BY cols  
+        SET graph TO list containing n PLUS one empty sets  
+        SET match TO list of size n PLUS one with all elements minus one  
+        SET dist TO list of size n PLUS one with all elements zero  
+  
+        FOR r FROM zero TO rows MINUS one  
+            FOR c FROM zero TO cols MINUS one  
+                IF grid at position r and c EQUALS one THEN  
+                    SET u TO r MULTIPLIED BY cols PLUS c  
+                    FOR each pair dr, dc IN the list of pairs (minus one, zero), (one, zero), (zero, minus one), (zero, one)  
+                        SET nr TO r PLUS dr  
+                        SET nc TO c PLUS dc  
+                        IF nr GREATER THAN OR EQUAL TO zero AND nr LESS THAN rows AND nc GREATER THAN OR EQUAL TO zero AND nc LESS THAN cols AND grid at position nr and nc EQUALS one THEN  
+                            SET v TO nr MULTIPLIED BY cols PLUS nc  
+                            ADD v TO graph at position u  
+                        END IF  
+                    END FOR  
+                END IF  
+            END FOR  
+        END FOR  
+  
+        SET matching TO zero  
+        WHILE bfs() RETURNS True  
+            FOR u FROM zero TO n MINUS one  
+                IF match at position u EQUALS minus one AND dfs(u) RETURNS True THEN  
+                    INCREMENT matching BY one  
+                END IF  
+            END FOR  
+        END WHILE  
+  
+        RETURN matching  
+    END FUNCTION  
+END CLASS

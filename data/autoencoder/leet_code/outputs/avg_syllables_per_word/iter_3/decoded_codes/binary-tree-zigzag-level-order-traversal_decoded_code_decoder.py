@@ -1,0 +1,59 @@
+from collections import deque
+from typing import Optional, List
+
+class TreeNode:
+    def __init__(self, val: int = 0, left: Optional['TreeNode'] = None, right: Optional['TreeNode'] = None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+def tree_node(values: List[Optional[int]]) -> Optional[TreeNode]:
+    if not values:
+        return None
+    root = TreeNode(values[0])
+    queue = deque([root])
+    i = 1
+    while queue and i < len(values):
+        node = queue.popleft()
+        if i < len(values) and values[i] is not None:
+            node.left = TreeNode(values[i])
+            queue.append(node.left)
+        i += 1
+        if i < len(values) and values[i] is not None:
+            node.right = TreeNode(values[i])
+            queue.append(node.right)
+        i += 1
+    return root
+
+def is_same_tree(p: Optional[TreeNode], q: Optional[TreeNode]) -> bool:
+    if p is None and q is None:
+        return True
+    if p is None or q is None:
+        return False
+    if p.val != q.val:
+        return False
+    return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)
+
+class Solution:
+    def zigzagLevelOrder(self, root: Optional[TreeNode]) -> List[List[int]]:
+        if root is None:
+            return []
+        result = []
+        queue = deque([root])
+        left_to_right = True
+        while queue:
+            level_size = len(queue)
+            current_level = deque()
+            for _ in range(level_size):
+                node = queue.popleft()
+                if left_to_right:
+                    current_level.append(node.val)
+                else:
+                    current_level.appendleft(node.val)
+                if node.left:
+                    queue.append(node.left)
+                if node.right:
+                    queue.append(node.right)
+            result.append(list(current_level))
+            left_to_right = not left_to_right
+        return result

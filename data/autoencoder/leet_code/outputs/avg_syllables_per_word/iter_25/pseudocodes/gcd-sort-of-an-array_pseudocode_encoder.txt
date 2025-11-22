@@ -1,0 +1,52 @@
+CLASS UnionFind  
+    FUNCTION __init__ WITH PARAMETER size  
+        SET self.parent TO a new list containing all integers FROM zero TO size MINUS one  
+        SET self.rank TO a new list containing size elements EACH initialized TO one  
+    END FUNCTION  
+
+    FUNCTION find WITH PARAMETER p  
+        IF the element at position p of self.parent IS NOT EQUAL TO p THEN  
+            SET the element at position p of self.parent TO the result of calling find WITH the element at position p of self.parent  
+        END IF  
+        RETURN the element at position p of self.parent  
+    END FUNCTION  
+
+    FUNCTION union WITH PARAMETERS p AND q  
+        SET rootP TO the result of calling find WITH p  
+        SET rootQ TO the result of calling find WITH q  
+        IF rootP IS EQUAL TO rootQ THEN  
+            RETURN False  
+        END IF  
+        IF the element at position rootP of self.rank IS GREATER THAN the element at position rootQ of self.rank THEN  
+            SET the element at position rootQ of self.parent TO rootP  
+        ELSE IF the element at position rootP of self.rank IS LESS THAN the element at position rootQ of self.rank THEN  
+            SET the element at position rootP of self.parent TO rootQ  
+        ELSE  
+            SET the element at position rootQ of self.parent TO rootP  
+            INCREMENT the element at position rootP of self.rank BY one  
+        END IF  
+        RETURN True  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION gcdSort WITH PARAMETER nums  
+        SET sorted_nums TO nums sorted in ascending order  
+        SET max_val TO the maximum value in nums  
+        SET uf TO a new instance of UnionFind initialized with max_val PLUS one  
+        FOR each num IN nums  
+            FOR factor FROM two TO the integer part of the square root of num PLUS one  
+                IF num MODULO factor EQUALS zero THEN  
+                    CALL uf.union WITH num AND factor  
+                    CALL uf.union WITH num AND the integer result of num DIVIDED BY factor  
+                END IF  
+            END FOR  
+        END FOR  
+        FOR i FROM zero TO the length of nums MINUS one  
+            IF the result of uf.find WITH element at position i of nums IS NOT EQUAL TO the result of uf.find WITH element at position i of sorted_nums THEN  
+                RETURN False  
+            END IF  
+        END FOR  
+        RETURN True  
+    END FUNCTION  
+END CLASS

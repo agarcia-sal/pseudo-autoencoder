@@ -1,0 +1,77 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val = 0, left = None, right = None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty THEN  
+        RETURN None  
+    END IF  
+    SET root TO TreeNode(values AT index 0)  
+    SET i TO 1  
+    INITIALIZE queue AS empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty DO  
+        SET node TO REMOVE first element FROM queue  
+        IF i IS LESS THAN LENGTH OF values AND values AT index i IS NOT None THEN  
+            SET node.left TO TreeNode(values AT index i)  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY 1  
+        IF i IS LESS THAN LENGTH OF values AND values AT index i IS NOT None THEN  
+            SET node.right TO TreeNode(values AT index i)  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None THEN  
+        RETURN True  
+    ELSE IF p IS None OR q IS None THEN  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val THEN  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION checkEqualTree(self, root)  
+        FUNCTION subtree_sum(node)  
+            IF node IS None THEN  
+                RETURN 0  
+            END IF  
+            RETURN node.val PLUS subtree_sum(node.left) PLUS subtree_sum(node.right)  
+        END FUNCTION  
+
+        SET total_sum TO subtree_sum(root)  
+
+        IF total_sum MODULO 2 IS NOT EQUAL TO 0 THEN  
+            RETURN False  
+        END IF  
+
+        SET target TO total_sum DIVIDED BY 2  
+        SET found TO LIST CONTAINING False  
+
+        FUNCTION can_split(node)  
+            IF node IS None THEN  
+                RETURN 0  
+            END IF  
+            SET current_sum TO node.val PLUS can_split(node.left) PLUS can_split(node.right)  
+            IF current_sum IS EQUAL TO target AND node IS NOT root THEN  
+                SET found AT index 0 TO True  
+            END IF  
+            RETURN current_sum  
+        END FUNCTION  
+
+        CALL can_split(root)  
+        RETURN found AT index 0  
+    END FUNCTION  
+END CLASS

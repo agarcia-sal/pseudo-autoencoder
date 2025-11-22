@@ -1,0 +1,61 @@
+CLASS Solution  
+    FUNCTION distanceToCycle(n, edges)  
+        SET graph TO a new mapping from keys to empty lists  
+        FOR each pair u AND v IN edges  
+            APPEND v TO the list at graph[u]  
+            APPEND u TO the list at graph[v]  
+        END FOR  
+      
+        FUNCTION dfs(node, parent, path, visited)  
+            IF node IS IN visited THEN  
+                SET cycle_start TO the position of node in path  
+                RETURN the sublist of path from cycle_start TO the end  
+            END IF  
+            ADD node TO visited  
+            APPEND node TO path  
+            FOR each neighbor IN the list at graph[node]  
+                IF neighbor IS NOT EQUAL TO parent THEN  
+                    SET cycle TO dfs(neighbor, node, path, visited)  
+                    IF cycle EXISTS THEN  
+                        RETURN cycle  
+                    END IF  
+                END IF  
+            END FOR  
+            REMOVE last element FROM path  
+            RETURN None  
+        END FUNCTION  
+      
+        SET visited TO an empty set  
+        SET cycle TO None  
+        FOR node FROM zero TO n MINUS one  
+            IF node IS NOT IN visited THEN  
+                SET cycle TO dfs(node, MINUS one, an empty list, visited)  
+                IF cycle EXISTS THEN  
+                    BREAK the loop  
+                END IF  
+            END IF  
+        END FOR  
+      
+        SET distance TO a list of zeros WITH length n  
+        SET queue TO a new double-ended queue initialized with cycle  
+        SET visited TO a set initialized with the elements of cycle  
+      
+        SET level TO zero  
+        WHILE queue IS NOT empty  
+            SET count TO the LENGTH OF queue  
+            FOR index FROM one TO count  
+                REMOVE first element FROM queue AND SET it TO node  
+                SET distance[node] TO level  
+                FOR each neighbor IN the list at graph[node]  
+                    IF neighbor IS NOT IN visited THEN  
+                        ADD neighbor TO visited  
+                        APPEND neighbor TO queue  
+                    END IF  
+                END FOR  
+            END FOR  
+            INCREMENT level BY one  
+        END WHILE  
+      
+        RETURN distance  
+    END FUNCTION  
+END CLASS

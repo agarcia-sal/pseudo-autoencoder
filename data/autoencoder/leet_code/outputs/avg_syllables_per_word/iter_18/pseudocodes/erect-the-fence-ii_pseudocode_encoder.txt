@@ -1,0 +1,49 @@
+CLASS Solution  
+    FUNCTION outerTrees WITH PARAMETER trees AS List OF List OF Integer  
+        FUNCTION dist_sq WITH PARAMETERS p1 AND p2  
+            SET result TO the SUM OF the SQUARE OF the DIFFERENCE BETWEEN the element at position zero of p1 AND the element at position zero of p2 AND the SQUARE OF the DIFFERENCE BETWEEN the element at position one of p1 AND the element at position one of p2  
+            RETURN result  
+        END FUNCTION  
+
+        FUNCTION circumcenter WITH PARAMETERS p1 AND p2 AND p3  
+            SET ax TO the element at position zero of p1  
+            SET ay TO the element at position one of p1  
+            SET bx TO the element at position zero of p2  
+            SET by TO the element at position one of p2  
+            SET cx TO the element at position zero of p3  
+            SET cy TO the element at position one of p3  
+            SET d TO two MULTIPLIED BY the SUM OF ax MULTIPLIED BY the DIFFERENCE BETWEEN by AND cy AND bx MULTIPLIED BY the DIFFERENCE BETWEEN cy AND ay AND cx MULTIPLIED BY the DIFFERENCE BETWEEN ay AND by  
+            SET ux TO the DIVISION OF the SUM OF the SUM OF ax SQUARED AND ay SQUARED MULTIPLIED BY the DIFFERENCE BETWEEN by AND cy AND the SUM OF bx SQUARED AND by SQUARED MULTIPLIED BY the DIFFERENCE BETWEEN cy AND ay AND the SUM OF cx SQUARED AND cy SQUARED MULTIPLIED BY the DIFFERENCE BETWEEN ay AND by BY d  
+            SET uy TO the DIVISION OF the SUM OF the SUM OF ax SQUARED AND ay SQUARED MULTIPLIED BY the DIFFERENCE BETWEEN cx AND bx AND the SUM OF bx SQUARED AND by SQUARED MULTIPLIED BY the DIFFERENCE BETWEEN ax AND cx AND the SUM OF cx SQUARED AND cy SQUARED MULTIPLIED BY the DIFFERENCE BETWEEN bx AND ax BY d  
+            SET center TO a List CONTAINING ux AND uy  
+            SET radius TO the SQUARE ROOT OF the SUM OF the SQUARE OF the DIFFERENCE BETWEEN ux AND ax AND the SQUARE OF the DIFFERENCE BETWEEN uy AND ay  
+            RETURN center AND radius  
+        END FUNCTION  
+
+        FUNCTION welzl WITH PARAMETERS points AND boundary AND n  
+            IF n EQUALS zero OR the LENGTH OF boundary EQUALS three THEN  
+                IF the LENGTH OF boundary EQUALS zero THEN  
+                    RETURN a List CONTAINING zero AND zero AND zero  
+                ELSE IF the LENGTH OF boundary EQUALS one THEN  
+                    RETURN the element at position zero of boundary AND zero  
+                ELSE IF the LENGTH OF boundary EQUALS two THEN  
+                    SET center TO a List CONTAINING the SUM OF the element at position zero of the element at position zero of boundary AND the element at position zero of the element at position one of boundary DIVIDED BY two AND the SUM OF the element at position one of the element at position zero of boundary AND the element at position one of the element at position one of boundary DIVIDED BY two  
+                    SET radius TO the SQUARE ROOT OF the DISTANCE SQUARED BETWEEN the element at position zero of boundary AND the element at position one of boundary DIVIDED BY two  
+                    RETURN center AND radius  
+                ELSE  
+                    RETURN the RESULT OF circumcenter WITH PARAMETERS the three elements IN boundary UNPACKED  
+                END IF  
+            END IF  
+            SET p TO the element at position n MINUS one of points  
+            SET center AND radius TO the RESULT OF welzl WITH PARAMETERS points AND boundary AND n MINUS one  
+            IF the DISTANCE SQUARED BETWEEN center AND p IS LESS THAN OR EQUAL TO radius MULTIPLIED BY radius THEN  
+                RETURN center AND radius  
+            END IF  
+            RETURN the RESULT OF welzl WITH PARAMETERS points AND the concatenation of boundary AND a List CONTAINING p AND n MINUS one  
+        END FUNCTION  
+
+        CALL the shuffle FUNCTION OF the random MODULE WITH PARAMETER trees  
+        SET center AND radius TO the RESULT OF welzl WITH PARAMETERS trees AND an empty List AND the LENGTH OF trees  
+        RETURN a List CONTAINING the element at position zero of center AND the element at position one of center AND radius  
+    END FUNCTION  
+END CLASS

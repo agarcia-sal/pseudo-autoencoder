@@ -1,0 +1,57 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val SET TO zero left SET TO none right SET TO none  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values IS EMPTY  
+        RETURN none  
+    END IF  
+    SET root TO A NEW TreeNode WITH val EQUAL TO element at position zero OF values  
+    SET i TO one  
+    SET queue TO A NEW empty double-ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO REMOVE FIRST ELEMENT FROM queue  
+        IF i IS LESS THAN LENGTH OF values AND element at position i OF values IS NOT none  
+            SET node.left TO A NEW TreeNode WITH val EQUAL TO element at position i OF values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN LENGTH OF values AND element at position i OF values IS NOT none  
+            SET node.right TO A NEW TreeNode WITH val EQUAL TO element at position i OF values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN false  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETERS p.left q.left AND is_same_tree WITH PARAMETERS p.right q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION constructMaximumBinaryTree WITH PARAMETERS self nums  
+        IF nums IS EMPTY  
+            RETURN none  
+        END IF  
+        SET max_val TO THE MAXIMUM VALUE IN nums  
+        SET max_index TO THE POSITION OF max_val IN nums  
+        SET root TO A NEW TreeNode WITH val EQUAL TO max_val  
+        SET root.left TO self.constructMaximumBinaryTree WITH PARAMETERS sublist of nums FROM position zero TO max_index MINUS one  
+        SET root.right TO self.constructMaximumBinaryTree WITH PARAMETERS sublist of nums FROM position max_index PLUS one TO END  
+        RETURN root  
+    END FUNCTION  
+END CLASS

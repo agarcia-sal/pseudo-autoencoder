@@ -1,0 +1,56 @@
+CLASS Solution
+    FUNCTION maxStudents(seats AS List OF List OF string)
+        SET m TO the LENGTH OF seats
+        SET n TO the LENGTH OF element at position zero of seats
+        
+        CALL convertSeatsToBitmask WITH parameters seats RETURNING broken
+        
+        FUNCTION convertSeatsToBitmask(seats)
+            SET number_of_rows TO the LENGTH OF seats
+            SET number_of_columns TO the LENGTH OF element at position zero of seats
+            SET broken_mask_list TO an EMPTY list of size number_of_rows FILLED WITH zero
+            FOR row_index FROM zero TO number_of_rows MINUS one
+                SET current_mask TO zero
+                FOR column_index FROM zero TO number_of_columns MINUS one
+                    IF element at position row_index of seats AT element at position column_index EQUALS the symbol representing broken seat
+                        SET current_mask TO current_mask OR one LEFT SHIFTED BY column_index
+                    END IF
+                END FOR
+                SET element at position row_index OF broken_mask_list TO current_mask
+            END FOR
+            RETURN broken_mask_list
+        END FUNCTION
+        
+        FUNCTION is_valid(arrangement)
+            RETURN the bitwise AND of arrangement AND the bitwise RIGHT SHIFT of arrangement BY one EQUALS zero
+        END FUNCTION
+        
+        SET dp TO a list of size m FILLED WITH empty dictionaries
+        
+        FOR arrangement FROM zero TO two RAISED TO THE POWER OF n MINUS one
+            IF is_valid(arrangement) AND the bitwise AND of arrangement AND element at position zero of broken EQUALS zero
+                SET the key arrangement in element at position zero of dp TO the number of ones in the binary representation OF arrangement
+            END IF
+        END FOR
+        
+        FOR row_index FROM one TO m MINUS one
+            FOR arrangement FROM zero TO two RAISED TO THE POWER OF n MINUS one
+                IF is_valid(arrangement) AND the bitwise AND of arrangement AND element at position row_index of broken EQUALS zero
+                    SET max_students TO zero
+                    FOR each previous_arrangement IN keys of element at position row_index MINUS one of dp
+                        IF the bitwise AND of arrangement AND the bitwise RIGHT SHIFT of previous_arrangement BY one EQUALS zero AND the bitwise AND of arrangement AND the bitwise LEFT SHIFT of previous_arrangement BY one EQUALS zero
+                            SET max_students TO the maximum of max_students AND element at previous_arrangement of element at position row_index MINUS one of dp
+                        END IF
+                    END FOR
+                    SET the key arrangement in element at position row_index of dp TO max_students PLUS the number of ones in the binary representation OF arrangement
+                END IF
+            END FOR
+        END FOR
+        
+        IF element at position m MINUS one of dp IS NOT EMPTY
+            RETURN the maximum OF the values of element at position m MINUS one of dp
+        ELSE
+            RETURN zero
+        END IF
+    END FUNCTION
+END CLASS

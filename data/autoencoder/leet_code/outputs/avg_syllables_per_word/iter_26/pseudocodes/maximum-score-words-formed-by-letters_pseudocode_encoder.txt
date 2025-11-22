@@ -1,0 +1,49 @@
+CLASS Solution
+    FUNCTION maxScoreWords(words, letters, score)
+        FUNCTION word_score(word, score_map)
+            RETURN the SUM OF the values FROM score_map FOR each character IN word
+        END FUNCTION
+
+        FUNCTION can_form(word, letter_count)
+            SET word_count TO the COUNTER OF word
+            FOR each character AND its count IN the ITEMS OF word_count
+                IF the VALUE AT character IN letter_count IS LESS THAN count
+                    RETURN False
+                END IF
+            END FOR
+            RETURN True
+        END FUNCTION
+
+        FUNCTION update_letter_count(letter_count, word, add)
+            FOR each character IN word
+                IF add IS True
+                    INCREMENT the VALUE AT character IN letter_count BY one
+                ELSE
+                    DECREMENT the VALUE AT character IN letter_count BY one
+                END IF
+            END FOR
+        END FUNCTION
+
+        FUNCTION backtrack(index, current_score, letter_count)
+            IF index EQUALS the LENGTH OF words
+                RETURN current_score
+            END IF
+
+            SET max_score TO current_score
+            FOR i FROM index TO the LENGTH OF words MINUS one INCLUSIVE
+                IF can_form(the element at position i OF words, letter_count) HOLDS
+                    CALL update_letter_count WITH letter_count, the element at position i OF words, add EQUALS False
+                    SET max_score TO the MAXIMUM OF max_score AND backtrack(i PLUS one, current_score PLUS word_score(the element at position i OF words, score_map), letter_count)
+                    CALL update_letter_count WITH letter_count, the element at position i OF words, add EQUALS True
+                END IF
+            END FOR
+
+            RETURN max_score
+        END FUNCTION
+
+        SET score_map TO a MAPPING FROM each lowercase letter FROM the letter a TO the letter z TO the corresponding element AT its zero-based position OF score
+        SET letter_count TO the COUNTER OF letters
+
+        RETURN backtrack(zero, zero, letter_count)
+    END FUNCTION
+END CLASS

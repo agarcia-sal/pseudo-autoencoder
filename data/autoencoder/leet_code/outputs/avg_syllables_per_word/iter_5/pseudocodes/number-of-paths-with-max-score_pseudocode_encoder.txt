@@ -1,0 +1,34 @@
+CLASS Solution  
+    FUNCTION pathsWithMaxScore(board)  
+        SET MOD TO 10 RAISED TO THE POWER 9 PLUS 7  
+        SET n TO LENGTH OF board  
+        
+        INITIALIZE dp AS 2D LIST WITH SIZE n BY n WHERE EACH ELEMENT IS A LIST OF TWO ELEMENTS [NEGATIVE_INFINITY, 0]  
+        
+        SET dp AT POSITION n MINUS 1, n MINUS 1 TO [0, 1]  
+        
+        FOR i FROM n MINUS 1 DOWN TO 0  
+            FOR j FROM n MINUS 1 DOWN TO 0  
+                IF board AT i, j IS 'X' OR 'S' THEN  
+                    CONTINUE TO NEXT ITERATION  
+                
+                IF board AT i, j IS NOT 'E' THEN  
+                    SET value TO INTEGER CONVERSION OF board AT i, j  
+                ELSE  
+                    SET value TO 0  
+                
+                FOR EACH (x, y) IN [(1, 0), (0, 1), (1, 1)]  
+                    SET ni TO i PLUS x  
+                    SET nj TO j PLUS y  
+                    IF ni IS GREATER THAN OR EQUAL TO 0 AND LESS THAN n AND nj IS GREATER THAN OR EQUAL TO 0 AND LESS THAN n THEN  
+                        IF dp AT ni, nj FIRST ELEMENT IS GREATER THAN dp AT i, j FIRST ELEMENT THEN  
+                            SET dp AT i, j TO [dp AT ni, nj FIRST ELEMENT PLUS value, dp AT ni, nj SECOND ELEMENT]  
+                        ELSE IF dp AT ni, nj FIRST ELEMENT EQUALS dp AT i, j FIRST ELEMENT THEN  
+                            SET dp AT i, j SECOND ELEMENT TO (dp AT i, j SECOND ELEMENT PLUS dp AT ni, nj SECOND ELEMENT) MODULO MOD  
+        
+        IF dp AT 0, 0 FIRST ELEMENT EQUALS NEGATIVE_INFINITY THEN  
+            RETURN [0, 0]  
+        
+        RETURN [dp AT 0, 0 FIRST ELEMENT, dp AT 0, 0 SECOND ELEMENT]  
+    END FUNCTION  
+END CLASS

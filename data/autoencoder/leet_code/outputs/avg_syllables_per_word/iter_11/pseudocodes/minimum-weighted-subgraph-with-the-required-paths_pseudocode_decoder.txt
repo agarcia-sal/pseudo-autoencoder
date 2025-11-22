@@ -1,0 +1,54 @@
+CLASS Solution  
+    FUNCTION minimumWeight(n, edges, src1, src2, dest)  
+        FUNCTION dijkstra(graph, start)  
+            SET distances TO a list of length n with all elements SET TO infinity  
+            SET element at position start of distances TO zero  
+            SET heap TO a list containing the tuple of zero and start  
+            
+            WHILE heap is not empty  
+                REMOVE the element with smallest first value FROM heap and SET TO current_distance and current_node  
+                
+                IF current_distance GREATER THAN element at position current_node of distances  
+                    CONTINUE to next iteration  
+                END IF  
+                
+                FOR each neighbor and weight IN element at position current_node of graph  
+                    SET distance TO current_distance PLUS weight  
+                    
+                    IF distance LESS THAN element at position neighbor of distances  
+                        SET element at position neighbor of distances TO distance  
+                        ADD the tuple of distance and neighbor TO heap  
+                    END IF  
+                END FOR  
+            END WHILE  
+            
+            RETURN distances  
+        END FUNCTION  
+        
+        SET graph TO a list of length n with all elements SET TO empty list  
+        SET reverse_graph TO a list of length n with all elements SET TO empty list  
+        
+        FOR each u, v, w IN edges  
+            APPEND the tuple of v and w TO element at position u of graph  
+            APPEND the tuple of u and w TO element at position v of reverse_graph  
+        END FOR  
+        
+        SET dist_from_src1 TO CALL dijkstra WITH graph and src1  
+        SET dist_from_src2 TO CALL dijkstra WITH graph and src2  
+        SET dist_to_dest TO CALL dijkstra WITH reverse_graph and dest  
+        
+        SET min_weight TO infinity  
+        
+        FOR i FROM zero TO n MINUS one  
+            IF element at position i of dist_from_src1 NOT EQUALS infinity AND element at position i of dist_from_src2 NOT EQUALS infinity AND element at position i of dist_to_dest NOT EQUALS infinity  
+                SET min_weight TO the smaller value BETWEEN min_weight AND element at position i of dist_from_src1 PLUS element at position i of dist_from_src2 PLUS element at position i of dist_to_dest  
+            END IF  
+        END FOR  
+        
+        IF min_weight EQUALS infinity  
+            RETURN negative one  
+        ELSE  
+            RETURN min_weight  
+        END IF  
+    END FUNCTION  
+END CLASS

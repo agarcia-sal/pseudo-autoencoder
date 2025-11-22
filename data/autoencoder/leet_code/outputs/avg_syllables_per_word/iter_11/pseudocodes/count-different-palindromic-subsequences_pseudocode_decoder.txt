@@ -1,0 +1,71 @@
+CLASS Solution  
+    FUNCTION countPalindromicSubsequences(s)  
+        SET MOD TO one billion PLUS seven  
+        SET n TO the LENGTH OF s  
+        
+        CALL init_two_dimensional_list WITH parameters - one minus one, number four, n  
+        SET next_occurrence TO the result  
+        CALL init_two_dimensional_list WITH parameters - one minus one, number four, n  
+        SET prev_occurrence TO the result  
+        
+        FOR c FROM zero TO three  
+            SET char TO the character AT code point of 'a' PLUS c  
+            SET last TO minus one  
+            
+            FOR i FROM zero TO n MINUS one  
+                IF the character AT position i of s EQUALS char THEN  
+                    SET last TO i  
+                END IF  
+                SET the element AT position i OF the list AT position c OF prev_occurrence TO last  
+            END FOR  
+            
+            SET last TO minus one  
+            FOR i FROM n MINUS one DOWNTO zero  
+                IF the character AT position i of s EQUALS char THEN  
+                    SET last TO i  
+                END IF  
+                SET the element AT position i OF the list AT position c OF next_occurrence TO last  
+            END FOR  
+        END FOR  
+        
+        CALL init_two_dimensional_list WITH parameters - zero, n, n  
+        SET dp TO the result  
+        
+        FOR i FROM zero TO n MINUS one  
+            SET the element AT position i OF the list AT position i OF dp TO one  
+        END FOR  
+        
+        FOR length FROM two TO n  
+            FOR i FROM zero TO n MINUS length  
+                SET j TO i PLUS length MINUS one  
+                FOR c FROM zero TO three  
+                    SET char TO the character AT code point of 'a' PLUS c  
+                    SET left TO the element AT position i OF the list AT position c OF next_occurrence  
+                    SET right TO the element AT position j OF the list AT position c OF prev_occurrence  
+                    
+                    IF left GREATER THAN j OR right LESS THAN i THEN  
+                        CONTINUE  
+                    ELSE IF left EQUALS right THEN  
+                        SET the element AT position i OF the list AT position j OF dp TO the remainder OF the sum OF the current value plus one DIVIDED BY MOD  
+                    ELSE  
+                        SET the element AT position i OF the list AT position j OF dp TO the remainder OF the sum OF the current value plus the element AT position left PLUS one OF the list AT position right MINUS one OF dp plus two DIVIDED BY MOD  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+        
+        RETURN the element AT position zero OF the list AT position n MINUS one OF dp  
+    END FUNCTION  
+    
+    FUNCTION init_two_dimensional_list(initial_value, outer_size, inner_size)  
+        SET new_list TO an empty list  
+        FOR outer_index FROM zero TO outer_size MINUS one  
+            SET inner_list TO an empty list  
+            FOR inner_index FROM zero TO inner_size MINUS one  
+                APPEND initial_value TO inner_list  
+            END FOR  
+            APPEND inner_list TO new_list  
+        END FOR  
+        RETURN new_list  
+    END FUNCTION  
+END CLASS

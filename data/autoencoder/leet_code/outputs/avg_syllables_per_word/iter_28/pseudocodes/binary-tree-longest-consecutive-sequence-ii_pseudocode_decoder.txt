@@ -1,0 +1,76 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values EQUALS empty THEN  
+        RETURN none  
+    END IF  
+    SET root TO a new TreeNode with value equal to element at position one of values  
+    SET i TO one  
+    SET queue TO a new double ended queue  
+    APPEND root TO queue  
+    WHILE queue is not empty  
+        SET node TO the first element removed from the left of queue  
+        IF i LESS THAN the length of values AND element at position i of values IS NOT none THEN  
+            SET node.left TO a new TreeNode with value equal to element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN the length of values AND element at position i of values IS NOT none THEN  
+            SET node.right TO a new TreeNode with value equal to element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS none AND q IS none THEN  
+        RETURN True  
+    ELSE IF p IS none OR q IS none THEN  
+        RETURN False  
+    ELSE IF the value of p IS NOT EQUALS the value of q THEN  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(the left child of p, the left child of q) AND is_same_tree(the right child of p, the right child of q)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION longestConsecutive(self, root)  
+        FUNCTION dfs(node)  
+            IF node IS none THEN  
+                RETURN zero, zero  
+            END IF  
+            SET inc_len TO one  
+            SET dec_len TO one  
+            SET left_inc, left_dec TO dfs(the left child of node)  
+            SET right_inc, right_dec TO dfs(the right child of node)  
+            IF the left child of node IS NOT none THEN  
+                IF the value of node EQUALS the value of the left child of node PLUS one THEN  
+                    SET dec_len TO left_dec PLUS one  
+                ELSE IF the value of node EQUALS the value of the left child of node MINUS one THEN  
+                    SET inc_len TO left_inc PLUS one  
+                END IF  
+            END IF  
+            IF the right child of node IS NOT none THEN  
+                IF the value of node EQUALS the value of the right child of node PLUS one THEN  
+                    SET dec_len TO the greater value BETWEEN dec_len AND right_dec PLUS one  
+                ELSE IF the value of node EQUALS the value of the right child of node MINUS one THEN  
+                    SET inc_len TO the greater value BETWEEN inc_len AND right_inc PLUS one  
+                END IF  
+            END IF  
+            SET max_len TO the greater value BETWEEN max_len AND inc_len PLUS dec_len MINUS one  
+            RETURN inc_len, dec_len  
+        END FUNCTION  
+        SET max_len TO zero  
+        CALL dfs with argument root  
+        RETURN max_len  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,44 @@
+CLASS Solution  
+    FUNCTION rectangleArea(rectangles)  
+        SET MOD TO 10 RAISED TO THE POWER OF 9 PLUS 7  
+        
+        SET y_coords TO an empty set  
+        FOR each rectangle DECOMPOSED AS x1, y1, x2, y2 IN rectangles  
+            ADD y1 TO y_coords  
+            ADD y2 TO y_coords  
+        
+        SET y_coords TO y_coords sorted in ascending order  
+        SET y_index TO a mapping from each y in y_coords TO its position index  
+        SET count TO a list of zeros with length EQUAL TO length of y_coords  
+        
+        SET events TO an empty list  
+        FOR each rectangle DECOMPOSED AS x1, y1, x2, y2 IN rectangles  
+            APPEND (x1, 1, y1, y2) TO events  
+            APPEND (x2, negative 1, y1, y2) TO events  
+        
+        SORT events by x-coordinate in ascending order  
+        
+        SET prev_x TO 0  
+        SET area TO 0  
+        
+        FOR each event DECOMPOSED AS x, eventType, y1, y2 IN events  
+            SET current_length TO 0  
+            FOR i FROM 1 TO LENGTH OF count MINUS 1  
+                IF count AT POSITION i MINUS 1 IS GREATER THAN 0  
+                    INCREMENT current_length BY y_coords AT POSITION i MINUS y_coords AT POSITION i MINUS 1  
+            
+            INCREMENT area BY current_length MULTIPLIED BY (x MINUS prev_x)  
+            SET area TO area MODULO MOD  
+            
+            IF eventType EQUALS 1  
+                FOR i FROM y_index OF y1 TO y_index OF y2 MINUS 1  
+                    INCREMENT count AT POSITION i BY 1  
+            ELSE  
+                FOR i FROM y_index OF y1 TO y_index OF y2 MINUS 1  
+                    DECREMENT count AT POSITION i BY 1  
+            
+            SET prev_x TO x  
+        
+        RETURN area  
+    END FUNCTION  
+END CLASS

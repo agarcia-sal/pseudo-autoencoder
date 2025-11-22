@@ -1,0 +1,40 @@
+```
+CLASS Solution
+    FUNCTION maximizeXor(nums: List of Integer, queries: List of List of Integer) RETURNS List of Integer
+        SORT nums in ascending order
+        SET sorted_queries TO queries with indices, sorted by each query's second element (mi) in ascending order
+        SET result TO list of length equal to queries, filled with -1
+        SET trie TO empty dictionary
+        SET num_index TO 0
+        
+        FOR each (query_index, (xi, mi)) IN sorted_queries
+            WHILE num_index less than LENGTH OF nums AND nums[num_index] less than or equal to mi
+                SET num TO nums[num_index]
+                SET node TO trie
+                FOR i FROM 31 DOWNTO 0
+                    SET bit TO ith bit of num
+                    IF bit NOT IN node
+                        SET node[bit] TO empty dictionary
+                    SET node TO node[bit]
+                INCREMENT num_index BY 1
+            
+            IF trie IS empty
+                CONTINUE to next query
+            
+            SET node TO trie
+            SET max_xor TO 0
+            FOR i FROM 31 DOWNTO 0
+                SET bit TO ith bit of xi
+                SET toggle_bit TO 1 minus bit
+                IF toggle_bit IN node
+                    SET max_xor TO max_xor OR (1 shifted LEFT BY i)
+                    SET node TO node[toggle_bit]
+                ELSE
+                    SET node TO node[bit]
+            
+            SET result[query_index] TO max_xor
+        
+        RETURN result
+    END FUNCTION
+END CLASS
+```

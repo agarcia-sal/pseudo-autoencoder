@@ -1,0 +1,33 @@
+CLASS Solution  
+    FUNCTION canPartitionKSubsets(nums PARAMETER, k PARAMETER) RETURNS boolean  
+        SET total_sum TO the SUM OF nums  
+        IF the total_sum MODULO k IS NOT EQUAL TO zero  
+            RETURN False  
+        END IF  
+        SET target TO total_sum DIVIDED BY k  
+        SORT nums IN REVERSE ORDER  
+        
+        FUNCTION can_partition(index PARAMETER, k PARAMETER, current_sum PARAMETER, used PARAMETER) RETURNS boolean  
+            IF k IS EQUAL TO zero  
+                RETURN True  
+            END IF  
+            IF current_sum IS EQUAL TO target  
+                RETURN the RESULT OF can_partition WITH PARAMETERS zero, k MINUS one, zero, used  
+            END IF  
+            
+            FOR i FROM index TO the LENGTH OF nums MINUS one  
+                IF the ELEMENT at POSITION i OF used IS False AND current_sum PLUS the ELEMENT at POSITION i OF nums IS LESS THAN OR EQUAL TO target  
+                    SET the ELEMENT at POSITION i OF used TO True  
+                    IF the RESULT OF can_partition WITH PARAMETERS i PLUS one, k, current_sum PLUS the ELEMENT at POSITION i OF nums, used IS True  
+                        RETURN True  
+                    END IF  
+                    SET the ELEMENT at POSITION i OF used TO False  
+                END IF  
+            END FOR  
+            RETURN False  
+        END FUNCTION  
+        
+        SET used TO a LIST OF False VALUES OF LENGTH the LENGTH OF nums  
+        RETURN the RESULT OF can_partition WITH PARAMETERS zero, k, zero, used  
+    END FUNCTION  
+END CLASS

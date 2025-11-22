@@ -1,0 +1,49 @@
+CLASS Solution
+    FUNCTION possibleToStamp(grid, stampHeight, stampWidth)
+        SET m TO the LENGTH OF grid
+        SET n TO the LENGTH OF element at position zero OF grid
+
+        FUNCTION prefix_sum(matrix)
+            SET p TO a new matrix of zeros with number of rows equal to m plus one AND number of columns equal to n plus one
+            FOR r FROM one TO m INCLUSIVE
+                FOR c FROM one TO n INCLUSIVE
+                    SET element at row r column c OF p TO element at row r MINUS one column c MINUS one OF matrix PLUS element at row r MINUS one column c OF p PLUS element at row r column c MINUS one OF p MINUS element at row r MINUS one column c MINUS one OF p
+                END FOR
+            END FOR
+            RETURN p
+        END FUNCTION
+
+        FUNCTION submatrix_sum(p, r1, c1, r2, c2)
+            RETURN element at row r2 PLUS one column c2 PLUS one OF p MINUS element at row r2 PLUS one column c1 OF p MINUS element at row r1 column c2 PLUS one OF p PLUS element at row r1 column c1 OF p
+        END FUNCTION
+
+        SET p_grid TO the RESULT OF prefix_sum WITH grid AS ARGUMENT
+        SET p_stamps TO a new matrix of zeros with number of rows equal to m plus one AND number of columns equal to n plus one
+
+        FOR r FROM zero TO m MINUS one INCLUSIVE
+            FOR c FROM zero TO n MINUS one INCLUSIVE
+                IF element at row r column c OF grid EQUALS zero
+                    IF r PLUS stampHeight LESS THAN OR EQUAL TO m AND c PLUS stampWidth LESS THAN OR EQUAL TO n
+                        IF submatrix_sum WITH p_grid AND r AND c AND r PLUS stampHeight MINUS one AND c PLUS stampWidth MINUS one AS ARGUMENTS EQUALS zero
+                            INCREMENT element at row r column c OF p_stamps BY one
+                        END IF
+                    END IF
+                END IF
+            END FOR
+        END FOR
+
+        SET p_stamps TO the RESULT OF prefix_sum WITH p_stamps AS ARGUMENT
+
+        FOR r FROM zero TO m MINUS one INCLUSIVE
+            FOR c FROM zero TO n MINUS one INCLUSIVE
+                IF element at row r column c OF grid EQUALS zero
+                    IF submatrix_sum WITH p_stamps AND the GREATER OF zero AND r MINUS stampHeight PLUS one AND the GREATER OF zero AND c MINUS stampWidth PLUS one AND r AND c AS ARGUMENTS EQUALS zero
+                        RETURN False
+                    END IF
+                END IF
+            END FOR
+        END FOR
+        
+        RETURN True
+    END FUNCTION
+END CLASS

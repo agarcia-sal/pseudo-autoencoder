@@ -1,0 +1,56 @@
+CLASS UnionFind
+    FUNCTION __init__(self, n)
+        SET self.parent TO list of integers FROM 0 TO n
+        SET self.rank TO list of zeros OF LENGTH n PLUS 1
+        SET self.count TO n
+    END FUNCTION
+
+    FUNCTION find(self, u)
+        IF self.parent AT u NOT EQUALS u
+            SET self.parent AT u TO CALL find WITH self.parent AT u
+        RETURN self.parent AT u
+    END FUNCTION
+
+    FUNCTION union(self, u, v)
+        SET rootU TO CALL find WITH u
+        SET rootV TO CALL find WITH v
+        IF rootU NOT EQUALS rootV
+            IF self.rank AT rootU GREATER THAN self.rank AT rootV
+                SET self.parent AT rootV TO rootU
+            ELSE IF self.rank AT rootU LESS THAN self.rank AT rootV
+                SET self.parent AT rootU TO rootV
+            ELSE
+                SET self.parent AT rootV TO rootU
+                INCREMENT self.rank AT rootU BY 1
+            DECREMENT self.count BY 1
+            RETURN True
+        RETURN False
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION maxNumEdgesToRemove(self, n, edges)
+        SET uf_common TO NEW UnionFind WITH n
+        SET uf_alice TO NEW UnionFind WITH n
+        SET uf_bob TO NEW UnionFind WITH n
+        SET used_edges TO 0
+
+        FOR each (t, u, v) IN edges
+            IF t EQUALS 3
+                IF CALL uf_common.union WITH u, v RETURNS True
+                    CALL uf_alice.union WITH u, v
+                    CALL uf_bob.union WITH u, v
+                    INCREMENT used_edges BY 1
+
+        FOR each (t, u, v) IN edges
+            IF t EQUALS 1 AND CALL uf_alice.union WITH u, v RETURNS True
+                INCREMENT used_edges BY 1
+            ELSE IF t EQUALS 2 AND CALL uf_bob.union WITH u, v RETURNS True
+                INCREMENT used_edges BY 1
+
+        IF uf_alice.count EQUALS 1 AND uf_bob.count EQUALS 1
+            RETURN LENGTH OF edges MINUS used_edges
+        ELSE
+            RETURN -1
+    END FUNCTION
+END CLASS

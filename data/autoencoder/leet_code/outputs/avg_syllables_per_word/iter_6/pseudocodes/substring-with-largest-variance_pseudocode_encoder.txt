@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION largestVariance(s)  
+        FUNCTION calculate_variance(substring, char_a, char_b)  
+            SET max_variance TO 0  
+            SET count_a TO 0  
+            SET count_b TO 0  
+            SET has_b TO FALSE  
+            SET first_b TO FALSE  
+            
+            FOR each char IN substring  
+                IF char EQUALS char_a  
+                    INCREMENT count_a BY 1  
+                ELSE IF char EQUALS char_b  
+                    INCREMENT count_b BY 1  
+                    SET has_b TO TRUE  
+                
+                IF count_b GREATER THAN 0  
+                    SET max_variance TO maximum OF max_variance AND count_a MINUS count_b  
+                ELSE IF count_b EQUALS 0 AND first_b IS TRUE  
+                    SET max_variance TO maximum OF max_variance AND count_a MINUS 1  
+                
+                IF count_b GREATER THAN count_a  
+                    SET count_a TO 0  
+                    SET count_b TO 0  
+                    SET first_b TO has_b  
+            
+            RETURN max_variance  
+        END FUNCTION  
+        
+        SET max_variance TO 0  
+        SET unique_chars TO set of characters in s  
+        
+        FOR each ordered pair char_a, char_b IN all permutations of unique_chars taken two at a time  
+            IF char_a EQUALS char_b  
+                CONTINUE  
+            SET max_variance TO maximum OF max_variance AND CALL calculate_variance WITH arguments s, char_a, char_b  
+        
+        RETURN max_variance  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,58 @@
+CLASS Solution  
+    FUNCTION rectangleArea WITH PARAMETER rectangles AS list of list of integer  
+        SET MOD TO ten POWERED BY nine PLUS one  
+          
+        SET y_coords TO empty set  
+        FOR each x1 y1 x2 y2 IN rectangles  
+            ADD y1 TO y_coords  
+            ADD y2 TO y_coords  
+        END FOR  
+          
+        SET y_coords TO y_coords SORTED IN increasing order  
+        SET y_index TO empty mapping from integer TO integer  
+        SET index_counter TO zero  
+        FOR each y_coordinate IN y_coords  
+            SET key y_coordinate IN y_index TO index_counter  
+            INCREMENT index_counter BY one  
+        END FOR  
+          
+        SET count TO new list OF length EQUAL TO the LENGTH OF y_coords FILLED WITH zero  
+          
+        SET events TO empty list  
+        FOR each x1 y1 x2 y2 IN rectangles  
+            APPEND tuple OF x1 ONE y1 y2 TO events  
+            APPEND tuple OF x2 MINUS one y1 y2 TO events  
+        END FOR  
+          
+        SORT events IN increasing order BASED ON the first element OF each tuple  
+          
+        SET prev_x TO zero  
+        SET area TO zero  
+          
+        FOR each x eventType y1 y2 IN events  
+            SET current_length TO zero  
+            FOR index FROM one TO the LENGTH OF count MINUS one  
+                IF element AT position index MINUS one OF count IS GREATER THAN zero THEN  
+                    INCREMENT current_length BY the element AT position index OF y_coords MINUS the element AT position index MINUS one OF y_coords  
+                END IF  
+            END FOR  
+              
+            SET area TO area PLUS current_length MULTIPLIED BY x MINUS prev_x  
+            SET area TO area MODULO MOD  
+              
+            IF eventType EQUALS one THEN  
+                FOR index FROM the element AT position y1 IN y_index TO the element AT position y2 IN y_index MINUS one  
+                    INCREMENT element AT position index OF count BY one  
+                END FOR  
+            ELSE  
+                FOR index FROM the element AT position y1 IN y_index TO the element AT position y2 IN y_index MINUS one  
+                    DECREMENT element AT position index OF count BY one  
+                END FOR  
+            END IF  
+              
+            SET prev_x TO x  
+        END FOR  
+          
+        RETURN area  
+    END FUNCTION  
+END CLASS

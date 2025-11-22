@@ -1,0 +1,39 @@
+CLASS Solution  
+    FUNCTION createSortedArray(instructions)  
+        SET MOD TO one billion PLUS seven  
+        SET MAX TO maximum value IN instructions PLUS one  
+        SET bit TO list OF zeros WITH length MAX  
+
+        FUNCTION update(idx, val)  
+            WHILE idx LESS THAN MAX  
+                INCREMENT bit AT idx BY val  
+                SET idx TO idx PLUS (idx BITWISE AND negative idx)  
+            END WHILE  
+        END FUNCTION  
+
+        FUNCTION query(idx)  
+            SET total TO zero  
+            WHILE idx GREATER THAN zero  
+                INCREMENT total BY bit AT idx  
+                SET idx TO idx MINUS (idx BITWISE AND negative idx)  
+            END WHILE  
+            RETURN total  
+        END FUNCTION  
+
+        SET total_cost TO zero  
+        FOR i FROM zero TO LENGTH OF instructions MINUS one  
+            SET num TO instructions AT i  
+            SET less_than TO CALL query WITH (num MINUS one)  
+            SET greater_than TO i MINUS CALL query WITH num  
+            IF less_than LESS THAN greater_than  
+                SET cost TO less_than  
+            ELSE  
+                SET cost TO greater_than  
+            END IF  
+            SET total_cost TO (total_cost PLUS cost) MODULO MOD  
+            CALL update WITH num AND one  
+        END FOR  
+
+        RETURN total_cost  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,90 @@
+CLASS Solution  
+    FUNCTION outerTrees(trees)  
+        FUNCTION dist_sq(p1 p2)  
+            SET difference_in_first_position TO element at position zero of p1 MINUS element at position zero of p2  
+            SET difference_in_second_position TO element at position one of p1 MINUS element at position one of p2  
+            SET square_of_difference_in_first_position TO difference_in_first_position POWERED BY two  
+            SET square_of_difference_in_second_position TO difference_in_second_position POWERED BY two  
+            SET sum_of_squares TO square_of_difference_in_first_position PLUS square_of_difference_in_second_position  
+            RETURN sum_of_squares  
+        END FUNCTION  
+      
+        FUNCTION circumcenter(p1 p2 p3)  
+            SET ax TO element at position zero of p1  
+            SET ay TO element at position one of p1  
+            SET bx TO element at position zero of p2  
+            SET by TO element at position one of p2  
+            SET cx TO element at position zero of p3  
+            SET cy TO element at position one of p3  
+            SET term1 TO ax MULTIPLIED BY by MINUS ax MULTIPLIED BY cy  
+            SET term2 TO bx MULTIPLIED BY cy MINUS bx MULTIPLIED BY ay  
+            SET term3 TO cx MULTIPLIED BY ay MINUS cx MULTIPLIED BY by  
+            SET d TO two MULTIPLIED BY the sum of term1 PLUS term2 PLUS term3  
+            
+            SET squared_ax TO ax POWERED BY two  
+            SET squared_ay TO ay POWERED BY two  
+            SET squared_bx TO bx POWERED BY two  
+            SET squared_by TO by POWERED BY two  
+            SET squared_cx TO cx POWERED BY two  
+            SET squared_cy TO cy POWERED BY two  
+            
+            SET ux_numerator_part_one TO the sum of squared_ax PLUS squared_ay MULTIPLIED BY by MINUS squared_ax PLUS squared_ay MULTIPLIED BY cy  
+            SET ux_numerator_part_two TO the sum of squared_bx PLUS squared_by MULTIPLIED BY cy MINUS squared_bx PLUS squared_by MULTIPLIED BY ay  
+            SET ux_numerator_part_three TO the sum of squared_cx PLUS squared_cy MULTIPLIED BY ay MINUS squared_cx PLUS squared_cy MULTIPLIED BY by  
+            
+            SET ux_numerator TO ux_numerator_part_one PLUS ux_numerator_part_two PLUS ux_numerator_part_three  
+            SET ux TO ux_numerator DIVIDED BY d  
+            
+            SET uy_numerator_part_one TO the sum of squared_ax PLUS squared_ay MULTIPLIED BY cx MINUS squared_ax PLUS squared_ay MULTIPLIED BY bx  
+            SET uy_numerator_part_two TO the sum of squared_bx PLUS squared_by MULTIPLIED BY ax MINUS squared_bx PLUS squared_by MULTIPLIED BY cx  
+            SET uy_numerator_part_three TO the sum of squared_cx PLUS squared_cy MULTIPLIED BY bx MINUS squared_cx PLUS squared_cy MULTIPLIED BY ax  
+            
+            SET uy_numerator TO uy_numerator_part_one PLUS uy_numerator_part_two PLUS uy_numerator_part_three  
+            SET uy TO uy_numerator DIVIDED BY d  
+            
+            SET distance_x TO ux MINUS ax  
+            SET distance_y TO uy MINUS ay  
+            SET radius TO the square root of the sum of distance_x POWERED BY two PLUS distance_y POWERED BY two  
+            RETURN list consisting of ux and uy AND radius  
+        END FUNCTION  
+      
+        FUNCTION welzl(points boundary n)  
+            IF n EQUALS zero OR the LENGTH OF boundary EQUALS three THEN  
+                IF the LENGTH OF boundary EQUALS zero THEN  
+                    RETURN list consisting of zero AND zero AND zero  
+                ELSE IF the LENGTH OF boundary EQUALS one THEN  
+                    RETURN element at position zero of boundary AND zero  
+                ELSE IF the LENGTH OF boundary EQUALS two THEN  
+                    SET first_point TO element at position zero of boundary  
+                    SET second_point TO element at position one of boundary  
+                    SET center_x TO element at position zero of first_point PLUS element at position zero of second_point DIVIDED BY two  
+                    SET center_y TO element at position one of first_point PLUS element at position one of second_point DIVIDED BY two  
+                    SET center TO list consisting of center_x AND center_y  
+                    SET distance_between_points TO the square root of dist_sq applied to first_point AND second_point  
+                    SET radius TO distance_between_points DIVIDED BY two  
+                    RETURN center AND radius  
+                ELSE  
+                    RETURN circumcenter applied to elements at positions zero one and two of boundary  
+                END IF  
+            END IF  
+          
+            SET point_p TO element at position n MINUS one of points  
+            SET center_and_radius TO welzl applied to points boundary AND n MINUS one  
+            SET center TO first element of center_and_radius  
+            SET radius TO second element of center_and_radius  
+            SET distance_center_to_p TO dist_sq applied to center AND point_p  
+            IF distance_center_to_p LESS THAN OR EQUAL TO radius MULTIPLIED BY radius THEN  
+                RETURN center AND radius  
+            END IF  
+          
+            SET new_boundary TO boundary with point_p added  
+            RETURN welzl applied to points new_boundary AND n MINUS one  
+        END FUNCTION  
+      
+        APPLY random shuffle to trees  
+        SET center_and_radius TO welzl applied to trees empty list AND the LENGTH OF trees  
+        SET center TO first element of center_and_radius  
+        SET radius TO second element of center_and_radius  
+        RETURN list consisting of element at position zero of center AND element at position one of center AND radius  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,42 @@
+CLASS Solution  
+    FUNCTION longestSubsequenceRepeatedK(s STRING, k INTEGER) RETURNS STRING  
+        DEFINE FUNCTION is_valid_subsequence(candidate STRING) RETURNS BOOLEAN  
+            SET count TO zero  
+            SET index TO zero  
+            FOR each character IN s  
+                IF character EQUALS element at position index of candidate  
+                    INCREMENT index BY one  
+                    IF index EQUALS LENGTH OF candidate  
+                        INCREMENT count BY one  
+                        SET index TO zero  
+                        IF count EQUALS k  
+                            RETURN TRUE  
+                        END IF  
+                    END IF  
+                END IF  
+            END FOR  
+            RETURN FALSE  
+        END FUNCTION  
+          
+        CREATE frequency_map AS mapping of character TO integer COUNT OF EACH character IN s  
+        CREATE valid_chars AS list OF characters WHERE the COUNT IN frequency_map OF character IS GREATER THAN OR EQUAL TO k  
+        SORT valid_chars IN REVERSE LEXICOGRAPHICAL ORDER  
+        SET max_length TO LENGTH OF valid_chars DIVIDED BY k  
+        SET best_candidate TO empty string  
+          
+        DEFINE FUNCTION backtrack(candidate STRING)  
+            IF LENGTH OF candidate GREATER THAN LENGTH OF best_candidate  
+                SET best_candidate TO candidate  
+            END IF  
+            FOR each char IN valid_chars  
+                SET new_candidate TO concatenation of candidate WITH char  
+                IF is_valid_subsequence(new_candidate) IS TRUE  
+                    CALL backtrack WITH new_candidate  
+                END IF  
+            END FOR  
+        END FUNCTION  
+          
+        CALL backtrack WITH empty string  
+        RETURN best_candidate  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,61 @@
+CLASS Solution
+    FUNCTION countOfAtoms(formula)
+        FUNCTION parse(segment)
+            SET atom_count TO CALL defaultdict WITH int as parameter
+            SET elements TO CALL findall WITH regular expression capturing uppercase letter FOLLOWED BY zero or more lowercase letters FOLLOWED BY zero or more digits AND segment AS parameters
+            FOR each element, count IN elements
+                IF count IS NOT empty
+                    INCREMENT atom_count[element] BY the INTEGER VALUE OF count
+                ELSE
+                    INCREMENT atom_count[element] BY one
+                END IF
+            END FOR
+            RETURN atom_count
+        END FUNCTION
+
+        FUNCTION multiply_counts(counts, multiplier)
+            FOR each element IN counts
+                SET counts[element] TO counts[element] MULTIPLIED BY multiplier
+            END FOR
+            RETURN counts
+        END FUNCTION
+
+        SET stack TO a LIST CONTAINING one ELEMENT WHICH IS a CALL TO defaultdict WITH int AS parameter
+        SET i TO zero
+        WHILE i IS LESS THAN the LENGTH OF formula
+            IF element at position i of formula EQUALS an opening parenthesis
+                APPEND a CALL TO defaultdict WITH int AS parameter TO stack
+                INCREMENT i BY one
+            ELSE IF element at position i of formula EQUALS a closing parenthesis
+                SET segment_count TO a CALL TO defaultdict WITH int AS parameter
+                SET j TO i PLUS one
+                WHILE j IS LESS THAN the LENGTH OF formula AND element at position j of formula IS A DIGIT
+                    INCREMENT j BY one
+                END WHILE
+                IF j IS GREATER THAN i PLUS one
+                    SET multiplier TO the INTEGER VALUE OF substring from position i plus one TO position j of formula
+                ELSE
+                    SET multiplier TO one
+                END IF
+                SET segment_count TO the RESULT OF CALLING multiply_counts WITH the LAST ELEMENT POPPED FROM stack AND multiplier AS parameters
+                FOR each element IN segment_count
+                    INCREMENT the VALUE AT element IN the LAST ELEMENT OF stack BY segment_count[element]
+                END FOR
+                SET i TO j
+            ELSE
+                SET j TO i PLUS one
+                WHILE j IS LESS THAN the LENGTH OF formula AND (element at position j of formula IS A lowercase letter OR element at position j of formula IS A digit)
+                    INCREMENT j BY one
+                END WHILE
+                SET segment_count TO CALL parse WITH substring from position i TO position j of formula AS parameter
+                FOR each element IN segment_count
+                    INCREMENT the VALUE AT element IN the LAST ELEMENT OF stack BY segment_count[element]
+                END FOR
+                SET i TO j
+            END IF
+        END WHILE
+
+        SET final_count TO the LAST ELEMENT POPPED FROM stack
+        RETURN the concatenation of each element AND (the STRING REPRESENTATION OF final_count[element] IF final_count[element] IS GREATER THAN one ELSE the EMPTY STRING) FOR each element IN final_count SORTED IN ascending order
+    END FUNCTION
+END CLASS

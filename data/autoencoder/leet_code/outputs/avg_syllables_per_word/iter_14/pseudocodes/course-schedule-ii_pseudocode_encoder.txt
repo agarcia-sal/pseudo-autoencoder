@@ -1,0 +1,55 @@
+CLASS Solution  
+    FUNCTION findOrder(numCourses, prerequisites)  
+        SET adj_list TO CALL create_empty_adjacency_list FOR numCourses  
+        SET in_degrees TO CALL create_zero_filled_list OF LENGTH numCourses  
+        
+        FOR each pair OF dest AND src IN prerequisites  
+            APPEND dest TO the list ASSOCIATED WITH src IN adj_list  
+            INCREMENT the element at position dest OF in_degrees BY one  
+        END FOR  
+        
+        SET queue TO CALL create_queue_with_courses HAVING zero_in_degree FROM in_degrees AND numCourses  
+        SET topological_order TO empty list  
+        
+        WHILE queue IS NOT empty  
+            SET current TO REMOVE first element FROM queue  
+            APPEND current TO topological_order  
+            
+            FOR each neighbor IN adj_list ASSOCIATED WITH current  
+                DECREMENT the element at position neighbor OF in_degrees BY one  
+                IF the element at position neighbor OF in_degrees IS EQUAL TO zero  
+                    ADD neighbor TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        IF the LENGTH OF topological_order IS EQUAL TO numCourses  
+            RETURN topological_order  
+        ELSE  
+            RETURN empty list  
+        END IF  
+    END FUNCTION  
+    
+    FUNCTION create_empty_adjacency_list FOR numCourses  
+        INITIALIZE an empty dictionary named adjacency_list  
+        FOR index FROM zero TO numCourses MINUS one  
+            ASSIGN an empty list TO the element at position index OF adjacency_list  
+        END FOR  
+        RETURN adjacency_list  
+    END FUNCTION  
+    
+    FUNCTION create_zero_filled_list OF LENGTH length_value  
+        INITIALIZE a list named zero_list WITH length_value elements all SET TO zero  
+        RETURN zero_list  
+    END FUNCTION  
+    
+    FUNCTION create_queue_with_courses HAVING zero_in_degree FROM in_degrees AND numCourses  
+        INITIALIZE an empty queue named result_queue  
+        FOR index FROM zero TO numCourses MINUS one  
+            IF the element at position index OF in_degrees IS EQUAL TO zero  
+                APPEND index TO result_queue  
+            END IF  
+        END FOR  
+        RETURN result_queue  
+    END FUNCTION  
+END CLASS

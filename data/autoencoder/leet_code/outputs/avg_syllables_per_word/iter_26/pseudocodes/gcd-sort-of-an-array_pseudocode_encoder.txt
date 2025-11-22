@@ -1,0 +1,56 @@
+CLASS UnionFind
+    FUNCTION __init__(self, size)
+        SET self.parent TO A list of all integers FROM zero TO size MINUS one INCLUSIVE
+        SET self.rank TO A list containing the integer one repeated size times
+    END FUNCTION
+
+    FUNCTION find(self, p)
+        IF element at position p OF self.parent NOT EQUALS p
+            SET element at position p OF self.parent TO the result of calling find ON element at position p OF self.parent
+        END IF
+        RETURN element at position p OF self.parent
+    END FUNCTION
+
+    FUNCTION union(self, p, q)
+        SET rootP TO the result of calling find ON p
+        SET rootQ TO the result of calling find ON q
+        IF rootP EQUALS rootQ
+            RETURN False
+        END IF
+        IF element at position rootP OF self.rank GREATER THAN element at position rootQ OF self.rank
+            SET element at position rootQ OF self.parent TO rootP
+        ELSE IF element at position rootP OF self.rank LESS THAN element at position rootQ OF self.rank
+            SET element at position rootP OF self.parent TO rootQ
+        ELSE
+            SET element at position rootQ OF self.parent TO rootP
+            INCREMENT element at position rootP OF self.rank BY one
+        END IF
+        RETURN True
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION gcdSort(self, nums)
+        SET sorted_nums TO the result of sorting the list nums in ascending order
+        SET max_val TO the maximum element IN nums
+        SET uf TO a new instance of UnionFind initialized WITH max_val PLUS one
+
+        FOR each num IN nums
+            FOR factor FROM two TO the integer part of the square root of num PLUS one INCLUSIVE
+                IF the remainder of num DIVIDED BY factor EQUALS zero
+                    CALL the union method OF uf WITH num AND factor
+                    CALL the union method OF uf WITH num AND num DIVIDED BY factor
+                END IF
+            END FOR
+        END FOR
+
+        FOR i FROM zero TO the LENGTH OF nums MINUS one INCLUSIVE
+            IF the result of calling find ON element at position i OF nums NOT EQUALS
+               the result of calling find ON element at position i OF sorted_nums
+                RETURN False
+            END IF
+        END FOR
+
+        RETURN True
+    END FUNCTION
+END CLASS

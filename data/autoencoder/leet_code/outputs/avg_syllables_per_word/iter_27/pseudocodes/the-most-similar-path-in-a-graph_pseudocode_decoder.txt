@@ -1,0 +1,45 @@
+CLASS Solution  
+    FUNCTION mostSimilar(n names roads targetPath)  
+        SET graph TO an empty mapping with default value as empty list  
+        FOR each element u v IN roads  
+            APPEND element v TO the element at key u of graph  
+            APPEND element u TO the element at key v of graph  
+        END FOR  
+        SET m TO the LENGTH OF targetPath  
+        FUNCTION dp(i j)  
+            IF i EQUALS zero THEN  
+                IF element at position j of names NOT EQUALS element at position i of targetPath THEN  
+                    SET base_cost TO one  
+                ELSE  
+                    SET base_cost TO zero  
+                END IF  
+                RETURN base_cost AND a list containing element j  
+            END IF  
+            SET min_cost TO positive infinity  
+            SET min_path TO an empty list  
+            FOR each element k IN the element at key j of graph  
+                SET cost AND path TO the result of dp with arguments i MINUS one and k  
+                IF cost LESS THAN min_cost THEN  
+                    SET min_cost TO cost  
+                    SET min_path TO path  
+                END IF  
+            END FOR  
+            IF element at position j of names NOT EQUALS element at position i of targetPath THEN  
+                SET current_cost TO min_cost PLUS one  
+            ELSE  
+                SET current_cost TO min_cost  
+            END IF  
+            RETURN current_cost AND the concatenation of min_path and a list containing element j  
+        END FUNCTION  
+        SET min_cost TO positive infinity  
+        SET min_path TO an empty list  
+        FOR index j FROM zero TO n MINUS one  
+            SET cost AND path TO the result of dp with arguments m MINUS one and j  
+            IF cost LESS THAN min_cost THEN  
+                SET min_cost TO cost  
+                SET min_path TO path  
+            END IF  
+        END FOR  
+        RETURN min_path  
+    END FUNCTION  
+END CLASS

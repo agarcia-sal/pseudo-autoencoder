@@ -1,0 +1,16 @@
+from typing import List
+
+class Solution:
+    def stoneGame(self, piles: List[int]) -> bool:
+        from functools import lru_cache
+
+        @lru_cache(None)
+        def dfs(i: int, j: int) -> int:
+            if i > j:
+                return 0
+            left_score = piles[i] - dfs(i + 1, j)
+            right_score = piles[j] - dfs(i, j - 1)
+            return max(left_score, right_score)
+
+        result = dfs(0, len(piles) - 1)
+        return result > 0

@@ -1,0 +1,43 @@
+CLASS Solution
+    FUNCTION getMaxRepetitions(string_s1, integer_n1, string_s2, integer_n2)
+        IF integer_n1 EQUALS zero
+            RETURN zero
+        END IF
+
+        SET list_s2_count TO auxiliary FUNCTION create_list_of_zeros WITH parameter the LENGTH OF string_s2 PLUS one
+        SET list_index_map TO auxiliary FUNCTION create_list_of_zeros WITH parameter the LENGTH OF string_s2 PLUS one
+
+        SET integer_current_index_s2 TO zero
+        SET integer_s1_count TO zero
+
+        WHILE integer_s1_count LESS THAN integer_n1
+            INCREMENT integer_s1_count BY one
+
+            FOR each character_char IN string_s1
+                IF character_char EQUALS element at position integer_current_index_s2 of string_s2
+                    INCREMENT integer_current_index_s2 BY one
+
+                    IF integer_current_index_s2 EQUALS the LENGTH OF string_s2
+                        SET element at position integer_s1_count of list_s2_count TO element at position integer_s1_count MINUS one of list_s2_count PLUS one
+                        SET integer_current_index_s2 TO zero
+                    END IF
+                END IF
+
+                SET element at position integer_s1_count of list_index_map TO integer_current_index_s2
+            END FOR
+
+            IF integer_current_index_s2 IS IN elements from position zero TO integer_s1_count MINUS one of list_index_map
+                SET integer_start TO auxiliary FUNCTION find_position_of_element WITH parameters integer_current_index_s2 and list_index_map
+                SET integer_cycle_length TO integer_s1_count MINUS integer_start
+                SET integer_cycles_fit TO the INTEGER DIVISION OF (integer_n1 MINUS integer_start) BY integer_cycle_length
+                SET integer_remainder TO the MODULO OF (integer_n1 MINUS integer_start) BY integer_cycle_length
+
+                SET integer_total_s2_count TO element at position integer_start of list_s2_count PLUS integer_cycles_fit MULTIPLIED BY (element at position integer_start PLUS integer_cycle_length of list_s2_count MINUS element at position integer_start of list_s2_count) PLUS element at position integer_start PLUS integer_remainder of list_s2_count MINUS element at position integer_start of list_s2_count
+
+                RETURN the INTEGER DIVISION OF integer_total_s2_count BY integer_n2
+            END IF
+        END WHILE
+
+        RETURN the INTEGER DIVISION OF element at position integer_s1_count of list_s2_count BY integer_n2
+    END FUNCTION
+END CLASS

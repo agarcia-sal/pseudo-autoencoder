@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION updateBoard WITH PARAMETERS board AND click  
+        FUNCTION count_adjacent_mines WITH PARAMETERS r AND c  
+            SET count TO zero  
+            FOR i FROM r MINUS one TO r PLUS one  
+                FOR j FROM c MINUS one TO c PLUS one  
+                    IF i IS GREATER THAN OR EQUAL TO zero AND i IS LESS THAN the LENGTH OF board AND j IS GREATER THAN OR EQUAL TO zero AND j IS LESS THAN the LENGTH OF element at position zero OF board AND element at position i OF board AT position j IS EQUAL TO MINE MARKER  
+                        INCREMENT count BY one  
+                    END IF  
+                END FOR  
+            END FOR  
+            RETURN count  
+        END FUNCTION  
+        
+        FUNCTION dfs WITH PARAMETERS r AND c  
+            IF r IS LESS THAN zero OR r IS GREATER THAN OR EQUAL TO the LENGTH OF board OR c IS LESS THAN zero OR c IS GREATER THAN OR EQUAL TO the LENGTH OF element at position zero OF board  
+                RETURN  
+            END IF  
+            IF element at position r OF board AT position c IS NOT EQUAL TO EMPTY MARKER  
+                RETURN  
+            END IF  
+            
+            SET mine_count TO count_adjacent_mines WITH ARGUMENTS r AND c  
+            IF mine_count IS GREATER THAN zero  
+                SET element at position r OF board AT position c TO textual REPRESENTATION OF mine_count  
+            ELSE  
+                SET element at position r OF board AT position c TO BLANK MARKER  
+                FOR i FROM r MINUS one TO r PLUS one  
+                    FOR j FROM c MINUS one TO c PLUS one  
+                        CALL dfs WITH ARGUMENTS i AND j  
+                    END FOR  
+                END FOR  
+            END IF  
+        END FUNCTION  
+        
+        SET row TO element at position zero OF click  
+        SET col TO element at position one OF click  
+        IF element at position row OF board AT position col IS EQUAL TO MINE MARKER  
+            SET element at position row OF board AT position col TO EXPLODED MARKER  
+            RETURN board  
+        END IF  
+        
+        CALL dfs WITH ARGUMENTS row AND col  
+        RETURN board  
+    END FUNCTION  
+END CLASS

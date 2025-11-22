@@ -1,0 +1,42 @@
+CLASS Solution  
+    FUNCTION ipToCIDR(ip, n)  
+        FUNCTION ip_to_int(ip)  
+            SET parts TO list of CONVERT each element TO integer IN SPLIT ip BY the period word  
+            SET res TO zero  
+            FOR each part IN parts  
+                SET res TO res MULTIPLIED BY two HUNDRED FIFTY SIX PLUS part  
+            END FOR  
+            RETURN res  
+        END FUNCTION  
+        FUNCTION int_to_ip(num)  
+            SET ip_parts TO empty list  
+            FOR i FROM three TO zero DECREMENT BY one  
+                SET shifted_value TO num DIVIDED BY two HUNDRED FIFTY SIX RAISED TO THE POWER i  
+                SET part_value TO shifted_value MODULO two HUNDRED FIFTY SIX  
+                APPEND the TEXT VERSION OF part_value TO ip_parts  
+            END FOR  
+            RETURN concatenation of ip_parts WITH the period word AS SEPARATOR  
+        END FUNCTION  
+        FUNCTION largest_cidr_size(start, n)  
+            IF the least significant bit of start EQUALS one THEN  
+                RETURN one  
+            END IF  
+            SET x TO one  
+            WHILE x IS LESS THAN OR EQUAL TO n AND the bitwise AND of start AND x MINUS one EQUALS zero  
+                SET x TO x MULTIPLIED BY two  
+            END WHILE  
+            RETURN x DIVIDED BY two  
+        END FUNCTION  
+        SET result TO empty list  
+        SET start_ip TO ip_to_int WITH ip AS PARAMETER  
+        WHILE n IS GREATER THAN zero  
+            SET size TO largest_cidr_size WITH start_ip AND n AS PARAMETERS  
+            SET cidr_suffix TO thirty TWO MINUS size CONVERTED TO BIT LENGTH MINUS one  
+            SET cidr_string TO concatenation OF int_to_ip WITH start_ip AS PARAMETER FOLLOWED BY slash word FOLLOWED BY the TEXT VERSION OF cidr_suffix  
+            APPEND cidr_string TO result  
+            SET start_ip TO start_ip PLUS size  
+            SET n TO n MINUS size  
+        END WHILE  
+        RETURN result  
+    END FUNCTION  
+END CLASS

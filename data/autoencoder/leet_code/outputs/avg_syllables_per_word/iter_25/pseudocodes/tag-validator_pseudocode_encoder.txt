@@ -1,0 +1,39 @@
+CLASS Solution  
+    FUNCTION isValid WITH parameter code  
+        IMPORT the regular expression module  
+        SET the pattern for CDATA to the literal string less than exclamation mark left square bracket CDATA left square bracket followed by any characters non-greedy followed by right square bracket right square bracket greater than  
+        SET code TO the result of substituting all occurrences matching the CDATA pattern in code with an empty string using regular expressions  
+        SET stack TO an empty list  
+        SET i TO zero  
+        WHILE i is less than the length of code  
+            IF the element at position i of code is less than  
+                SET j TO the position found by searching for the character greater than in code starting at position i plus one  
+                IF j equals negative one  
+                    RETURN false because no matching greater than character was found  
+                END IF  
+                SET tag_content TO the substring of code from position i plus one up to position j minus one inclusive  
+                IF tag_content is empty  
+                    RETURN false because tag was empty  
+                END IF  
+                IF the element at position zero of tag_content equals the character slash  
+                    SET tag_name TO the substring of tag_content from position one to the end  
+                    IF stack is empty or the last element of stack does not equal tag_name  
+                        RETURN false due to mismatched or unbalanced tag  
+                    END IF  
+                    REMOVE the last element from stack  
+                ELSE IF the element at position zero of tag_content equals the exclamation mark  
+                    RETURN false because CDATA section should have been removed  
+                ELSE  
+                    IF the length of tag_content is less than one or greater than nine or tag_content is not composed entirely of uppercase letters  
+                        RETURN false because tag name is invalid  
+                    END IF  
+                    APPEND tag_content to stack  
+                END IF  
+                SET i TO j plus one  
+            ELSE  
+                INCREMENT i by one  
+            END IF  
+        END WHILE  
+        RETURN true if stack is empty and the count of matches found by finding with regular expressions all substrings matching a pattern with less than symbol followed by one or more uppercase letters then greater than then any characters then less than slash followed by one or more uppercase letters then greater than in code is greater than zero otherwise return false  
+    END FUNCTION  
+END CLASS

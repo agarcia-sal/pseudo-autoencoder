@@ -1,0 +1,68 @@
+CLASS Solution  
+    FUNCTION shortestDistance(self, grid)  
+        IF grid IS empty OR first element of grid IS empty THEN  
+            RETURN minus one  
+        END IF  
+        
+        SET m TO length of grid  
+        SET n TO length of first element of grid  
+        SET total_distance TO auxiliary FUNCTION that creates a two-dimensional list with m rows and n columns filled with zero  
+        SET reach_count TO auxiliary FUNCTION that creates a two-dimensional list with m rows and n columns filled with zero  
+        SET building_count TO zero  
+        
+        SET directions TO list of pairs: (1, 0), (minus one, 0), (0, 1), (0, minus one)  
+        
+        FUNCTION bfs(start_x, start_y)  
+            SET queue TO new deque initialized with pair (start_x, start_y)  
+            SET visited TO auxiliary FUNCTION that creates a two-dimensional list with m rows and n columns filled with False  
+            SET distance TO zero  
+            SET reachable TO zero  
+            
+            WHILE queue is not empty DO  
+                SET size TO number of elements in queue  
+                INCREMENT distance BY one  
+                FOR index FROM zero TO size minus one DO  
+                    SET x, y TO dequeued first element from queue  
+                    FOR each pair dx, dy IN directions DO  
+                        SET nx TO x PLUS dx  
+                        SET ny TO y PLUS dy  
+                        IF nx GREATER THAN OR EQUAL TO zero AND nx LESS THAN m AND ny GREATER THAN OR EQUAL TO zero AND ny LESS THAN n AND visited[nx][ny] IS False AND grid[nx][ny] EQUALS zero THEN  
+                            SET visited[nx][ny] TO True  
+                            ENQUEUE pair (nx, ny) TO queue  
+                            INCREMENT total_distance[nx][ny] BY distance  
+                            INCREMENT reach_count[nx][ny] BY one  
+                            INCREMENT reachable BY one  
+                        END IF  
+                    END FOR  
+                END FOR  
+            END WHILE  
+            RETURN reachable  
+        END FUNCTION  
+        
+        FOR i FROM zero TO m minus one DO  
+            FOR j FROM zero TO n minus one DO  
+                IF grid[i][j] EQUALS one THEN  
+                    INCREMENT building_count BY one  
+                    IF bfs(i, j) LESS THAN building_count MINUS one THEN  
+                        RETURN minus one  
+                    END IF  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET min_distance TO positive infinity  
+        FOR i FROM zero TO m minus one DO  
+            FOR j FROM zero TO n minus one DO  
+                IF grid[i][j] EQUALS zero AND reach_count[i][j] EQUALS building_count THEN  
+                    SET min_distance TO smaller of min_distance AND total_distance[i][j]  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        IF min_distance EQUALS positive infinity THEN  
+            RETURN minus one  
+        ELSE  
+            RETURN min_distance  
+        END IF  
+    END FUNCTION  
+END CLASS

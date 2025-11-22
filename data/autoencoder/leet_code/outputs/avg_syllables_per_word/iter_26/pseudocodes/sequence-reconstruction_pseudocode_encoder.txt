@@ -1,0 +1,47 @@
+CLASS Solution
+    FUNCTION sequenceReconstruction(nums AS List OF integers, sequences AS List OF List OF integers) RETURNS boolean
+        SET n TO the LENGTH OF nums
+        SET graph TO a new default dictionary OF lists
+        SET indegree TO a new list OF zeros WITH the LENGTH OF n PLUS one
+
+        FOR each seq IN sequences
+            FOR i FROM zero TO the LENGTH OF seq MINUS one MINUS one INCLUSIVE
+                SET u TO element at position i OF seq
+                SET v TO element at position i PLUS one OF seq
+                APPEND v TO the list AT key u OF graph
+                INCREMENT the element at position v OF indegree BY one
+            END FOR
+        END FOR
+
+        SET queue TO a new double ended queue CONTAINING all integers i FROM one TO n INCLUSIVE FOR WHICH the element at position i OF indegree EQUALS zero
+
+        IF the LENGTH OF queue NOT EQUALS one
+            RETURN false
+        END IF
+
+        SET index TO zero
+
+        WHILE the LENGTH OF queue GREATER THAN zero HOLDS
+            IF the LENGTH OF queue NOT EQUALS one
+                RETURN false
+            END IF
+
+            SET node TO the element REMOVED FROM the LEFT OF queue
+
+            IF node NOT EQUALS element at position index OF nums
+                RETURN false
+            END IF
+
+            INCREMENT index BY one
+
+            FOR each neighbor IN the list AT key node OF graph
+                DECREMENT the element at position neighbor OF indegree BY one
+                IF the element at position neighbor OF indegree EQUALS zero
+                    APPEND neighbor TO the RIGHT OF queue
+                END IF
+            END FOR
+        END WHILE
+
+        RETURN index EQUALS n
+    END FUNCTION
+END CLASS

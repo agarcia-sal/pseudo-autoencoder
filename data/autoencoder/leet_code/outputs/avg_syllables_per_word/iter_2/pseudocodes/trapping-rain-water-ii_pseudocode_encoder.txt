@@ -1,0 +1,48 @@
+```
+CLASS Solution
+    FUNCTION trapRainWater(heightMap)
+        IF heightMap IS EMPTY OR heightMap[0] IS EMPTY
+            RETURN 0
+        END IF
+
+        SET m TO LENGTH OF heightMap
+        SET n TO LENGTH OF heightMap[0]
+        SET visited TO 2D LIST OF size m by n FILLED WITH False
+        SET min_heap TO EMPTY LIST
+
+        FOR i FROM 0 TO m - 1
+            PUSH (heightMap[i][0], i, 0) INTO min_heap
+            PUSH (heightMap[i][n - 1], i, n - 1) INTO min_heap
+            SET visited[i][0] TO True
+            SET visited[i][n - 1] TO True
+        END FOR
+
+        FOR j FROM 0 TO n - 1
+            PUSH (heightMap[0][j], 0, j) INTO min_heap
+            PUSH (heightMap[m - 1][j], m - 1, j) INTO min_heap
+            SET visited[0][j] TO True
+            SET visited[m - 1][j] TO True
+        END FOR
+
+        SET directions TO LIST OF (-1,0), (1,0), (0,-1), (0,1)
+        SET water_trapped TO 0
+
+        WHILE min_heap IS NOT EMPTY
+            POP (height, x, y) FROM min_heap
+
+            FOR EACH (dx, dy) IN directions
+                SET nx TO x + dx
+                SET ny TO y + dy
+
+                IF nx IS BETWEEN 0 AND m-1 AND ny IS BETWEEN 0 AND n-1 AND visited[nx][ny] IS False
+                    SET visited[nx][ny] TO True
+                    SET water_trapped TO water_trapped + MAXIMUM OF 0 AND (height - heightMap[nx][ny])
+                    PUSH (MAXIMUM OF height AND heightMap[nx][ny], nx, ny) INTO min_heap
+                END IF
+            END FOR
+        END WHILE
+
+        RETURN water_trapped
+    END FUNCTION
+END CLASS
+```

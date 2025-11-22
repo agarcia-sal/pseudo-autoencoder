@@ -1,0 +1,59 @@
+CLASS Solution  
+    FUNCTION minimumWeight(n, edges, src1, src2, dest)  
+        FUNCTION dijkstra(graph, start)  
+            SET distances TO a list containing the value positive infinity repeated n times  
+            SET element at position start OF distances TO zero  
+            SET heap TO a list containing the tuple of zero and start  
+            
+            WHILE the LENGTH OF heap IS GREATER THAN zero  
+                CALL heappop WITH PARAMETERS heap AND ASSIGN the result TO current_distance AND current_node  
+                
+                IF current_distance IS GREATER THAN element at position current_node OF distances  
+                    CONTINUE to the next iteration of the WHILE loop  
+                END IF  
+                
+                FOR each neighbor_weight_tuple IN element at position current_node OF graph  
+                    DECOMPOSE neighbor_weight_tuple INTO neighbor AND weight  
+                    SET distance TO current_distance PLUS weight  
+                    
+                    IF distance IS LESS THAN element at position neighbor OF distances  
+                        SET element at position neighbor OF distances TO distance  
+                        CALL heappush WITH PARAMETERS heap AND the tuple of distance AND neighbor  
+                    END IF  
+                END FOR  
+            END WHILE  
+            
+            RETURN distances  
+        END FUNCTION  
+        
+        SET graph TO a list containing empty lists repeated n times  
+        SET reverse_graph TO a list containing empty lists repeated n times  
+        
+        FOR each edge_tuple IN edges  
+            DECOMPOSE edge_tuple INTO u, v, w  
+            APPEND the tuple of v AND w TO element at position u OF graph  
+            APPEND the tuple of u AND w TO element at position v OF reverse_graph  
+        END FOR  
+        
+        SET dist_from_src1 TO CALL dijkstra WITH PARAMETERS graph AND src1  
+        SET dist_from_src2 TO CALL dijkstra WITH PARAMETERS graph AND src2  
+        SET dist_to_dest TO CALL dijkstra WITH PARAMETERS reverse_graph AND dest  
+        
+        SET min_weight TO positive infinity  
+        
+        FOR index FROM zero TO n MINUS one  
+            IF element at position index OF dist_from_src1 IS NOT EQUAL TO positive infinity AND element at position index OF dist_from_src2 IS NOT EQUAL TO positive infinity AND element at position index OF dist_to_dest IS NOT EQUAL TO positive infinity  
+                SET candidate_weight TO element at position index OF dist_from_src1 PLUS element at position index OF dist_from_src2 PLUS element at position index OF dist_to_dest  
+                IF candidate_weight IS LESS THAN min_weight  
+                    SET min_weight TO candidate_weight  
+                END IF  
+            END IF  
+        END FOR  
+        
+        IF min_weight IS EQUAL TO positive infinity  
+            RETURN negative one  
+        ELSE  
+            RETURN min_weight  
+        END IF  
+    END FUNCTION  
+END CLASS

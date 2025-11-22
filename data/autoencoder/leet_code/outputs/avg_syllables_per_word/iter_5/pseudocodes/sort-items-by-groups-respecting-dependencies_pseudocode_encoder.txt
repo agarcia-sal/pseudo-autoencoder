@@ -1,0 +1,62 @@
+CLASS Solution  
+    FUNCTION sortItems(n, m, group, beforeItems)  
+        FOR i FROM 0 TO n MINUS 1  
+            IF group AT i EQUALS -1 THEN  
+                SET group AT i TO m  
+                INCREMENT m BY 1  
+        
+        INITIALIZE group_items AS mapping from group to list  
+        INITIALIZE group_graph AS mapping from group to list  
+        INITIALIZE item_graph AS mapping from item to list  
+        INITIALIZE item_in_degree AS list of zeros of length n  
+        INITIALIZE group_in_degree AS list of zeros of length m  
+        
+        FOR i FROM 0 TO n MINUS 1  
+            APPEND i TO group_items AT group AT i  
+        
+        FOR i FROM 0 TO n MINUS 1  
+            FOR each before IN beforeItems AT i  
+                IF group AT before EQUALS group AT i THEN  
+                    APPEND i TO item_graph AT before  
+                    INCREMENT item_in_degree AT i BY 1  
+                ELSE  
+                    APPEND group AT i TO group_graph AT group AT before  
+                    INCREMENT group_in_degree AT group AT i BY 1  
+        
+        FUNCTION topological_sort(graph, in_degree, items)  
+            SET q TO list of items WITH in_degree EQUALS 0  
+            SET result TO empty list  
+            WHILE q IS NOT empty  
+                REMOVE first element u FROM q  
+                APPEND u TO result  
+                FOR each v IN graph AT u  
+                    DECREMENT in_degree AT v BY 1  
+                    IF in_degree AT v EQUALS 0 THEN  
+                        APPEND v TO q  
+            IF LENGTH OF result EQUALS LENGTH OF items THEN  
+                RETURN result  
+            ELSE  
+                RETURN empty list  
+        
+        SET sorted_within_groups TO empty list  
+        FOR each items IN group_items values  
+            SET sorted_items TO topological_sort(item_graph, item_in_degree, items)  
+            IF sorted_items IS empty THEN  
+                RETURN empty list  
+            APPEND all elements of sorted_items TO sorted_within_groups  
+        
+        SET sorted_groups TO topological_sort(group_graph, group_in_degree, list of integers FROM 0 TO m MINUS 1)  
+        IF sorted_groups IS empty THEN  
+            RETURN empty list  
+        
+        INITIALIZE group_to_items_map AS mapping from group to list  
+        FOR each item IN sorted_within_groups  
+            APPEND item TO group_to_items_map AT group AT item  
+        
+        SET result TO empty list  
+        FOR each group IN sorted_groups  
+            APPEND all elements of group_to_items_map AT group TO result  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

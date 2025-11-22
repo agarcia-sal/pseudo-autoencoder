@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION solveEquation WITH parameter equation  
+        FUNCTION parse_side WITH parameter side  
+            SET tokens TO side WITH all occurrences of plus replaced by a special separator followed by plus AND all occurrences of minus replaced by a special separator followed by minus THEN SPLIT by the special separator  
+            SET x_count TO zero  
+            SET num_sum TO zero  
+            FOR each token IN tokens  
+                IF token is empty  
+                    CONTINUE to next iteration  
+                END IF  
+                IF token CONTAINS letter x  
+                    IF token EQUALS letter x OR token EQUALS plus followed by letter x  
+                        INCREMENT x_count BY one  
+                    ELSE IF token EQUALS minus followed by letter x  
+                        DECREMENT x_count BY one  
+                    ELSE  
+                        SET numeric_value TO token WITH letter x REPLACED BY empty string CONVERTED TO integer  
+                        INCREMENT x_count BY numeric_value  
+                    END IF  
+                ELSE  
+                    SET numeric_value TO token CONVERTED TO integer  
+                    INCREMENT num_sum BY numeric_value  
+                END IF  
+            END FOR  
+            RETURN x_count AND num_sum  
+        END FUNCTION
+
+        SET left_side AND right_side TO equation SPLIT by equal sign  
+        SET left_x AND left_num TO parse_side WITH left_side  
+        SET right_x AND right_num TO parse_side WITH right_side
+
+        SET total_x TO left_x MINUS right_x  
+        SET total_num TO right_num MINUS left_num
+
+        IF total_x EQUALS zero  
+            IF total_num EQUALS zero  
+                RETURN string indicating infinite solutions  
+            ELSE  
+                RETURN string indicating no solution  
+            END IF  
+        ELSE  
+            SET division_result TO total_num DIVIDED BY total_x USING integer division  
+            RETURN string constructed by letter x EQUALS division_result  
+        END IF  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,47 @@
+CLASS Solution  
+    FUNCTION minNumberOfSemesters(n, relations, k)  
+        CALL initialize_graph_and_in_degree WITH PARAMETERS n, relations AND RECEIVE graph, in_degree  
+        CALL initialize_queue WITH PARAMETERS in_degree, n AND RECEIVE queue  
+        SET semesters TO zero  
+        WHILE the LENGTH OF queue IS GREATER THAN zero HOLDS  
+            SET courses_to_take TO the MINIMUM OF k AND the LENGTH OF queue  
+            FOR index FROM one TO courses_to_take  
+                CALL remove_and_process_course WITH PARAMETERS queue, graph, in_degree  
+            END FOR  
+            INCREMENT semesters BY one  
+        END WHILE  
+        RETURN semesters  
+    END FUNCTION  
+    
+    FUNCTION initialize_graph_and_in_degree(n, relations)  
+        CREATE graph AS a MAPPING OF DEFAULT LIST  
+        CREATE in_degree AS a LIST WITH n PLUS one ELEMENTS INITIALIZED TO zero  
+        FOR each relation IN relations  
+            SET prevCourse TO element at position one OF relation  
+            SET nextCourse TO element at position two OF relation  
+            APPEND nextCourse TO the LIST AT KEY prevCourse OF graph  
+            INCREMENT the ELEMENT AT POSITION nextCourse OF in_degree BY one  
+        END FOR  
+        RETURN graph, in_degree  
+    END FUNCTION  
+
+    FUNCTION initialize_queue(in_degree, n)  
+        CREATE queue AS an EMPTY DOUBLE-ENDED QUEUE  
+        FOR course FROM one TO n  
+            IF the ELEMENT AT POSITION course OF in_degree EQUALS zero THEN  
+                APPEND course TO queue  
+            END IF  
+        END FOR  
+        RETURN queue  
+    END FUNCTION  
+
+    FUNCTION remove_and_process_course(queue, graph, in_degree)  
+        REMOVE the ELEMENT AT THE FRONT FROM queue AND ASSIGN TO current_course  
+        FOR each next_course IN the LIST AT KEY current_course OF graph  
+            DECREMENT the ELEMENT AT POSITION next_course OF in_degree BY one  
+            IF the ELEMENT AT POSITION next_course OF in_degree EQUALS zero THEN  
+                APPEND next_course TO queue  
+            END IF  
+        END FOR  
+    END FUNCTION  
+END CLASS

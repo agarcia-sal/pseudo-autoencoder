@@ -1,0 +1,66 @@
+CLASS Solution
+    FUNCTION cutOffTree(forest: List of List of Integer) RETURNS Integer
+        IF forest IS EMPTY OR forest[0] IS EMPTY THEN
+            RETURN -1
+        END IF
+
+        SET trees TO EMPTY LIST
+        FOR i FROM 0 TO LENGTH OF forest MINUS 1
+            FOR j FROM 0 TO LENGTH OF forest[0] MINUS 1
+                IF forest[i][j] GREATER THAN 1 THEN
+                    APPEND (forest[i][j], i, j) TO trees
+                END IF
+            END FOR
+        END FOR
+        SORT trees BY HEIGHT
+
+        FUNCTION bfs(start: Tuple(Integer, Integer), end: Tuple(Integer, Integer)) RETURNS Integer
+            IF start EQUALS end THEN
+                RETURN 0
+            END IF
+
+            SET m TO LENGTH OF forest
+            SET n TO LENGTH OF forest[0]
+            SET queue TO DEQUE initialized with start
+            SET visited TO SET initialized with start
+            SET steps TO 0
+
+            WHILE queue IS NOT EMPTY
+                SET current_level_size TO LENGTH OF queue
+                FOR count FROM 1 TO current_level_size
+                    SET (x, y) TO DEQUEUE from queue
+                    FOR EACH (dx, dy) IN [(-1, 0), (1, 0), (0, -1), (0, 1)]
+                        SET nx TO x PLUS dx
+                        SET ny TO y PLUS dy
+                        IF nx IN RANGE 0 TO m MINUS 1 AND ny IN RANGE 0 TO n MINUS 1 AND (nx, ny) NOT IN visited AND forest[nx][ny] NOT EQUAL TO 0 THEN
+                            IF (nx, ny) EQUALS end THEN
+                                RETURN steps PLUS 1
+                            END IF
+                            ADD (nx, ny) TO visited
+                            ENQUEUE (nx, ny) TO queue
+                        END IF
+                    END FOR
+                END FOR
+                INCREMENT steps BY 1
+            END WHILE
+
+            RETURN -1
+        END FUNCTION
+
+        SET x TO 0
+        SET y TO 0
+        SET total_steps TO 0
+
+        FOR EACH (height, tx, ty) IN trees
+            SET steps TO bfs((x, y), (tx, ty))
+            IF steps EQUALS -1 THEN
+                RETURN -1
+            END IF
+            INCREMENT total_steps BY steps
+            SET x TO tx
+            SET y TO ty
+        END FOR
+
+        RETURN total_steps
+    END FUNCTION
+END CLASS

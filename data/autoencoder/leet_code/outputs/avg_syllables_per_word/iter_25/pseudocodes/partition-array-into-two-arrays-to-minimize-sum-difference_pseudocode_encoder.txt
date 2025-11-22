@@ -1,0 +1,49 @@
+CLASS Solution  
+    FUNCTION minimumDifference(nums)  
+        SET n TO the LENGTH OF nums DIVIDED BY two  
+        SET total_sum TO the SUM OF nums  
+        SET target TO total_sum DIVIDED BY two  
+        SET min_diff TO infinite value  
+        SET left_half TO the SUBLIST starting at zero TO n MINUS one of nums  
+        SET right_half TO the SUBLIST starting at n TO the END of nums  
+        SET left_sums TO a LIST OF EMPTY DICTIONARIES with LENGTH n PLUS one  
+        SET right_sums TO a LIST OF EMPTY DICTIONARIES with LENGTH n PLUS one  
+        FOR i FROM zero TO n INCLUSIVE  
+            FOR each combination OF left_half TAKING i ELEMENTS  
+                SET subset_sum TO the SUM OF the combination  
+                IF subset_sum NOT IN left_sums AT i  
+                    SET left_sums AT i AT subset_sum TO zero  
+                END IF  
+                INCREMENT left_sums AT i AT subset_sum BY one  
+            END FOR  
+            FOR each combination OF right_half TAKING i ELEMENTS  
+                SET subset_sum TO the SUM OF the combination  
+                IF subset_sum NOT IN right_sums AT i  
+                    SET right_sums AT i AT subset_sum TO zero  
+                END IF  
+                INCREMENT right_sums AT i AT subset_sum BY one  
+            END FOR  
+        END FOR  
+        FOR i FROM zero TO n INCLUSIVE  
+            SET left_values TO THE SORTED LIST OF KEYS IN left_sums AT i  
+            SET right_values TO THE SORTED LIST OF KEYS IN right_sums AT n MINUS i  
+            SET j TO zero  
+            SET k TO the LENGTH OF right_values MINUS one  
+            WHILE j LESS THAN the LENGTH OF left_values AND k GREATER THAN OR EQUAL TO zero  
+                SET current_sum TO left_values AT j PLUS right_values AT k  
+                SET potential_diff TO the ABSOLUTE VALUE OF total_sum MINUS two MULTIPLIED BY current_sum  
+                IF potential_diff LESS THAN min_diff  
+                    SET min_diff TO potential_diff  
+                END IF  
+                IF current_sum LESS THAN target  
+                    INCREMENT j BY one  
+                ELSE IF current_sum GREATER THAN target  
+                    DECREMENT k BY one  
+                ELSE  
+                    RETURN zero  
+                END IF  
+            END WHILE  
+        END FOR  
+        RETURN min_diff  
+    END FUNCTION  
+END CLASS

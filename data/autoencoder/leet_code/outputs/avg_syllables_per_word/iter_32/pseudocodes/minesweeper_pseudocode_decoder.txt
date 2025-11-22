@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION updateBoard(board, click)  
+        FUNCTION count_adjacent_mines(r, c)  
+            SET count TO zero  
+            FOR i FROM r MINUS one TO r PLUS one  
+                FOR j FROM c MINUS one TO c PLUS one  
+                    IF i GREATER THAN OR EQUAL TO zero AND i LESS THAN the LENGTH OF board AND j GREATER THAN OR EQUAL TO zero AND j LESS THAN the LENGTH OF element at position zero OF board AND element at position i OF board AT position j EQUALS mine symbol  
+                        INCREMENT count BY one  
+                    END IF  
+                END FOR  
+            END FOR  
+            RETURN count  
+        END FUNCTION  
+        
+        FUNCTION dfs(r, c)  
+            IF NOT (r GREATER THAN OR EQUAL TO zero AND r LESS THAN the LENGTH OF board AND c GREATER THAN OR EQUAL TO zero AND c LESS THAN the LENGTH OF element at position zero OF board)  
+                RETURN  
+            END IF  
+            IF element at position r OF board AT position c NOT EQUALS empty symbol  
+                RETURN  
+            END IF  
+            
+            SET mine_count TO count_adjacent_mines WITH r AND c  
+            IF mine_count GREATER THAN zero  
+                SET element at position r OF board AT position c TO string representation of mine_count  
+            ELSE  
+                SET element at position r OF board AT position c TO blank symbol  
+                FOR i FROM r MINUS one TO r PLUS one  
+                    FOR j FROM c MINUS one TO c PLUS one  
+                        CALL dfs WITH i AND j  
+                    END FOR  
+                END FOR  
+            END IF  
+        END FUNCTION  
+        
+        SET row TO element at position zero OF click  
+        SET col TO element at position one OF click  
+        IF element at position row OF board AT position col EQUALS mine symbol  
+            SET element at position row OF board AT position col TO exploded symbol  
+            RETURN board  
+        END IF  
+        
+        CALL dfs WITH row AND col  
+        RETURN board  
+    END FUNCTION  
+END CLASS

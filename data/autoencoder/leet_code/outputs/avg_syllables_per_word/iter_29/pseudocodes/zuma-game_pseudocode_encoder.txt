@@ -1,0 +1,58 @@
+CLASS Solution  
+    FUNCTION findMinStep(board, hand)  
+        FUNCTION clean(board_string)  
+            SET stack TO empty list  
+            FOR each character representing ball IN board_string  
+                IF stack is not empty AND the first element of the last pair in stack NOT EQUALS ball AND the second element of the last pair in stack GREATER THAN OR EQUAL TO three  
+                    REMOVE the last pair FROM stack  
+                END IF  
+                IF stack is empty OR the first element of the last pair in stack NOT EQUALS ball  
+                    APPEND a pair of ball and one TO stack  
+                ELSE  
+                    INCREMENT the second element of the last pair in stack BY one  
+                END IF  
+            END FOR  
+            IF stack is not empty AND the second element of the last pair in stack GREATER THAN OR EQUAL TO three  
+                REMOVE the last pair FROM stack  
+            END IF  
+            SET result_string TO empty string  
+            FOR each pair of ball and count IN stack  
+                APPEND ball repeated count times TO result_string  
+            END FOR  
+            RETURN result_string  
+        END FUNCTION  
+
+        FUNCTION dfs(current_board, current_hand_counter)  
+            IF current_board is empty  
+                RETURN zero  
+            END IF  
+            SET minimum_steps TO infinity  
+            SET position_i TO zero  
+            WHILE position_i LESS THAN the LENGTH OF current_board  
+                SET position_j TO position_i PLUS one  
+                WHILE position_j LESS THAN the LENGTH OF current_board AND character at position_i of current_board EQUALS character at position_j of current_board  
+                    INCREMENT position_j BY one  
+                END WHILE  
+                SET required_increment TO three MINUS the difference of position_j MINUS position_i  
+                IF the count corresponding to character at position_i of current_board IN current_hand_counter GREATER THAN OR EQUAL TO required_increment  
+                    SET new_hand_counter TO a copy of current_hand_counter  
+                    DECREMENT the count corresponding to character at position_i of current_board IN new_hand_counter BY required_increment  
+                    SET new_board TO the result of calling clean with substring from start TO position_i of current_board CONCATENATED WITH substring from position_j TO end of current_board  
+                    SET steps_result TO the result of calling dfs with new_board AND new_hand_counter  
+                    IF steps_result GREATER THAN OR EQUAL TO zero  
+                        SET minimum_steps TO the smaller of minimum_steps AND steps_result PLUS required_increment  
+                    END IF  
+                END IF  
+                SET position_i TO position_j  
+            END WHILE  
+            IF minimum_steps EQUALS infinity  
+                RETURN negative one  
+            ELSE  
+                RETURN minimum_steps  
+            END IF  
+        END FUNCTION  
+
+        SET hand_counter TO a count mapping of characters in hand  
+        RETURN the result of calling dfs with board AND hand_counter  
+    END FUNCTION  
+END CLASS

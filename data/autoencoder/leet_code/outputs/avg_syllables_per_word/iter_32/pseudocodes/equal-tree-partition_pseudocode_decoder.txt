@@ -1,0 +1,77 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS
+
+FUNCTION tree_node(values)  
+    IF values EQUALS empty  
+        RETURN None  
+    END IF  
+    SET root TO new TreeNode with value equal to element at position one of values and left equal to None and right equal to None  
+    SET i TO one  
+    SET queue TO an empty double ended queue  
+    APPEND root TO queue  
+    WHILE queue is not empty  
+        SET node TO the element removed from the left of queue  
+        IF i LESS THAN the length of values AND element at position i of values NOT EQUALS None  
+            SET node.left TO new TreeNode with value equal to element at position i of values and left equal to None and right equal to None  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN the length of values AND element at position i of values NOT EQUALS None  
+            SET node.right TO new TreeNode with value equal to element at position i of values and left equal to None and right equal to None  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)  
+    IF p EQUALS None AND q EQUALS None  
+        RETURN True  
+    ELSE IF p EQUALS None OR q EQUALS None  
+        RETURN False  
+    ELSE IF the value of p NOT EQUALS the value of q  
+        RETURN False  
+    ELSE  
+        RETURN the result of is_same_tree called with the left child of p and the left child of q AND the result of is_same_tree called with the right child of p and the right child of q  
+    END IF  
+END FUNCTION
+
+CLASS Solution  
+    FUNCTION checkEqualTree(self, root)  
+        FUNCTION subtree_sum(node)  
+            IF node EQUALS None  
+                RETURN zero  
+            END IF  
+            RETURN the value of node PLUS the result of subtree_sum called with the left child of node PLUS the result of subtree_sum called with the right child of node  
+        END FUNCTION  
+
+        SET total_sum TO the result of subtree_sum called with root  
+
+        IF total_sum MODULO two NOT EQUALS zero  
+            RETURN False  
+        END IF  
+
+        SET target TO total_sum DIVIDED BY two  
+        SET found TO a list containing False  
+
+        FUNCTION can_split(node)  
+            IF node EQUALS None  
+                RETURN zero  
+            END IF  
+            SET current_sum TO the value of node PLUS the result of can_split called with the left child of node PLUS the result of can_split called with the right child of node  
+            IF current_sum EQUALS target AND node NOT EQUALS root  
+                SET the element at position one of found TO True  
+            END IF  
+            RETURN current_sum  
+        END FUNCTION  
+
+        CALL can_split with root  
+        RETURN the element at position one of found  
+    END FUNCTION  
+END CLASS

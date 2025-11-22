@@ -1,0 +1,28 @@
+CLASS Solution
+    FUNCTION minimumTimeRequired(jobs: List OF int, k: int) RETURNS int
+        SET n TO LENGTH OF jobs
+        SET subset_sums TO LIST OF SIZE (2 TO THE POWER OF n) FILLED WITH 0
+        
+        FOR i FROM 0 TO n MINUS 1
+            FOR mask FROM 0 TO (2 TO THE POWER OF i) MINUS 1
+                SET subset_sums[mask OR (1 LEFT SHIFTED BY i)] TO subset_sums[mask] PLUS jobs[i]
+        
+        FUNCTION dp(k: int, mask: int) RETURNS int
+            IF k EQUALS 1 THEN
+                RETURN subset_sums[mask]
+            END IF
+            
+            SET res TO INFINITY
+            SET submask TO mask
+            
+            WHILE submask IS NOT 0
+                SET res TO MINIMUM OF res AND MAXIMUM OF dp(k MINUS 1, mask XOR submask) AND subset_sums[submask]
+                SET submask TO (submask MINUS 1) BITWISE AND mask
+            END WHILE
+            
+            RETURN res
+        END FUNCTION
+        
+        RETURN dp(k, (1 LEFT SHIFTED BY n) MINUS 1)
+    END FUNCTION
+END CLASS

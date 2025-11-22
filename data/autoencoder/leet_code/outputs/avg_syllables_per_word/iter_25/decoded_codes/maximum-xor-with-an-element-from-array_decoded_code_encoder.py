@@ -1,0 +1,42 @@
+from typing import List, Tuple
+
+class Solution:
+    def maximizeXor(self, nums: List[int], queries: List[List[int]]) -> List[int]:
+        nums.sort()
+        # Enumerate queries to keep track of original indices,
+        # then sort by mi (the second element of each query)
+        sorted_queries = sorted(enumerate(queries), key=lambda x: x[1][1])
+        result = [-1] * len(queries)
+        trie = {}
+        num_index = 0
+        n = len(nums)
+
+        for query_index, (xi, mi) in sorted_queries:
+            # Insert into trie all nums <= mi
+            while num_index < n and nums[num_index] <= mi:
+                num = nums[num_index]
+                node = trie
+                for i in range(31, -1, -1):
+                    bit = (num >> i) & 1
+                    if bit not in node:
+                        node[bit] = {}
+                    node = node[bit]
+                num_index += 1
+
+            if not trie:
+                # No numbers inserted that are <= mi, result stays -1
+                continue
+
+            node = trie
+            max_xor = 0
+            for i in range(31, -1, -1):
+                bit = (xi >> i) & 1
+                toggle_bit = 1 - bit
+                if toggle_bit in node:
+                    max_xor |= (1 << i)
+                    node = node[toggle_bit]
+                else:
+                    node = node[bit]
+            result[query_index] = max_xor
+
+        return result

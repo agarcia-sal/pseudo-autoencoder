@@ -1,0 +1,49 @@
+CLASS Solution  
+    FUNCTION maxStudents WITH parameter seats  
+        SET m TO the LENGTH OF seats  
+        SET n TO the LENGTH OF element at position zero OF seats  
+        
+        SET broken TO a list of zero values with LENGTH m  
+        FOR index i FROM zero TO m MINUS one  
+            FOR index j FROM zero TO n MINUS one  
+                IF element at position j OF element at position i OF seats IS EQUAL TO the symbol for broken seat  
+                    SET broken at position i TO broken at position i OR a value of one SHIFTED LEFT BY j positions  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        FUNCTION is_valid WITH parameter arrangement  
+            RETURN arrangement AND arrangement SHIFTED RIGHT BY one POSITION IS EQUAL TO zero  
+        END FUNCTION  
+        
+        SET dp TO a list containing m empty mappings  
+        
+        FOR arrangement FROM zero TO a value of one SHIFTED LEFT BY n POSITIONS MINUS one  
+            IF is_valid WITH argument arrangement IS TRUE AND arrangement AND broken at position zero IS EQUAL TO zero  
+                SET dp at position zero WITH key arrangement TO the COUNT OF one bits IN arrangement  
+            END IF  
+        END FOR  
+        
+        FOR index i FROM one TO m MINUS one  
+            FOR arrangement FROM zero TO a value of one SHIFTED LEFT BY n POSITIONS MINUS one  
+                IF is_valid WITH argument arrangement IS TRUE AND arrangement AND broken at position i IS EQUAL TO zero  
+                    SET max_students TO zero  
+                    FOR each prev_arrangement IN keys OF dp at position i MINUS one  
+                        IF arrangement AND prev_arrangement SHIFTED RIGHT BY one POSITION IS EQUAL TO zero AND arrangement AND prev_arrangement SHIFTED LEFT BY one POSITION IS EQUAL TO zero  
+                            IF dp at position i MINUS one WITH key prev_arrangement IS GREATER THAN max_students  
+                                SET max_students TO dp at position i MINUS one WITH key prev_arrangement  
+                            END IF  
+                        END IF  
+                    END FOR  
+                    SET dp at position i WITH key arrangement TO max_students PLUS the COUNT OF one bits IN arrangement  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        IF dp at the last position IS NOT EMPTY  
+            RETURN the maximum value AMONG values IN dp at the last position  
+        ELSE  
+            RETURN zero  
+        END IF  
+    END FUNCTION  
+END CLASS

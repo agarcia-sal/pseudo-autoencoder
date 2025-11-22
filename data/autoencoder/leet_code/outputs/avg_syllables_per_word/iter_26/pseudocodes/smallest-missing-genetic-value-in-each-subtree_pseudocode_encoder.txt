@@ -1,0 +1,68 @@
+CLASS Solution
+    FUNCTION smallestMissingValueSubtree(parents AS List OF integers, nums AS List OF integers) RETURNS List OF integers
+        IMPORT the DEFAULT DICTIONARY CLASS from the collections module
+        
+        SET n TO the LENGTH OF parents
+        SET tree TO a DEFAULT DICTIONARY with default value as an empty LIST
+        
+        FOR index i FROM one TO n MINUS one INCLUSIVE
+            APPEND i TO the LIST associated with the key element at position i OF parents IN tree
+        END FOR
+        
+        SET node_with_one TO the negative one
+        
+        FOR index i FROM zero TO n MINUS one INCLUSIVE
+            IF element at position i OF nums EQUALS one THEN
+                SET node_with_one TO i
+                BREAK OUT OF the loop
+            END IF
+        END FOR
+        
+        IF node_with_one EQUALS the negative one THEN
+            RETURN a LIST OF value one REPEATED n TIMES
+        END IF
+        
+        SET result TO a LIST OF value one REPEATED n TIMES
+        
+        FUNCTION dfs(node AS integer) RETURNS A SET OF integers
+            ADD node TO visited
+            SET genetic_values TO a SET containing element at position node OF nums
+            
+            FOR each child IN the LIST associated with key node IN tree
+                IF child IS NOT IN visited THEN
+                    SET genetic_values TO genetic_values UNION the RESULT OF dfs(child)
+                END IF
+            END FOR
+            
+            SET smallest_missing TO one
+            WHILE smallest_missing IS IN genetic_values DO
+                INCREMENT smallest_missing BY one
+            END WHILE
+            
+            SET element at position node OF result TO smallest_missing
+            
+            RETURN genetic_values
+        END FUNCTION
+        
+        SET visited TO an empty SET
+        
+        SET path TO an empty LIST
+        SET current TO node_with_one
+        
+        WHILE current IS NOT EQUAL TO the negative one DO
+            APPEND current TO path
+            SET current TO element at position current OF parents
+        END WHILE
+        
+        SET path_set TO a SET containing all elements of path
+        
+        FOR each node IN the REVERSED path
+            IF node IS IN visited THEN
+                CONTINUE TO the next iteration
+            END IF
+            CALL dfs WITH argument node
+        END FOR
+        
+        RETURN result
+    END FUNCTION
+END CLASS

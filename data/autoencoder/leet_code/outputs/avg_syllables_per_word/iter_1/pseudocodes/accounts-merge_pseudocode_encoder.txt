@@ -1,0 +1,25 @@
+```
+class UF:
+  init(n): root=[0..n-1]; rank=[1]*n
+  find(x): root[x]=x?x:find(root[x]); return root[x]
+  union(x,y): rx=find(x); ry=find(y)
+    if rx!=ry:
+      if rank[rx]>rank[ry]: root[ry]=rx
+      else if rank[rx]<rank[ry]: root[rx]=ry
+      else: root[ry]=rx; rank[rx]+=1
+
+accountsMerge(accts):
+  uf=UF(len(accts))
+  em_to_id={}
+  for i,(n,*emails) in enumerate(accts):
+    for e in emails:
+      if e not in em_to_id: em_to_id[e]=i
+      else: uf.union(i,em_to_id[e])
+  merged=defaultdict(list)
+  for e,i in em_to_id.items():
+    merged[uf.find(i)].append(e)
+  res=[]
+  for i,emails in merged.items():
+    res.append([accts[i][0]] + sorted(emails))
+  return res
+```

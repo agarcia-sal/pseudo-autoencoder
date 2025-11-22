@@ -1,0 +1,17 @@
+class Solution:
+    def maxChunksToSorted(self, arr):
+        max_so_far = []
+        current_max = arr[0]
+        for num in arr:
+            if num > current_max:
+                current_max = num
+            max_so_far.append(current_max)
+        sorted_arr = sorted(arr)
+        chunks = 0
+        max_chunk = 0
+        for index in range(len(arr)):
+            if arr[index] > max_chunk:
+                max_chunk = arr[index]
+            if max_chunk == sorted_arr[index]:
+                chunks += 1
+        return chunks

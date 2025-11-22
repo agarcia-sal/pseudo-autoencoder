@@ -1,0 +1,70 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, n)  
+        SET parent TO list of integers from zero TO n MINUS one  
+        SET rank TO list of zeros with length n  
+    END FUNCTION  
+
+    FUNCTION find(self, x)  
+        IF element at position x of parent NOT EQUALS x THEN  
+            SET element at position x of parent TO result of calling find on element at position x of parent  
+        END IF  
+        RETURN element at position x of parent  
+    END FUNCTION  
+
+    FUNCTION union(self, x, y)  
+        SET rootX TO result of calling find on x  
+        SET rootY TO result of calling find on y  
+        IF rootX NOT EQUALS rootY THEN  
+            IF element at position rootX of rank GREATER THAN element at position rootY of rank THEN  
+                SET element at position rootY of parent TO rootX  
+            ELSE IF element at position rootX of rank LESS THAN element at position rootY of rank THEN  
+                SET element at position rootX of parent TO rootY  
+            ELSE  
+                SET element at position rootY of parent TO rootX  
+                INCREMENT element at position rootX of rank BY one  
+            END IF  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION latestDayToCross(self, row, col, cells)  
+        SET grid TO list containing row elements each being a list containing col elements each set to one  
+
+        ASSIGN pointer TO new UnionFind with parameter being row MULTIPLIED BY col PLUS two  
+        SET TOP TO row MULTIPLIED BY col  
+        SET BOTTOM TO row MULTIPLIED BY col PLUS one  
+
+        SET directions TO list containing four pairs namely negative one and zero, one and zero, zero and negative one, zero and one  
+
+        FOR day FROM length of cells MINUS one DOWN TO zero DO  
+            SET r TO element at position day of cells at position zero  
+            SET c TO element at position day of cells at position one  
+            DECREMENT r BY one  
+            DECREMENT c BY one  
+            SET element at position r of grid at position c TO zero  
+
+            FOR each pair dr, dc IN directions DO  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                IF nr GREATER THAN OR EQUAL TO zero AND nr LESS THAN row AND nc GREATER THAN OR EQUAL TO zero AND nc LESS THAN col AND element at position nr of grid at position nc EQUALS zero THEN  
+                    CALL union on uf with parameters being r MULTIPLIED BY col PLUS c AND nr MULTIPLIED BY col PLUS nc  
+                END IF  
+            END FOR  
+
+            IF r EQUALS zero THEN  
+                CALL union on uf with parameters being r MULTIPLIED BY col PLUS c AND TOP  
+            END IF  
+
+            IF r EQUALS row MINUS one THEN  
+                CALL union on uf with parameters being r MULTIPLIED BY col PLUS c AND BOTTOM  
+            END IF  
+
+            IF result of calling find on uf with TOP EQUALS result of calling find on uf with BOTTOM THEN  
+                RETURN day  
+            END IF  
+        END FOR  
+
+        RETURN zero  
+    END FUNCTION  
+END CLASS

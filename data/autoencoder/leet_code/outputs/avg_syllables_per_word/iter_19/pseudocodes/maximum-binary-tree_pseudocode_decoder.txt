@@ -1,0 +1,57 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val EQUALS zero left EQUALS None right EQUALS None  
+        SET self dot val TO val  
+        SET self dot left TO left  
+        SET self dot right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETERS values  
+    IF values IS empty  
+        RETURN None  
+    END IF  
+    SET root TO A NEW TreeNode WITH parameter element at position zero of values  
+    SET i TO one  
+    SET queue TO A NEW double ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO THE element REMOVED FROM THE FRONT OF queue  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i of values IS NOT None  
+            SET node dot left TO A NEW TreeNode WITH parameter element at position i of values  
+            APPEND node dot left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i of values IS NOT None  
+            SET node dot right TO A NEW TreeNode WITH parameter element at position i of values  
+            APPEND node dot right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p dot val IS NOT EQUALS q dot val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETERS p dot left q dot left AND is_same_tree WITH PARAMETERS p dot right q dot right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION constructMaximumBinaryTree WITH PARAMETERS self nums  
+        IF nums IS empty  
+            RETURN None  
+        END IF  
+        SET max_val TO THE MAXIMUM VALUE IN nums  
+        SET max_index TO THE POSITION OF max_val IN nums  
+        SET root TO A NEW TreeNode WITH parameter max_val  
+        SET root dot left TO self dot constructMaximumBinaryTree WITH parameter THE SUBLIST OF nums FROM START TO POSITION max_index MINUS one  
+        SET root dot right TO self dot constructMaximumBinaryTree WITH parameter THE SUBLIST OF nums FROM POSITION max_index PLUS one TO END  
+        RETURN root  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,57 @@
+CLASS Solution  
+    FUNCTION minPushBox(grid)  
+        SET directions TO list of pairs representing up one zero, down one zero, zero minus one, zero one  
+        
+        FOR i FROM zero TO the length of grid MINUS one  
+            FOR j FROM zero TO the length of the element at position zero OF grid MINUS one  
+                IF the element at position i THEN j OF grid EQUALS the character denoting player start  
+                    ASSIGN reference TO the pair of i and j AS player_start  
+                ELSE IF the element at position i THEN j OF grid EQUALS the character denoting box start  
+                    ASSIGN reference TO the pair of i and j AS box_start  
+                ELSE IF the element at position i THEN j OF grid EQUALS the character denoting target  
+                    ASSIGN reference TO the pair of i and j AS target  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        ASSIGN reference TO a deque initialized with the triple of player_start, box_start, and zero AS queue  
+        INITIALIZE visited AS an empty set  
+        ADD the pair of player_start and box_start TO visited  
+        
+        WHILE queue is not empty  
+            REMOVE and RETURN the first element from queue INTO player_pos, box_pos, and push_count  
+            
+            IF box_pos EQUALS target  
+                RETURN push_count  
+            END IF  
+            
+            FOR each pair dx, dy IN directions  
+                SET new_player_pos TO the pair of the first element of player_pos PLUS dx and the second element of player_pos PLUS dy  
+                
+                IF the result of calling method is_valid_position WITH new_player_pos and grid is true  
+                    IF new_player_pos EQUALS box_pos  
+                        SET new_box_pos TO the pair of the first element of box_pos PLUS dx and the second element of box_pos PLUS dy  
+                        
+                        IF the result of calling method is_valid_position WITH new_box_pos and grid is true AND the pair of new_player_pos and new_box_pos is not in visited  
+                            ADD the pair of new_player_pos and new_box_pos TO visited  
+                            APPEND the triple of new_player_pos, new_box_pos, and push_count PLUS one TO queue  
+                        END IF  
+                    ELSE  
+                        IF the pair of new_player_pos and box_pos is not in visited  
+                            ADD the pair of new_player_pos and box_pos TO visited  
+                            APPEND the triple of new_player_pos, box_pos, and push_count TO queue  
+                        END IF  
+                    END IF  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN the integer negative one  
+    END FUNCTION  
+      
+    FUNCTION is_valid_position(position, grid)  
+        ASSIGN x TO the first element of position  
+        ASSIGN y TO the second element of position  
+        RETURN the result of the logical expression x greater than or equal to zero AND x less than the length of grid AND y greater than or equal to zero AND y less than the length of the element at position zero OF grid AND the element at position x THEN y OF grid not EQUAL to the character denoting wall  
+    END FUNCTION  
+END CLASS

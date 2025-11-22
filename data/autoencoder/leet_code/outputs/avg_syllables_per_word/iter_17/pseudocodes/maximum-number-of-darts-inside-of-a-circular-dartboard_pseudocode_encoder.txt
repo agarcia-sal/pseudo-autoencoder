@@ -1,0 +1,51 @@
+CLASS Solution
+    FUNCTION numPoints(darts, r)
+        FUNCTION distance(p1, p2)
+            RETURN the SQUARE ROOT OF the SUM OF the SQUARE OF the DIFFERENCE BETWEEN element at position zero of p1 AND element at position zero of p2 AND the SQUARE OF the DIFFERENCE BETWEEN element at position one of p1 AND element at position one of p2
+        END FUNCTION
+
+        FUNCTION circle_center(p1, p2, r)
+            SET d TO CALL distance WITH p1 AND p2
+            IF d GREATER THAN two MULTIPLIED BY r
+                RETURN None
+            END IF
+            SET a TO the SQUARE ROOT OF r MULTIPLIED BY r MINUS the SQUARE OF the QUOTIENT OF d DIVIDED BY two
+            SET h TO list WITH element at position zero of p1 PLUS element at position zero of p2 DIVIDED BY two AND element at position one of p1 PLUS element at position one of p2 DIVIDED BY two
+            SET dx TO the PRODUCT OF the DIFFERENCE BETWEEN element at position one of p2 AND element at position one of p1 AND a DIVIDED BY d
+            SET dy TO the PRODUCT OF the DIFFERENCE BETWEEN element at position zero of p2 AND element at position zero of p1 AND a DIVIDED BY d
+            RETURN list WITH tuple WITH element at position zero of h MINUS dx AND element at position one of h PLUS dy AND tuple WITH element at position zero of h PLUS dx AND element at position one of h MINUS dy
+        END FUNCTION
+
+        FUNCTION is_inside(circle, point, r)
+            RETURN CALL distance WITH circle AND point LESS THAN OR EQUAL TO r
+        END FUNCTION
+
+        SET n TO the LENGTH OF darts
+        IF n EQUALS one
+            RETURN one
+        END IF
+
+        SET max_count TO one
+
+        FOR i FROM zero TO n MINUS one
+            FOR j FROM i PLUS one TO n MINUS one
+                SET centers TO CALL circle_center WITH element at position i of darts AND element at position j of darts AND r
+                IF centers IS NOT None
+                    FOR each center IN centers
+                        SET count TO zero
+                        FOR each dart IN darts
+                            IF CALL is_inside WITH center AND dart AND r
+                                INCREMENT count BY one
+                            END IF
+                        END FOR
+                        IF count GREATER THAN max_count
+                            SET max_count TO count
+                        END IF
+                    END FOR
+                END IF
+            END FOR
+        END FOR
+
+        RETURN max_count
+    END FUNCTION
+END CLASS

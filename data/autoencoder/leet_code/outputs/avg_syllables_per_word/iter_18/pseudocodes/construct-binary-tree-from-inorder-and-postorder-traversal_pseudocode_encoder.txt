@@ -1,0 +1,57 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val EQUAL TO zero left EQUAL TO none right EQUAL TO none  
+        SET self dot val TO val  
+        SET self dot left TO left  
+        SET self dot right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETERS values  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO A NEW instance OF TreeNode INITIALIZED WITH element at position zero OF values  
+    SET i TO one  
+    SET queue TO A NEW double ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO THE FIRST ELEMENT REMOVED FROM queue  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i OF values IS NOT none  
+            SET node dot left TO A NEW instance OF TreeNode INITIALIZED WITH element at position i OF values  
+            APPEND node dot left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i OF values IS NOT none  
+            SET node dot right TO A NEW instance OF TreeNode INITIALIZED WITH element at position i OF values  
+            APPEND node dot right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF p dot val IS NOT EQUAL TO q dot val  
+        RETURN false  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETERS p dot left q dot left AND is_same_tree WITH PARAMETERS p dot right q dot right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION buildTree WITH PARAMETERS self inorder postorder  
+        IF inorder IS empty OR postorder IS empty  
+            RETURN none  
+        END IF  
+        SET root_val TO THE LAST ELEMENT REMOVED FROM postorder  
+        SET root TO A NEW instance OF TreeNode INITIALIZED WITH root_val  
+        SET root_index TO THE POSITION OF root_val IN inorder  
+        SET root dot right TO THE RESULT OF buildTree WITH PARAMETERS self THE SUBLIST OF inorder FROM POSITION root_index PLUS one TO THE END AND postorder  
+        SET root dot left TO THE RESULT OF buildTree WITH PARAMETERS self THE SUBLIST OF inorder FROM THE START TO POSITION root_index MINUS one PLUS one ZERO BASED INDEXING IMPLIED AND postorder  
+        RETURN root  
+    END FUNCTION  
+END CLASS

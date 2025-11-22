@@ -1,0 +1,38 @@
+CLASS Solution
+    FUNCTION minTransfers(transactions)
+        SET balance TO an empty dictionary
+        FOR each triplet of from_person, to_person, amount IN transactions
+            SET the value at from_person IN balance TO the value at from_person IN balance IF PRESENT OTHERWISE zero MINUS amount
+            SET the value at to_person IN balance TO the value at to_person IN balance IF PRESENT OTHERWISE zero PLUS amount
+        END FOR
+
+        SET balances TO a list of each net_value FROM the values of balance WHERE net_value NOT EQUALS zero
+
+        IF the LENGTH OF balances EQUALS zero THEN
+            RETURN zero
+        END IF
+
+        FUNCTION settle(start, count)
+            WHILE start LESS THAN the LENGTH OF balances AND the element at position start OF balances EQUALS zero
+                INCREMENT start BY one
+            END WHILE
+
+            IF start EQUALS the LENGTH OF balances THEN
+                RETURN count
+            END IF
+
+            SET minimum_count TO a very large infinite value
+
+            FOR index i FROM start PLUS one TO the LENGTH OF balances MINUS one INCLUSIVE
+                IF the element at position start OF balances MULTIPLIED BY the element at position i OF balances LESS THAN zero THEN
+                    INCREMENT the element at position i OF balances BY the element at position start OF balances
+                    SET minimum_count TO the lesser of minimum_count AND the result of settle with parameters start PLUS one and count PLUS one
+                    DECREMENT the element at position i OF balances BY the element at position start OF balances
+                END IF
+            END FOR
+
+            RETURN minimum_count
+        END FUNCTION
+
+        RETURN the result of settle with parameters zero and zero
+END CLASS

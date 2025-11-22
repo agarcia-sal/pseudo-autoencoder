@@ -1,0 +1,55 @@
+CLASS Solution  
+    FUNCTION countPalindromicSubsequences(s)  
+        SET MOD TO ten raised to the power of nine PLUS seven  
+        SET n TO the LENGTH OF s  
+        
+        CREATE next_occurrence AS a list of four lists each of length n filled with negative one  
+        CREATE prev_occurrence AS a list of four lists each of length n filled with negative one  
+        
+        FOR each c FROM zero TO three  
+            SET char TO the character represented by the letter a PLUS c  
+            SET last TO negative one  
+            FOR each i FROM zero TO n MINUS one  
+                IF element at position i of s EQUALS char THEN  
+                    SET last TO i  
+                END IF  
+                SET element at position i of element at position c of prev_occurrence TO last  
+            END FOR  
+            
+            SET last TO negative one  
+            FOR each i FROM n MINUS one DOWN TO zero  
+                IF element at position i of s EQUALS char THEN  
+                    SET last TO i  
+                END IF  
+                SET element at position i of element at position c of next_occurrence TO last  
+            END FOR  
+        END FOR  
+        
+        CREATE dp AS a list of lists each of length n filled with zero, total n such lists  
+        
+        FOR each i FROM zero TO n MINUS one  
+            SET element at position i of element at position i of dp TO one  
+        END FOR  
+        
+        FOR each length FROM two TO n  
+            FOR each i FROM zero TO n MINUS length  
+                SET j TO i PLUS length MINUS one  
+                FOR each c FROM zero TO three  
+                    SET char TO the character represented by the letter a PLUS c  
+                    SET left TO element at position i of element at position c of next_occurrence  
+                    SET right TO element at position j of element at position c of prev_occurrence  
+                    
+                    IF left GREATER THAN j OR right LESS THAN i THEN  
+                        CONTINUE TO next iteration of c loop  
+                    ELSE IF left EQUALS right THEN  
+                        SET element at position i of element at position j of dp TO the remainder after dividing the sum of the current value of element at position i of element at position j of dp PLUS one BY MOD  
+                    ELSE  
+                        SET element at position i of element at position j of dp TO the remainder after dividing the sum of the current value of element at position i of element at position j of dp PLUS the value of element at position left PLUS one of element at position right MINUS one of dp PLUS two BY MOD  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+        
+        RETURN element at position zero of element at position n MINUS one of dp  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,49 @@
+CLASS Solution  
+    FUNCTION minFlips(mat)  
+        FUNCTION flip(matrix, x, y)  
+            SET directions TO list of pairs: minus one and zero, one and zero, zero and minus one, zero and one, zero and zero  
+            FOR each pair dx and dy IN directions  
+                SET nx TO x PLUS dx  
+                SET ny TO y PLUS dy  
+                IF nx GREATER THAN OR EQUAL TO zero AND nx LESS THAN m AND ny GREATER THAN OR EQUAL TO zero AND ny LESS THAN n  
+                    SET element at position nx and ny of matrix TO one MINUS element at position nx and ny of matrix  
+                END IF  
+            END FOR  
+        END FUNCTION  
+
+        FUNCTION matrix_to_tuple(matrix)  
+            RETURN tuple of tuples where each inner tuple is the row from matrix  
+        END FUNCTION  
+
+        SET m TO LENGTH OF mat  
+        SET n TO LENGTH OF first element of mat  
+        SET target TO tuple of tuples where each element is zero for n times, repeated for m times  
+        SET initial_state TO matrix_to_tuple with mat  
+        SET queue TO list containing tuple of initial_state and zero  
+        SET visited TO empty set  
+        ADD initial_state TO visited  
+
+        WHILE queue is not empty  
+            REMOVE first element FROM queue and DESTRUCTURE as current_state and steps  
+            IF current_state EQUALS target  
+                RETURN steps  
+            END IF  
+
+            SET current_matrix TO list where each element is list converted from row of current_state  
+
+            FOR i FROM zero TO m MINUS one  
+                FOR j FROM zero TO n MINUS one  
+                    SET next_matrix TO deep copy of current_matrix  
+                    CALL flip with next_matrix, i, j  
+                    SET next_state TO matrix_to_tuple with next_matrix  
+                    IF next_state NOT IN visited  
+                        ADD next_state TO visited  
+                        APPEND tuple of next_state and steps PLUS one TO queue  
+                    END IF  
+                END FOR  
+            END FOR  
+        END WHILE  
+
+        RETURN minus one  
+    END FUNCTION  
+END CLASS

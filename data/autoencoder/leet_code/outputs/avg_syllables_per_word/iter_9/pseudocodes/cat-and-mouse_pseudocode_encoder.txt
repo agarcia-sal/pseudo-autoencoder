@@ -1,0 +1,55 @@
+CLASS Solution  
+    FUNCTION catMouseGame(self, graph)  
+        SET DRAW TO zero  
+        SET MOUSE_WIN TO one  
+        SET CAT_WIN TO two  
+        SET n TO length of graph  
+        
+        FUNCTION dfs(turn, mouse_pos, cat_pos)  
+            IF turn EQUALS two MULTIPLIED BY n THEN  
+                RETURN DRAW  
+            END IF  
+            IF mouse_pos EQUALS zero THEN  
+                RETURN MOUSE_WIN  
+            END IF  
+            IF mouse_pos EQUALS cat_pos THEN  
+                RETURN CAT_WIN  
+            END IF  
+            
+            IF turn MODULO two EQUALS zero THEN  
+                SET current_player TO mouse  
+            ELSE  
+                SET current_player TO cat  
+            END IF  
+            
+            IF current_player EQUALS mouse THEN  
+                SET result TO CAT_WIN  
+                FOR each next_pos IN graph at index mouse_pos  
+                    SET next_result TO dfs with parameters (turn INCREMENTED BY one, next_pos, cat_pos)  
+                    IF next_result EQUALS MOUSE_WIN THEN  
+                        RETURN MOUSE_WIN  
+                    ELSE IF next_result EQUALS DRAW THEN  
+                        SET result TO DRAW  
+                    END IF  
+                END FOR  
+                RETURN result  
+            ELSE  
+                SET result TO MOUSE_WIN  
+                FOR each next_pos IN graph at index cat_pos  
+                    IF next_pos EQUALS zero THEN  
+                        CONTINUE to next iteration  
+                    END IF  
+                    SET next_result TO dfs with parameters (turn INCREMENTED BY one, mouse_pos, next_pos)  
+                    IF next_result EQUALS CAT_WIN THEN  
+                        RETURN CAT_WIN  
+                    ELSE IF next_result EQUALS DRAW THEN  
+                        SET result TO DRAW  
+                    END IF  
+                END FOR  
+                RETURN result  
+            END IF  
+        END FUNCTION  
+        
+        RETURN dfs with parameters (zero, one, two)  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,45 @@
+CLASS Solution  
+    FUNCTION numPoints(darts, r)  
+        FUNCTION distance(p1, p2)  
+            COMPUTE horizontal_difference AS p1 at index 0 MINUS p2 at index 0  
+            COMPUTE vertical_difference AS p1 at index 1 MINUS p2 at index 1  
+            RETURN square root of (horizontal_difference MULTIPLIED BY horizontal_difference PLUS vertical_difference MULTIPLIED BY vertical_difference)  
+        END FUNCTION  
+        
+        FUNCTION circle_center(p1, p2, r)  
+            SET d TO CALL distance WITH p1 AND p2  
+            IF d GREATER THAN 2 MULTIPLIED BY r  
+                RETURN None  
+            SET a TO square root of (r MULTIPLIED BY r MINUS (d DIVIDED BY 2) MULTIPLIED BY (d DIVIDED BY 2))  
+            SET h TO list containing [(p1 at index 0 PLUS p2 at index 0) DIVIDED BY 2, (p1 at index 1 PLUS p2 at index 1) DIVIDED BY 2]  
+            SET dx TO (p2 at index 1 MINUS p1 at index 1) MULTIPLIED BY a DIVIDED BY d  
+            SET dy TO (p2 at index 0 MINUS p1 at index 0) MULTIPLIED BY a DIVIDED BY d  
+            RETURN list containing [(h at index 0 MINUS dx, h at index 1 PLUS dy), (h at index 0 PLUS dx, h at index 1 MINUS dy)]  
+        END FUNCTION  
+        
+        FUNCTION is_inside(circle, point, r)  
+            SET dist TO CALL distance WITH circle AND point  
+            RETURN dist LESS THAN OR EQUAL TO r  
+        END FUNCTION  
+        
+        SET n TO LENGTH OF darts  
+        IF n EQUALS 1  
+            RETURN 1  
+        
+        SET max_count TO 1  
+        
+        FOR i FROM 0 TO n MINUS 1  
+            FOR j FROM i PLUS 1 TO n MINUS 1  
+                SET centers TO CALL circle_center WITH darts at i, darts at j, AND r  
+                IF centers IS NOT None  
+                    FOR each center IN centers  
+                        SET count TO 0  
+                        FOR each dart IN darts  
+                            IF CALL is_inside WITH center, dart, AND r IS TRUE  
+                                INCREMENT count BY 1  
+                        IF count GREATER THAN max_count  
+                            SET max_count TO count  
+        
+        RETURN max_count  
+    END FUNCTION  
+END CLASS

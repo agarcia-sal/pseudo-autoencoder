@@ -1,0 +1,62 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty THEN  
+        RETURN None  
+    END IF  
+    SET root TO CREATE new TreeNode WITH val set to first element of values, left set to None, right set to None  
+    SET i TO 1  
+    SET queue TO a new empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty DO  
+        SET node TO first element removed from queue  
+        IF i LESS THAN length of values AND values at i IS NOT None THEN  
+            SET node.left TO CREATE new TreeNode WITH val set to values at i, left None, right None  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY 1  
+        IF i LESS THAN length of values AND values at i IS NOT None THEN  
+            SET node.right TO CREATE new TreeNode WITH val set to values at i, left None, right None  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None THEN  
+        RETURN True  
+    ELSE IF p IS None OR q IS None THEN  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val THEN  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION tree2str(self, root)  
+        FUNCTION helper(node)  
+            IF node IS None THEN  
+                RETURN empty string  
+            END IF  
+            SET result TO string representation of node.val  
+            IF node.left IS NOT None OR node.right IS NOT None THEN  
+                SET result TO result CONCATENATED WITH opening parenthesis CONCATENATED WITH helper(node.left) CONCATENATED WITH closing parenthesis  
+            END IF  
+            IF node.right IS NOT None THEN  
+                SET result TO result CONCATENATED WITH opening parenthesis CONCATENATED WITH helper(node.right) CONCATENATED WITH closing parenthesis  
+            END IF  
+            RETURN result  
+        END FUNCTION  
+        RETURN helper(root)  
+    END FUNCTION  
+END CLASS

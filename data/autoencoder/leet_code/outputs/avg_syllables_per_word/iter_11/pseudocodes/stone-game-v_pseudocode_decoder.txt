@@ -1,0 +1,43 @@
+CLASS Solution  
+    FUNCTION stoneGameV(stoneValue)  
+        CALL FUNCTION initialize_prefix_sum WITH stoneValue RETURNING prefix_sum  
+        
+        FUNCTION get_range_sum(left, right)  
+            SET sum_value TO element at position right PLUS one of prefix_sum MINUS element at position left of prefix_sum  
+            RETURN sum_value  
+        END FUNCTION  
+        
+        FUNCTION dp(left, right)  
+            IF left EQUALS right  
+                RETURN zero  
+            END IF  
+            SET max_score TO zero  
+            FOR index i FROM left TO right MINUS one  
+                SET left_sum TO CALL get_range_sum WITH left, i  
+                SET right_sum TO CALL get_range_sum WITH i PLUS one, right  
+                IF left_sum LESS THAN right_sum  
+                    SET possible_score TO left_sum PLUS CALL dp WITH left, i  
+                    SET max_score TO maximum OF max_score AND possible_score  
+                ELSE IF left_sum GREATER THAN right_sum  
+                    SET possible_score TO right_sum PLUS CALL dp WITH i PLUS one, right  
+                    SET max_score TO maximum OF max_score AND possible_score  
+                ELSE  
+                    SET option1 TO left_sum PLUS CALL dp WITH left, i  
+                    SET option2 TO right_sum PLUS CALL dp WITH i PLUS one, right  
+                    SET max_score TO maximum OF max_score, option1, AND option2  
+                END IF  
+            END FOR  
+            RETURN max_score  
+        END FUNCTION  
+        
+        RETURN CALL dp WITH zero, LENGTH OF stoneValue MINUS one  
+    END FUNCTION  
+    
+    FUNCTION initialize_prefix_sum(stoneValue)  
+        SET prefix_sum TO list WITH LENGTH OF stoneValue PLUS one FILLED WITH zero  
+        FOR index i FROM zero TO LENGTH OF stoneValue MINUS one  
+            SET element at position i PLUS one of prefix_sum TO element at position i of prefix_sum PLUS element at position i of stoneValue  
+        END FOR  
+        RETURN prefix_sum  
+    END FUNCTION  
+END CLASS

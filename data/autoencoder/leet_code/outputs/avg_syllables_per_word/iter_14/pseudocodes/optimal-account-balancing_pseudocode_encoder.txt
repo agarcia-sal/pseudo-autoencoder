@@ -1,0 +1,53 @@
+CLASS Solution  
+    FUNCTION minTransfers(transactions)  
+        SET balance TO an empty map  
+        FOR each transaction IN transactions  
+            SET frm TO the first element of transaction  
+            SET to TO the second element of transaction  
+            SET amount TO the third element of transaction  
+            IF frm IS a key in balance  
+                SET balance at key frm TO balance at key frm MINUS amount  
+            ELSE  
+                SET balance at key frm TO zero MINUS amount  
+            END IF  
+            IF to IS a key in balance  
+                SET balance at key to TO balance at key to PLUS amount  
+            ELSE  
+                SET balance at key to TO amount  
+            END IF  
+        END FOR  
+        
+        SET balances TO an empty list  
+        FOR each net IN the values of balance  
+            IF net IS NOT EQUAL TO zero  
+                APPEND net TO balances  
+            END IF  
+        END FOR  
+        
+        IF the LENGTH OF balances IS EQUAL TO zero  
+            RETURN zero  
+        END IF  
+        
+        FUNCTION settle(start, cnt)  
+            WHILE start IS LESS THAN the LENGTH OF balances AND element at position start OF balances IS EQUAL TO zero  
+                INCREMENT start BY one  
+            END WHILE  
+            
+            IF start IS EQUAL TO the LENGTH OF balances  
+                RETURN cnt  
+            END IF  
+            
+            SET min_cnt TO positive infinity  
+            FOR i FROM start PLUS one TO the LENGTH OF balances MINUS one  
+                IF element at position start OF balances MULTIPLIED BY element at position i OF balances IS LESS THAN zero  
+                    SET element at position i OF balances TO element at position i OF balances PLUS element at position start OF balances  
+                    SET min_cnt TO the smaller OF min_cnt AND settle(start PLUS one, cnt PLUS one)  
+                    SET element at position i OF balances TO element at position i OF balances MINUS element at position start OF balances  
+                END IF  
+            END FOR  
+            RETURN min_cnt  
+        END FUNCTION  
+        
+        RETURN settle(zero, zero)  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,72 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS val WITH DEFAULT zero left WITH DEFAULT none right WITH DEFAULT none  
+        SET val TO val  
+        SET left TO left  
+        SET right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values AS list  
+    IF values IS EMPTY  
+        RETURN none  
+    END IF  
+    SET root TO A NEW TreeNode INITIALIZED WITH value at position zero of values  
+    SET i TO one  
+    SET queue TO A NEW double ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO THE FIRST ELEMENT REMOVED FROM queue  
+        IF i IS LESS THAN the LENGTH OF values AND value at position i of values IS NOT none  
+            SET left OF node TO A NEW TreeNode INITIALIZED WITH value at position i of values  
+            APPEND left OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND value at position i of values IS NOT none  
+            SET right OF node TO A NEW TreeNode INITIALIZED WITH value at position i of values  
+            APPEND right OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p AND q  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF value of p IS NOT EQUAL TO value of q  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree WITH PARAMETERS left OF p AND left OF q AND is_same_tree WITH PARAMETERS right OF p AND right OF q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION deleteNode WITH PARAMETERS root AS optional TreeNode AND key AS integer RETURNS optional TreeNode  
+        IF root IS none  
+            RETURN none  
+        END IF  
+        IF value of root IS GREATER THAN key  
+            SET left OF root TO deleteNode WITH PARAMETERS left OF root AND key  
+            RETURN root  
+        END IF  
+        IF value of root IS LESS THAN key  
+            SET right OF root TO deleteNode WITH PARAMETERS right OF root AND key  
+            RETURN root  
+        END IF  
+        IF left OF root IS none  
+            RETURN right OF root  
+        END IF  
+        IF right OF root IS none  
+            RETURN left OF root  
+        END IF  
+        SET node TO right OF root  
+        WHILE left OF node IS NOT none  
+            SET node TO left OF node  
+        END WHILE  
+        SET left OF node TO left OF root  
+        SET root TO right OF root  
+        RETURN root  
+    END FUNCTION  
+END CLASS

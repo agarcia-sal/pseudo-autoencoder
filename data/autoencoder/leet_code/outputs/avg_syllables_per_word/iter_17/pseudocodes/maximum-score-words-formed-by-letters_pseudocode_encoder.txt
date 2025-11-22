@@ -1,0 +1,47 @@
+CLASS Solution
+    FUNCTION maxScoreWords(words_list, letters_list, score_list)
+        FUNCTION word_score(word_string, score_mapping)
+            RETURN sum_of_score_mapping_for_each_character_in_word_string
+        END FUNCTION
+
+        FUNCTION can_form(word_string, letter_count_map)
+            SET word_count_map TO the RESULT OF calling Counter FUNCTION WITH word_string
+            FOR each character and count_value IN the ITEMS OF word_count_map
+                IF letter_count_map AT character IS LESS THAN count_value
+                    RETURN false
+                END IF
+            END FOR
+            RETURN true
+        END FUNCTION
+
+        FUNCTION update_letter_count(letter_count_map, word_string, add_indicator TRUE)
+            FOR each character IN word_string
+                IF add_indicator IS true
+                    INCREMENT letter_count_map AT character BY one
+                ELSE
+                    DECREMENT letter_count_map AT character BY one
+                END IF
+            END FOR
+        END FUNCTION
+
+        FUNCTION backtrack(index_position, current_score_value, letter_count_map)
+            IF index_position EQUALS the LENGTH OF words_list
+                RETURN current_score_value
+            END IF
+            SET max_score_value TO current_score_value
+            FOR i FOR index FROM index_position TO the LENGTH OF words_list MINUS one
+                IF can_form(element_at_position_i_of_words_list, letter_count_map)
+                    CALL update_letter_count WITH letter_count_map, element_at_position_i_of_words_list, and add_indicator false
+                    SET max_score_value TO the maximum OF max_score_value AND
+                        backtrack(i PLUS one, current_score_value PLUS word_score(element_at_position_i_of_words_list, score_mapping), letter_count_map)
+                    CALL update_letter_count WITH letter_count_map, element_at_position_i_of_words_list, and add_indicator true
+                END IF
+            END FOR
+            RETURN max_score_value
+        END FUNCTION
+
+        SET score_mapping TO auxiliary FUNCTION mapping each lowercase character from a TO z TO element_at_corresponding_position OF score_list
+        SET letter_count_map TO the RESULT OF calling Counter FUNCTION WITH letters_list
+        RETURN backtrack(zero, zero, letter_count_map)
+    END FUNCTION
+END CLASS

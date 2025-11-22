@@ -1,0 +1,42 @@
+CLASS Solution  
+    FUNCTION smallestSufficientTeam(self, req_skills, people)  
+        SET skill_index_map TO an empty mapping from skill string TO integer  
+        SET index_counter TO zero  
+        FOR each skill IN req_skills  
+            ASSIGN skill_index_map at skill TO index_counter  
+            INCREMENT index_counter BY one  
+        END FOR  
+        SET number_of_skills TO the LENGTH OF req_skills  
+        SET number_of_people TO the LENGTH OF people  
+        SET skill_mask_list TO a list of zeroes of LENGTH number_of_people  
+        FOR each index i AND skill_list ss IN people  
+            FOR each skill s IN ss  
+                SET skill_mask_list at position i TO skill_mask_list at position i OR a value with the BIT AT the skill_index_map at skill s SET TO one  
+            END FOR  
+        END FOR  
+        SET cost_array f TO a list filled with infinity OF LENGTH two RAISED TO THE power OF number_of_skills  
+        SET person_array g TO a list of zeroes OF LENGTH two RAISED TO THE power OF number_of_skills  
+        SET previous_state_array h TO a list of zeroes OF LENGTH two RAISED TO THE power OF number_of_skills  
+        SET cost_array at position zero TO zero  
+        FOR each integer state i FROM zero UP TO BUT NOT INCLUDING two RAISED TO THE power OF number_of_skills  
+            IF cost_array at position i EQUALS infinity  
+                CONTINUE TO the next iteration  
+            END IF  
+            FOR each person index j FROM zero UP TO BUT NOT INCLUDING number_of_people  
+                SET new_state TO bitwise OR of i AND skill_mask_list at position j  
+                IF cost_array at position i PLUS one IS LESS THAN cost_array at position new_state  
+                    SET cost_array at position new_state TO cost_array at position i PLUS one  
+                    SET person_array at position new_state TO j  
+                    SET previous_state_array at position new_state TO i  
+                END IF  
+            END FOR  
+        END FOR  
+        SET i TO two RAISED TO THE power OF number_of_skills MINUS one  
+        SET answer_list TO an empty list  
+        WHILE i IS NOT zero  
+            APPEND person_array at position i TO answer_list  
+            SET i TO previous_state_array at position i  
+        END WHILE  
+        RETURN answer_list  
+    END FUNCTION  
+END CLASS

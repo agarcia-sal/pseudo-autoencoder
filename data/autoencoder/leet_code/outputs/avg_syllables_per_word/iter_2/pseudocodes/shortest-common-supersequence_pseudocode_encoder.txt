@@ -1,0 +1,43 @@
+CLASS Solution
+    FUNCTION shortestCommonSupersequence(str1, str2)
+        SET m TO LENGTH OF str1
+        SET n TO LENGTH OF str2
+
+        CREATE dp AS 2D LIST OF SIZE (m + 1) BY (n + 1) FILLED WITH 0
+
+        FOR i FROM 1 TO m
+            FOR j FROM 1 TO n
+                IF CHARACTER AT str1 AT (i - 1) EQUALS CHARACTER AT str2 AT (j - 1)
+                    SET dp[i][j] TO dp[i - 1][j - 1] PLUS 1
+                ELSE
+                    SET dp[i][j] TO MAXIMUM OF dp[i - 1][j] AND dp[i][j - 1]
+
+        SET i TO m
+        SET j TO n
+        SET scs TO EMPTY LIST
+
+        WHILE i GREATER THAN 0 AND j GREATER THAN 0
+            IF CHARACTER AT str1 AT (i - 1) EQUALS CHARACTER AT str2 AT (j - 1)
+                APPEND CHARACTER AT str1 AT (i - 1) TO scs
+                DECREMENT i BY 1
+                DECREMENT j BY 1
+            ELSE IF dp[i - 1][j] GREATER THAN dp[i][j - 1]
+                APPEND CHARACTER AT str1 AT (i - 1) TO scs
+                DECREMENT i BY 1
+            ELSE
+                APPEND CHARACTER AT str2 AT (j - 1) TO scs
+                DECREMENT j BY 1
+
+        WHILE i GREATER THAN 0
+            APPEND CHARACTER AT str1 AT (i - 1) TO scs
+            DECREMENT i BY 1
+
+        WHILE j GREATER THAN 0
+            APPEND CHARACTER AT str2 AT (j - 1) TO scs
+            DECREMENT j BY 1
+
+        REVERSE scs
+
+        RETURN CONCATENATION OF ELEMENTS IN scs
+    END FUNCTION
+END CLASS

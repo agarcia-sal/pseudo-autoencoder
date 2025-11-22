@@ -1,0 +1,72 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values EQUALS nothing THEN  
+        RETURN nothing  
+    END IF  
+    SET root TO a new TreeNode with value equal to the element at position one of values and left and right equal to nothing  
+    SET i TO one  
+    SET queue TO an empty double ended queue  
+    APPEND root TO queue  
+    WHILE the LENGTH OF queue is greater than zero DO  
+        SET node TO the element popped from the left of queue  
+        IF i LESS THAN the LENGTH OF values AND the element at position i of values NOT EQUALS nothing THEN  
+            SET node.left TO a new TreeNode with value equal to the element at position i of values and left and right equal to nothing  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN the LENGTH OF values AND the element at position i of values NOT EQUALS nothing THEN  
+            SET node.right TO a new TreeNode with value equal to the element at position i of values and left and right equal to nothing  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p EQUALS nothing AND q EQUALS nothing THEN  
+        RETURN True  
+    ELSE IF p EQUALS nothing OR q EQUALS nothing THEN  
+        RETURN False  
+    ELSE IF the value of p NOT EQUALS the value of q THEN  
+        RETURN False  
+    ELSE  
+        RETURN the result of is_same_tree of the left child of p and the left child of q AND the result of is_same_tree of the right child of p and the right child of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION widthOfBinaryTree(self, root)  
+        IF root EQUALS nothing THEN  
+            RETURN zero  
+        END IF  
+        SET queue TO a new double ended queue containing a tuple of root and zero  
+        SET max_width TO zero  
+        WHILE the LENGTH OF queue is greater than zero DO  
+            SET level_length TO the LENGTH OF queue  
+            SET first_index TO the second element of the first tuple in queue  
+            FOR underscore FROM one TO level_length DO  
+                SET node, index TO the tuple popped from the left of queue  
+                IF underscore EQUALS level_length THEN  
+                    IF max_width LESS THAN index MINUS first_index PLUS one THEN  
+                        SET max_width TO index MINUS first_index PLUS one  
+                    END IF  
+                END IF  
+                IF the left child of node IS NOT nothing THEN  
+                    APPEND a tuple of the left child of node and the value of two MULTIPLIED BY index TO queue  
+                END IF  
+                IF the right child of node IS NOT nothing THEN  
+                    APPEND a tuple of the right child of node and the value of two MULTIPLIED BY index PLUS one TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        RETURN max_width  
+    END FUNCTION  
+END CLASS

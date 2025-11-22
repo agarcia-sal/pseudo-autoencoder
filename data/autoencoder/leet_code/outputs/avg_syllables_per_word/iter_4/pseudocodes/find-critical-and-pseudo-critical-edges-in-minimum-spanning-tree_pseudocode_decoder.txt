@@ -1,0 +1,74 @@
+```
+CLASS UnionFind
+    FUNCTION __init__(n)
+        SET parent TO list of integers from 0 to n-1
+        SET rank TO list of length n filled with 1
+    END FUNCTION
+
+    FUNCTION find(u)
+        IF parent[u] IS NOT u THEN
+            SET parent[u] TO find(parent[u])
+        RETURN parent[u]
+    END FUNCTION
+
+    FUNCTION union(u, v)
+        SET rootU TO find(u)
+        SET rootV TO find(v)
+
+        IF rootU IS NOT rootV THEN
+            IF rank[rootU] > rank[rootV] THEN
+                SET parent[rootV] TO rootU
+            ELSE IF rank[rootU] < rank[rootV] THEN
+                SET parent[rootU] TO rootV
+            ELSE
+                SET parent[rootV] TO rootU
+                INCREMENT rank[rootU] BY 1
+            RETURN True
+        RETURN False
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION findCriticalAndPseudoCriticalEdges(n, edges)
+        FOR i FROM 0 TO LENGTH OF edges MINUS 1
+            APPEND i TO edges[i]
+
+        SORT edges BY their weight (third element)
+
+        FUNCTION mst(exclude = None, include = None)
+            CREATE uf AS UnionFind(n)
+            SET weight TO 0
+
+            IF include IS NOT None THEN
+                uf.union(include[0], include[1])
+                INCREMENT weight BY include[2]
+
+            FOR each edge (u, v, w, idx) IN edges
+                IF idx IS exclude THEN
+                    CONTINUE TO NEXT edge
+                IF uf.union(u, v) IS True THEN
+                    INCREMENT weight BY w
+
+            SET root TO uf.find(0)
+            FOR i FROM 0 TO n MINUS 1
+                IF uf.find(i) IS NOT root THEN
+                    RETURN infinity
+
+            RETURN weight
+        END FUNCTION
+
+        SET mst_weight TO mst()
+
+        SET critical TO empty list
+        SET pseudo_critical TO empty list
+
+        FOR each edge (u, v, w, idx) IN edges
+            IF mst(exclude = idx) IS GREATER THAN mst_weight THEN
+                APPEND idx TO critical
+            ELSE IF mst(include = (u, v, w)) IS EQUAL TO mst_weight THEN
+                APPEND idx TO pseudo_critical
+
+        RETURN list containing critical and pseudo_critical
+    END FUNCTION
+END CLASS
+```

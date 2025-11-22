@@ -1,0 +1,40 @@
+CLASS Solution
+    FUNCTION secondMinimum(n, edges, time, change)
+        SET graph TO an empty list of empty lists FOR each number FROM one TO n PLUS one
+        FOR each pair of vertices u and v IN edges
+            APPEND vertex v TO the element at position u of graph
+            APPEND vertex u TO the element at position v of graph
+        END FOR
+
+        ASSIGN queue TO a new deque containing the tuple of vertex one current time zero and count zero
+        SET minTimes TO a list containing two elements of positive infinity FOR each number FROM one TO n PLUS one
+        SET the element at position one and zero of minTimes TO zero
+
+        WHILE queue is not empty
+            EXTRACT current vertex currentTime and count FROM the front element OF queue
+
+            IF current EQUALS n AND count EQUALS one
+                RETURN currentTime
+            END IF
+
+            IF the integer division OF currentTime BY change MODULO two EQUALS zero
+                SET nextTime TO currentTime PLUS time
+            ELSE
+                SET nextTime TO the product of the sum of the integer division OF currentTime BY change PLUS one AND change PLUS time
+            END IF
+
+            FOR each neighbor IN the element at position current of graph
+                IF the element at position neighbor and zero of minTimes IS GREATER THAN nextTime
+                    SET the element at position neighbor and one of minTimes TO the element at position neighbor and zero of minTimes
+                    SET the element at position neighbor and zero of minTimes TO nextTime
+                    APPEND the tuple of neighbor nextTime and zero TO queue
+                ELSE IF the element at position neighbor and zero of minTimes IS LESS THAN nextTime AND nextTime IS LESS THAN the element at position neighbor and one of minTimes
+                    SET the element at position neighbor and one of minTimes TO nextTime
+                    APPEND the tuple of neighbor nextTime and one TO queue
+                END IF
+            END FOR
+        END WHILE
+
+        RETURN negative one
+    END FUNCTION
+END CLASS

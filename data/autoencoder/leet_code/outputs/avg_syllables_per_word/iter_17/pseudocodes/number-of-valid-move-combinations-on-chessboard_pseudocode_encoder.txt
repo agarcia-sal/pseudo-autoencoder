@@ -1,0 +1,82 @@
+CLASS Solution
+    FUNCTION countCombinations(pieces, positions)
+        SET directions TO a MAPPING FROM string TO list OF pairs OF integers
+        SET directions rook TO list OF pair one zero, pair minus one zero, pair zero one, pair zero minus one
+        SET directions queen TO list OF pair one zero, pair minus one zero, pair zero one, pair zero minus one,
+            pair one one, pair minus one one, pair one minus one, pair minus one minus one
+        SET directions bishop TO list OF pair one one, pair minus one one, pair one minus one, pair minus one minus one
+
+        SET positions TO CALL convert_positions_to_zero_based WITH positions
+
+        FUNCTION get_destinations(start, piece_type)
+            SET r TO element at position zero of start
+            SET c TO element at position one of start
+            SET dests TO list containing start
+            FOR each pair dr dc IN directions FOR key piece_type
+                SET nr TO r PLUS dr
+                SET nc TO c PLUS dc
+                WHILE nr GREATER THAN OR EQUAL TO zero AND nr LESS THAN eight AND nc GREATER THAN OR EQUAL TO zero AND nc LESS THAN eight
+                    APPEND pair nr nc TO dests
+                    INCREMENT nr BY dr
+                    INCREMENT nc BY dc
+                END WHILE
+            END FOR
+            RETURN dests
+        END FUNCTION
+
+        SET all_destinations TO list OF CALL get_destinations WITH pos piece FOR pos piece IN zip positions pieces
+
+        FUNCTION is_valid_combination(combination)
+            SET pos TO a COPY OF positions
+            SET n TO the LENGTH OF pos
+            WHILE TRUE
+                IF the LENGTH OF the SET OF pos LESS THAN n
+                    RETURN False
+                END IF
+                SET all_reached TO True
+                FOR i FROM zero TO n MINUS one
+                    IF element at position i of pos EQUALS element at position i of combination
+                        CONTINUE TO next iteration
+                    END IF
+                    SET all_reached TO False
+                    SET r TO element at position zero of element at position i of pos
+                    SET c TO element at position one of element at position i of pos
+
+                    IF element at position zero of element at position i of combination GREATER THAN r
+                        SET dr TO one
+                    ELSE IF element at position zero of element at position i of combination LESS THAN r
+                        SET dr TO minus one
+                    ELSE
+                        SET dr TO zero
+                    END IF
+
+                    IF element at position one of element at position i of combination GREATER THAN c
+                        SET dc TO one
+                    ELSE IF element at position one of element at position i of combination LESS THAN c
+                        SET dc TO minus one
+                    ELSE
+                        SET dc TO zero
+                    END IF
+
+                    SET element at position i of pos TO pair r PLUS dr c PLUS dc
+                END FOR
+                IF all_reached
+                    RETURN True
+                END IF
+            END WHILE
+        END FUNCTION
+
+        SET valid_count TO zero
+        FOR each combination IN CALL product WITH all_destinations unpacked
+            IF CALL is_valid_combination WITH combination
+                INCREMENT valid_count BY one
+            END IF
+        END FOR
+
+        RETURN valid_count
+    END FUNCTION
+
+    FUNCTION convert_positions_to_zero_based(positions)
+        # Implementation omitted as auxiliary function converting one-based to zero-based indices
+    END FUNCTION
+END CLASS

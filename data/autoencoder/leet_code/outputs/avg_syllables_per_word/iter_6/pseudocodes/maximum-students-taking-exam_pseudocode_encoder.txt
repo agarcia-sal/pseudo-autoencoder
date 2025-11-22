@@ -1,0 +1,37 @@
+CLASS Solution  
+    FUNCTION maxStudents(seats)  
+        SET m TO LENGTH OF seats  
+        SET n TO LENGTH OF seats AT INDEX 0  
+        
+        SET broken TO list of zeroes with length m  
+        FOR i FROM 0 TO m MINUS 1  
+            FOR j FROM 0 TO n MINUS 1  
+                IF seats AT i AT j EQUALS '#' THEN  
+                    SET broken AT i TO broken AT i OR (1 LEFT SHIFTED BY j)  
+        
+        FUNCTION is_valid(arrangement)  
+            RETURN arrangement AND (arrangement RIGHT SHIFTED BY 1) EQUALS 0  
+        END FUNCTION  
+        
+        SET dp TO list of empty dictionaries with length m  
+        
+        FOR arrangement FROM 0 TO (1 LEFT SHIFTED BY n) MINUS 1  
+            IF is_valid(arrangement) AND (arrangement AND broken AT 0) EQUALS 0 THEN  
+                SET dp AT 0 AT arrangement TO COUNT OF ONES IN arrangement  
+        
+        FOR i FROM 1 TO m MINUS 1  
+            FOR arrangement FROM 0 TO (1 LEFT SHIFTED BY n) MINUS 1  
+                IF is_valid(arrangement) AND (arrangement AND broken AT i) EQUALS 0 THEN  
+                    SET max_students TO 0  
+                    FOR prev_arrangement IN KEYS OF dp AT i MINUS 1  
+                        IF (arrangement AND (prev_arrangement RIGHT SHIFTED BY 1)) EQUALS 0 AND (arrangement AND (prev_arrangement LEFT SHIFTED BY 1)) EQUALS 0 THEN  
+                            IF dp AT i MINUS 1 AT prev_arrangement GREATER THAN max_students THEN  
+                                SET max_students TO dp AT i MINUS 1 AT prev_arrangement  
+                    SET dp AT i AT arrangement TO max_students PLUS COUNT OF ONES IN arrangement  
+        
+        IF dp AT m MINUS 1 IS NOT EMPTY THEN  
+            RETURN MAXIMUM VALUE IN dp AT m MINUS 1  
+        ELSE  
+            RETURN 0  
+    END FUNCTION  
+END CLASS

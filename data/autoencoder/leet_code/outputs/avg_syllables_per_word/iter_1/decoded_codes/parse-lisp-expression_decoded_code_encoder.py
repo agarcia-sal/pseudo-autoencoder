@@ -1,0 +1,35 @@
+def evaluate(expr):
+    def get_tokens(s):
+        tokens, buf, d = [], "", 0
+        for c in s:
+            if c == ' ' and d == 0:
+                tokens.append(buf)
+                buf = ""
+            else:
+                d += (c == '(') - (c == ')')
+                buf += c
+        if buf:
+            tokens.append(buf)
+        return tokens
+
+    def parse(e):
+        return e if e[0] != '(' else [parse(t) for t in get_tokens(e[1:-1])]
+
+    def eval_tokens(t, ctx):
+        if t[0] == 'add':
+            return eval_tokens(t[1], ctx) + eval_tokens(t[2], ctx)
+        if t[0] == 'mult':
+            return eval_tokens(t[1], ctx) * eval_tokens(t[2], ctx)
+        if t[0] == 'let':
+            c = ctx.copy()
+            i = 1
+            while i < len(t) - 1:
+                c[t[i]] = eval_tokens(t[i+1], c)
+                i += 2
+            return eval_tokens(t[-1], c)
+        try:
+            return int(t[0])
+        except:
+            return ctx[t[0]]
+
+    return eval_tokens(parse(expr), {})

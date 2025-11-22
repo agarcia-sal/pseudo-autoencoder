@@ -1,0 +1,58 @@
+CLASS TrieNode
+    FUNCTION __init__(self)
+        SET self.children TO a new default dictionary MAPPING TO TrieNode
+        SET self.deleted TO False
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION deleteDuplicateFolder(self, paths)
+        SET ans TO an empty list
+        SET root TO a new TrieNode
+        SET subtreeToNodes TO a new default dictionary MAPPING TO an empty list
+
+        FOR each path IN the sorted order OF paths
+            SET node TO root
+            FOR each s IN path
+                SET node TO the element at key s OF node.children
+            END FOR
+        END FOR
+
+        FUNCTION buildSubtreeToRoots(node)
+            SET subtree TO an opening parenthesis
+            FOR each s IN the keys IN node.children in the inherent order
+                APPEND s PLUS the result of calling buildSubtreeToRoots with the element at key s OF node.children TO subtree
+            END FOR
+            APPEND a closing parenthesis TO subtree
+            IF subtree IS NOT equal TO an opening parenthesis plus a closing parenthesis
+                APPEND node TO the list at key subtree IN subtreeToNodes
+            END IF
+            RETURN subtree
+        END FUNCTION
+
+        CALL buildSubtreeToRoots with root
+
+        FOR each nodes IN the values OF subtreeToNodes
+            IF the LENGTH OF nodes IS GREATER THAN one
+                FOR each node IN nodes
+                    SET node.deleted TO True
+                END FOR
+            END IF
+        END FOR
+
+        FUNCTION constructPath(node, path)
+            FOR each s, child IN the pairs of keys and values OF node.children
+                IF NOT child.deleted
+                    CALL constructPath with child and the concatenation of path PLUS a list containing s
+                END IF
+            END FOR
+            IF the LENGTH OF path IS GREATER THAN zero
+                APPEND path TO ans
+            END IF
+        END FUNCTION
+
+        CALL constructPath with root and an empty list
+
+        RETURN ans
+    END FUNCTION
+END CLASS

@@ -1,0 +1,9 @@
+def rotatedDigits(n):
+    change = {'2', '5', '6', '9'}
+    same = {'0', '1', '8'}
+
+    def isGood(num):
+        s = str(num)
+        return all(d in change | same for d in s) and any(d in change for d in s)
+
+    return sum(isGood(i) for i in range(1, n + 1))

@@ -1,0 +1,43 @@
+CLASS Solution  
+    FUNCTION reachableNodes(edges AS List OF List OF integer, maxMoves AS integer, n AS integer) RETURNS integer  
+        SET graph TO an empty mapping from integers TO empty lists  
+        FOR index FROM zero TO the integer ONE LESS THAN n  
+            ASSIGN pointer/reference TO an empty list AT key index OF graph  
+        END FOR  
+        FOR each triple u v cnt IN edges  
+            APPEND the pair of v and cnt TO the list at key u OF graph  
+            APPEND the pair of u and cnt TO the list at key v OF graph  
+        END FOR  
+        SET distances TO a list of size n FILLED WITH infinity  
+        SET the element at position zero OF distances TO zero  
+        SET priority_queue TO a list CONTAINING the pair of zero and zero  
+        WHILE priority_queue is NOT EMPTY  
+            EXTRACT the pair of dist and node FROM priority_queue USING the operation that removes the element with the smallest first component  
+            IF dist IS GREATER THAN the element at position node OF distances  
+                CONTINUE to the next iteration of the WHILE loop  
+            END IF  
+            FOR each pair neighbor and cnt IN the list at key node OF graph  
+                SET new_dist TO dist PLUS cnt PLUS integer ONE  
+                IF new_dist IS LESS THAN the element at position neighbor OF distances  
+                    SET the element at position neighbor OF distances TO new_dist  
+                    INSERT the pair of new_dist and neighbor INTO priority_queue PRESERVING the order by the first component  
+                END IF  
+            END FOR  
+        END WHILE  
+        SET reachable_nodes TO zero  
+        FOR each d IN distances  
+            IF d IS LESS THAN OR EQUAL TO maxMoves  
+                INCREMENT reachable_nodes BY integer ONE  
+            END IF  
+        END FOR  
+        SET used_edges TO an empty mapping  
+        FOR each triple u v cnt IN edges  
+            SET moves_u TO the maximum between integer zero AND maxMoves MINUS the element at position u OF distances  
+            SET moves_v TO the maximum between integer zero AND maxMoves MINUS the element at position v OF distances  
+            SET reachable_new_nodes TO the minimum between cnt AND moves_u PLUS moves_v  
+            INCREMENT reachable_nodes BY reachable_new_nodes  
+            ASSIGN pointer/reference TO reachable_new_nodes AT key composed of u and v OF used_edges  
+        END FOR  
+        RETURN reachable_nodes  
+    END FUNCTION  
+END CLASS

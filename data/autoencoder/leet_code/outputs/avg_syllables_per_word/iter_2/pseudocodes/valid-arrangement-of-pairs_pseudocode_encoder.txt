@@ -1,0 +1,39 @@
+CLASS Solution
+    FUNCTION validArrangement(pairs: LIST OF LIST OF INTEGER) RETURNS LIST OF LIST OF INTEGER
+        SET graph TO a mapping with default empty LIST
+        SET out_degree TO a counter mapping
+        SET in_degree TO a counter mapping
+        
+        FOR each (u, v) IN pairs
+            APPEND v TO graph[u]
+            INCREMENT out_degree[u] BY 1
+            INCREMENT in_degree[v] BY 1
+        
+        SET start_node TO NONE
+        FOR each node IN graph
+            IF out_degree[node] EQUALS in_degree[node] PLUS 1
+                SET start_node TO node
+                BREAK
+        IF start_node IS NONE
+            SET start_node TO any node FROM graph
+        
+        SET path TO empty LIST
+        SET stack TO LIST containing start_node
+        
+        WHILE stack IS NOT empty
+            SET u TO last element OF stack
+            IF graph[u] IS NOT empty
+                SET v TO last element FROM graph[u] REMOVED
+                APPEND v TO stack
+            ELSE
+                APPEND stack POPPED element TO path
+        
+        REVERSE path
+        
+        SET result TO empty LIST
+        FOR i FROM 0 TO LENGTH OF path MINUS 2
+            APPEND LIST containing path[i] AND path[i PLUS 1] TO result
+        
+        RETURN result
+    END FUNCTION
+END CLASS

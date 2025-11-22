@@ -1,0 +1,57 @@
+CLASS Solution
+    FUNCTION maximalRectangle(matrix)
+        IF matrix EQUALS empty OR element at position zero OF matrix EQUALS empty
+            RETURN zero
+        END IF
+        SET rows TO the LENGTH OF matrix
+        SET cols TO the LENGTH OF element at position zero OF matrix
+        SET heights TO a list of zeros with LENGTH cols
+        SET max_area TO zero
+
+        FOR i FROM zero TO rows MINUS one
+            FOR j FROM zero TO cols MINUS one
+                IF element at position i OF matrix AND element at position j OF that EQUALS the character one
+                    INCREMENT element at position j OF heights BY one
+                ELSE
+                    SET element at position j OF heights TO zero
+                END IF
+            END FOR
+            SET max_area TO the GREATER OF max_area AND CALL largestRectangleArea WITH PARAMETERS heights
+        END FOR
+
+        RETURN max_area
+    END FUNCTION
+
+    FUNCTION largestRectangleArea(heights)
+        SET stack TO empty list
+        SET max_area TO zero
+        SET index TO zero
+
+        WHILE index LESS THAN the LENGTH OF heights
+            IF the LENGTH OF stack EQUALS zero OR element at position index OF heights GREATER THAN OR EQUAL TO element at position last element OF stack OF heights
+                APPEND index TO stack
+                INCREMENT index BY one
+            ELSE
+                SET top_of_stack TO the last element popped FROM stack
+                IF the LENGTH OF stack GREATER THAN zero
+                    SET area TO element at position top_of_stack OF heights MULTIPLIED BY (index MINUS element at position last element OF stack MINUS one)
+                ELSE
+                    SET area TO element at position top_of_stack OF heights MULTIPLIED BY index
+                END IF
+                SET max_area TO the GREATER OF max_area AND area
+            END IF
+        END WHILE
+
+        WHILE the LENGTH OF stack GREATER THAN zero
+            SET top_of_stack TO the last element popped FROM stack
+            IF the LENGTH OF stack GREATER THAN zero
+                SET area TO element at position top_of_stack OF heights MULTIPLIED BY (index MINUS element at position last element OF stack MINUS one)
+            ELSE
+                SET area TO element at position top_of_stack OF heights MULTIPLIED BY index
+            END IF
+            SET max_area TO the GREATER OF max_area AND area
+        END WHILE
+
+        RETURN max_area
+    END FUNCTION
+END CLASS

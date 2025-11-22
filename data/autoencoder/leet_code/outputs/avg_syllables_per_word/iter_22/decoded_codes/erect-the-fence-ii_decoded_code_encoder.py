@@ -1,0 +1,67 @@
+import math
+import random
+from typing import List, Tuple
+
+class Solution:
+    def outerTrees(self, trees: List[List[int]]) -> List[float]:
+        def dist_sq(p1: List[int], p2: List[int]) -> float:
+            x_diff = p1[0] - p2[0]
+            y_diff = p1[1] - p2[1]
+            return x_diff * x_diff + y_diff * y_diff
+
+        def circumcenter(p1: List[int], p2: List[int], p3: List[int]) -> Tuple[List[float], float]:
+            ax, ay = p1[0], p1[1]
+            bx, by = p2[0], p2[1]
+            cx, cy = p3[0], p3[1]
+
+            d = 2 * (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by))
+            # To avoid division by zero (collinear points)
+            if d == 0:
+                # Collinear points: circumcenter is undefined, handle by returning center as midpoint of two points with max dist
+                dists = [
+                    (dist_sq(p1, p2), (p1, p2)),
+                    (dist_sq(p2, p3), (p2, p3)),
+                    (dist_sq(p3, p1), (p3, p1))
+                ]
+                max_dist, (pt1, pt2) = max(dists, key=lambda x: x[0])
+                center = [(pt1[0] + pt2[0]) / 2, (pt1[1] + pt2[1]) / 2]
+                radius = math.sqrt(max_dist) / 2
+                return center, radius
+
+            ax2ay2 = ax * ax + ay * ay
+            bx2by2 = bx * bx + by * by
+            cx2cy2 = cx * cx + cy * cy
+
+            ux = ((ax2ay2 * (by - cy)) + (bx2by2 * (cy - ay)) + (cx2cy2 * (ay - by))) / d
+            uy = ((ax2ay2 * (cx - bx)) + (bx2by2 * (ax - cx)) + (cx2cy2 * (bx - ax))) / d
+            center = [ux, uy]
+            radius = math.sqrt((ux - ax)**2 + (uy - ay)**2)
+            return center, radius
+
+        def welzl(points: List[List[int]], boundary: List[List[int]], n: int) -> Tuple[List[float], float]:
+            if n == 0 or len(boundary) == 3:
+                if len(boundary) == 0:
+                    return [0.0, 0.0], 0.0
+                elif len(boundary) == 1:
+                    return [float(boundary[0][0]), float(boundary[0][1])], 0.0
+                elif len(boundary) == 2:
+                    c_x = (boundary[0][0] + boundary[1][0]) / 2
+                    c_y = (boundary[0][1] + boundary[1][1]) / 2
+                    center = [c_x, c_y]
+                    radius = math.sqrt(dist_sq(boundary[0], boundary[1])) / 2
+                    return center, radius
+                else:
+                    return circumcenter(boundary[0], boundary[1], boundary[2])
+
+            p = points[n - 1]
+            center, radius = welzl(points, boundary, n - 1)
+
+            if dist_sq(center, p) <= radius * radius + 1e-14:
+                return center, radius
+
+            return welzl(points, boundary + [p], n - 1)
+
+        points = trees[:]
+        random.shuffle(points)
+        center, radius = welzl(points, [], len(points))
+        return [center[0], center[1], radius]

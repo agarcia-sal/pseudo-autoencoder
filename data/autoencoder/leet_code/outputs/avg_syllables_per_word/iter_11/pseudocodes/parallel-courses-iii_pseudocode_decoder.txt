@@ -1,0 +1,37 @@
+CLASS Solution  
+    FUNCTION minimumTime(n, relations, time)  
+        CALL create_graph FROM defaultdict WITH list AND SET TO graph  
+        FOR each pair prevCourse AND nextCourse IN relations  
+            APPEND prevCourse TO the list at key nextCourse OF graph  
+        END FOR  
+        
+        SET memo TO a list of size n PLUS one FILLED WITH minus one  
+        
+        FUNCTION dfs(course)  
+            IF the element at position course OF memo NOT EQUALS minus one  
+                RETURN the element at position course OF memo  
+            END IF  
+            
+            SET max_prerequisite_time TO zero  
+            FOR each prevCourse IN the list at key course OF graph  
+                SET dfs_prevCourse_time TO CALL dfs WITH argument prevCourse  
+                IF dfs_prevCourse_time GREATER THAN max_prerequisite_time  
+                    SET max_prerequisite_time TO dfs_prevCourse_time  
+                END IF  
+            END FOR  
+            
+            SET the element at position course OF memo TO max_prerequisite_time PLUS the element at position course MINUS one OF time  
+            RETURN the element at position course OF memo  
+        END FUNCTION  
+        
+        SET total_minimum_time TO zero  
+        FOR course FROM one TO n  
+            SET dfs_course_time TO CALL dfs WITH argument course  
+            IF dfs_course_time GREATER THAN total_minimum_time  
+                SET total_minimum_time TO dfs_course_time  
+            END IF  
+        END FOR  
+        
+        RETURN total_minimum_time  
+    END FUNCTION  
+END CLASS

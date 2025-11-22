@@ -1,0 +1,55 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val = 0, left = None, right = None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET root TO NEW TreeNode with val AS values AT INDEX 0  
+    SET i TO 1  
+    SET queue TO EMPTY deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO queue POP LEFT  
+        IF i IS LESS THAN LENGTH OF values AND values AT INDEX i IS NOT None  
+            SET node.left TO NEW TreeNode with val AS values AT INDEX i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i IS LESS THAN LENGTH OF values AND values AT INDEX i IS NOT None  
+            SET node.right TO NEW TreeNode with val AS values AT INDEX i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION largestBSTSubtree(self, root)  
+
+        FUNCTION dfs(node)  
+            IF node IS None  
+                RETURN positive infinity, negative infinity, 0  
+            SET left_min, left_max, left_size TO dfs(node.left)  
+            SET right_min, right_max, right_size TO dfs(node.right)  
+            IF left_max IS LESS THAN node.val AND node.val IS LESS THAN right_min  
+                RETURN minimum OF node.val AND left_min, maximum OF node.val AND right_max, left_size PLUS right_size PLUS 1  
+            RETURN negative infinity, positive infinity, maximum OF left_size AND right_size  
+        END FUNCTION  
+
+        RETURN dfs(root) AT INDEX 2  
+    END FUNCTION  
+END CLASS

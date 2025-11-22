@@ -1,0 +1,51 @@
+CLASS Solution  
+    FUNCTION minOperationsToFlip(self, expression)  
+        SET stack TO empty list  
+
+        FOR each element IN expression  
+            IF element IS one of open parenthesis, ampersand, or vertical bar THEN  
+                APPEND tuple of element and zero TO stack  
+                CONTINUE to next iteration  
+            END IF  
+
+            IF element IS close parenthesis THEN  
+                SET lastPair TO result of popping from stack  
+                POP once from stack to remove open parenthesis  
+            ELSE  
+                SET lastPair TO tuple of element and one  
+            END IF  
+
+            IF stack is not empty AND first item of last element in stack IS ampersand OR vertical bar THEN  
+                SET op TO first item of result of popping from stack  
+                SET a, costA TO result of popping from stack  
+                SET b, costB TO lastPair  
+                
+                IF op IS ampersand THEN  
+                    IF a IS zero AND b IS zero THEN  
+                        SET lastPair TO tuple of zero and one PLUS minimum of costA and costB  
+                    ELSE IF a IS zero AND b IS one THEN  
+                        SET lastPair TO tuple of zero and one  
+                    ELSE IF a IS one AND b IS zero THEN  
+                        SET lastPair TO tuple of zero and one  
+                    ELSE  
+                        SET lastPair TO tuple of one and minimum of costA and costB  
+                    END IF  
+                ELSE  
+                    IF a IS zero AND b IS zero THEN  
+                        SET lastPair TO tuple of zero and minimum of costA and costB  
+                    ELSE IF a IS zero AND b IS one THEN  
+                        SET lastPair TO tuple of one and one  
+                    ELSE IF a IS one AND b IS zero THEN  
+                        SET lastPair TO tuple of one and one  
+                    ELSE  
+                        SET lastPair TO tuple of one and one PLUS minimum of costA and costB  
+                    END IF  
+                END IF  
+            END IF  
+
+            APPEND lastPair TO stack  
+        END FOR  
+
+        RETURN second item of last element in stack  
+    END FUNCTION  
+END CLASS

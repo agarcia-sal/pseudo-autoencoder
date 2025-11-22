@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION totalNQueens WITH PARAMETER n  
+        FUNCTION is_not_under_attack WITH PARAMETERS row AND col  
+            RETURN NOT (element at position col of cols PLUS element at position row MINUS col of hills PLUS element at position row PLUS col of dales)  
+        END FUNCTION  
+  
+        FUNCTION place_queen WITH PARAMETERS row AND col  
+            SET element at position col of cols TO one  
+            SET element at position row MINUS col of hills TO one  
+            SET element at position row PLUS col of dales TO one  
+        END FUNCTION  
+  
+        FUNCTION remove_queen WITH PARAMETERS row AND col  
+            SET element at position col of cols TO zero  
+            SET element at position row MINUS col of hills TO zero  
+            SET element at position row PLUS col of dales TO zero  
+        END FUNCTION  
+  
+        FUNCTION backtrack WITH PARAMETERS row DEFAULTING TO zero AND count DEFAULTING TO zero  
+            FOR col FROM zero TO n MINUS one  
+                IF is_not_under_attack WITH ARGUMENTS row AND col  
+                    CALL place_queen WITH ARGUMENTS row AND col  
+                    IF row PLUS one EQUALS n  
+                        INCREMENT count BY one  
+                    ELSE  
+                        SET count TO RESULT OF backtrack WITH ARGUMENTS row PLUS one AND count  
+                    END IF  
+                    CALL remove_queen WITH ARGUMENTS row AND col  
+                END IF  
+            END FOR  
+            RETURN count  
+        END FUNCTION  
+  
+        SET cols TO list OF zero REPEATED n TIMES  
+        SET hills TO list OF zero REPEATED two MULTIPLIED BY n MINUS one TIMES  
+        SET dales TO list OF zero REPEATED two MULTIPLIED BY n MINUS one TIMES  
+  
+        RETURN RESULT OF backtrack WITH NO ARGUMENTS  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,17 @@
+def exclusiveTime(n, logs):
+    res = [0]*n
+    stack = []
+    for log in logs:
+        fid, act, t = log.split(':')
+        fid, t = int(fid), int(t)
+        if act == "start":
+            if stack:
+                f, ts = stack[-1]
+                res[f] += t - ts
+            stack.append((fid, t))
+        else:
+            f, ts = stack.pop()
+            res[f] += t - ts + 1
+            if stack:
+                stack[-1] = (stack[-1][0], t + 1)
+    return res

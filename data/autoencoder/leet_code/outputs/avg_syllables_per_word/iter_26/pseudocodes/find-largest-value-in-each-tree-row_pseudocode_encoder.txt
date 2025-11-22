@@ -1,0 +1,69 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values AS list)
+    IF the LENGTH OF values EQUALS zero
+        RETURN none
+    END IF
+    SET root TO A NEW TreeNode INITIALIZED WITH the element at position zero OF values
+    SET i TO one
+    SET queue TO AN EMPTY double ended queue
+    APPEND root TO queue
+    WHILE the queue HOLDS
+        SET node TO THE FIRST ELEMENT REMOVED FROM THE queue
+        IF i IS LESS THAN THE LENGTH OF values AND the element at position i OF values IS NOT none
+            SET node.left TO A NEW TreeNode INITIALIZED WITH the element at position i OF values
+            APPEND node.left TO queue
+        END IF
+        INCREMENT i BY one
+        IF i IS LESS THAN THE LENGTH OF values AND the element at position i OF values IS NOT none
+            SET node.right TO A NEW TreeNode INITIALIZED WITH the element at position i OF values
+            APPEND node.right TO queue
+        END IF
+        INCREMENT i BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS none AND q IS none
+        RETURN true
+    ELSE IF p IS none OR q IS none
+        RETURN false
+    ELSE IF p.val NOT EQUALS q.val
+        RETURN false
+    ELSE
+        RETURN the RESULT OF is_same_tree WITH p.left AND q.left AND THE RESULT OF is_same_tree WITH p.right AND q.right
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION largestValues(self, root AS Optional TreeNode)
+        IF root IS none
+            RETURN AN EMPTY list
+        END IF
+        SET queue TO A double ended queue INITIALIZED WITH root AS THE ONLY ELEMENT
+        SET largest_values TO AN EMPTY list
+        WHILE the queue HOLDS
+            SET level_size TO the LENGTH OF queue
+            SET max_value TO negative infinity
+            FOR index FROM zero TO level_size MINUS one INCLUSIVE
+                SET node TO THE FIRST ELEMENT REMOVED FROM THE queue
+                SET max_value TO THE GREATER VALUE OF max_value AND node.val
+                IF node.left IS NOT none
+                    APPEND node.left TO queue
+                END IF
+                IF node.right IS NOT none
+                    APPEND node.right TO queue
+                END IF
+            END FOR
+            APPEND max_value TO largest_values
+        END WHILE
+        RETURN largest_values
+    END FUNCTION
+END CLASS

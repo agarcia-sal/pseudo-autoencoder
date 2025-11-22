@@ -1,0 +1,20 @@
+CLASS Solution
+    FUNCTION connectTwoGroups(cost)
+        SET size1 TO LENGTH OF cost
+        SET size2 TO LENGTH OF cost[0]
+        SET dp TO 2D LIST WITH size1 + 1 ROWS AND 2^size2 COLUMNS, EACH ELEMENT SET TO infinity
+        SET dp[0][0] TO 0
+
+        FOR i FROM 0 TO size1 - 1
+            FOR mask FROM 0 TO 2^size2 - 1
+                FOR j FROM 0 TO size2 - 1
+                    SET new_mask TO mask OR (1 LEFT SHIFT j)
+                    SET dp[i + 1][new_mask] TO MINIMUM OF dp[i + 1][new_mask] AND dp[i][mask] PLUS cost[i][j]
+
+                FOR j FROM 0 TO size2 - 1
+                    IF mask AND (1 LEFT SHIFT j) IS NOT 0
+                        SET dp[i + 1][mask] TO MINIMUM OF dp[i + 1][mask] AND dp[i + 1][mask XOR (1 LEFT SHIFT j)] PLUS cost[i][j]
+
+        RETURN dp[size1][2^size2 - 1]
+    END FUNCTION
+END CLASS

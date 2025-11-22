@@ -1,0 +1,57 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS None, right EQUALS None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    END IF  
+    SET root TO NEW TreeNode WITH value at position one of values  
+    SET i TO one  
+    SET queue TO new double ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        REMOVE element at position one from the left of queue AND ASSIGN TO node  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT None  
+            SET node.left TO NEW TreeNode WITH value at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i of values IS NOT None  
+            SET node.right TO NEW TreeNode WITH value at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF value property of p NOT EQUALS value property of q  
+        RETURN False  
+    ELSE  
+        RETURN the result of is_same_tree WITH arguments value property left of p AND value property left of q AND the result of is_same_tree WITH arguments value property right of p AND value property right of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION buildTree(self, inorder, postorder)  
+        IF inorder IS EMPTY OR postorder IS EMPTY  
+            RETURN None  
+        END IF  
+        SET root_val TO the result of removing the last element from postorder  
+        SET root TO NEW TreeNode WITH root_val  
+        SET root_index TO the position of root_val in inorder  
+        SET root.right TO the result of calling self.buildTree WITH arguments the elements of inorder from position root_index PLUS one TO the end AND postorder  
+        SET root.left TO the result of calling self.buildTree WITH arguments the elements of inorder from position one TO position root_index MINUS one AND postorder  
+        RETURN root  
+    END FUNCTION  
+END CLASS

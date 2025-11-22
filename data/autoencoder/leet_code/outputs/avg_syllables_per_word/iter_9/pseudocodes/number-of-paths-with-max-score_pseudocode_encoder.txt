@@ -1,0 +1,54 @@
+CLASS Solution  
+    FUNCTION pathsWithMaxScore(board)  
+        SET MODULO TO one billion plus seven  
+        SET n TO length of board  
+        
+        FUNCTION initialize_dp_array(size)  
+            CREATE empty two-dimensional list dp of size by size  
+            FOR each index FROM zero TO size minus one  
+                CREATE empty list row  
+                FOR each index FROM zero TO size minus one  
+                    APPEND list containing negative infinity and zero TO row  
+                END FOR  
+                APPEND row TO dp  
+            END FOR  
+            RETURN dp  
+        END FUNCTION  
+        
+        SET dp TO result of initialize_dp_array(n)  
+        
+        SET element at row n minus one and column n minus one in dp TO list containing zero and one  
+        
+        FOR each i FROM n minus one DOWN TO zero  
+            FOR each j FROM n minus one DOWN TO zero  
+                IF element at row i and column j in board EQUALS 'X' OR EQUALS 'S' THEN  
+                    CONTINUE to next iteration of inner loop  
+                END IF  
+                
+                IF element at row i and column j in board NOT EQUALS 'E' THEN  
+                    SET value TO integer representation of element at row i and column j in board  
+                ELSE  
+                    SET value TO zero  
+                END IF  
+                
+                FOR each pair (x, y) IN the list containing (one, zero), (zero, one), and (one, one)  
+                    SET ni TO i plus x  
+                    SET nj TO j plus y  
+                    IF ni GREATER THAN OR EQUAL TO zero AND ni LESS THAN n AND nj GREATER THAN OR EQUAL TO zero AND nj LESS THAN n THEN  
+                        IF first element of dp at position ni, nj GREATER THAN first element of dp at position i, j THEN  
+                            SET dp at position i, j TO list containing first element of dp at ni, nj PLUS value, and second element of dp at ni, nj  
+                        ELSE IF first element of dp at position ni, nj EQUALS first element of dp at position i, j THEN  
+                            SET second element of dp at position i, j TO remainder of (second element of dp at position i, j PLUS second element of dp at position ni, nj) DIVIDED BY MODULO  
+                        END IF  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+        
+        IF first element of dp at position zero, zero EQUALS negative infinity THEN  
+            RETURN list containing zero and zero  
+        END IF  
+        
+        RETURN list containing first element of dp at position zero, zero and second element of dp at position zero, zero  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,66 @@
+```
+CLASS Solution
+    FUNCTION sortItems(n, m, group, beforeItems)
+        FOR i FROM 0 TO n - 1
+            IF group[i] EQUALS -1
+                SET group[i] TO m
+                INCREMENT m BY 1
+        
+        SET group_items TO a new defaultdict of list
+        SET group_graph TO a new defaultdict of list
+        SET item_graph TO a new defaultdict of list
+        SET item_in_degree TO a list of zeros of length n
+        SET group_in_degree TO a list of zeros of length m
+        
+        FOR i FROM 0 TO n - 1
+            APPEND i TO group_items[group[i]]
+        
+        FOR i FROM 0 TO n - 1
+            FOR each before IN beforeItems[i]
+                IF group[before] EQUALS group[i]
+                    APPEND i TO item_graph[before]
+                    INCREMENT item_in_degree[i] BY 1
+                ELSE
+                    APPEND group[i] TO group_graph[group[before]]
+                    INCREMENT group_in_degree[group[i]] BY 1
+        
+        FUNCTION topological_sort(graph, in_degree, items)
+            SET q TO a deque containing items WHERE in_degree[item] EQUALS 0
+            SET result TO an empty list
+            WHILE q IS NOT empty
+                SET u TO q.popleft()
+                APPEND u TO result
+                FOR each v IN graph[u]
+                    DECREMENT in_degree[v] BY 1
+                    IF in_degree[v] EQUALS 0
+                        APPEND v TO q
+            END WHILE
+            IF LENGTH OF result EQUALS LENGTH OF items
+                RETURN result
+            ELSE
+                RETURN empty list
+        END FUNCTION
+        
+        SET sorted_within_groups TO an empty list
+        FOR each items IN group_items.values()
+            SET sorted_items TO topological_sort(item_graph, item_in_degree, items)
+            IF sorted_items IS empty
+                RETURN empty list
+            EXTEND sorted_within_groups BY sorted_items
+        
+        SET sorted_groups TO topological_sort(group_graph, group_in_degree, list FROM 0 TO m - 1)
+        IF sorted_groups IS empty
+            RETURN empty list
+        
+        SET group_to_items_map TO a new defaultdict of list
+        FOR each item IN sorted_within_groups
+            APPEND item TO group_to_items_map[group[item]]
+        
+        SET result TO empty list
+        FOR each group_id IN sorted_groups
+            EXTEND result BY group_to_items_map[group_id]
+        
+        RETURN result
+    END FUNCTION
+END CLASS
+```

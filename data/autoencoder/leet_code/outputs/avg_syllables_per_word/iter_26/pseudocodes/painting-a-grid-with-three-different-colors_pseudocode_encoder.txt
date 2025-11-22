@@ -1,0 +1,68 @@
+CLASS Solution
+    FUNCTION colorTheGrid(parameter m, parameter n)
+        SET MODULO TO ten RAISED TO the power of nine PLUS one
+        
+        FUNCTION generate_valid_columns(parameter previous_column)
+            SET color_options TO list containing one, two, three
+            SET list_of_valid_columns TO empty list
+            
+            FUNCTION backtrack(parameter current_column, parameter current_row)
+                IF current_row EQUALS parameter m THEN
+                    APPEND the tuple form OF current_column TO list_of_valid_columns
+                    RETURN
+                END IF
+                FOR each color IN color_options
+                    IF current_column is empty OR element at position last of current_column NOT EQUALS color THEN
+                        IF previous_column IS NOT null AND element at position current_row OF previous_column EQUALS color THEN
+                            CONTINUE TO next iteration of FOR
+                        END IF
+                        APPEND color TO current_column
+                        CALL backtrack WITH current_column AND current_row PLUS one
+                        REMOVE last element FROM current_column
+                    END IF
+                END FOR
+            END FUNCTION
+            
+            CALL backtrack WITH empty list AND zero
+            RETURN list_of_valid_columns
+        END FUNCTION
+        
+        SET list_of_all_valid_columns TO the result of calling generate_valid_columns WITH null
+        SET number_of_valid_columns TO the LENGTH OF list_of_all_valid_columns
+        
+        SET dictionary_of_compatible_columns TO a mapping FROM each index FROM zero TO number_of_valid_columns MINUS one INCLUSIVE TO empty list
+        FOR index_i FROM zero TO number_of_valid_columns MINUS one INCLUSIVE
+            FOR index_j FROM zero TO number_of_valid_columns MINUS one INCLUSIVE
+                SET condition_hold TO true
+                FOR position_k FROM zero TO m MINUS one INCLUSIVE
+                    IF element at position k OF element at position index_i OF list_of_all_valid_columns EQUALS element at position k OF element at position index_j OF list_of_all_valid_columns THEN
+                        SET condition_hold TO false
+                        BREAK from FOR
+                    END IF
+                END FOR
+                IF condition_hold HOLDS THEN
+                    APPEND index_j TO dictionary_of_compatible_columns AT key index_i
+                END IF
+            END FOR
+        END FOR
+        
+        SET dynamic_programming_list TO a list OF length number_of_valid_columns WITH each element SET TO one
+        
+        FOR repetition_counter FROM one TO n MINUS one INCLUSIVE
+            SET next_dynamic_programming_list TO a list OF length number_of_valid_columns WITH each element SET TO zero
+            FOR index_i FROM zero TO number_of_valid_columns MINUS one INCLUSIVE
+                FOR each compatible_index IN dictionary_of_compatible_columns AT key index_i
+                    SET next_dynamic_programming_list AT position compatible_index TO next_dynamic_programming_list AT position compatible_index PLUS dynamic_programming_list AT position index_i MODULO MODULO
+                END FOR
+            END FOR
+            SET dynamic_programming_list TO next_dynamic_programming_list
+        END FOR
+        
+        SET total_ways TO zero
+        FOR each count IN dynamic_programming_list
+            INCREMENT total_ways BY count
+        END FOR
+        
+        RETURN total_ways MODULO MODULO
+    END FUNCTION
+END CLASS

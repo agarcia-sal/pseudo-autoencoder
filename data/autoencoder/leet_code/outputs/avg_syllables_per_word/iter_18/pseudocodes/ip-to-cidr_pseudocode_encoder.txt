@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION ipToCIDR WITH PARAMETERS ip STRING AND n INTEGER RETURNS LIST OF STRING  
+        FUNCTION ip_to_int WITH PARAMETER ip STRING RETURNS INTEGER  
+            SET parts TO list obtained by converting each segment in ip separated by the period delimiter into an integer  
+            SET result_number TO zero  
+            FOR each part IN parts  
+                SET result_number TO result_number MULTIPLIED BY two HUNDRED FIFTY SIX PLUS part  
+            END FOR  
+            RETURN result_number  
+        END FUNCTION  
+
+        FUNCTION int_to_ip WITH PARAMETER num INTEGER RETURNS STRING  
+            SET result_string TO empty list  
+            FOR index FROM three DOWNTO zero  
+                APPEND the string representation of the integer remainder of num DIVIDED BY two HUNDRED FIFTY SIX after shifting right by eight TIMES the index TO result_string  
+            END FOR  
+            RETURN concatenation of elements in result_string separated by the period delimiter  
+        END FUNCTION  
+
+        FUNCTION largest_cidr_size WITH PARAMETERS start INTEGER AND n INTEGER RETURNS INTEGER  
+            IF the bitwise AND of start AND one EQUALS one  
+                RETURN one  
+            END IF  
+            SET x TO one  
+            WHILE x LESS THAN OR EQUAL TO n AND the bitwise AND of start AND the difference of x AND one EQUALS zero  
+                SET x TO x MULTIPLIED BY two  
+            END WHILE  
+            RETURN x DIVIDED BY two  
+        END FUNCTION  
+
+        SET result TO empty list  
+        SET start_ip TO the value returned by ip_to_int applied to ip  
+        WHILE n GREATER THAN zero  
+            SET size TO the value returned by largest_cidr_size with start_ip AND n as arguments  
+            APPEND concatenation of int_to_ip applied to start_ip AND the forward slash AND the difference of thirty two AND the difference of the bit length of size AND one TO the result list  
+            SET start_ip TO start_ip PLUS size  
+            SET n TO n MINUS size  
+        END WHILE  
+        RETURN result  
+    END FUNCTION  
+END CLASS

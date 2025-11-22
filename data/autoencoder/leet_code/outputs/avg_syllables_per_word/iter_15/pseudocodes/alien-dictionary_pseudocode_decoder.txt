@@ -1,0 +1,42 @@
+CLASS Solution  
+    FUNCTION alienOrder(words)  
+        SET graph TO an empty mapping with default value as an empty set  
+        SET indegree TO an empty mapping with default value zero  
+        SET all_chars TO the set of all characters appearing in the concatenation of all elements of words  
+        FOR index FROM zero TO the number of elements in words MINUS one  
+            SET word1 TO the element at position index of words  
+            SET word2 TO the element at position index PLUS one of words  
+            SET min_length TO the smaller value between the LENGTH OF word1 and the LENGTH OF word2  
+            SET found TO false  
+            FOR position FROM zero TO min_length MINUS one  
+                IF the character at position of word1 IS NOT EQUAL TO the character at position of word2 THEN  
+                    IF the character at position of word2 IS NOT IN the set mapped from the character at position of word1 in graph THEN  
+                        ADD the character at position of word2 TO the set mapped from the character at position of word1 in graph  
+                        INCREMENT the value mapped from the character at position of word2 in indegree BY one  
+                    END IF  
+                    SET found TO true  
+                    BREAK out of the inner loop  
+                END IF  
+            END FOR  
+            IF found IS false AND the LENGTH OF word1 IS GREATER THAN the LENGTH OF word2 THEN  
+                RETURN the empty text string  
+            END IF  
+        END FOR  
+        SET queue TO a double ended queue initialized with all characters in all_chars whose corresponding indegree value IS EQUAL TO zero  
+        SET result TO an empty list  
+        WHILE the queue IS NOT empty  
+            REMOVE the element from the front of queue and assign it TO char  
+            APPEND char TO result  
+            FOR each neighbor IN the set mapped from char in graph  
+                DECREMENT the value mapped from neighbor in indegree BY one  
+                IF the value mapped from neighbor in indegree IS EQUAL TO zero THEN  
+                    APPEND neighbor TO the end of queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        IF the LENGTH OF result IS NOT EQUAL TO the SIZE OF all_chars THEN  
+            RETURN the empty text string  
+        END IF  
+        RETURN the concatenation of all elements in result in order  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,112 @@
+CLASS Solution  
+    FUNCTION canMouseWin(grid, catJump, mouseJump)  
+        SET m TO the LENGTH OF grid  
+        SET n TO the LENGTH OF element at position zero of grid  
+        SET cat_start TO zero  
+        SET mouse_start TO zero  
+        SET food TO zero  
+        SET dirs TO the SEQUENCE of integer minus one zero integer one zero integer minus one  
+        SET g_mouse TO an empty list repeated m MULTIPLIED BY n times  
+        SET g_cat TO an empty list repeated m MULTIPLIED BY n times  
+        FOR each index i AND element row IN enumeration of grid  
+            FOR each index j AND element c IN enumeration of row  
+                IF c EQUALS hash symbol  
+                    CONTINUE to the next iteration of inner loop  
+                END IF  
+                SET v TO i MULTIPLIED BY n PLUS j  
+                IF c EQUALS uppercase C  
+                    SET cat_start TO v  
+                ELSE IF c EQUALS uppercase M  
+                    SET mouse_start TO v  
+                ELSE IF c EQUALS uppercase F  
+                    SET food TO v  
+                END IF  
+                FOR each pair a AND b IN pairwise of dirs  
+                    FOR k FROM zero TO mouseJump PLUS one MINUS one  
+                        SET x TO i PLUS k MULTIPLIED BY a  
+                        SET y TO j PLUS k MULTIPLIED BY b  
+                        IF NOT x GREATER THAN OR EQUAL TO zero AND x LESS THAN m AND y GREATER THAN OR EQUAL TO zero AND y LESS THAN n AND element at position x of grid at position y NOT EQUALS hash symbol  
+                            BREAK the loop  
+                        END IF  
+                        APPEND x MULTIPLIED BY n PLUS y TO element at position v of g_mouse  
+                    END FOR  
+                    FOR k FROM zero TO catJump PLUS one MINUS one  
+                        SET x TO i PLUS k MULTIPLIED BY a  
+                        SET y TO j PLUS k MULTIPLIED BY b  
+                        IF NOT x GREATER THAN OR EQUAL TO zero AND x LESS THAN m AND y GREATER THAN OR EQUAL TO zero AND y LESS THAN n AND element at position x of grid at position y NOT EQUALS hash symbol  
+                            BREAK the loop  
+                        END IF  
+                        APPEND x MULTIPLIED BY n PLUS y TO element at position v of g_cat  
+                    END FOR  
+                END FOR  
+            END FOR  
+        END FOR  
+        RETURN self.calc(g_mouse, g_cat, mouse_start, cat_start, food) EQUALS one  
+    END FUNCTION  
+
+    FUNCTION calc(g_mouse, g_cat, mouse_start, cat_start, hole)  
+        FUNCTION get_prev_states(state)  
+            SET m TO element at position zero of state  
+            SET c TO element at position one of state  
+            SET t TO element at position two of state  
+            SET pt TO t XOR one  
+            SET pre TO an empty list  
+            IF pt EQUALS one  
+                FOR each pc IN element at position c of g_cat  
+                    IF element at index m of element at index pc of ans at index one EQUALS zero  
+                        APPEND the tuple of m pc pt TO pre  
+                    END IF  
+                END FOR  
+            ELSE  
+                FOR each pm IN element at position m of g_mouse  
+                    IF element at index pm of element at index c of ans at index zero EQUALS zero  
+                        APPEND the tuple of pm c zero TO pre  
+                    END IF  
+                END FOR  
+            END IF  
+            RETURN pre  
+        END FUNCTION  
+
+        SET n TO the LENGTH OF g_mouse  
+        SET degree TO a three dimensional list of zeros with dimensions n by n by two  
+        FOR i FROM zero TO n MINUS one  
+            FOR j FROM zero TO n MINUS one  
+                SET element at index zero of element at index j of element at index i of degree TO the LENGTH OF element at index i of g_mouse  
+                SET element at index one of element at index j of element at index i of degree TO the LENGTH OF element at index j of g_cat  
+            END FOR  
+        END FOR  
+
+        SET ans TO a three dimensional list of zeros with dimensions n by n by two  
+        SET q TO an empty double ended queue  
+        FOR i FROM zero TO n MINUS one  
+            SET element at index one of element at index i of element at index hole of ans TO one  
+            SET element at index zero of element at index hole of element at index i of ans TO two  
+            SET element at index one of element at index i of element at index i of ans TO two  
+            SET element at index zero of element at index i of element at index i of ans TO two  
+            APPEND the tuple of hole i one TO q  
+            APPEND the tuple of i hole zero TO q  
+            APPEND the tuple of i i zero TO q  
+            APPEND the tuple of i i one TO q  
+        END FOR  
+        WHILE q is not empty  
+            SET state TO the result of popping from the left of q  
+            SET t TO element at index t of ans at indexes of state zero and state one  
+            FOR each prev_state IN get_prev_states(state)  
+                SET pm TO element at position zero of prev_state  
+                SET pc TO element at position one of prev_state  
+                SET pt TO element at position two of prev_state  
+                IF pt EQUALS t MINUS one  
+                    SET element at index pt of element at index pc of element at index pm of ans TO t  
+                    APPEND prev_state TO q  
+                ELSE  
+                    DECREMENT element at index pt of element at index pc of element at index pm of degree BY one  
+                    IF element at index pt of element at index pc of element at index pm of degree EQUALS zero  
+                        SET element at index pt of element at index pc of element at index pm of ans TO t  
+                        APPEND prev_state TO q  
+                    END IF  
+                END IF  
+            END FOR  
+        END WHILE  
+        RETURN element at index zero of element at index cat_start of element at index mouse_start of ans  
+    END FUNCTION  
+END CLASS

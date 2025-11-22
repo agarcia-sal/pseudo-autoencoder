@@ -1,0 +1,30 @@
+from collections import Counter
+
+def longest_subsequence(s, k):
+    freq = Counter(s)
+    valid = sorted([c for c, v in freq.items() if v >= k], reverse=True)
+
+    def valid_subseq(cand):
+        cnt = idx = 0
+        for ch in s:
+            if ch == cand[idx]:
+                idx += 1
+                if idx == len(cand):
+                    cnt += 1
+                    idx = 0
+                    if cnt == k:
+                        return True
+        return False
+
+    best = ""
+    def bt(cand):
+        nonlocal best
+        if len(cand) > len(best):
+            best = cand
+        for c in valid:
+            nxt = cand + c
+            if valid_subseq(nxt):
+                bt(nxt)
+
+    bt("")
+    return best

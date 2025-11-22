@@ -1,0 +1,45 @@
+CLASS Solution  
+    FUNCTION rectangleArea(rectangles)  
+        SET MOD TO one billion PLUS seven  
+        SET y_coords TO empty set  
+        FOR each element named x1 y1 x2 y2 IN rectangles  
+            ADD y1 TO y_coords  
+            ADD y2 TO y_coords  
+        END FOR  
+        SET y_coords TO y_coords SORTED in ascending order  
+        SET y_index TO empty dictionary  
+        FOR each element i y IN enumeration of y_coords  
+            SET y_index at key y TO i  
+        END FOR  
+        SET count TO list of zeros with the LENGTH OF y_coords  
+        SET events TO empty list  
+        FOR each element named x1 y1 x2 y2 IN rectangles  
+            APPEND tuple of x1 one y1 y2 TO events  
+            APPEND tuple of x2 minus one y1 y2 TO events  
+        END FOR  
+        SORT events by their first element in ascending order  
+        SET prev_x TO zero  
+        SET area TO zero  
+        FOR each element named x eventType y1 y2 IN events  
+            SET current_length TO zero  
+            FOR index i FROM one TO LENGTH OF count MINUS one  
+                IF element at position i MINUS one of count IS GREATER THAN zero  
+                    INCREMENT current_length BY element at position i of y_coords MINUS element at position i MINUS one of y_coords  
+                END IF  
+            END FOR  
+            INCREMENT area BY current_length MULTIPLIED BY x MINUS prev_x  
+            SET area TO area MODULO MOD  
+            IF eventType EQUALS one  
+                FOR index i FROM y_index at key y1 TO y_index at key y2 MINUS one  
+                    INCREMENT element at position i of count BY one  
+                END FOR  
+            ELSE  
+                FOR index i FROM y_index at key y1 TO y_index at key y2 MINUS one  
+                    DECREMENT element at position i of count BY one  
+                END FOR  
+            END IF  
+            SET prev_x TO x  
+        END FOR  
+        RETURN area  
+    END FUNCTION  
+END CLASS

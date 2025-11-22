@@ -1,0 +1,38 @@
+```
+CLASS Solution
+    FUNCTION cherryPickup(grid)
+        SET n TO LENGTH OF grid
+        IF grid[0][0] IS -1 OR grid[n-1][n-1] IS -1
+            RETURN 0
+        
+        SET dp TO 3D LIST OF SIZE n x n x n FILLED WITH -1
+        SET dp[0][0][0] TO grid[0][0]
+        
+        SET directions TO LIST OF PAIRS (0, 1) AND (1, 0)
+        
+        FOR t FROM 1 TO 2 * n - 2
+            FOR i1 FROM MAXIMUM OF 0 AND (t - (n - 1)) TO MINIMUM OF n AND (t + 1) MINUS 1
+                FOR i2 FROM MAXIMUM OF 0 AND (t - (n - 1)) TO MINIMUM OF n AND (t + 1) MINUS 1
+                    SET j1 TO t MINUS i1
+                    SET j2 TO t MINUS i2
+                    IF grid[i1][j1] IS -1 OR grid[i2][j2] IS -1
+                        CONTINUE TO NEXT i2
+                    SET prev_max TO -1
+                    FOR EACH (di1, dj1) IN directions
+                        FOR EACH (di2, dj2) IN directions
+                            SET pi1 TO i1 MINUS di1
+                            SET pj1 TO j1 MINUS dj1
+                            SET pi2 TO i2 MINUS di2
+                            SET pj2 TO j2 MINUS dj2
+                            IF pi1 IS AT LEAST 0 AND LESS THAN n AND pj1 IS AT LEAST 0 AND LESS THAN n AND pi2 IS AT LEAST 0 AND LESS THAN n AND pj2 IS AT LEAST 0 AND LESS THAN n
+                                SET prev_max TO MAXIMUM OF prev_max AND dp[pi1][pi2][pj1]
+                    IF prev_max IS AT LEAST 0
+                        IF i1 EQUALS i2
+                            SET cherries TO grid[i1][j1]
+                        ELSE
+                            SET cherries TO grid[i1][j1] PLUS grid[i2][j2]
+                        SET dp[i1][i2][j1] TO prev_max PLUS cherries
+        RETURN MAXIMUM OF 0 AND dp[n-1][n-1][n-1]
+    END FUNCTION
+END CLASS
+```

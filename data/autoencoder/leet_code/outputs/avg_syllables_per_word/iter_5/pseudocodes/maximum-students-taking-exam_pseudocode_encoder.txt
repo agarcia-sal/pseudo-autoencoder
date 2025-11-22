@@ -1,0 +1,36 @@
+CLASS Solution  
+    FUNCTION maxStudents(seats)  
+        SET m TO LENGTH OF seats  
+        SET n TO LENGTH OF seats AT INDEX 0  
+        
+        SET broken TO LIST OF LENGTH m WITH ALL ELEMENTS 0  
+        FOR i FROM 0 TO m MINUS 1  
+            FOR j FROM 0 TO n MINUS 1  
+                IF seats AT i AT j EQUALS '#'  
+                    SET broken AT i TO broken AT i OR BIT SHIFT 1 BY j  
+        
+        FUNCTION is_valid(arrangement)  
+            RETURN arrangement AND BIT SHIFT arrangement RIGHT BY 1 EQUALS 0  
+        END FUNCTION  
+        
+        SET dp TO LIST OF DICTIONARIES OF LENGTH m  
+        
+        FOR arrangement FROM 0 TO BIT SHIFT 1 BY n MINUS 1  
+            IF is_valid(arrangement) AND arrangement AND broken AT 0 EQUALS 0  
+                SET dp AT 0 AT arrangement TO COUNT OF ONES IN BINARY REPRESENTATION OF arrangement  
+        
+        FOR i FROM 1 TO m MINUS 1  
+            FOR arrangement FROM 0 TO BIT SHIFT 1 BY n MINUS 1  
+                IF is_valid(arrangement) AND arrangement AND broken AT i EQUALS 0  
+                    SET max_students TO 0  
+                    FOR prev_arrangement IN KEYS OF dp AT i MINUS 1  
+                        IF arrangement AND BIT SHIFT prev_arrangement RIGHT BY 1 EQUALS 0 AND arrangement AND BIT SHIFT prev_arrangement LEFT BY 1 EQUALS 0  
+                            SET max_students TO MAXIMUM OF max_students AND dp AT i MINUS 1 AT prev_arrangement  
+                    SET dp AT i AT arrangement TO max_students PLUS COUNT OF ONES IN BINARY REPRESENTATION OF arrangement  
+        
+        IF dp AT m MINUS 1 IS NOT EMPTY  
+            RETURN MAXIMUM VALUE IN dp AT m MINUS 1  
+        ELSE  
+            RETURN 0  
+    END FUNCTION  
+END CLASS

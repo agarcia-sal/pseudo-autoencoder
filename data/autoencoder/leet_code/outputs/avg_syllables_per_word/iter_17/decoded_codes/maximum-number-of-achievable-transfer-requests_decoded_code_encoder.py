@@ -1,0 +1,16 @@
+class Solution:
+    def maximumRequests(self, n: int, requests: list[list[int]]) -> int:
+        max_requests = 0
+        num_requests = len(requests)
+        for mask in range(1 << num_requests):
+            balance = [0] * n
+            count = 0
+            for i in range(num_requests):
+                if (mask & (1 << i)) != 0:
+                    from_building, to_building = requests[i]
+                    balance[from_building] -= 1
+                    balance[to_building] += 1
+                    count += 1
+            if all(x == 0 for x in balance) and count > max_requests:
+                max_requests = count
+        return max_requests

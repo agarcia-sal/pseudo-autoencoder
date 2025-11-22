@@ -1,0 +1,36 @@
+from collections import defaultdict, deque
+
+class Solution:
+    def alienOrder(self, words):
+        graph = defaultdict(set)
+        indegree = defaultdict(int)
+        all_chars = set(''.join(words))
+
+        for i in range(len(words) - 1):
+            w1, w2 = words[i], words[i + 1]
+            min_len = min(len(w1), len(w2))
+            found = False
+            for j in range(min_len):
+                if w1[j] != w2[j]:
+                    if w2[j] not in graph[w1[j]]:
+                        graph[w1[j]].add(w2[j])
+                        indegree[w2[j]] += 1
+                    found = True
+                    break
+            if not found and len(w1) > len(w2):
+                return ""
+
+        queue = deque([c for c in all_chars if indegree[c] == 0])
+
+        result = []
+        while queue:
+            c = queue.popleft()
+            result.append(c)
+            for nei in graph[c]:
+                indegree[nei] -= 1
+                if indegree[nei] == 0:
+                    queue.append(nei)
+
+        if len(result) != len(all_chars):
+            return ""
+        return "".join(result)

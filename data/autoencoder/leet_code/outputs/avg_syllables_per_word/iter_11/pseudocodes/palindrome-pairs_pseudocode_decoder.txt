@@ -1,0 +1,49 @@
+CLASS Solution  
+    FUNCTION palindromePairs(words)  
+        FUNCTION is_palindrome(s)  
+            RETURN s EQUALS s REVERSED  
+        END FUNCTION  
+        
+        SET word_dict TO an EMPTY dictionary  
+        FOR index FROM zero TO the LENGTH OF words MINUS one  
+            SET word AT position index OF words TO current_word  
+            SET word_dict AT key current_word TO index  
+        END FOR  
+        
+        SET result TO an EMPTY list  
+        
+        FOR i FROM zero TO the LENGTH OF words MINUS one  
+            SET word AT position i OF words TO current_word  
+            IF current_word EQUALS empty string THEN  
+                CONTINUE  
+            END IF  
+            
+            IF empty string IS A KEY IN word_dict AND is_palindrome(current_word) THEN  
+                APPEND list CONTAINING i AND word_dict AT key empty string TO result  
+                APPEND list CONTAINING word_dict AT key empty string AND i TO result  
+            END IF  
+            
+            SET reversed_word TO current_word REVERSED  
+            IF reversed_word IS A KEY IN word_dict AND word_dict AT key reversed_word NOT EQUALS i THEN  
+                APPEND list CONTAINING i AND word_dict AT key reversed_word TO result  
+            END IF  
+            
+            FOR j FROM one TO the LENGTH OF current_word MINUS one  
+                SET prefix TO the SUBSTRING OF current_word FROM start TO j MINUS one  
+                SET suffix TO the SUBSTRING OF current_word FROM j TO end  
+                SET reversed_prefix TO prefix REVERSED  
+                SET reversed_suffix TO suffix REVERSED  
+                
+                IF is_palindrome(suffix) AND reversed_prefix IS A KEY IN word_dict THEN  
+                    APPEND list CONTAINING i AND word_dict AT key reversed_prefix TO result  
+                END IF  
+                
+                IF is_palindrome(prefix) AND reversed_suffix IS A KEY IN word_dict THEN  
+                    APPEND list CONTAINING word_dict AT key reversed_suffix AND i TO result  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

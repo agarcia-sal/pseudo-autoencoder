@@ -1,0 +1,72 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val default TO zero left default TO none right default TO none  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values AS list  
+    IF the LENGTH OF values EQUALS zero  
+        RETURN none  
+    END IF  
+    SET root TO AN INSTANCE OF TreeNode WITH the element at position zero of values  
+    SET i TO one  
+    SET queue TO AN INSTANCE OF a double ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO the element REMOVED FROM THE FRONT OF queue  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT none  
+            SET node.left TO AN INSTANCE OF TreeNode WITH the element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT none  
+            SET node.right TO AN INSTANCE OF TreeNode WITH the element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF the val attribute of p IS NOT EQUALS the val attribute of q  
+        RETURN false  
+    ELSE  
+        RETURN the result OF is_same_tree WITH PARAMETERS the left attribute of p AND the left attribute of q AND the result OF is_same_tree WITH PARAMETERS the right attribute of p AND the right attribute of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION deleteNode WITH PARAMETERS self root AS OPTIONAL TreeNode key AS integer RETURNS OPTIONAL TreeNode  
+        IF root IS none  
+            RETURN none  
+        END IF  
+        IF the val attribute of root IS GREATER THAN key  
+            SET the left attribute of root TO the result OF self.deleteNode WITH PARAMETERS the left attribute of root AND key  
+            RETURN root  
+        END IF  
+        IF the val attribute of root IS LESS THAN key  
+            SET the right attribute of root TO the result OF self.deleteNode WITH PARAMETERS the right attribute of root AND key  
+            RETURN root  
+        END IF  
+        IF the left attribute of root IS none  
+            RETURN the right attribute of root  
+        END IF  
+        IF the right attribute of root IS none  
+            RETURN the left attribute of root  
+        END IF  
+        SET node TO the right attribute of root  
+        WHILE the left attribute of node IS NOT none  
+            SET node TO the left attribute of node  
+        END WHILE  
+        SET the left attribute of node TO the left attribute of root  
+        SET root TO the right attribute of root  
+        RETURN root  
+    END FUNCTION  
+END CLASS

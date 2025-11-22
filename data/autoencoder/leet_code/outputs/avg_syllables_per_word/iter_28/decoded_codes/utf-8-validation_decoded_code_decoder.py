@@ -1,0 +1,26 @@
+from typing import List
+
+class Solution:
+    def validUtf8(self, data: List[int]) -> bool:
+        def get_byte_count(byte: int) -> int:
+            if (byte & 0b10000000) == 0:
+                return 1
+            elif (byte & 0b11100000) == 0b11000000:
+                return 2
+            elif (byte & 0b11110000) == 0b11100000:
+                return 3
+            elif (byte & 0b11111000) == 0b11110000:
+                return 4
+            return -1
+
+        i = 0
+        n = len(data)
+        while i < n:
+            byte_count = get_byte_count(data[i])
+            if byte_count == -1 or i + byte_count > n:
+                return False
+            for j in range(i + 1, i + byte_count):
+                if (data[j] & 0b11000000) != 0b10000000:
+                    return False
+            i += byte_count
+        return True

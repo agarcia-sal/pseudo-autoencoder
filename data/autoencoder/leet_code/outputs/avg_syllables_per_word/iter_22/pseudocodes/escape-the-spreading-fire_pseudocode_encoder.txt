@@ -1,0 +1,78 @@
+CLASS Solution  
+    FUNCTION maximumMinutes(grid)  
+        SET m TO the LENGTH OF grid  
+        SET n TO the LENGTH OF the element at position zero of grid  
+        SET directions TO a list containing the elements one and zero then negative one and zero then zero and one then zero and negative one  
+        
+        FUNCTION can_escape(wait)  
+            SET fire_times TO a list of lists each of length n filled with infinity repeated m times  
+            SET queue TO an empty double ended queue  
+            
+            FOR i FROM zero TO m MINUS one  
+                FOR j FROM zero TO n MINUS one  
+                    IF the element at position i of grid EQUALS one  
+                        APPEND the triple containing i j and zero TO queue  
+                        SET the element at position i of fire_times at position j TO zero  
+                    END IF  
+                END FOR  
+            END FOR  
+            
+            WHILE the LENGTH OF queue IS GREATER THAN zero  
+                REMOVE the first element from queue assigning to x y and t  
+                FOR each element dx dy IN directions  
+                    SET nx TO x PLUS dx  
+                    SET ny TO y PLUS dy  
+                    IF nx IS GREATER THAN OR EQUAL TO zero AND nx IS LESS THAN m AND ny IS GREATER THAN OR EQUAL TO zero AND ny IS LESS THAN n AND the element at position nx of grid at position ny EQUALS zero AND the element at position nx of fire_times at position ny EQUALS infinity  
+                        SET the element at position nx of fire_times at position ny TO t PLUS one  
+                        APPEND the triple containing nx ny t PLUS one TO queue  
+                    END IF  
+                END FOR  
+            END WHILE  
+            
+            SET queue TO a double ended queue containing the triple zero zero wait  
+            SET visited TO a set containing the tuple zero zero  
+            
+            WHILE the LENGTH OF queue IS GREATER THAN zero  
+                REMOVE the first element from queue assigning to x y and t  
+                FOR each element dx dy IN directions  
+                    SET nx TO x PLUS dx  
+                    SET ny TO y PLUS dy  
+                    IF nx IS GREATER THAN OR EQUAL TO zero AND nx IS LESS THAN m AND ny IS GREATER THAN OR EQUAL TO zero AND ny IS LESS THAN n AND the tuple nx ny IS NOT IN visited AND the element at position nx of grid at position ny EQUALS zero  
+                        IF nx EQUALS m MINUS one AND ny EQUALS n MINUS one  
+                            IF the element at position nx of fire_times at position ny IS GREATER THAN OR EQUAL TO t PLUS one  
+                                RETURN True  
+                            ELSE  
+                                RETURN False  
+                            END IF  
+                        END IF  
+                        IF the element at position nx of fire_times at position ny IS GREATER THAN t PLUS one  
+                            ADD the tuple nx ny TO visited  
+                            APPEND the triple containing nx ny t PLUS one TO queue  
+                        END IF  
+                    END IF  
+                END FOR  
+            END WHILE  
+            
+            RETURN False  
+        END FUNCTION  
+        
+        SET left TO zero  
+        SET right TO m MULTIPLIED BY n  
+        SET result TO negative one  
+        WHILE left IS LESS THAN OR EQUAL TO right  
+            SET mid TO left PLUS right DIVIDED BY two INTEGER DIVISION  
+            IF can_escape(mid)  
+                SET result TO mid  
+                SET left TO mid PLUS one  
+            ELSE  
+                SET right TO mid MINUS one  
+            END IF  
+        END WHILE  
+        
+        IF result IS EQUAL TO m MULTIPLIED BY n  
+            RETURN one followed by nine zeros  
+        ELSE  
+            RETURN result  
+        END IF  
+    END FUNCTION  
+END CLASS

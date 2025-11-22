@@ -1,0 +1,59 @@
+CLASS Solution  
+    FUNCTION colorTheGrid WITH PARAMETERS m AND n  
+        SET MOD TO ten TO THE POWER OF nine PLUS one  
+        
+        FUNCTION generate_valid_columns WITH PARAMETER prev_col  
+            SET colors TO the list containing one AND two AND three  
+            SET valid_cols TO an empty list  
+            
+            FUNCTION backtrack WITH PARAMETERS col AND row  
+                IF row EQUAL TO m THEN  
+                    APPEND a tuple of col TO valid_cols  
+                    RETURN  
+                END IF  
+                FOR each color IN colors  
+                    IF col IS empty OR the element at the last position OF col IS NOT color THEN  
+                        IF prev_col IS NOT none AND the element at position row OF prev_col EQUAL TO color THEN  
+                            CONTINUE TO the next iteration  
+                        END IF  
+                        APPEND color TO col  
+                        CALL backtrack WITH col AND row PLUS one  
+                        REMOVE the last element FROM col  
+                    END IF  
+                END FOR  
+            END FUNCTION  
+            
+            CALL backtrack WITH an empty list AND zero  
+            RETURN valid_cols  
+        END FUNCTION  
+        
+        SET all_valid_cols TO the result of calling generate_valid_columns WITH none  
+        SET num_valid_cols TO the length OF all_valid_cols  
+        
+        SET compatible_cols TO a mapping from each integer i from zero TO num_valid_cols MINUS one TO an empty list  
+        FOR i FROM zero TO num_valid_cols MINUS one  
+            FOR j FROM zero TO num_valid_cols MINUS one  
+                IF FOR each integer k FROM zero TO m MINUS one THE element at position k OF all_valid_cols at i IS NOT EQUAL TO the element at position k OF all_valid_cols at j THEN  
+                    APPEND j TO compatible_cols at i  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET dp TO a list of length num_valid_cols FILLED WITH one  
+        
+        FOR each integer _ FROM one TO n MINUS one  
+            SET next_dp TO a list of length num_valid_cols FILLED WITH zero  
+            FOR i FROM zero TO num_valid_cols MINUS one  
+                FOR each j IN compatible_cols at i  
+                    SET the element at position j OF next_dp TO the element at position j OF next_dp PLUS the element at position i OF dp  
+                    SET the element at position j OF next_dp TO the element at position j OF next_dp MODULO MOD  
+                END FOR  
+            END FOR  
+            SET dp TO next_dp  
+        END FOR  
+        
+        SET result TO the sum OF all elements IN dp  
+        SET result TO result MODULO MOD  
+        RETURN result  
+    END FUNCTION  
+END CLASS

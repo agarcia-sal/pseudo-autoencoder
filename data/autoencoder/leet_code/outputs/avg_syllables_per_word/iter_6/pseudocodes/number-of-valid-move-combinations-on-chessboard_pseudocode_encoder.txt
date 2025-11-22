@@ -1,0 +1,51 @@
+CLASS Solution  
+    FUNCTION countCombinations(pieces, positions)  
+        SET directions TO dictionary mapping  
+            "rook" TO list of direction pairs representing vertical and horizontal moves  
+            "queen" TO list of direction pairs representing vertical, horizontal, and diagonal moves  
+            "bishop" TO list of direction pairs representing diagonal moves  
+        
+        SET positions TO list of tuples each obtained by subtracting one from the row and column in original positions  
+        
+        FUNCTION get_destinations(start, piece_type)  
+            SET r and c TO start  
+            SET dests TO list containing start  
+            FOR each direction pair dr and dc IN directions for piece_type  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                WHILE nr GREATER THAN OR EQUAL TO 0 AND nr LESS THAN 8 AND nc GREATER THAN OR EQUAL TO 0 AND nc LESS THAN 8  
+                    APPEND tuple (nr, nc) TO dests  
+                    INCREMENT nr BY dr  
+                    INCREMENT nc BY dc  
+            RETURN dests  
+        END FUNCTION  
+        
+        SET all_destinations TO list obtained by calling get_destinations for each position and corresponding piece  
+        
+        FUNCTION is_valid_combination(combination)  
+            SET pos TO copy of positions  
+            SET n TO LENGTH OF pos  
+            WHILE TRUE  
+                IF COUNT OF UNIQUE ELEMENTS IN pos LESS THAN n  
+                    RETURN FALSE  
+                SET all_reached TO TRUE  
+                FOR i FROM 0 TO n MINUS 1  
+                    IF pos at index i EQUALS combination at index i  
+                        CONTINUE TO next iteration  
+                    SET all_reached TO FALSE  
+                    SET r, c TO pos at index i  
+                    SET dr TO 1 IF combination at index i row GREATER THAN r ELSE (MINUS 1 IF LESS THAN r ELSE 0)  
+                    SET dc TO 1 IF combination at index i column GREATER THAN c ELSE (MINUS 1 IF LESS THAN c ELSE 0)  
+                    SET pos at index i TO tuple (r PLUS dr, c PLUS dc)  
+                IF all_reached IS TRUE  
+                    RETURN TRUE  
+        END FUNCTION  
+        
+        SET valid_count TO 0  
+        FOR each combination IN Cartesian product of all_destinations  
+            IF is_valid_combination(combination) IS TRUE  
+                INCREMENT valid_count BY 1  
+        
+        RETURN valid_count  
+    END FUNCTION  
+END CLASS

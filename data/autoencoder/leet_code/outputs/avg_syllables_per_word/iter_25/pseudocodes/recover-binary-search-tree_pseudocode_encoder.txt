@@ -1,0 +1,88 @@
+CLASS TreeNode  
+    FUNCTION __init__ with parameters val defaulting to zero left defaulting to none right defaulting to none  
+        SET the attribute val of this object TO val  
+        SET the attribute left of this object TO left  
+        SET the attribute right of this object TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node with parameter values which is a list  
+    IF the collection values is empty  
+        RETURN none  
+    END IF  
+    SET root TO a new instance of TreeNode initialized with the element at position zero of values  
+    SET i TO one  
+    SET queue TO a new empty double ended queue  
+    APPEND root TO queue  
+    WHILE the queue is not empty  
+        SET node TO the element obtained by removing from the left of the queue  
+        IF i is less than the length of values AND the element at position i of values is not none  
+            SET the attribute left of node TO a new instance of TreeNode initialized with the element at position i of values  
+            APPEND the attribute left of node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i is less than the length of values AND the element at position i of values is not none  
+            SET the attribute right of node TO a new instance of TreeNode initialized with the element at position i of values  
+            APPEND the attribute right of node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree with parameters p and q  
+    IF p is none AND q is none  
+        RETURN true  
+    ELSE IF p is none OR q is none  
+        RETURN false  
+    ELSE IF the attribute val of p is not equal to the attribute val of q  
+        RETURN false  
+    ELSE  
+        RETURN the result of is_same_tree with the attribute left of p and the attribute left of q AND the result of is_same_tree with the attribute right of p and the attribute right of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION recoverTree with parameter root which is optionally a TreeNode  
+        SET first TO none  
+        SET second TO none  
+        SET prev TO none  
+        SET curr TO root  
+        WHILE curr is not none  
+            IF the attribute left of curr is none  
+                IF prev is not none AND the attribute val of prev is greater than the attribute val of curr  
+                    IF first is none  
+                        SET first TO prev  
+                    END IF  
+                    SET second TO curr  
+                END IF  
+                SET prev TO curr  
+                SET curr TO the attribute right of curr  
+            ELSE  
+                SET pred TO the attribute left of curr  
+                WHILE the attribute right of pred is not none AND the attribute right of pred is not curr  
+                    SET pred TO the attribute right of pred  
+                END WHILE  
+                IF the attribute right of pred is none  
+                    SET the attribute right of pred TO curr  
+                    SET curr TO the attribute left of curr  
+                ELSE  
+                    SET the attribute right of pred TO none  
+                    IF prev is not none AND the attribute val of prev is greater than the attribute val of curr  
+                        IF first is none  
+                            SET first TO prev  
+                        END IF  
+                        SET second TO curr  
+                    END IF  
+                    SET prev TO curr  
+                    SET curr TO the attribute right of curr  
+                END IF  
+            END IF  
+        END WHILE  
+        IF first is not none AND second is not none  
+            SET a temporary variable temp_val TO the attribute val of first  
+            SET the attribute val of first TO the attribute val of second  
+            SET the attribute val of second TO temp_val  
+        END IF  
+    END FUNCTION  
+END CLASS

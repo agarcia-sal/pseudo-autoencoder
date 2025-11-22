@@ -1,0 +1,110 @@
+CLASS Solution  
+    FUNCTION canMouseWin(grid, catJump, mouseJump)  
+        SET total_rows TO the LENGTH OF grid  
+        SET total_columns TO the LENGTH OF element at position zero of grid  
+        SET cat_start_position TO zero  
+        SET mouse_start_position TO zero  
+        SET food_position TO zero  
+        SET directions TO the sequence of integers showing negative one zero one zero negative one  
+        SET mouse_graph TO list of empty lists with quantity total_rows MULTIPLIED BY total_columns  
+        SET cat_graph TO list of empty lists with quantity total_rows MULTIPLIED BY total_columns  
+        
+        FOR each row_index AND row_string IN grid with enumeration  
+            FOR each column_index AND character IN row_string with enumeration  
+                IF character EQUALS the character representing wall  
+                    CONTINUE to next iteration  
+                END IF  
+                SET current_position TO row_index MULTIPLIED BY total_columns PLUS column_index  
+                IF character EQUALS the character representing cat  
+                    SET cat_start_position TO current_position  
+                ELSE IF character EQUALS the character representing mouse  
+                    SET mouse_start_position TO current_position  
+                ELSE IF character EQUALS the character representing food  
+                    SET food_position TO current_position  
+                END IF  
+                FOR each direction_a AND direction_b in consecutive pairs from directions  
+                    FOR step_index FROM zero TO mouseJump INCLUSIVE  
+                        SET next_x TO row_index PLUS step_index MULTIPLIED BY direction_a  
+                        SET next_y TO column_index PLUS step_index MULTIPLIED BY direction_b  
+                        IF next_x LESS THAN zero OR next_x GREATER THAN OR EQUAL TO total_rows OR next_y LESS THAN zero OR next_y GREATER THAN OR EQUAL TO total_columns OR element at position next_x of grid AT position next_y EQUALS wall  
+                            BREAK inner loop  
+                        END IF  
+                        APPEND next_x MULTIPLIED BY total_columns PLUS next_y TO mouse_graph AT position current_position  
+                    END FOR  
+                    FOR step_index FROM zero TO catJump INCLUSIVE  
+                        SET next_x TO row_index PLUS step_index MULTIPLIED BY direction_a  
+                        SET next_y TO column_index PLUS step_index MULTIPLIED BY direction_b  
+                        IF next_x LESS THAN zero OR next_x GREATER THAN OR EQUAL TO total_rows OR next_y LESS THAN zero OR next_y GREATER THAN OR EQUAL TO total_columns OR element at position next_x of grid AT position next_y EQUALS wall  
+                            BREAK inner loop  
+                        END IF  
+                        APPEND next_x MULTIPLIED BY total_columns PLUS next_y TO cat_graph AT position current_position  
+                    END FOR  
+                END FOR  
+            END FOR  
+        END FOR  
+        RETURN the result of invoking calc with mouse_graph cat_graph mouse_start_position cat_start_position food_position EQUALS the integer one  
+    END FUNCTION  
+  
+    FUNCTION calc(g_mouse, g_cat, mouse_start, cat_start, hole)  
+        FUNCTION get_prev_states(state)  
+            UNPACK state INTO mouse_position cat_position turn  
+            SET previous_turn TO turn XOR one  
+            SET previous_states TO empty list  
+            IF previous_turn EQUALS one  
+                FOR each possible_cat_position IN list at position cat_position of g_cat  
+                    IF answer at mouse_position at possible_cat_position at index one EQUALS zero  
+                        APPEND tuple of mouse_position possible_cat_position previous_turn TO previous_states  
+                    END IF  
+                END FOR  
+            ELSE  
+                FOR each possible_mouse_position IN list at position mouse_position of g_mouse  
+                    IF answer at possible_mouse_position at cat_position at index zero EQUALS zero  
+                        APPEND tuple of possible_mouse_position cat_position zero TO previous_states  
+                    END IF  
+                END FOR  
+            END IF  
+            RETURN previous_states  
+        END FUNCTION  
+  
+        SET total_positions TO the LENGTH OF g_mouse  
+        SET degrees TO a three-dimensional list of zeros with dimensions total_positions by total_positions by two  
+        FOR each index_i FROM zero TO total_positions MINUS one  
+            FOR each index_j FROM zero TO total_positions MINUS one  
+                SET degrees at index_i at index_j at index zero TO the LENGTH OF list at index_i in g_mouse  
+                SET degrees at index_i at index_j at index one TO the LENGTH OF list at index_j in g_cat  
+            END FOR  
+        END FOR  
+  
+        SET answer TO a three-dimensional list of zeros with dimensions total_positions by total_positions by two  
+        SET queue TO an empty double ended queue structure  
+        FOR each index_i FROM zero TO total_positions MINUS one  
+            SET answer at hole at index_i at index one TO one  
+            SET answer at index_i at hole at index zero TO two  
+            SET answer at index_i at index_i at index one TO two  
+            SET answer at index_i at index_i at index zero TO two  
+            APPEND tuple of hole index_i one TO queue  
+            APPEND tuple of index_i hole zero TO queue  
+            APPEND tuple of index_i index_i zero TO queue  
+            APPEND tuple of index_i index_i one TO queue  
+        END FOR  
+  
+        WHILE queue is not empty  
+            REMOVE and RETURN the leftmost element FROM queue ASSIGN TO current_state  
+            SET current_result TO answer at first element of current_state at second element of current_state at third element of current_state  
+            FOR each previous_state IN get_prev_states called with current_state  
+                UNPACK previous_state INTO prev_mouse prev_cat prev_turn  
+                IF prev_turn EQUALS current_result MINUS one  
+                    SET answer at prev_mouse at prev_cat at prev_turn TO current_result  
+                    APPEND previous_state TO queue  
+                ELSE  
+                    DECREMENT degrees at prev_mouse at prev_cat at prev_turn BY one  
+                    IF degrees at prev_mouse at prev_cat at prev_turn EQUALS zero  
+                        SET answer at prev_mouse at prev_cat at prev_turn TO current_result  
+                        APPEND previous_state TO queue  
+                    END IF  
+                END IF  
+            END FOR  
+        END WHILE  
+        RETURN answer at mouse_start at cat_start at index zero  
+    END FUNCTION  
+END CLASS

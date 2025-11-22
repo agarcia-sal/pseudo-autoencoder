@@ -1,0 +1,68 @@
+CLASS Solution  
+    FUNCTION longestRepeating(s, queryCharacters, queryIndices)  
+        FUNCTION merge_intervals()  
+            SET i TO zero  
+            WHILE i IS LESS THAN the LENGTH OF intervals MINUS one  
+                SET the_current_character TO the element at position two of the element at position i of intervals  
+                SET the_next_character TO the element at position two of the element at position i PLUS one of intervals  
+                IF the_current_character EQUALS the_next_character  
+                    SET the_start_of_current TO the element at position zero of the element at position i of intervals  
+                    SET the_end_of_next TO the element at position one of the element at position i PLUS one of intervals  
+                    SET intervals at position i TO a tuple consisting of the_start_of_current, the_end_of_next, the_current_character  
+                    REMOVE the element at position i PLUS one FROM intervals  
+                ELSE  
+                    INCREMENT i BY one  
+                END IF  
+            END WHILE  
+        END FUNCTION  
+        
+        SET intervals TO an empty list  
+        SET n TO the LENGTH OF s  
+        SET start TO zero  
+        FOR i FROM one TO n MINUS one  
+            SET the_character_at_i TO the element at position i of s  
+            SET the_character_at_start TO the element at position start of s  
+            IF the_character_at_i NOT EQUALS the_character_at_start  
+                APPEND a tuple consisting of start, i MINUS one, the_character_at_start TO intervals  
+                SET start TO i  
+            END IF  
+        END FOR  
+        APPEND a tuple consisting of start, n MINUS one, the element at position start of s TO intervals  
+        
+        SET results TO an empty list  
+        SET longest TO the maximum value obtained by subtracting the start index from the end index PLUS one for each tuple in intervals  
+        
+        FOR each character AND index IN zip of queryCharacters AND queryIndices  
+            SET i TO zero  
+            WHILE i IS LESS THAN the LENGTH OF intervals  
+                SET current_start TO the element at position zero of the element at position i of intervals  
+                SET current_end TO the element at position one of the element at position i of intervals  
+                SET current_character TO the element at position two of the element at position i of intervals  
+                IF current_start IS LESS THAN OR EQUAL TO index AND index IS LESS THAN OR EQUAL TO current_end  
+                    BREAK the loop  
+                END IF  
+                INCREMENT i BY one  
+            END WHILE  
+            
+            IF index IS GREATER THAN current_start  
+                INSERT a tuple consisting of current_start, index MINUS one, current_character INTO intervals AT position i  
+                SET the element at position i PLUS one of intervals TO a tuple consisting of index, current_end, current_character  
+            END IF  
+            
+            IF index IS LESS THAN current_end  
+                INSERT a tuple consisting of index PLUS one, current_end, current_character INTO intervals AT position i PLUS one  
+                SET the element at position i of intervals TO a tuple consisting of current_start, index, current_character  
+            END IF  
+            
+            SET the element at position two of the element at position i of intervals TO character  
+            SET the element at position i of intervals TO a tuple consisting of the element at position zero of the element at position i of intervals, the element at position one of the element at position i of intervals, character  
+            
+            CALL merge_intervals  
+            
+            SET longest TO the maximum value obtained by subtracting the start index from the end index PLUS one for each tuple in intervals  
+            APPEND longest TO results  
+        END FOR  
+        
+        RETURN results  
+    END FUNCTION  
+END CLASS

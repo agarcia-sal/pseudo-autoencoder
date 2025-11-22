@@ -1,0 +1,49 @@
+CLASS Solution
+    FUNCTION longestRepeating(s, queryCharacters, queryIndices)
+        FUNCTION merge_intervals()
+            SET i TO 0
+            WHILE i < LENGTH OF intervals MINUS 1
+                IF intervals[i][2] EQUALS intervals[i + 1][2]
+                    SET intervals[i] TO (intervals[i][0], intervals[i + 1][1], intervals[i][2])
+                    REMOVE intervals AT POSITION i + 1
+                ELSE
+                    INCREMENT i BY 1
+        END FUNCTION
+
+        SET intervals TO empty list
+        SET n TO LENGTH OF s
+        SET start TO 0
+        FOR i FROM 1 TO n MINUS 1
+            IF s[i] NOT EQUAL TO s[start]
+                APPEND (start, i MINUS 1, s[start]) TO intervals
+                SET start TO i
+        APPEND (start, n MINUS 1, s[start]) TO intervals
+
+        SET results TO empty list
+        SET longest TO MAXIMUM OF (end MINUS start PLUS 1) FOR EACH (start, end, char) IN intervals
+
+        FOR EACH char, idx IN queryCharacters AND queryIndices
+            SET i TO 0
+            WHILE i < LENGTH OF intervals
+                SET start, end, c TO intervals[i]
+                IF start <= idx AND idx <= end
+                    BREAK
+                INCREMENT i BY 1
+
+            IF idx > start
+                INSERT (start, idx MINUS 1, c) INTO intervals AT POSITION i
+                SET intervals[i + 1] TO (idx, end, c)
+            IF idx < end
+                INSERT (idx PLUS 1, end, c) INTO intervals AT POSITION i + 1
+                SET intervals[i] TO (start, idx, c)
+
+            SET intervals[i] TO (intervals[i][0], intervals[i][1], char)
+
+            CALL merge_intervals()
+
+            SET longest TO MAXIMUM OF (end MINUS start PLUS 1) FOR EACH (start, end, char) IN intervals
+            APPEND longest TO results
+
+        RETURN results
+    END FUNCTION
+END CLASS

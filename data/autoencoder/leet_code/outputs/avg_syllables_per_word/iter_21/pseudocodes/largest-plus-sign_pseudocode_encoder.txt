@@ -1,0 +1,83 @@
+CLASS Solution  
+    FUNCTION orderOfLargestPlusSign(n, mines)  
+        CALL convert_mines_to_set WITH PARAMETERS mines  
+        SET mines_set TO THE RESULT OF convert_mines_to_set
+        
+        CALL initialize_dp_grid WITH PARAMETERS n  
+        SET dp TO THE RESULT OF initialize_dp_grid
+        
+        CALL define_directions  
+        SET directions TO THE RESULT OF define_directions
+        
+        FOR i FROM zero TO n MINUS one  
+            FOR j FROM zero TO n MINUS one  
+                IF the pair consisting of i AND j IS NOT IN mines_set  
+                    IF j IS GREATER THAN zero  
+                        SET element at position zero OF element at position j OF element at position i OF dp TO element at position zero OF element at position j MINUS one OF element at position i OF dp PLUS one  
+                    END IF  
+                    IF i IS GREATER THAN zero  
+                        SET element at position one OF element at position j OF element at position i OF dp TO element at position one OF element at position j OF element at position i MINUS one OF dp PLUS one  
+                    END IF  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET result TO zero  
+        
+        FOR i FROM n MINUS one TO zero STEP negative one  
+            FOR j FROM n MINUS one TO zero STEP negative one  
+                IF the pair consisting of i AND j IS NOT IN mines_set  
+                    IF j IS LESS THAN n MINUS one  
+                        SET element at position two OF element at position j OF element at position i OF dp TO element at position two OF element at position j PLUS one OF element at position i OF dp PLUS one  
+                    END IF  
+                    IF i IS LESS THAN n MINUS one  
+                        SET element at position three OF element at position j OF element at position i OF dp TO element at position three OF element at position j OF element at position i PLUS one OF dp PLUS one  
+                    END IF  
+                    CALL minimum_value WITH PARAMETERS element at position j OF element at position i OF dp  
+                    SET plus_sign_order TO THE RESULT OF minimum_value
+                    IF plus_sign_order IS GREATER THAN result  
+                        SET result TO plus_sign_order  
+                    END IF  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION
+    
+    FUNCTION convert_mines_to_set(mines)  
+        CREATE an empty set called mines_set  
+        FOR each mine IN mines  
+            CONVERT mine TO a tuple of its elements  
+            ADD the tuple TO mines_set  
+        END FOR  
+        RETURN mines_set  
+    END FUNCTION
+    
+    FUNCTION initialize_dp_grid(n)  
+        CREATE a two-dimensional list of size n BY n  
+        FOR each row_index FROM zero TO n MINUS one  
+            CREATE a list called row  
+            FOR each column_index FROM zero TO n MINUS one  
+                APPEND the list containing four zeros TO row  
+            END FOR  
+            APPEND row TO the grid  
+        END FOR  
+        RETURN the grid  
+    END FUNCTION
+    
+    FUNCTION define_directions  
+        SET directions TO the list containing the pairs zero AND one zero ONE zero AND zero ONE zero AND negative one  
+        RETURN directions  
+    END FUNCTION
+    
+    FUNCTION minimum_value(list_of_values)  
+        SET min_value TO the first element OF list_of_values  
+        FOR each value IN list_of_values  
+            IF value IS LESS THAN min_value  
+                SET min_value TO value  
+            END IF  
+        END FOR  
+        RETURN min_value  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,78 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val EQUAL TO zero left EQUAL TO None right EQUAL TO None  
+        SET the value property of self TO val  
+        SET the left property of self TO left  
+        SET the right property of self TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF the collection values IS EMPTY  
+        RETURN None  
+    END IF  
+    SET root TO a new instance of TreeNode initialized with the element at position zero of values  
+    SET i TO one  
+    SET queue TO a new empty deque collection  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO the element removed from the left of queue  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT None  
+            SET the left property of node TO a new instance of TreeNode initialized with the element at position i of values  
+            APPEND the left property of node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT None  
+            SET the right property of node TO a new instance of TreeNode initialized with the element at position i of values  
+            APPEND the right property of node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF the value property of p IS NOT EQUAL TO the value property of q  
+        RETURN False  
+    ELSE  
+        RETURN the result of is_same_tree called with the left property of p AND the left property of q AND the result of is_same_tree called with the right property of p AND the right property of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION verticalTraversal WITH PARAMETERS self root  
+        IF root IS None  
+            RETURN an empty list  
+        END IF  
+        SET node_dict TO a new default dictionary that maps keys to empty lists  
+        SET min_col TO zero  
+        SET max_col TO zero  
+
+        FUNCTION dfs WITH PARAMETERS node row col  
+            IF node IS None  
+                RETURN  
+            END IF  
+            APPEND the tuple of row and the value property of node TO the list corresponding to key col in node_dict  
+            SET min_col TO the smaller value BETWEEN min_col AND col  
+            SET max_col TO the larger value BETWEEN max_col AND col  
+            CALL dfs WITH the left property of node row incremented BY one col decremented BY one  
+            CALL dfs WITH the right property of node row incremented BY one col incremented BY one  
+        END FUNCTION  
+
+        CALL dfs WITH root zero zero  
+
+        SET result TO an empty list  
+        FOR col FROM min_col TO max_col  
+            SET sorted_nodes TO the list corresponding to key col in node_dict SORTED BY the first element of each tuple THEN BY the second element of each tuple  
+            SET column_values TO an empty list  
+            FOR each tuple of row and val IN sorted_nodes  
+                APPEND val TO column_values  
+            END FOR  
+            APPEND column_values TO result  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+END CLASS

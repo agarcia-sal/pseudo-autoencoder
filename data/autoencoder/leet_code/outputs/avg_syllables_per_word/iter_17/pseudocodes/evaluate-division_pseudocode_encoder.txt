@@ -1,0 +1,47 @@
+CLASS Solution
+    FUNCTION calcEquation(equations AS list of list of strings, values AS list of floats, queries AS list of list of strings) RETURNS list of floats
+        SET graph TO CALL initialize_graph
+
+        FOR each pair AND value IN zip of equations AND values
+            SET first_element TO element at position zero of pair
+            SET second_element TO element at position one of pair
+            SET element at position second_element of element at position first_element of graph TO value
+            SET element at position first_element of element at position second_element of graph TO one DIVIDED BY value
+        END FOR
+
+        FUNCTION dfs(start, end, visited)
+            IF start IS NOT IN graph OR end IS NOT IN graph
+                RETURN minus one
+            END IF
+            IF start EQUALS end
+                RETURN one
+            END IF
+            CALL add start TO visited
+            FOR each neighbor AND weight IN items of element at position start of graph
+                IF neighbor IS NOT IN visited
+                    SET result TO CALL dfs WITH parameters neighbor, end, visited
+                    IF result IS NOT EQUAL TO minus one
+                        RETURN weight MULTIPLIED BY result
+                    END IF
+                END IF
+            END FOR
+            CALL remove start FROM visited
+            RETURN minus one
+        END FUNCTION
+
+        SET results TO empty list
+        FOR each query IN queries
+            SET start TO element at position zero of query
+            SET end TO element at position one of query
+            SET visited TO empty set
+            SET result TO CALL dfs WITH parameters start, end, visited
+            CALL append result TO results
+        END FOR
+
+        RETURN results
+    END FUNCTION
+
+    FUNCTION initialize_graph
+        RETURN an empty default dictionary of dictionaries
+    END FUNCTION
+END CLASS

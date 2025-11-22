@@ -1,0 +1,66 @@
+CLASS Solution  
+    FUNCTION medianSlidingWindow(nums, k)  
+        SET lo TO empty max-heap represented by an empty list for inverted values  
+        SET hi TO empty min-heap represented by an empty list  
+
+        FUNCTION balance_heaps()  
+            IF the LENGTH of lo IS GREATER THAN the LENGTH of hi PLUS one  
+                REMOVE the largest element FROM lo USING heap pop  
+                INVERT the removed element  
+                ADD the inverted element TO hi USING heap push  
+            ELSE IF the LENGTH of hi IS GREATER THAN the LENGTH of lo  
+                REMOVE the smallest element FROM hi USING heap pop  
+                INVERT the removed element  
+                ADD the inverted element TO lo USING heap push  
+            END IF  
+        END FUNCTION  
+
+        FUNCTION add_num(num)  
+            IF lo IS empty OR num IS LESS THAN OR EQUAL TO the inverted value of the first element of lo  
+                INVERT num  
+                ADD the inverted num TO lo USING heap push  
+            ELSE  
+                ADD num TO hi USING heap push  
+            END IF  
+            CALL balance_heaps()  
+        END FUNCTION  
+
+        FUNCTION remove_num(num)  
+            IF num IS LESS THAN OR EQUAL TO the inverted value of the first element of lo  
+                REMOVE the inverted num FROM lo  
+                IF lo IS NOT empty  
+                    REBUILD lo TO reestablish heap property  
+                END IF  
+            ELSE  
+                REMOVE num FROM hi  
+                IF hi IS NOT empty  
+                    REBUILD hi TO reestablish heap property  
+                END IF  
+            END IF  
+            CALL balance_heaps()  
+        END FUNCTION  
+
+        FUNCTION get_median()  
+            IF the LENGTH of lo IS GREATER THAN the LENGTH of hi  
+                RETURN the inverted value of the first element of lo  
+            ELSE  
+                SET median_value TO the average of the inverted value of the first element of lo PLUS the first element of hi  
+                RETURN median_value  
+            END IF  
+        END FUNCTION  
+
+        FOR index FROM zero TO k MINUS one  
+            CALL add_num WITH the element at position index OF nums  
+        END FOR  
+
+        SET medians TO a list containing the result of get_median()  
+
+        FOR index FROM k TO the LENGTH of nums MINUS one  
+            CALL add_num WITH the element at position index OF nums  
+            CALL remove_num WITH the element at position index MINUS k OF nums  
+            APPEND the result of get_median() TO medians  
+        END FOR  
+
+        RETURN medians  
+    END FUNCTION  
+END CLASS

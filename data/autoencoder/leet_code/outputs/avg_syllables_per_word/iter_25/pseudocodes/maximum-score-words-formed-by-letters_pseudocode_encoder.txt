@@ -1,0 +1,56 @@
+CLASS Solution  
+    FUNCTION maxScoreWords(words, letters, score)  
+        FUNCTION word_score(word, score_map)  
+            SET total_score TO zero  
+            FOR each character IN word  
+                INCREMENT total_score BY the value in score_map corresponding to character  
+            END FOR  
+            RETURN total_score  
+        END FUNCTION  
+  
+        FUNCTION can_form(word, letter_count)  
+            SET word_count TO the frequency count of each character in word  
+            FOR each character and its count IN word_count  
+                IF the count of character in letter_count is less than count  
+                    RETURN false  
+                END IF  
+            END FOR  
+            RETURN true  
+        END FUNCTION  
+  
+        FUNCTION update_letter_count(letter_count, word, add)  
+            FOR each character IN word  
+                IF add is true  
+                    INCREMENT the count of character in letter_count BY one  
+                ELSE  
+                    DECREMENT the count of character in letter_count BY one  
+                END IF  
+            END FOR  
+        END FUNCTION  
+  
+        FUNCTION backtrack(index, current_score, letter_count)  
+            IF index EQUALS the length of words  
+                RETURN current_score  
+            END IF  
+  
+            SET max_score TO current_score  
+            FOR i FROM index TO the length of words MINUS one  
+                IF can_form the word at position i in words using letter_count  
+                    CALL update_letter_count on letter_count and the word at position i in words with add as false  
+                    SET candidate_score TO the result of backtrack with i plus one as index and current_score PLUS word_score of the word at position i in words and score_map and the updated letter_count  
+                    IF candidate_score GREATER THAN max_score  
+                        SET max_score TO candidate_score  
+                    END IF  
+                    CALL update_letter_count on letter_count and the word at position i in words with add as true  
+                END IF  
+            END FOR  
+  
+            RETURN max_score  
+        END FUNCTION  
+  
+        SET score_map TO a mapping from the lowercase English letters FROM a TO z to the corresponding values in score where each letter at position i corresponds to score at position i  
+        SET letter_count TO the frequency count of each character in letters  
+  
+        RETURN the result of backtrack starting at index zero current_score zero and letter_count  
+    END FUNCTION  
+END CLASS

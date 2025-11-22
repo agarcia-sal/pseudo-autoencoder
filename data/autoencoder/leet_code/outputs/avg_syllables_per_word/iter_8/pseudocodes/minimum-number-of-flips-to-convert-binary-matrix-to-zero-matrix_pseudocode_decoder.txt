@@ -1,0 +1,47 @@
+CLASS Solution  
+    FUNCTION minFlips(mat)  
+        FUNCTION flip(matrix, x, y)  
+            SET directions TO list of coordinate offsets for neighbors and self  
+            FOR each dx, dy IN directions  
+                SET nx TO x PLUS dx  
+                SET ny TO y PLUS dy  
+                IF nx GREATER THAN OR EQUAL TO 0 AND nx LESS THAN m AND ny GREATER THAN OR EQUAL TO 0 AND ny LESS THAN n THEN  
+                    TOGGLE value at matrix position nx, ny BETWEEN 0 and 1  
+            END FOR  
+        END FUNCTION  
+
+        FUNCTION matrix_to_tuple(matrix)  
+            RETURN immutable sequence representation of matrix rows  
+        END FUNCTION  
+
+        SET m TO number of rows in mat  
+        SET n TO number of columns in mat  
+        SET target TO immutable sequence of zeros for all cells in m by n matrix  
+        SET initial_state TO matrix_to_tuple applied to mat  
+        SET queue TO list containing tuple of initial_state and zero steps  
+        SET visited TO set containing initial_state  
+
+        WHILE queue is not empty  
+            REMOVE first element from queue and ASSIGN to current_state and steps  
+            IF current_state EQUALS target THEN  
+                RETURN steps  
+            END IF  
+
+            CONVERT current_state to mutable matrix current_matrix  
+
+            FOR i FROM 0 TO m MINUS 1  
+                FOR j FROM 0 TO n MINUS 1  
+                    CREATE deep copy of current_matrix as next_matrix  
+                    CALL flip with next_matrix, i, j  
+                    SET next_state TO matrix_to_tuple of next_matrix  
+                    IF next_state NOT IN visited THEN  
+                        ADD next_state TO visited  
+                        APPEND tuple of next_state and steps PLUS 1 TO queue  
+                    END IF  
+                END FOR  
+            END FOR  
+        END WHILE  
+
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

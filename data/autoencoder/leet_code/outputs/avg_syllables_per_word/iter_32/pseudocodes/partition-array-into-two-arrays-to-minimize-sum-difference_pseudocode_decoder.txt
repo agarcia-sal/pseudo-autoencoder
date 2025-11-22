@@ -1,0 +1,61 @@
+CLASS Solution  
+    FUNCTION minimumDifference(nums)  
+        SET n TO the LENGTH OF nums DIVIDED BY two  
+        SET total_sum TO the SUM OF all elements IN nums  
+        SET target TO total_sum DIVIDED BY two  
+        SET min_diff TO positive infinity  
+        
+        SET left_half TO the FIRST n elements OF nums  
+        SET right_half TO elements OF nums STARTING FROM position n TO the END OF nums  
+        
+        SET left_sums TO a new list containing empty dictionaries FOR index FROM zero TO n INCLUSIVE  
+        SET right_sums TO a new list containing empty dictionaries FOR index FROM zero TO n INCLUSIVE  
+        
+        FOR i FROM zero TO n INCLUSIVE  
+            FOR each combination OF i elements IN left_half  
+                SET subset_sum TO the SUM OF elements IN combination  
+                IF subset_sum NOT IN left_sums AT position i  
+                    SET left_sums AT position i AND key subset_sum TO zero  
+                END IF  
+                INCREMENT left_sums AT position i AND key subset_sum BY one  
+            END FOR  
+            
+            FOR each combination OF i elements IN right_half  
+                SET subset_sum TO the SUM OF elements IN combination  
+                IF subset_sum NOT IN right_sums AT position i  
+                    SET right_sums AT position i AND key subset_sum TO zero  
+                END IF  
+                INCREMENT right_sums AT position i AND key subset_sum BY one  
+            END FOR  
+        END FOR  
+        
+        FOR i FROM zero TO n INCLUSIVE  
+            SET left_values TO the sorted list OF keys IN left_sums AT position i  
+            SET right_values TO the sorted list OF keys IN right_sums AT position n MINUS i  
+            
+            SET j TO zero  
+            SET k TO the LENGTH OF right_values MINUS one  
+            
+            WHILE j LESS THAN the LENGTH OF left_values AND k GREATER THAN OR EQUAL TO zero  
+                SET current_sum TO the element at position j OF left_values PLUS the element at position k OF right_values  
+                SET current_diff TO total_sum MINUS two TIMES current_sum  
+                IF current_diff LESS THAN zero  
+                    SET current_diff TO the NEGATION OF current_diff  
+                END IF  
+                IF current_diff LESS THAN min_diff  
+                    SET min_diff TO current_diff  
+                END IF  
+                
+                IF current_sum LESS THAN target  
+                    INCREMENT j BY one  
+                ELSE IF current_sum GREATER THAN target  
+                    DECREMENT k BY one  
+                ELSE  
+                    RETURN zero  
+                END IF  
+            END WHILE  
+        END FOR  
+        
+        RETURN min_diff  
+    END FUNCTION  
+END CLASS

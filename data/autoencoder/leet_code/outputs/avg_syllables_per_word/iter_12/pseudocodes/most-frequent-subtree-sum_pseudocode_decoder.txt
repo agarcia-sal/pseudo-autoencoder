@@ -1,0 +1,70 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS None, right EQUALS None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN None  
+    END IF  
+    SET root TO TreeNode with value as element at position zero of values  
+    SET i TO one  
+    INITIALIZE queue AS empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO first element FROM queue and remove it  
+        IF i IS LESS THAN LENGTH OF values AND element at position i of values IS NOT None  
+            SET node.left TO TreeNode with value as element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN LENGTH OF values AND element at position i of values IS NOT None  
+            SET node.right TO TreeNode with value as element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION findFrequentTreeSum(self, root)  
+        FUNCTION subtree_sum(node)  
+            IF node IS None  
+                RETURN zero  
+            END IF  
+            SET current_sum TO node.val PLUS subtree_sum(node.left) PLUS subtree_sum(node.right)  
+            INCREMENT count at key current_sum BY one  
+            RETURN current_sum  
+        END FUNCTION  
+        
+        INITIALIZE count AS empty mapping with default integer zero  
+        CALL subtree_sum(root)  
+        
+        SET max_freq TO maximum value OF count values WITH default zero  
+        
+        SET result TO empty list  
+        FOR each key, freq IN count items  
+            IF freq EQUALS max_freq  
+                APPEND key TO result  
+            END IF  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,34 @@
+CLASS Solution
+    FUNCTION candy(list_of_ratings)
+        SET number_of_children TO the LENGTH OF list_of_ratings
+        CALL initialize_candies WITH number_of_children RETURNING list_of_candies
+
+        FOR index FROM one TO number_of_children MINUS one
+            IF element at position index of list_of_ratings IS GREATER THAN element at position index MINUS one of list_of_ratings
+                SET element at position index of list_of_candies TO element at position index MINUS one of list_of_candies PLUS one
+            END IF
+        END FOR
+
+        FOR index FROM number_of_children MINUS two DOWN TO zero
+            IF element at position index of list_of_ratings IS GREATER THAN element at position index PLUS one of list_of_ratings
+                SET element at position index of list_of_candies TO the GREATER OF element at position index of list_of_candies AND element at position index PLUS one of list_of_candies PLUS one
+            END IF
+        END FOR
+
+        CALL sum_candies WITH list_of_candies RETURNING total_candies
+        RETURN total_candies
+    END FUNCTION
+
+    FUNCTION initialize_candies(number_of_children)
+        CREATE list_of_candies WITH number_of_children ELEMENTS EACH SET TO one
+        RETURN list_of_candies
+    END FUNCTION
+
+    FUNCTION sum_candies(list_of_candies)
+        SET total TO zero
+        FOR each candy_count IN list_of_candies
+            INCREMENT total BY candy_count
+        END FOR
+        RETURN total
+    END FUNCTION
+END CLASS

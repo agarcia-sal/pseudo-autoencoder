@@ -1,0 +1,36 @@
+CLASS Solution
+    FUNCTION wordBreak(input_string, list_of_words)
+        SET wordSet TO ConvertListToSet WITH list_of_words
+        SET memo TO CreateEmptyDictionary
+        
+        FUNCTION backtrack(current_start)
+            IF current_start IS IN memo
+                RETURN the element at position current_start of memo
+            END IF
+            
+            IF current_start EQUALS the LENGTH OF input_string
+                RETURN a list containing the empty string
+            END IF
+            
+            SET result_list TO an empty list
+            
+            FOR each end_position FROM current_start INCREMENTED BY one TO the LENGTH OF input_string INCREMENTED BY one
+                SET word_substring TO substring from position current_start TO end_position MINUS one of input_string
+                IF word_substring IS IN wordSet
+                    FOR each sentence IN CALL backtrack WITH end_position
+                        IF sentence IS the empty string
+                            APPEND word_substring TO result_list
+                        ELSE
+                            APPEND word_substring PLUS the word space PLUS sentence TO result_list
+                        END IF
+                    END FOR
+                END IF
+            END FOR
+            
+            SET the element at position current_start of memo TO result_list
+            RETURN result_list
+        END FUNCTION
+        
+        RETURN CALL backtrack WITH zero
+    END FUNCTION
+END CLASS

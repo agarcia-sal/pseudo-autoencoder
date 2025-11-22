@@ -1,0 +1,45 @@
+CLASS Solution  
+    FUNCTION openLock(deadends AS List OF STRING, target AS STRING) RETURNS INTEGER  
+        SET deadends_set TO a new set containing all elements of deadends  
+        
+        IF the string zero zero zero zero EXISTS IN deadends_set  
+            RETURN negative one  
+        END IF  
+        
+        IF target EQUALS the string zero zero zero zero  
+            RETURN zero  
+        END IF  
+        
+        SET queue TO a new deque containing a pair of the string zero zero zero zero AND zero  
+        SET visited TO a new set containing the string zero zero zero zero  
+        
+        FUNCTION neighbors(state AS STRING)  
+            SET result TO a new empty list  
+            FOR index FROM zero TO three  
+                SET digit TO the integer value of the character at position index of state  
+                FOR move IN the list containing negative one AND positive one  
+                    SET new_digit TO the remainder after dividing digit PLUS move BY ten  
+                    SET new_state TO the concatenation of the substring from position zero TO index minus one of state WITH the string representation of new_digit WITH the substring from position index plus one TO the last position of state  
+                    APPEND new_state TO result  
+                END FOR  
+            END FOR  
+            RETURN result  
+        END FUNCTION  
+        
+        WHILE the queue IS NOT empty  
+            REMOVE and ASSIGN the leftmost element of queue TO current_state AND steps  
+            
+            FOR each neighbor IN neighbors(current_state)  
+                IF neighbor IS NOT IN visited AND neighbor IS NOT IN deadends_set  
+                    IF neighbor EQUALS target  
+                        RETURN steps PLUS one  
+                    END IF  
+                    ADD neighbor TO visited  
+                    APPEND the pair of neighbor AND steps PLUS one TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

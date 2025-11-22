@@ -1,0 +1,43 @@
+CLASS Solution  
+    FUNCTION stoneGameV(stoneValue)  
+        SET prefix_sum TO list of zeros with length equal to the length of stoneValue PLUS one  
+        FOR index FROM zero TO the length of stoneValue MINUS one  
+            SET element at position index PLUS one of prefix_sum TO element at position index of prefix_sum PLUS element at position index of stoneValue  
+        END FOR  
+        
+        FUNCTION get_range_sum(left, right)  
+            SET sum_value TO element at position right PLUS one of prefix_sum MINUS element at position left of prefix_sum  
+            RETURN sum_value  
+        END FUNCTION  
+        
+        FUNCTION dp(left, right)  
+            IF left EQUALS right  
+                RETURN zero  
+            END IF  
+            SET max_score TO zero  
+            FOR i FROM left TO right MINUS one  
+                SET left_sum TO get_range_sum(left, i)  
+                SET right_sum TO get_range_sum(i PLUS one, right)  
+                IF left_sum LESS THAN right_sum  
+                    SET candidate_score TO left_sum PLUS dp(left, i)  
+                    IF candidate_score GREATER THAN max_score  
+                        SET max_score TO candidate_score  
+                    END IF  
+                ELSE IF left_sum GREATER THAN right_sum  
+                    SET candidate_score TO right_sum PLUS dp(i PLUS one, right)  
+                    IF candidate_score GREATER THAN max_score  
+                        SET max_score TO candidate_score  
+                    END IF  
+                ELSE  
+                    SET candidate_score_left TO left_sum PLUS dp(left, i)  
+                    SET candidate_score_right TO right_sum PLUS dp(i PLUS one, right)  
+                    SET max_score TO the maximum of max_score, candidate_score_left, candidate_score_right  
+                END IF  
+            END FOR  
+            RETURN max_score  
+        END FUNCTION  
+        
+        SET result TO dp(zero, the length of stoneValue MINUS one)  
+        RETURN result  
+    END FUNCTION  
+END CLASS

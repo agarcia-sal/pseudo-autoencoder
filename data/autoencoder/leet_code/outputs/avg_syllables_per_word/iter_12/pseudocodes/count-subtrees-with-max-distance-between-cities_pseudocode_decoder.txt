@@ -1,0 +1,83 @@
+CLASS Solution  
+    FUNCTION countSubgraphsForEachDiameter(n, edges)  
+        SET graph TO an empty mapping from integer TO list  
+        FOR index FROM one TO n  
+            SET the list at graph for index TO an empty list  
+        END FOR  
+        FOR each pair u and v IN edges  
+            APPEND v TO the list at graph for u  
+            APPEND u TO the list at graph for v  
+        END FOR  
+        
+        FUNCTION bfs(subtree)  
+            SET start TO an arbitrary element from subtree  
+            INITIALIZE queue TO a new empty double-ended queue containing start  
+            INITIALIZE visited TO a new set containing start  
+            SET distance TO zero  
+            SET farthest_node TO start  
+            
+            WHILE queue is not empty  
+                REMOVE first element from queue and SET it TO node  
+                FOR each neighbor IN the list at graph for node  
+                    IF neighbor is IN subtree AND neighbor is NOT IN visited  
+                        ADD neighbor TO visited  
+                        APPEND neighbor TO queue  
+                        SET farthest_node TO neighbor  
+                    END IF  
+                END FOR  
+            END WHILE  
+            
+            INITIALIZE queue TO a new empty double-ended queue containing farthest_node  
+            INITIALIZE visited TO a new set containing farthest_node  
+            SET max_distance TO zero  
+            
+            WHILE queue is not empty  
+                SET size TO the length of queue  
+                FOR counter FROM one TO size  
+                    REMOVE first element from queue and SET it TO node  
+                    FOR each neighbor IN the list at graph for node  
+                        IF neighbor is IN subtree AND neighbor is NOT IN visited  
+                            ADD neighbor TO visited  
+                            APPEND neighbor TO queue  
+                        END IF  
+                    END FOR  
+                END FOR  
+                IF queue is not empty  
+                    INCREMENT max_distance BY one  
+                END IF  
+            END WHILE  
+            
+            RETURN max_distance  
+        END FUNCTION  
+        
+        SET result TO a list of zero repeated n MINUS one times  
+        
+        FOR size FROM two TO n  
+            FOR each subset IN all combinations of the list from one TO n taken size at a time  
+                INITIALIZE visited TO an empty set  
+                INITIALIZE stack TO a list containing the element at position one of subset  
+                
+                WHILE stack is not empty  
+                    REMOVE last element from stack and SET it TO node  
+                    IF node is NOT IN visited  
+                        ADD node TO visited  
+                        FOR each neighbor IN the list at graph for node  
+                            IF neighbor is IN subset AND neighbor is NOT IN visited  
+                                APPEND neighbor TO stack  
+                            END IF  
+                        END FOR  
+                    END IF  
+                END WHILE  
+                
+                IF visited EQUALS the set formed from subset  
+                    SET diameter TO bfs(the set formed from subset)  
+                    IF diameter GREATER THAN zero  
+                        INCREMENT element at position diameter MINUS one of result BY one  
+                    END IF  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

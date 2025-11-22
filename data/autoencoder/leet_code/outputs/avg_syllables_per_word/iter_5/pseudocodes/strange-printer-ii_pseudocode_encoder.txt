@@ -1,0 +1,45 @@
+CLASS Solution  
+    FUNCTION isPrintable(targetGrid)  
+        SET color_bounds TO a default mapping with default value [infinity, infinity, negative infinity, negative infinity]  
+        FOR each row index r FROM 0 TO length of targetGrid MINUS 1  
+            FOR each column index c FROM 0 TO length of targetGrid at row r MINUS 1  
+                SET color TO value at targetGrid[r][c]  
+                SET color_bounds[color][0] TO minimum of color_bounds[color][0] and r  
+                SET color_bounds[color][1] TO minimum of color_bounds[color][1] and c  
+                SET color_bounds[color][2] TO maximum of color_bounds[color][2] and r  
+                SET color_bounds[color][3] TO maximum of color_bounds[color][3] and c  
+        END FOR  
+        END FOR  
+
+        SET graph TO a default mapping with default value as empty list  
+        SET in_degree TO a default mapping with default integer value 0  
+
+        FOR each color and its bounds (minr, minc, maxr, maxc) IN color_bounds  
+            FOR each row r FROM minr TO maxr INCLUSIVE  
+                FOR each column c FROM minc TO maxc INCLUSIVE  
+                    IF value at targetGrid[r][c] is not equal to color THEN  
+                        SET other_color TO value at targetGrid[r][c]  
+                        APPEND color TO graph[other_color]  
+                        INCREMENT in_degree[color] BY 1  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+
+        SET queue TO deque containing colors in color_bounds where in_degree for that color is equal to 0  
+        SET visited_colors TO 0  
+
+        WHILE queue is not empty  
+            REMOVE first item from queue and assign to color  
+            INCREMENT visited_colors BY 1  
+            FOR each next_color IN graph[color]  
+                DECREMENT in_degree[next_color] BY 1  
+                IF in_degree[next_color] is equal to 0 THEN  
+                    ADD next_color TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+
+        RETURN true if visited_colors is equal to the number of colors in color_bounds otherwise false  
+    END FUNCTION  
+END CLASS

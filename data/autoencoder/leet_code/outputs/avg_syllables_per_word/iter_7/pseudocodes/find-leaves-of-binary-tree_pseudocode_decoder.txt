@@ -1,0 +1,59 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val TO 0, left TO None, right TO None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN None  
+    SET root TO new TreeNode with values AT position 0  
+    SET i TO 1  
+    SET queue TO new empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO queue.popleft()  
+        IF i LESS THAN length of values AND values AT position i IS NOT None  
+            SET node.left TO new TreeNode with values AT position i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i LESS THAN length of values AND values AT position i IS NOT None  
+            SET node.right TO new TreeNode with values AT position i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION findLeaves(self, root)  
+        FUNCTION collectLeaves(node)  
+            IF node IS None  
+                RETURN -1  
+            SET left_height TO collectLeaves(node.left)  
+            SET right_height TO collectLeaves(node.right)  
+            SET current_height TO maximum of left_height AND right_height PLUS 1  
+            IF current_height GREATER THAN OR EQUAL TO length of result  
+                APPEND empty list TO result  
+            APPEND node.val TO result AT index current_height  
+            RETURN current_height  
+        END FUNCTION  
+      
+        SET result TO empty list  
+        CALL collectLeaves WITH root  
+        RETURN result  
+    END FUNCTION  
+END CLASS

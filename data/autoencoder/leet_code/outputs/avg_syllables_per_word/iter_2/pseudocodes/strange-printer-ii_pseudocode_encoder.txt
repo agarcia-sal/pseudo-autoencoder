@@ -1,0 +1,39 @@
+```
+CLASS Solution
+    FUNCTION isPrintable(targetGrid)
+        SET color_bounds TO dictionary with default [infinity, infinity, negative infinity, negative infinity]
+
+        FOR r FROM 0 TO LENGTH OF targetGrid MINUS 1
+            FOR c FROM 0 TO LENGTH OF targetGrid[0] MINUS 1
+                SET color TO targetGrid[r][c]
+                SET color_bounds[color][0] TO minimum of color_bounds[color][0] and r
+                SET color_bounds[color][1] TO minimum of color_bounds[color][1] and c
+                SET color_bounds[color][2] TO maximum of color_bounds[color][2] and r
+                SET color_bounds[color][3] TO maximum of color_bounds[color][3] and c
+
+        SET graph TO dictionary with default empty list
+        SET in_degree TO dictionary with default 0
+
+        FOR each color and its bounds (minr, minc, maxr, maxc) IN color_bounds
+            FOR r FROM minr TO maxr
+                FOR c FROM minc TO maxc
+                    IF targetGrid[r][c] IS NOT color
+                        SET other_color TO targetGrid[r][c]
+                        APPEND color TO graph[other_color]
+                        INCREMENT in_degree[color] BY 1
+
+        SET queue TO deque containing colors from color_bounds where in_degree[color] IS 0
+        SET visited_colors TO 0
+
+        WHILE queue IS NOT empty
+            SET color TO REMOVE first element FROM queue
+            INCREMENT visited_colors BY 1
+            FOR each next_color IN graph[color]
+                DECREMENT in_degree[next_color] BY 1
+                IF in_degree[next_color] IS 0
+                    APPEND next_color TO queue
+
+        RETURN visited_colors EQUALS LENGTH OF color_bounds
+    END FUNCTION
+END CLASS
+```

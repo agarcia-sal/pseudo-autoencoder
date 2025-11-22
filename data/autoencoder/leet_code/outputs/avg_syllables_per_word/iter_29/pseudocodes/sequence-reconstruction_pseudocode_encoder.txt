@@ -1,0 +1,44 @@
+CLASS Solution  
+    FUNCTION sequenceReconstruction(nums, sequences)  
+        SET number_of_elements TO the LENGTH OF nums  
+        ASSIGN graph TO an empty mapping of default type list  
+        SET indegree_list TO a list of zeroes with LENGTH number_of_elements PLUS one  
+        
+        FOR each sequence IN sequences  
+            FOR position FROM zero TO the LENGTH OF sequence MINUS one MINUS one  
+                SET first_element TO element at position position of sequence  
+                SET second_element TO element at position position PLUS one of sequence  
+                APPEND second_element TO the list mapped by first_element in graph  
+                INCREMENT the indegree_list at position second_element BY one  
+            END FOR  
+        END FOR  
+        
+        SET queue TO a double ended queue of elements i WHERE i ranges FROM one TO number_of_elements AND indegree_list at position i EQUALS zero  
+        
+        IF the LENGTH OF queue NOT EQUALS one  
+            RETURN false  
+        END IF  
+        
+        SET current_index TO zero  
+        WHILE queue is not empty  
+            IF the LENGTH OF queue NOT EQUALS one  
+                RETURN false  
+            END IF  
+            
+            SET current_node TO the element removed from the front of queue  
+            IF current_node NOT EQUALS the element at position current_index of nums  
+                RETURN false  
+            END IF  
+            INCREMENT current_index BY one  
+            
+            FOR each adjacent_node IN the list mapped by current_node in graph  
+                DECREMENT the indegree_list at position adjacent_node BY one  
+                IF the indegree_list at position adjacent_node EQUALS zero  
+                    APPEND adjacent_node TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN current_index EQUALS number_of_elements  
+    END FUNCTION  
+END CLASS

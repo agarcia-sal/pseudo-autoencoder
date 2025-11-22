@@ -1,0 +1,61 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS None, right EQUALS None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values)
+    IF values IS NOT truthy
+        RETURN None
+    END IF
+    SET root TO NEW TreeNode WITH the element at position zero OF values
+    SET i TO one
+    SET queue TO an empty double ended queue
+    APPEND root TO queue
+    WHILE queue HOLDS
+        SET node TO the element removed from the left of queue
+        IF i LESS THAN the LENGTH OF values AND the element at position i OF values IS NOT None
+            SET node.left TO NEW TreeNode WITH the element at position i OF values
+            APPEND node.left TO queue
+        END IF
+        INCREMENT i BY one
+        IF i LESS THAN the LENGTH OF values AND the element at position i OF values IS NOT None
+            SET node.right TO NEW TreeNode WITH the element at position i OF values
+            APPEND node.right TO queue
+        END IF
+        INCREMENT i BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS NOT truthy AND q IS NOT truthy
+        RETURN True
+    ELSE IF p IS NOT truthy OR q IS NOT truthy
+        RETURN False
+    ELSE IF the val attribute of p NOT EQUALS THE val attribute of q
+        RETURN False
+    ELSE
+        RETURN the result of calling is_same_tree WITH p.left AND q.left AND the result of calling is_same_tree WITH p.right AND q.right
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION lowestCommonAncestor(self, root, p, q)
+        IF root IS None OR root EQUALS p OR root EQUALS q
+            RETURN root
+        END IF
+        SET left TO the result of calling lowestCommonAncestor ON self WITH root.left, p, q
+        SET right TO the result of calling lowestCommonAncestor ON self WITH root.right, p, q
+        IF left IS NOT None AND right IS NOT None
+            RETURN root
+        END IF
+        IF left IS NOT None
+            RETURN left
+        ELSE
+            RETURN right
+        END IF
+    END FUNCTION
+END CLASS

@@ -1,0 +1,44 @@
+CLASS Solution
+    FUNCTION outerTrees(trees)
+        FUNCTION cross(i, j, k)
+            SET a TO trees[i]
+            SET b TO trees[j]
+            SET c TO trees[k]
+            RETURN (b[0] MINUS a[0]) TIMES (c[1] MINUS b[1]) MINUS (b[1] MINUS a[1]) TIMES (c[0] MINUS b[0])
+        END FUNCTION
+
+        SET n TO LENGTH OF trees
+        IF n LESS THAN 4 THEN
+            RETURN trees
+        END IF
+
+        SORT trees IN ASCENDING ORDER
+        SET vis TO LIST OF n FALSE VALUES
+        SET stk TO LIST WITH SINGLE ELEMENT 0
+
+        FOR i FROM 1 TO n MINUS 1 DO
+            WHILE LENGTH OF stk GREATER THAN 1 AND cross(stk SECOND LAST ELEMENT, stk LAST ELEMENT, i) LESS THAN 0 DO
+                SET vis VALUE AT stk LAST ELEMENT TO FALSE
+                REMOVE LAST ELEMENT FROM stk
+            END WHILE
+            SET vis VALUE AT i TO TRUE
+            APPEND i TO stk
+        END FOR
+
+        SET m TO LENGTH OF stk
+
+        FOR i FROM n MINUS 2 DOWNTO 0 DO
+            IF vis VALUE AT i IS TRUE THEN
+                CONTINUE TO NEXT i
+            END IF
+            WHILE LENGTH OF stk GREATER THAN m AND cross(stk SECOND LAST ELEMENT, stk LAST ELEMENT, i) LESS THAN 0 DO
+                REMOVE LAST ELEMENT FROM stk
+            END WHILE
+            APPEND i TO stk
+        END FOR
+
+        REMOVE LAST ELEMENT FROM stk
+
+        RETURN LIST OF trees ELEMENTS AT INDICES IN stk
+    END FUNCTION
+END CLASS

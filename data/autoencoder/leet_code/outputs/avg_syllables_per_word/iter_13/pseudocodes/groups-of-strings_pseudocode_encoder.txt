@@ -1,0 +1,98 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.parent TO list of integers FROM zero TO size MINUS one  
+        SET self.rank TO list containing zero REPEATED size times  
+        SET self.size TO list containing one REPEATED size times  
+    END FUNCTION  
+
+    FUNCTION find(self, u)  
+        IF element at position u of self.parent DOES NOT EQUAL u  
+            SET element at position u of self.parent TO the result of calling find with element at position u of self.parent  
+        END IF  
+        RETURN element at position u of self.parent  
+    END FUNCTION  
+
+    FUNCTION union(self, u, v)  
+        SET rootU TO the result of calling find with u  
+        SET rootV TO the result of calling find with v  
+        IF rootU DOES NOT EQUAL rootV  
+            IF element at position rootU of self.rank IS GREATER THAN element at position rootV of self.rank  
+                SET element at position rootV of self.parent TO rootU  
+                INCREMENT element at position rootU of self.size BY element at position rootV of self.size  
+            ELSE IF element at position rootU of self.rank IS LESS THAN element at position rootV of self.rank  
+                SET element at position rootU of self.parent TO rootV  
+                INCREMENT element at position rootV of self.size BY element at position rootU of self.size  
+            ELSE  
+                SET element at position rootV of self.parent TO rootU  
+                INCREMENT element at position rootU of self.size BY element at position rootV of self.size  
+                INCREMENT element at position rootU of self.rank BY one  
+            END IF  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION groupStrings(self, words)  
+        FUNCTION bitmask(word)  
+            SET mask TO zero  
+            FOR each character IN word  
+                SET mask TO mask OR one LEFT SHIFTED BY the difference of the ordinal value of character MINUS the ordinal value of lower-case a  
+            END FOR  
+            RETURN mask  
+        END FUNCTION  
+
+        SET word_map TO a new mapping from integer keys TO list of integers  
+        SET n TO the LENGTH OF words  
+        SET uf TO a new instance of UnionFind initialized with n  
+
+        FOR each index i AND word IN enumeration of words  
+            SET mask TO the result of calling bitmask with word  
+            APPEND i TO the list at key mask in word_map  
+        END FOR  
+
+        FOR each index i AND word IN enumeration of words  
+            SET mask TO the result of calling bitmask with word  
+            FOR j FROM zero TO twenty five  
+                SET new_mask TO the result of exclusive OR of mask WITH one LEFT SHIFTED BY j  
+                IF new_mask IS A KEY IN word_map  
+                    FOR each element k IN the list at key new_mask in word_map  
+                        CALL union on uf WITH arguments i AND k  
+                    END FOR  
+                END IF  
+
+                IF bitwise AND of mask WITH one LEFT SHIFTED BY j IS EQUAL TO zero  
+                    SET new_mask TO the result of bitwise OR of mask WITH one LEFT SHIFTED BY j  
+                    IF new_mask IS A KEY IN word_map  
+                        FOR each element k IN the list at key new_mask in word_map  
+                            CALL union on uf WITH arguments i AND k  
+                        END FOR  
+                    END IF  
+                END IF  
+
+                IF bitwise AND of mask WITH one LEFT SHIFTED BY j IS NOT EQUAL TO zero  
+                    FOR k FROM zero TO twenty five  
+                        IF bitwise AND of mask WITH one LEFT SHIFTED BY k IS EQUAL TO zero  
+                            SET new_mask TO the bitwise OR of the exclusive OR of mask WITH one LEFT SHIFTED BY j WITH one LEFT SHIFTED BY k  
+                            IF new_mask IS A KEY IN word_map  
+                                FOR each element l IN the list at key new_mask in word_map  
+                                    CALL union on uf WITH arguments i AND l  
+                                END FOR  
+                            END IF  
+                        END IF  
+                    END FOR  
+                END IF  
+            END FOR  
+        END FOR  
+
+        SET root_sizes TO a new mapping from integer keys TO integer values initialized to zero  
+        FOR i FROM zero TO n MINUS one  
+            SET root TO the result of calling find on uf WITH argument i  
+            INCREMENT element at key root in root_sizes BY one  
+        END FOR  
+
+        SET max_group_size TO the maximum value in root_sizes  
+        SET num_groups TO the number of keys in root_sizes  
+
+        RETURN list containing num_groups AND max_group_size  
+    END FUNCTION  
+END CLASS

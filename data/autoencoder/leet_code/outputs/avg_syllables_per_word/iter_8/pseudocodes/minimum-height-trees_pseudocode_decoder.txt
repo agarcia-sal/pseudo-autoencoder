@@ -1,0 +1,36 @@
+CLASS Solution  
+    FUNCTION findMinHeightTrees(n, edges)  
+        IF n EQUAL TO 1 THEN  
+            RETURN list containing 0  
+        END IF  
+  
+        CREATE graph AS mapping FROM integer TO list of integers WITH default empty list  
+        CREATE degree AS list of length n FILLED WITH 0  
+  
+        FOR each pair u, v IN edges  
+            APPEND v TO graph AT key u  
+            APPEND u TO graph AT key v  
+            INCREMENT degree AT index u BY 1  
+            INCREMENT degree AT index v BY 1  
+        END FOR  
+  
+        CREATE leaves AS a deque containing all indices i FROM 0 TO n-1 WHERE degree AT i EQUALS 1  
+  
+        SET remaining_nodes TO n  
+        WHILE remaining_nodes GREATER THAN 2  
+            SET leaves_count TO LENGTH OF leaves  
+            DECREMENT remaining_nodes BY leaves_count  
+            FOR each _ FROM 1 TO leaves_count  
+                SET leaf TO REMOVE first element FROM leaves  
+                FOR each neighbor IN graph AT key leaf  
+                    DECREMENT degree AT index neighbor BY 1  
+                    IF degree AT index neighbor EQUALS 1 THEN  
+                        APPEND neighbor TO leaves  
+                    END IF  
+                END FOR  
+            END FOR  
+        END WHILE  
+  
+        RETURN list OF elements IN leaves  
+    END FUNCTION  
+END CLASS

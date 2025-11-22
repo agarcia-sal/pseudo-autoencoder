@@ -1,0 +1,50 @@
+CLASS Solution  
+    FUNCTION outerTrees(trees)  
+        FUNCTION dist_sq(p1, p2)  
+            RETURN square of difference between p1 first coordinate and p2 first coordinate  
+                 plus square of difference between p1 second coordinate and p2 second coordinate  
+        END FUNCTION  
+  
+        FUNCTION circumcenter(p1, p2, p3)  
+            SET ax, ay TO p1 first coordinate, p1 second coordinate  
+            SET bx, by TO p2 first coordinate, p2 second coordinate  
+            SET cx, cy TO p3 first coordinate, p3 second coordinate  
+            SET d TO 2 multiplied by (ax multiplied by (by minus cy) plus bx multiplied by (cy minus ay) plus cx multiplied by (ay minus by))  
+            SET ux TO ((ax squared plus ay squared) multiplied by (by minus cy)  
+                      plus (bx squared plus by squared) multiplied by (cy minus ay)  
+                      plus (cx squared plus cy squared) multiplied by (ay minus by)) divided by d  
+            SET uy TO ((ax squared plus ay squared) multiplied by (cx minus bx)  
+                      plus (bx squared plus by squared) multiplied by (ax minus cx)  
+                      plus (cx squared plus cy squared) multiplied by (bx minus ax)) divided by d  
+            RETURN list of ux and uy, and square root of (ux minus ax) squared plus (uy minus ay) squared  
+        END FUNCTION  
+  
+        FUNCTION welzl(points, boundary, n)  
+            IF n equals 0 OR length of boundary equals 3 THEN  
+                IF length of boundary equals 0 THEN  
+                    RETURN list of 0 and 0, 0  
+                ELSE IF length of boundary equals 1 THEN  
+                    RETURN first element of boundary, 0  
+                ELSE IF length of boundary equals 2 THEN  
+                    SET center TO list of (first coordinate of boundary first element plus first coordinate of boundary second element) divided by 2  
+                       and (second coordinate of boundary first element plus second coordinate of boundary second element) divided by 2  
+                    SET radius TO square root of dist_sq of boundary first element and boundary second element divided by 2  
+                    RETURN center, radius  
+                ELSE  
+                    RETURN result of calling circumcenter with boundary elements as arguments  
+            END IF  
+  
+            SET p TO points element at index n minus 1  
+            SET center, radius TO result of calling welzl with points, boundary, and n minus 1  
+            IF dist_sq of center and p is less than or equal to radius squared THEN  
+                RETURN center, radius  
+            END IF  
+  
+            RETURN result of calling welzl with points, boundary appended with p, and n minus 1  
+        END FUNCTION  
+  
+        CALL random shuffle ON trees  
+        SET center, radius TO result of calling welzl with trees, empty list, and length of trees  
+        RETURN list of center first coordinate, center second coordinate, and radius  
+    END FUNCTION  
+END CLASS

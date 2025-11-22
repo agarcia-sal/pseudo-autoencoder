@@ -1,0 +1,57 @@
+CLASS TreeNode  
+    FUNCTION __init__(val EQUALS zero, left EQUALS None, right EQUALS None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN None  
+    END IF  
+    SET root TO A NEW INSTANCE OF TreeNode WITH val EQUALS element at position zero OF values  
+    SET i TO one  
+    SET queue TO A NEW DEQUE COLLECTION  
+    CALL queue.APPEND WITH PARAMETERS root  
+    WHILE queue IS NOT empty  
+        SET node TO CALL queue.POP LEFT WITH NO PARAMETERS  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i OF values IS NOT None  
+            SET node.left TO A NEW INSTANCE OF TreeNode WITH val EQUALS element at position i OF values  
+            CALL queue.APPEND WITH PARAMETERS node.left  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i OF values IS NOT None  
+            SET node.right TO A NEW INSTANCE OF TreeNode WITH val EQUALS element at position i OF values  
+            CALL queue.APPEND WITH PARAMETERS node.right  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN CALL is_same_tree WITH PARAMETERS p.left, q.left AND CALL is_same_tree WITH PARAMETERS p.right, q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION buildTree(self, inorder, postorder)  
+        IF inorder IS empty OR postorder IS empty  
+            RETURN None  
+        END IF  
+        SET root_val TO CALL postorder.POP WITH NO PARAMETERS  
+        SET root TO A NEW INSTANCE OF TreeNode WITH val EQUALS root_val  
+        SET root_index TO THE POSITION OF root_val IN inorder  
+        SET root.right TO CALL self.buildTree WITH PARAMETERS elements FROM position root_index PLUS one TO end OF inorder, postorder  
+        SET root.left TO CALL self.buildTree WITH PARAMETERS elements FROM start TO position root_index MINUS one PLUS one LESS THAN root_index OF inorder, postorder  
+        RETURN root  
+    END FUNCTION  
+END CLASS

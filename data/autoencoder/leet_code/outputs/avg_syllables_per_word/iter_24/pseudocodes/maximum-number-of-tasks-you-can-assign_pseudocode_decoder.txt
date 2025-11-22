@@ -1,0 +1,45 @@
+CLASS Solution  
+    FUNCTION maxTaskAssign(tasks tasks_list, workers workers_list, pills pills_count, strength strength_value) RETURNS integer  
+        SORT tasks_list  
+        SORT workers_list  
+        
+        FUNCTION canAssignTasks(k integer) RETURNS boolean  
+            SET available_workers TO the sublist of workers_list consisting of the last k elements  
+            SET pills_used TO zero  
+            
+            FOR index FROM k MINUS one DOWN TO zero  
+                SET task TO the element at position index of tasks_list  
+                
+                SET worker_idx TO the position of the first element in available_workers that is GREATER THAN OR EQUAL TO task using binary search  
+                IF worker_idx IS LESS THAN the LENGTH OF available_workers THEN  
+                    REMOVE the element at position worker_idx FROM available_workers  
+                ELSE IF pills_used IS LESS THAN pills_count THEN  
+                    SET worker_idx TO the position of the first element in available_workers that is GREATER THAN OR EQUAL TO task MINUS strength_value using binary search  
+                    IF worker_idx IS LESS THAN the LENGTH OF available_workers THEN  
+                        REMOVE the element at position worker_idx FROM available_workers  
+                        INCREMENT pills_used BY one  
+                    ELSE  
+                        RETURN false  
+                    END IF  
+                ELSE  
+                    RETURN false  
+                END IF  
+            END FOR  
+            RETURN true  
+        END FUNCTION  
+        
+        SET left TO zero  
+        SET right TO the minimum of the length of tasks_list AND the length of workers_list PLUS one  
+        
+        WHILE left IS LESS THAN right  
+            SET mid TO the integer division of the sum of left AND right BY two  
+            IF canAssignTasks(mid) IS true THEN  
+                SET left TO mid PLUS one  
+            ELSE  
+                SET right TO mid  
+            END IF  
+        END WHILE  
+        
+        RETURN left MINUS one  
+    END FUNCTION  
+END CLASS

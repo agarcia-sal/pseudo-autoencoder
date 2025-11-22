@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION solveEquation(equation)  
+        FUNCTION parse_side(side)  
+            SET tokens TO side WITH every plus SIGN replaced BY concatenation of hash SYMBOL AND plus SIGN THEN WITH every minus SIGN replaced BY concatenation of hash SYMBOL AND minus SIGN THEN SPLIT INTO parts BY hash SYMBOL  
+            SET x_count TO zero  
+            SET num_sum TO zero  
+            FOR each token IN tokens  
+                IF token IS empty  
+                    CONTINUE to next iteration  
+                END IF  
+                IF token CONTAINS character x  
+                    IF token EQUALS character x OR token EQUALS concatenation of plus SIGN AND character x  
+                        INCREMENT x_count BY one  
+                    ELSE IF token EQUALS concatenation of minus SIGN AND character x  
+                        DECREMENT x_count BY one  
+                    ELSE  
+                        SET numeric_part TO token WITH character x REMOVED converted TO integer  
+                        INCREMENT x_count BY numeric_part  
+                    END IF  
+                ELSE  
+                    SET number_value TO token converted TO integer  
+                    INCREMENT num_sum BY number_value  
+                END IF  
+            END FOR  
+            RETURN x_count AND num_sum  
+        END FUNCTION  
+
+        SPLIT equation INTO left_side AND right_side BY equal SIGN  
+        SET left_x AND left_num TO parse_side APPLIED TO left_side  
+        SET right_x AND right_num TO parse_side APPLIED TO right_side  
+
+        SET total_x TO left_x MINUS right_x  
+        SET total_num TO right_num MINUS left_num  
+
+        IF total_x EQUALS zero  
+            IF total_num EQUALS zero  
+                RETURN phrase Infinite solutions  
+            ELSE  
+                RETURN phrase No solution  
+            END IF  
+        ELSE  
+            SET result TO integer division OF total_num BY total_x  
+            RETURN concatenation of character x EQUALS and result converted TO string  
+        END IF  
+    END FUNCTION  
+END CLASS

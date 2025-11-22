@@ -1,0 +1,59 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val LEFT right  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values IS EQUAL TO empty OR values IS NONE  
+        RETURN NONE  
+    END IF  
+    SET root TO NEW TreeNode WITH PARAMETERS the ELEMENT AT POSITION zero OF values  
+    SET i TO one  
+    SET queue TO A NEW empty double ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO THE FIRST ELEMENT REMOVED FROM queue  
+        IF i IS LESS THAN the LENGTH OF values AND THE ELEMENT AT POSITION i OF values IS NOT NONE  
+            SET node.left TO NEW TreeNode WITH PARAMETERS THE ELEMENT AT POSITION i OF values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND THE ELEMENT AT POSITION i OF values IS NOT NONE  
+            SET node.right TO NEW TreeNode WITH PARAMETERS THE ELEMENT AT POSITION i OF values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS NONE AND q IS NONE  
+        RETURN TRUE  
+    ELSE IF p IS NONE OR q IS NONE  
+        RETURN FALSE  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN FALSE  
+    ELSE  
+        SET left_same TO CALL is_same_tree WITH PARAMETERS p.left q.left  
+        SET right_same TO CALL is_same_tree WITH PARAMETERS p.right q.right  
+        RETURN left_same AND right_same  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION upsideDownBinaryTree WITH PARAMETERS self root  
+        IF root IS NONE OR root.left IS NONE  
+            RETURN root  
+        END IF  
+        SET new_root TO CALL self.upsideDownBinaryTree WITH PARAMETERS root.left  
+        SET THE left CHILD OF root.left TO root.right  
+        SET THE right CHILD OF root.left TO root  
+        SET root.left TO NONE  
+        SET root.right TO NONE  
+        RETURN new_root  
+    END FUNCTION  
+END CLASS

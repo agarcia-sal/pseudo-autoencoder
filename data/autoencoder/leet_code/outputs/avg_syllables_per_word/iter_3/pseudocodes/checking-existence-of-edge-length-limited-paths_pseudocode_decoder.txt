@@ -1,0 +1,56 @@
+CLASS UnionFind
+    FUNCTION __init__(self, size)
+        SET self.parent TO list of integers from 0 to size minus 1
+        SET self.rank TO list of 1 repeated size times
+    END FUNCTION
+
+    FUNCTION find(self, p)
+        IF self.parent[p] IS NOT EQUAL TO p THEN
+            SET self.parent[p] TO self.find(self.parent[p])
+        END IF
+        RETURN self.parent[p]
+    END FUNCTION
+
+    FUNCTION union(self, p, q)
+        SET rootP TO self.find(p)
+        SET rootQ TO self.find(q)
+        IF rootP IS EQUAL TO rootQ THEN
+            RETURN False
+        END IF
+        IF self.rank[rootP] > self.rank[rootQ] THEN
+            SET self.parent[rootQ] TO rootP
+        ELSE IF self.rank[rootP] < self.rank[rootQ] THEN
+            SET self.parent[rootP] TO rootQ
+        ELSE
+            SET self.parent[rootQ] TO rootP
+            INCREMENT self.rank[rootP] BY 1
+        END IF
+        RETURN True
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION distanceLimitedPathsExist(self, n, edgeList, queries)
+        SORT edgeList BY distance ascending
+        SET indexedQueries TO list of tuples (limit, p, q, originalIndex) extracted from queries with their indices
+        SORT indexedQueries BY limit ascending
+        INITIALIZE uf AS new UnionFind with size n
+        SET edgeIndex TO 0
+        SET numEdges TO LENGTH OF edgeList
+        SET results TO list of False repeated LENGTH OF queries times
+
+        FOR EACH (limit, p, q, originalIndex) IN indexedQueries
+            WHILE edgeIndex < numEdges AND edgeList[edgeIndex][2] < limit
+                SET u TO edgeList[edgeIndex][0]
+                SET v TO edgeList[edgeIndex][1]
+                CALL uf.union(u, v)
+                INCREMENT edgeIndex BY 1
+            END WHILE
+            IF uf.find(p) IS EQUAL TO uf.find(q) THEN
+                SET results[originalIndex] TO True
+            END IF
+        END FOR
+
+        RETURN results
+    END FUNCTION
+END CLASS

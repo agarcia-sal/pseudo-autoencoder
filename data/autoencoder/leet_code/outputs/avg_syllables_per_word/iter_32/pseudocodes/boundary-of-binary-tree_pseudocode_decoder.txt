@@ -1,0 +1,100 @@
+CLASS TreeNode  
+    FUNCTION __init__ (val zero left none right none)  
+        SET the val attribute TO val  
+        SET the left attribute TO left  
+        SET the right attribute TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node (values)  
+    IF the values collection IS EMPTY  
+        RETURN none  
+    END IF  
+    SET root TO new TreeNode initialized with the element at position one of values  
+    SET i TO one  
+    CREATE an empty double ended queue called queue  
+    ADD root TO queue at the end  
+    WHILE the queue IS NOT EMPTY  
+        REMOVE the element from the front of the queue and ASSIGN it TO node  
+        IF the variable i IS LESS THAN the length of values AND the element at position i of values IS NOT none  
+            SET the left attribute of node TO new TreeNode initialized with the element at position i of values  
+            ADD the left attribute of node TO the end of queue  
+        END IF  
+        INCREMENT i BY one  
+        IF the variable i IS LESS THAN the length of values AND the element at position i of values IS NOT none  
+            SET the right attribute of node TO new TreeNode initialized with the element at position i of values  
+            ADD the right attribute of node TO the end of queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree (p q)  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF the val attribute of p IS NOT EQUALS TO the val attribute of q  
+        RETURN False  
+    ELSE  
+        RETURN the logical AND of the result of calling is_same_tree with the left attribute of p and the left attribute of q AND the result of calling is_same_tree with the right attribute of p and the right attribute of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION boundaryOfBinaryTree (root)  
+        IF root IS none  
+            RETURN an empty list  
+        END IF  
+
+        FUNCTION is_leaf (node)  
+            RETURN the logical AND of node having its left attribute IS none AND node having its right attribute IS none  
+        END FUNCTION  
+
+        CREATE an empty list called left_boundary  
+        SET current TO the left attribute of root  
+        WHILE current IS NOT none  
+            IF is_leaf applied to current RETURNS False  
+                APPEND the val attribute of current TO left_boundary  
+            END IF  
+            IF the left attribute of current IS NOT none  
+                SET current TO the left attribute of current  
+            ELSE  
+                SET current TO the right attribute of current  
+            END IF  
+        END WHILE  
+
+        CREATE an empty list called right_boundary  
+        SET current TO the right attribute of root  
+        WHILE current IS NOT none  
+            IF is_leaf applied to current RETURNS False  
+                APPEND the val attribute of current TO right_boundary  
+            END IF  
+            IF the right attribute of current IS NOT none  
+                SET current TO the right attribute of current  
+            ELSE  
+                SET current TO the left attribute of current  
+            END IF  
+        END WHILE  
+
+        CREATE an empty list called leaves  
+        FUNCTION collect_leaves (node)  
+            IF node IS none  
+                RETURN  
+            END IF  
+            IF is_leaf applied to node RETURNS True  
+                APPEND the val attribute of node TO leaves  
+            END IF  
+            CALL collect_leaves with the left attribute of node  
+            CALL collect_leaves with the right attribute of node  
+        END FUNCTION  
+        CALL collect_leaves with root  
+
+        IF is_leaf applied to root RETURNS True  
+            SET leaves TO an empty list  
+        END IF  
+
+        RETURN the concatenation of the list containing the val attribute of root FOLLOWED BY left_boundary FOLLOWED BY leaves FOLLOWED BY the reverse of right_boundary  
+    END FUNCTION  
+END CLASS  

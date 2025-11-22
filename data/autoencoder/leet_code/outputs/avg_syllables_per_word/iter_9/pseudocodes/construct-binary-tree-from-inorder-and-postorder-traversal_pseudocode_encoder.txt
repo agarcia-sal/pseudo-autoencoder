@@ -1,0 +1,57 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS None, right EQUALS None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty THEN  
+        RETURN None  
+    END IF  
+    SET root TO NEW TreeNode WITH values AT zero  
+    SET i TO one  
+    SET queue TO new empty double-ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty DO  
+        SET node TO first element REMOVED FROM queue  
+        IF i LESS THAN length of values AND values AT i IS NOT None THEN  
+            SET node.left TO NEW TreeNode WITH values AT i  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN length of values AND values AT i IS NOT None THEN  
+            SET node.right TO NEW TreeNode WITH values AT i  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None THEN  
+        RETURN True  
+    ELSE IF p IS None OR q IS None THEN  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val THEN  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION buildTree(self, inorder, postorder)  
+        IF inorder IS empty OR postorder IS empty THEN  
+            RETURN None  
+        END IF  
+        SET root_val TO element REMOVED FROM end OF postorder  
+        SET root TO NEW TreeNode WITH root_val  
+        SET root_index TO position OF root_val IN inorder  
+        SET root.right TO self.buildTree(sublist OF inorder FROM root_index INCREMENTED BY one TO end, postorder)  
+        SET root.left TO self.buildTree(sublist OF inorder FROM start TO root_index EXCLUSIVE, postorder)  
+        RETURN root  
+    END FUNCTION  
+END CLASS

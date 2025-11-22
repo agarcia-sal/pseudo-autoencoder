@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION makeArrayIncreasing(arr1 AS List of integer, arr2 AS List of integer) RETURNS integer  
+        CALL arr2 SORT IN ASCENDING ORDER  
+        SET dp TO mapping with key negative one and value zero  
+        
+        FOR each num IN arr1  
+            SET new_dp TO empty mapping  
+            
+            FOR each last_num and ops IN dp  
+                IF num GREATER THAN last_num THEN  
+                    IF num IN new_dp THEN  
+                        SET current_min TO the value associated with num in new_dp  
+                    ELSE  
+                        SET current_min TO positive infinity  
+                    END IF  
+                    SET new_dp at key num TO the smaller of current_min AND ops  
+                END IF  
+                
+                SET idx TO the result of FINDING the position immediately after last_num IN arr2 USING BINARY SEARCH  
+                IF idx LESS THAN the LENGTH OF arr2 THEN  
+                    LET replacement_num BE element at position idx of arr2  
+                    IF replacement_num IN new_dp THEN  
+                        SET current_min_replacement TO the value associated with replacement_num in new_dp  
+                    ELSE  
+                        SET current_min_replacement TO positive infinity  
+                    END IF  
+                    SET new_dp at key replacement_num TO the smaller of current_min_replacement AND ops PLUS one  
+                END IF  
+            END FOR  
+            
+            IF new_dp IS EMPTY THEN  
+                RETURN negative one  
+            END IF  
+            SET dp TO new_dp  
+        END FOR  
+        
+        SET minimum_operations TO the smallest value in dp  
+        RETURN minimum_operations  
+    END FUNCTION  
+END CLASS

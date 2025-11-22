@@ -1,0 +1,77 @@
+CLASS Solution  
+    FUNCTION shortestDistance(grid)  
+        IF grid IS EQUAL TO nothing OR element at position zero OF grid IS EQUAL TO nothing  
+            RETURN negative one  
+        END IF  
+
+        SET m TO the LENGTH OF grid  
+        SET n TO the LENGTH OF element at position zero OF grid  
+        SET total_distance TO a two dimensional list with m rows and n columns each initialized to zero  
+        SET reach_count TO a two dimensional list with m rows and n columns each initialized to zero  
+        SET building_count TO zero  
+
+        SET directions TO a list containing elements  
+            element one being a pair one AND zero  
+            element two being a pair negative one AND zero  
+            element three being a pair zero AND one  
+            element four being a pair zero AND negative one  
+        END LIST  
+
+        FUNCTION bfs(start_x, start_y)  
+            SET queue TO a double ended queue initialized with a pair of start_x AND start_y  
+            SET visited TO a two dimensional list with m rows and n columns each initialized to false  
+            SET distance TO zero  
+            SET reachable TO zero  
+
+            WHILE queue IS NOT empty  
+                SET size TO the LENGTH OF queue  
+                INCREMENT distance BY one  
+
+                FOR each element FROM zero TO size MINUS one  
+                    REMOVE the first element FROM queue AND ASSIGN TO x AND y  
+                    FOR each pair dx AND dy IN directions  
+                        SET nx TO x PLUS dx  
+                        SET ny TO y PLUS dy  
+                        IF nx IS GREATER THAN OR EQUAL TO zero AND nx IS LESS THAN m AND ny IS GREATER THAN OR EQUAL TO zero AND ny IS LESS THAN n AND element at position nx OF visited AT position ny IS false AND element at position nx OF grid AT position ny IS EQUAL TO zero  
+                            SET element at position nx OF visited AT position ny TO true  
+                            APPEND the pair nx AND ny TO queue  
+                            INCREMENT element at position nx OF total_distance AT position ny BY distance  
+                            INCREMENT element at position nx OF reach_count AT position ny BY one  
+                            INCREMENT reachable BY one  
+                        END IF  
+                    END FOR  
+                END FOR  
+            END WHILE  
+            RETURN reachable  
+        END FUNCTION  
+
+        FOR i FROM zero TO m MINUS one  
+            FOR j FROM zero TO n MINUS one  
+                IF element at position i OF grid AT position j IS EQUAL TO one  
+                    INCREMENT building_count BY one  
+                    IF bfs(i, j) IS LESS THAN building_count MINUS one  
+                        RETURN negative one  
+                    END IF  
+                END IF  
+            END FOR  
+        END FOR  
+
+        SET min_distance TO positive infinity  
+
+        FOR i FROM zero TO m MINUS one  
+            FOR j FROM zero TO n MINUS one  
+                IF element at position i OF grid AT position j IS EQUAL TO zero AND element at position i OF reach_count AT position j IS EQUAL TO building_count  
+                    IF element at position i OF total_distance AT position j IS LESS THAN min_distance  
+                        SET min_distance TO element at position i OF total_distance AT position j  
+                    END IF  
+                END IF  
+            END FOR  
+        END FOR  
+
+        IF min_distance IS EQUAL TO positive infinity  
+            RETURN negative one  
+        ELSE  
+            RETURN min_distance  
+        END IF  
+    END FUNCTION  
+END CLASS

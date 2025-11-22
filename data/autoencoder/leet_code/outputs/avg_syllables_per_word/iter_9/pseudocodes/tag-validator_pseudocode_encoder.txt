@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION isValid(self, code)  
+        IMPORT regular expression module AS re  
+        
+        SET cdata_pattern TO string representing CDATA regular expression  
+        
+        SET code TO result of replacing all occurrences matching cdata_pattern in code with empty string using regular expression replacement  
+        
+        SET stack TO empty list  
+        
+        SET i TO zero  
+        WHILE i LESS THAN length of code  
+            IF character at position i in code EQUALS less than symbol THEN  
+                SET j TO position of character greater than symbol in code starting from position i plus one  
+                IF j EQUALS negative one THEN  
+                    RETURN False  
+                END IF  
+                
+                SET tag_content TO substring of code from position i plus one up to position j  
+                
+                IF tag_content IS empty THEN  
+                    RETURN False  
+                END IF  
+                
+                IF first character of tag_content EQUALS forward slash THEN  
+                    SET tag_name TO substring of tag_content from position one to end  
+                    IF stack IS empty OR last element of stack NOT EQUALS tag_name THEN  
+                        RETURN False  
+                    END IF  
+                    REMOVE last element FROM stack  
+                ELSE IF first character of tag_content EQUALS exclamation mark THEN  
+                    RETURN False  
+                ELSE  
+                    IF length of tag_content LESS THAN one OR length of tag_content GREATER THAN nine OR tag_content IS NOT composed of uppercase letters THEN  
+                        RETURN False  
+                    END IF  
+                    APPEND tag_content TO stack  
+                END IF  
+                
+                SET i TO j plus one  
+            ELSE  
+                INCREMENT i BY one  
+            END IF  
+        END WHILE  
+        
+        RETURN (stack IS empty) AND (number of matches of pattern representing opening and closing tags with uppercase letters in code GREATER THAN zero)  
+    END FUNCTION  
+END CLASS

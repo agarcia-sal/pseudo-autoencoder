@@ -1,0 +1,71 @@
+CLASS UnionFind
+    FUNCTION __init__(self, n)
+        SET self.parent TO list of integers from 0 to n-1
+        SET self.rank TO list of 1 repeated n times
+    END FUNCTION
+
+    FUNCTION find(self, u)
+        IF self.parent[u] IS NOT u
+            SET self.parent[u] TO self.find(self.parent[u])
+        RETURN self.parent[u]
+    END FUNCTION
+
+    FUNCTION union(self, u, v)
+        SET rootU TO self.find(u)
+        SET rootV TO self.find(v)
+
+        IF rootU IS NOT rootV
+            IF self.rank[rootU] > self.rank[rootV]
+                SET self.parent[rootV] TO rootU
+            ELSE IF self.rank[rootU] < self.rank[rootV]
+                SET self.parent[rootU] TO rootV
+            ELSE
+                SET self.parent[rootV] TO rootU
+                INCREMENT self.rank[rootU] BY 1
+            RETURN True
+        RETURN False
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION findCriticalAndPseudoCriticalEdges(self, n, edges)
+        FOR i, edge IN ENUMERATE edges
+            APPEND i TO edge
+        SORT edges BY the third element (weight)
+
+        FUNCTION mst(exclude=None, include=None)
+            SET uf TO new UnionFind with n
+            SET weight TO 0
+
+            IF include IS NOT None
+                uf.union(include[0], include[1])
+                INCREMENT weight BY include[2]
+
+            FOR each u, v, w, idx IN edges
+                IF idx EQUALS exclude
+                    CONTINUE
+                IF uf.union(u, v)
+                    INCREMENT weight BY w
+
+            SET root TO uf.find(0)
+            FOR i FROM 0 TO n-1
+                IF uf.find(i) IS NOT root
+                    RETURN infinity
+
+            RETURN weight
+        END FUNCTION
+
+        SET mst_weight TO mst()
+
+        SET critical TO empty list
+        SET pseudo_critical TO empty list
+
+        FOR each u, v, w, idx IN edges
+            IF mst(exclude=idx) > mst_weight
+                APPEND idx TO critical
+            ELSE IF mst(include=(u, v, w)) EQUALS mst_weight
+                APPEND idx TO pseudo_critical
+
+        RETURN list containing critical and pseudo_critical
+    END FUNCTION
+END CLASS

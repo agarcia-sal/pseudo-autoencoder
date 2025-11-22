@@ -1,0 +1,77 @@
+CLASS Solution  
+    FUNCTION countCombinations(pieces, positions)  
+        SET directions TO a mapping with keys rook, queen, bishop and values as lists of pairs of integers representing movement directions  
+        
+        SET adjusted_positions TO an empty list  
+        FOR each pair r, c IN positions  
+            APPEND a pair of r minus one and c minus one TO adjusted_positions  
+        END FOR  
+        
+        FUNCTION get_destinations(start, piece_type)  
+            SET r TO the first element of start  
+            SET c TO the second element of start  
+            SET dests TO a list containing start only  
+            FOR each pair dr, dc IN directions at key piece_type  
+                SET nr TO r plus dr  
+                SET nc TO c plus dc  
+                WHILE nr greater than or equal to zero AND nr less than eight AND nc greater than or equal to zero AND nc less than eight  
+                    APPEND a pair of nr and nc TO dests  
+                    INCREMENT nr BY dr  
+                    INCREMENT nc BY dc  
+                END WHILE  
+            END FOR  
+            RETURN dests  
+        END FUNCTION  
+        
+        SET all_destinations TO an empty list  
+        FOR each pair pos, piece IN the zipped lists adjusted_positions and pieces  
+            APPEND the result of get_destinations with pos and piece TO all_destinations  
+        END FOR  
+        
+        FUNCTION is_valid_combination(combination)  
+            SET pos TO a copy of adjusted_positions  
+            SET n TO the length of pos  
+            WHILE true  
+                IF the length of the set of positions pos less than n  
+                    RETURN false  
+                END IF  
+                SET all_reached TO true  
+                FOR i FROM zero TO n minus one  
+                    IF element at position i of pos equals element at position i of combination  
+                        CONTINUE  
+                    END IF  
+                    SET all_reached TO false  
+                    SET r TO the first element of element at position i of pos  
+                    SET c TO the second element of element at position i of pos  
+                    IF element at position i, first of combination greater than r  
+                        SET dr TO one  
+                    ELSE IF element at position i, first of combination less than r  
+                        SET dr TO minus one  
+                    ELSE  
+                        SET dr TO zero  
+                    END IF  
+                    IF element at position i, second of combination greater than c  
+                        SET dc TO one  
+                    ELSE IF element at position i, second of combination less than c  
+                        SET dc TO minus one  
+                    ELSE  
+                        SET dc TO zero  
+                    END IF  
+                    SET element at position i of pos TO a pair of r plus dr and c plus dc  
+                END FOR  
+                IF all_reached  
+                    RETURN true  
+                END IF  
+            END WHILE  
+        END FUNCTION  
+        
+        SET valid_count TO zero  
+        FOR each combination IN the cartesian product of all elements in all_destinations  
+            IF is_valid_combination with combination  
+                INCREMENT valid_count BY one  
+            END IF  
+        END FOR  
+        
+        RETURN valid_count  
+    END FUNCTION  
+END CLASS

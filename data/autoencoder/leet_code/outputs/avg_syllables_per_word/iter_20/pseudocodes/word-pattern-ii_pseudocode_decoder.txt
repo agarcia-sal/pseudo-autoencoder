@@ -1,0 +1,38 @@
+CLASS Solution  
+    FUNCTION wordPatternMatch(pattern STRING, s STRING) RETURNS BOOLEAN  
+        FUNCTION backtrack(pattern_index INTEGER, string_index INTEGER, mapping DICTIONARY, used SET) RETURNS BOOLEAN  
+            IF pattern_index EQUALS the LENGTH OF pattern AND string_index EQUALS the LENGTH OF s  
+                RETURN true  
+            END IF  
+            IF pattern_index EQUALS the LENGTH OF pattern OR string_index EQUALS the LENGTH OF s  
+                RETURN false  
+            END IF  
+            SET current_char TO the element at position pattern_index of pattern  
+            IF current_char IS IN mapping  
+                SET word TO the value mapped by current_char in mapping  
+                IF the substring from position string_index TO string_index PLUS the LENGTH OF word of s NOT EQUALS word  
+                    RETURN false  
+                END IF  
+                IF backtrack(pattern_index PLUS one, string_index PLUS the LENGTH OF word, mapping, used) RETURNS true  
+                    RETURN true  
+                END IF  
+            ELSE  
+                FOR each end FROM string_index PLUS one TO the LENGTH OF s  
+                    SET word TO the substring from position string_index TO end of s  
+                    IF word IS IN used  
+                        CONTINUE to the next iteration  
+                    END IF  
+                    SET the mapping from current_char TO word  
+                    ADD word TO used  
+                    IF backtrack(pattern_index PLUS one, end, mapping, used) RETURNS true  
+                        RETURN true  
+                    END IF  
+                    REMOVE the mapping for current_char  
+                    REMOVE word FROM used  
+                END FOR  
+            END IF  
+            RETURN false  
+        END FUNCTION  
+        RETURN backtrack(zero, zero, an empty dictionary, an empty set)  
+    END FUNCTION  
+END CLASS

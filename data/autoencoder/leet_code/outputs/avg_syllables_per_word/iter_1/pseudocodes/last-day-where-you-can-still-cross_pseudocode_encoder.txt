@@ -1,0 +1,30 @@
+```
+class UF:
+  init(n): p=[0..n-1], r=[0]*n
+  find(x): p[x]=x if p[x]==x else find(p[x]); return p[x]
+  union(x,y):
+    rx,ry=find(x),find(y)
+    if rx!=ry:
+      if r[rx]>r[ry]: p[ry]=rx
+      elif r[rx]<r[ry]: p[rx]=ry
+      else: p[ry]=rx; r[rx]+=1
+
+latestDayToCross(row,col,cells):
+  grid=[[1]*col for _ in 0..row-1]
+  uf=UF(row*col+2)
+  TOP=row*col; BOTTOM=TOP+1
+  dirs=[(-1,0),(1,0),(0,-1),(0,1)]
+
+  for day in len(cells)-1 down to 0:
+    r,c=cells[day][0]-1, cells[day][1]-1
+    grid[r][c]=0
+    for dr,dc in dirs:
+      nr,nc=r+dr,c+dc
+      if 0<=nr<row and 0<=nc<col and grid[nr][nc]==0:
+        uf.union(r*col+c, nr*col+nc)
+    if r==0: uf.union(r*col+c, TOP)
+    if r==row-1: uf.union(r*col+c, BOTTOM)
+    if uf.find(TOP)==uf.find(BOTTOM): return day
+
+  return 0
+```

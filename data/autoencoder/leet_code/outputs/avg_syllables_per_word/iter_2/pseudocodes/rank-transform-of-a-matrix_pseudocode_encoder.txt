@@ -1,0 +1,55 @@
+CLASS UnionFind
+    FUNCTION __init__(self, size)
+        SET self.parent TO list of integers from 0 to size minus 1
+    END FUNCTION
+
+    FUNCTION find(self, u)
+        IF self.parent[u] NOT EQUAL TO u THEN
+            SET self.parent[u] TO self.find(self.parent[u])
+        END IF
+        RETURN self.parent[u]
+    END FUNCTION
+
+    FUNCTION union(self, u, v)
+        SET root_u TO self.find(u)
+        SET root_v TO self.find(v)
+        IF root_u NOT EQUAL TO root_v THEN
+            SET self.parent[root_u] TO root_v
+        END IF
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION matrixRankTransform(self, matrix)
+        SET m TO number of rows in matrix
+        SET n TO number of columns in matrix
+        SET value_to_indices TO empty dictionary with default list
+        
+        FOR r FROM 0 TO m MINUS 1
+            FOR c FROM 0 TO n MINUS 1
+                APPEND (r, c) TO value_to_indices[matrix[r][c]]
+        
+        SET row_rank TO list of zeros of length m
+        SET col_rank TO list of zeros of length n
+        SET result TO m by n matrix filled with zeros
+        
+        FOR each value IN keys of value_to_indices sorted in ascending order
+            SET uf TO new UnionFind(m plus n)
+            SET rank TO empty dictionary with default integer
+            
+            FOR each (r, c) IN value_to_indices[value]
+                CALL uf.union(r, c plus m)
+            
+            FOR each (r, c) IN value_to_indices[value]
+                SET root TO uf.find(r)
+                SET rank[root] TO maximum of rank[root] and (maximum of row_rank[r] and col_rank[c] plus 1)
+            
+            FOR each (r, c) IN value_to_indices[value]
+                SET root TO uf.find(r)
+                SET result[r][c] TO rank[root]
+                SET row_rank[r] TO rank[root]
+                SET col_rank[c] TO rank[root]
+        
+        RETURN result
+    END FUNCTION
+END CLASS

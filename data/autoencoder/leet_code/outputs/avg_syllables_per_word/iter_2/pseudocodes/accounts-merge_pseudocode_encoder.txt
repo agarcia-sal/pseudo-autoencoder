@@ -1,0 +1,59 @@
+CLASS UnionFind
+    FUNCTION __init__(size)
+        SET root TO LIST FROM 0 TO size MINUS 1
+        SET rank TO LIST OF 1 REPEATED size TIMES
+    END FUNCTION
+
+    FUNCTION find(x)
+        IF root[x] EQUALS x THEN
+            RETURN x
+        SET root[x] TO find(root[x])
+        RETURN root[x]
+    END FUNCTION
+
+    FUNCTION union(x, y)
+        SET rootX TO find(x)
+        SET rootY TO find(y)
+        IF rootX NOT EQUALS rootY THEN
+            IF rank[rootX] GREATER THAN rank[rootY] THEN
+                SET root[rootY] TO rootX
+            ELSE IF rank[rootX] LESS THAN rank[rootY] THEN
+                SET root[rootX] TO rootY
+            ELSE
+                SET root[rootY] TO rootX
+                INCREMENT rank[rootX] BY 1
+            END IF
+        END IF
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION accountsMerge(accounts)
+        SET email_to_id TO EMPTY MAP
+        SET uf TO NEW UnionFind WITH size LENGTH OF accounts
+        
+        FOR EACH index i, (_, emails...) IN accounts
+            FOR EACH email IN emails
+                IF email NOT IN email_to_id THEN
+                    SET email_to_id[email] TO i
+                ELSE
+                    CALL uf.union(i, email_to_id[email])
+                END IF
+            END FOR
+        END FOR
+        
+        SET merged_emails TO EMPTY MAP WITH DEFAULT VALUE AS EMPTY LIST
+        FOR EACH email, account_id IN email_to_id
+            SET root_id TO uf.find(account_id)
+            APPEND email TO merged_emails[root_id]
+        END FOR
+        
+        SET result TO EMPTY LIST
+        FOR EACH account_id, emails IN merged_emails
+            SET name TO accounts[account_id][0]
+            APPEND LIST CONSISTING OF name FOLLOWED BY SORTED emails TO result
+        END FOR
+        
+        RETURN result
+    END FUNCTION
+END CLASS

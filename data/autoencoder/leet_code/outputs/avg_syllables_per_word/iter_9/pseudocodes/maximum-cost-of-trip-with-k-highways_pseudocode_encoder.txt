@@ -1,0 +1,33 @@
+CLASS Solution  
+    FUNCTION maximumCost(self, n, highways, k)  
+        CREATE an adjacency list named graph mapping each city to an empty list of connected city-toll pairs  
+        FOR each city1, city2, toll IN highways  
+            APPEND the pair of city2 and toll TO graph at city1  
+            APPEND the pair of city1 and toll TO graph at city2  
+        END FOR  
+        
+        SET max_cost TO negative one  
+        
+        FUNCTION dfs(city, visited, cost, highways_used)  
+            IF highways_used EQUALS k THEN  
+                SET max_cost TO the greater of max_cost and cost  
+                RETURN  
+            END IF  
+            
+            FOR each neighbor, toll IN graph at city  
+                IF neighbor NOT IN visited THEN  
+                    ADD neighbor TO visited  
+                    CALL dfs with neighbor, visited, cost PLUS toll, highways_used PLUS one  
+                    REMOVE neighbor FROM visited  
+                END IF  
+            END FOR  
+        END FUNCTION  
+        
+        FOR start_city FROM zero TO n MINUS one  
+            CREATE a set visited containing start_city  
+            CALL dfs with start_city, visited, zero, zero  
+        END FOR  
+        
+        RETURN max_cost  
+    END FUNCTION  
+END CLASS

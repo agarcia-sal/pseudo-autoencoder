@@ -1,0 +1,58 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS None, right EQUALS None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values)
+    IF values IS empty
+        RETURN None
+    END IF
+    SET root TO CALL TreeNode WITH the element at position zero of values
+    SET i TO one
+    SET queue TO CALL deque WITH no parameters
+    CALL APPEND root TO queue
+    WHILE queue IS NOT empty
+        SET node TO CALL popleft ON queue
+        IF i LESS THAN the LENGTH OF values AND the element at position i of values IS NOT None
+            SET node.left TO CALL TreeNode WITH the element at position i of values
+            CALL APPEND node.left TO queue
+        END IF
+        INCREMENT i BY one
+        IF i LESS THAN the LENGTH OF values AND the element at position i of values IS NOT None
+            SET node.right TO CALL TreeNode WITH the element at position i of values
+            CALL APPEND node.right TO queue
+        END IF
+        INCREMENT i BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val NOT EQUALS q.val
+        RETURN False
+    ELSE
+        RETURN the result of CALL is_same_tree WITH p.left AND q.left AND the result of CALL is_same_tree WITH p.right AND q.right
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION isValidBST(self, root)
+        FUNCTION validate(node, low EQUALS negative infinity, high EQUALS positive infinity)
+            IF node IS None
+                RETURN True
+            END IF
+            IF node.val LESS THAN OR EQUAL TO low OR node.val GREATER THAN OR EQUAL TO high
+                RETURN False
+            END IF
+            RETURN the result of CALL validate WITH node.left, low, AND node.val AND the result of CALL validate WITH node.right, node.val, AND high
+        END FUNCTION
+        RETURN CALL validate WITH root
+    END FUNCTION
+END CLASS

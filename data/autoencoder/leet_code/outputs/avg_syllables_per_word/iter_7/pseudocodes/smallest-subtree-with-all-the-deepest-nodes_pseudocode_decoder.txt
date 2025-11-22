@@ -1,0 +1,56 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val = 0, left = None, right = None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET root TO NEW TreeNode WITH value values AT INDEX 0  
+    SET i TO 1  
+    SET queue TO NEW EMPTY double-ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO REMOVE first element FROM queue  
+        IF i IS LESS THAN LENGTH OF values AND values AT INDEX i IS NOT None  
+            SET node.left TO NEW TreeNode WITH value values AT INDEX i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i IS LESS THAN LENGTH OF values AND values AT INDEX i IS NOT None  
+            SET node.right TO NEW TreeNode WITH value values AT INDEX i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION subtreeWithAllDeepest(self, root)  
+        FUNCTION dfs(node)  
+            IF node IS None  
+                RETURN node, 0  
+            SET left_node, left_depth TO dfs(node.left)  
+            SET right_node, right_depth TO dfs(node.right)  
+            IF left_depth IS GREATER THAN right_depth  
+                RETURN left_node, left_depth INCREMENTED BY 1  
+            ELSE IF right_depth IS GREATER THAN left_depth  
+                RETURN right_node, right_depth INCREMENTED BY 1  
+            ELSE  
+                RETURN node, left_depth INCREMENTED BY 1  
+        END FUNCTION  
+        RETURN FIRST ELEMENT OF dfs(root)  
+    END FUNCTION  
+END CLASS

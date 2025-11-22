@@ -1,0 +1,44 @@
+CLASS Solution  
+    FUNCTION openLock(deadends WITH TYPE List OF strings, target WITH TYPE string) RETURNS integer  
+        SET deadends_set TO a set created from deadends  
+        
+        IF the literal string zero zero zero zero is an element of deadends_set  
+            RETURN negative one  
+        END IF  
+        
+        IF target EQUALS the literal string zero zero zero zero  
+            RETURN zero  
+        END IF  
+        
+        SET queue TO a deque initialized with a tuple containing the literal string zero zero zero zero and the integer zero  
+        SET visited TO a set containing the literal string zero zero zero zero  
+        
+        FUNCTION neighbors(state WITH TYPE string) RETURNS list OF string  
+            SET result TO an empty list  
+            FOR i FROM zero TO three  
+                SET digit TO the integer value of the element at position i of state  
+                FOR each move IN a list containing negative one and positive one  
+                    SET new_digit TO the remainder of digit PLUS move when divided by ten  
+                    SET new_state TO the concatenation of the substring from position zero TO position i minus one of state PLUS the string representation of new_digit PLUS the substring from position i PLUS one TO the end of state  
+                    APPEND new_state TO result  
+                END FOR  
+            END FOR  
+            RETURN result  
+        END FUNCTION  
+        
+        WHILE the LENGTH OF queue GREATER THAN zero  
+            REMOVE the first element FROM queue AND ASSIGN the first part TO current_state AND the second part TO steps  
+            FOR each neighbor IN neighbors(current_state)  
+                IF neighbor is not an element of visited AND neighbor is not an element of deadends_set  
+                    IF neighbor EQUALS target  
+                        RETURN steps PLUS one  
+                    END IF  
+                    ADD neighbor TO visited  
+                    APPEND a tuple containing neighbor and steps PLUS one TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

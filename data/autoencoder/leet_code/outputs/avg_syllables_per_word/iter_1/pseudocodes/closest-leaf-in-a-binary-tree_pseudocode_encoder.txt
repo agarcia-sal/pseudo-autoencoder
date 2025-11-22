@@ -1,0 +1,35 @@
+```
+def tree_node(vals):
+  if not vals: return None
+  r = TreeNode(vals[0]); i=1; q=deque([r])
+  while q:
+    n = q.popleft()
+    if i<len(vals) and vals[i] is not None: n.left=TreeNode(vals[i]); q.append(n.left)
+    i+=1
+    if i<len(vals) and vals[i] is not None: n.right=TreeNode(vals[i]); q.append(n.right)
+    i+=1
+  return r
+
+def is_same_tree(p,q):
+  if not p and not q: return True
+  if not p or not q: return False
+  if p.val!=q.val: return False
+  return is_same_tree(p.left,q.left) and is_same_tree(p.right,q.right)
+
+class Solution:
+  def findClosestLeaf(self, root, k):
+    if not root.left and not root.right: return root.val
+    g=defaultdict(list)
+    def dfs(n,p=None):
+      if p: g[n.val].append(p.val); g[p.val].append(n.val)
+      if n.left: dfs(n.left,n)
+      if n.right: dfs(n.right,n)
+    dfs(root)
+    q=deque([k]); v=set()
+    while q:
+      c=q.popleft(); v.add(c)
+      if len(g[c])==1 and c!=root.val: return c
+      for nb in g[c]:
+        if nb not in v: q.append(nb)
+    return -1
+```

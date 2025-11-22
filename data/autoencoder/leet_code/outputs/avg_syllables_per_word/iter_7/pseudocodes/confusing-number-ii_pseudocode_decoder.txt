@@ -1,0 +1,30 @@
+CLASS Solution  
+    FUNCTION confusingNumberII(n)  
+        SET rotate_map TO mapping from digits 0,1,6,8,9 TO 0,1,9,8,6 respectively  
+        SET valid_digits TO list of digits 0,1,6,8,9  
+        
+        FUNCTION is_confusing(num)  
+            SET original_num TO num  
+            SET rotated_num TO 0  
+            WHILE num GREATER THAN 0  
+                SET digit TO remainder of num DIVIDED BY 10  
+                SET rotated_num TO rotated_num MULTIPLIED BY 10 PLUS rotate_map AT digit  
+                SET num TO num DIVIDED BY 10 (integer division)  
+            RETURN rotated_num IS NOT EQUAL TO original_num  
+        END FUNCTION  
+        
+        FUNCTION count_confusing_numbers(limit, current = 0)  
+            IF current GREATER THAN limit THEN  
+                RETURN 0  
+            SET count TO 1 IF current IS NOT 0 AND is_confusing(current) IS TRUE ELSE 0  
+            FOR each digit IN valid_digits  
+                SET new_number TO current MULTIPLIED BY 10 PLUS digit  
+                IF new_number IS EQUAL TO 0 THEN  
+                    CONTINUE TO next iteration  
+                SET count TO count PLUS count_confusing_numbers(limit, new_number)  
+            RETURN count  
+        END FUNCTION  
+        
+        RETURN count_confusing_numbers(n)  
+    END FUNCTION  
+END CLASS

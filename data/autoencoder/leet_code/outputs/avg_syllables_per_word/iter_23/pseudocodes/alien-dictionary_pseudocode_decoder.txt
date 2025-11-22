@@ -1,0 +1,47 @@
+CLASS Solution  
+    FUNCTION alienOrder(words)  
+        SET graph TO a default dictionary with set as default value  
+        SET indegree TO a default dictionary with integer zero as default value  
+        SET all_chars TO the set of every character obtained by concatenating all elements of words as one sequence  
+        
+        FOR each index i FROM zero TO the length of words MINUS one MINUS one  
+            SET word1 TO element at position i of words  
+            SET word2 TO element at position i PLUS one of words  
+            SET min_length TO the minimum of the lengths of word1 and word2  
+            SET found TO false  
+            FOR each index j FROM zero TO min_length MINUS one  
+                IF element at position j of word1 NOT EQUALS element at position j of word2 THEN  
+                    IF element at position j of word2 NOT IN the set at key element at position j of word1 in graph THEN  
+                        ADD element at position j of word2 TO the set at key element at position j of word1 in graph  
+                        INCREMENT indegree at key element at position j of word2 BY one  
+                    END IF  
+                    SET found TO true  
+                    BREAK the inner FOR loop  
+                END IF  
+            END FOR  
+            IF found EQUALS false AND the length of word1 GREATER THAN the length of word2 THEN  
+                RETURN an empty string described as no characters  
+            END IF  
+        END FOR  
+        
+        SET queue TO a double ended queue initialized with every character in all_chars WHERE indegree of that character EQUALS zero  
+        SET result TO an empty list  
+        
+        WHILE queue holds elements  
+            REMOVE and RETURN the leftmost character from queue as char  
+            APPEND char TO result  
+            FOR each neighbor IN the set at key char in graph  
+                DECREMENT indegree at key neighbor BY one  
+                IF indegree at key neighbor EQUALS zero THEN  
+                    APPEND neighbor TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        IF the length of result NOT EQUALS the length of all_chars THEN  
+            RETURN an empty string described as no characters  
+        END IF  
+        
+        RETURN the concatenation of every element in result with no separating characters  
+    END FUNCTION  
+END CLASS

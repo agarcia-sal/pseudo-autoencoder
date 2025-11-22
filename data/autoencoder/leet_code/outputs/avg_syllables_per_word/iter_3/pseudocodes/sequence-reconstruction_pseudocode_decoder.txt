@@ -1,0 +1,36 @@
+CLASS Solution
+    FUNCTION sequenceReconstruction(nums, sequences)
+        SET n TO LENGTH OF nums
+        INITIALIZE graph AS mapping FROM integer TO list
+        INITIALIZE indegree AS list OF size n + 1 WITH all zeros
+
+        FOR each seq IN sequences
+            FOR i FROM 0 TO LENGTH OF seq MINUS 2
+                SET u TO seq[i]
+                SET v TO seq[i + 1]
+                APPEND v TO graph[u]
+                INCREMENT indegree[v] BY 1
+
+        SET queue TO deque OF all i FROM 1 TO n WHERE indegree[i] IS 0
+
+        IF LENGTH OF queue IS NOT 1
+            RETURN False
+
+        SET index TO 0
+        WHILE queue IS NOT empty
+            IF LENGTH OF queue IS NOT 1
+                RETURN False
+
+            SET node TO DEQUEUE from queue
+            IF node IS NOT EQUAL TO nums[index]
+                RETURN False
+            INCREMENT index BY 1
+
+            FOR each neighbor IN graph[node]
+                DECREMENT indegree[neighbor] BY 1
+                IF indegree[neighbor] IS 0
+                    ENQUEUE neighbor TO queue
+
+        RETURN index IS EQUAL TO n
+    END FUNCTION
+END CLASS

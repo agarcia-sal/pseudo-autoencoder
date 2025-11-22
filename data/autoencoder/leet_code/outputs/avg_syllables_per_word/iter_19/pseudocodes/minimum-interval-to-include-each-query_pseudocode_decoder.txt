@@ -1,0 +1,30 @@
+CLASS Solution  
+    FUNCTION minInterval(intervals AS List OF List OF Integer, queries AS List OF Integer) RETURNS List OF Integer  
+        SORT intervals IN ASCENDING ORDER BY element at position zero of each element  
+        SET sorted_queries TO the LIST OF PAIRS each consisting of query AND original position FROM queries sorted BY the first element of each PAIR IN ASCENDING ORDER  
+        
+        SET min_heap TO an empty priority collection that orders elements by first element ascending  
+        SET result TO a list with the LENGTH OF queries FILLED WITH negative one  
+        
+        SET interval_index TO zero  
+        FOR each query AND original_index IN sorted_queries  
+            WHILE interval_index LESS THAN LENGTH OF intervals AND element at position zero of element at position interval_index of intervals LESS THAN OR EQUAL TO query  
+                SET start TO element at position zero of element at position interval_index of intervals  
+                SET end TO element at position one of element at position interval_index of intervals  
+                SET interval_size TO end MINUS start PLUS one  
+                ADD the PAIR of interval_size AND end TO min_heap  
+                INCREMENT interval_index BY one  
+            END WHILE  
+            
+            WHILE min_heap is not empty AND the second element of the FIRST element in min_heap LESS THAN query  
+                REMOVE the FIRST element FROM min_heap  
+            END WHILE  
+            
+            IF min_heap is not empty  
+                SET element at position original_index of result TO the first element of the FIRST element in min_heap  
+            END IF  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

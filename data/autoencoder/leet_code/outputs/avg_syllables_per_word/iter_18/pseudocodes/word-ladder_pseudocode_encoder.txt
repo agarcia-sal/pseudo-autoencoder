@@ -1,0 +1,39 @@
+CLASS Solution  
+    FUNCTION ladderLength(beginWord AS string endWord AS string wordList AS list of string) RETURNS integer  
+        IF endWord NOT IN wordList THEN  
+            RETURN zero  
+        END IF  
+
+        SET word_dict TO a new mapping with default value as empty list  
+        SET word_length TO the LENGTH OF beginWord  
+
+        FOR each word IN wordList  
+            FOR each index FROM zero TO word_length MINUS one  
+                SET intermediate_word TO concatenation OF substring of word from start TO position index MINUS one PLUS the character ASTERISK PLUS substring of word from position index PLUS one TO end  
+                APPEND word TO the list at key intermediate_word IN word_dict  
+            END FOR  
+        END FOR  
+
+        SET queue TO a new double ended queue containing the tuple of beginWord AND the integer one  
+        SET visited TO a new set containing beginWord  
+
+        WHILE queue is not empty  
+            REMOVE the first element FROM queue AND ASSIGN its values TO current_word AND current_length  
+
+            FOR each index FROM zero TO word_length MINUS one  
+                SET intermediate_word TO concatenation OF substring of current_word from start TO position index MINUS one PLUS the character ASTERISK PLUS substring of current_word from position index PLUS one TO end  
+                FOR each word IN the list at key intermediate_word IN word_dict  
+                    IF word EQUALS endWord THEN  
+                        RETURN current_length PLUS one  
+                    END IF  
+                    IF word NOT IN visited THEN  
+                        ADD word TO visited  
+                        APPEND the tuple of word AND current_length PLUS one TO queue  
+                    END IF  
+                END FOR  
+            END FOR  
+        END WHILE  
+
+        RETURN zero  
+    END FUNCTION  
+END CLASS

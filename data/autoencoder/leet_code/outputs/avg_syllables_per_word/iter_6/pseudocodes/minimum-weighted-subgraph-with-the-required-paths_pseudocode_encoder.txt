@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION minimumWeight(n, edges, src1, src2, dest)  
+        FUNCTION dijkstra(graph, start)  
+            SET distances TO a list of size n filled with infinity  
+            SET distances at index start TO 0  
+            SET heap TO a list containing a pair of 0 and start  
+            
+            WHILE heap IS NOT EMPTY  
+                CALL heappop ON heap AND ASSIGN TO current_distance AND current_node  
+                
+                IF current_distance GREATER THAN distances at index current_node  
+                    CONTINUE  
+                
+                FOR each neighbor AND weight IN graph at index current_node  
+                    SET distance TO current_distance PLUS weight  
+                    
+                    IF distance LESS THAN distances at index neighbor  
+                        SET distances at index neighbor TO distance  
+                        CALL heappush ON heap WITH distance AND neighbor  
+            
+            RETURN distances  
+        END FUNCTION  
+        
+        SET graph TO a list of n empty lists  
+        SET reverse_graph TO a list of n empty lists  
+        
+        FOR each u, v, w IN edges  
+            APPEND pair of v and w TO graph at index u  
+            APPEND pair of u and w TO reverse_graph at index v  
+        
+        SET dist_from_src1 TO CALL dijkstra WITH graph AND src1  
+        SET dist_from_src2 TO CALL dijkstra WITH graph AND src2  
+        SET dist_to_dest TO CALL dijkstra WITH reverse_graph AND dest  
+        
+        SET min_weight TO infinity  
+        
+        FOR index i FROM 0 TO n MINUS 1  
+            IF dist_from_src1 at index i NOT EQUALS infinity AND dist_from_src2 at index i NOT EQUALS infinity AND dist_to_dest at index i NOT EQUALS infinity  
+                SET candidate_sum TO dist_from_src1 at index i PLUS dist_from_src2 at index i PLUS dist_to_dest at index i  
+                IF candidate_sum LESS THAN min_weight  
+                    SET min_weight TO candidate_sum  
+        
+        IF min_weight EQUALS infinity  
+            RETURN negative one  
+        ELSE  
+            RETURN min_weight  
+    END FUNCTION  
+END CLASS

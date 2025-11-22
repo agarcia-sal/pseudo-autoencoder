@@ -1,0 +1,37 @@
+CLASS Solution  
+    FUNCTION waysToPartition(nums AS List of INTEGER, k AS INTEGER) RETURNS INTEGER  
+        SET total_sum TO the SUM OF elements IN nums  
+        SET n TO the LENGTH OF nums  
+        
+        CREATE left_diff AS a DEFAULT DICTIONARY with DEFAULT INTEGER zero  
+        CREATE right_diff AS a DEFAULT DICTIONARY with DEFAULT INTEGER zero  
+        
+        SET current_sum TO zero  
+        FOR index FROM zero TO n MINUS one MINUS one  
+            INCREMENT current_sum BY element at position index of nums  
+            SET diff TO total_sum MINUS two MULTIPLIED BY current_sum  
+            INCREMENT the VALUE at key diff IN right_diff BY one  
+        END FOR  
+        
+        SET max_ways TO the VALUE at key zero IN right_diff  
+        
+        SET current_sum TO zero  
+        FOR index FROM zero TO n MINUS one  
+            INCREMENT current_sum BY element at position index of nums  
+            
+            SET diff_change TO k MINUS element at position index of nums  
+            
+            SET new_ways TO the SUM OF the VALUE at key negative diff_change IN left_diff AND the VALUE at key diff_change IN right_diff  
+            
+            IF new_ways IS GREATER THAN max_ways  
+                SET max_ways TO new_ways  
+            END IF  
+            
+            SET diff TO total_sum MINUS two MULTIPLIED BY current_sum  
+            DECREMENT the VALUE at key diff IN right_diff BY one  
+            INCREMENT the VALUE at key diff IN left_diff BY one  
+        END FOR  
+        
+        RETURN max_ways  
+    END FUNCTION  
+END CLASS

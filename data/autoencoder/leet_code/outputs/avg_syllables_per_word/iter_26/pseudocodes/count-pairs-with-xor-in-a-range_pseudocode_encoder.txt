@@ -1,0 +1,58 @@
+CLASS TrieNode
+    FUNCTION __init__(self)
+        SET children TO empty MAPPING
+        SET count TO zero
+    END FUNCTION
+END CLASS
+
+CLASS Trie
+    FUNCTION __init__(self, bit_length EQUALS fifteen)
+        ASSIGN root TO A NEW INSTANCE OF TrieNode
+        SET bit_length TO bit_length
+    END FUNCTION
+
+    FUNCTION insert(self, num)
+        ASSIGN node TO self.root
+        FOR i FROM self.bit_length DOWN TO zero INCLUSIVE
+            SET bit TO THE RESULT OF shifting num TO THE RIGHT BY i AND BITWISE AND WITH one
+            IF bit NOT IN node.children
+                ASSIGN node.children AT bit TO A NEW INSTANCE OF TrieNode
+            END IF
+            ASSIGN node TO node.children AT bit
+            INCREMENT node.count BY one
+        END FOR
+    END FUNCTION
+
+    FUNCTION count_less_than(self, num, threshold)
+        SET count TO zero
+        ASSIGN node TO self.root
+        FOR i FROM self.bit_length DOWN TO zero INCLUSIVE
+            IF node IS None
+                BREAK THE LOOP
+            END IF
+            SET bit TO THE RESULT OF shifting num TO THE RIGHT BY i AND BITWISE AND WITH one
+            SET threshold_bit TO THE RESULT OF shifting threshold TO THE RIGHT BY i AND BITWISE AND WITH one
+            IF threshold_bit EQUALS one
+                INCREMENT count BY THE count OF the CHILD AT bit OF node OR zero IF ABSENT
+                ASSIGN node TO THE CHILD AT bit BITWISE XOR one OF node
+            ELSE
+                ASSIGN node TO THE CHILD AT bit OF node
+            END IF
+        END FOR
+        RETURN count
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION countPairs(self, nums AS LIST OF integers, low AS integer, high AS integer) RETURNS integer
+        ASSIGN trie TO A NEW INSTANCE OF Trie
+        SET nice_pairs TO zero
+
+        FOR each num IN nums
+            INCREMENT nice_pairs BY THE RESULT OF trie.count_less_than(num, high PLUS one) MINUS trie.count_less_than(num, low)
+            CALL trie.insert WITH num
+        END FOR
+
+        RETURN nice_pairs
+    END FUNCTION
+END CLASS

@@ -1,0 +1,53 @@
+CLASS Solution
+    FUNCTION outerTrees(trees)
+        FUNCTION dist_sq(p1, p2)
+            SET difference_in_first_coordinate TO element at position zero of p1 MINUS element at position zero of p2
+            SET difference_in_second_coordinate TO element at position one of p1 MINUS element at position one of p2
+            SET distance_squared TO difference_in_first_coordinate MULTIPLIED BY difference_in_first_coordinate PLUS difference_in_second_coordinate MULTIPLIED BY difference_in_second_coordinate
+            RETURN distance_squared
+        END FUNCTION
+
+        FUNCTION circumcenter(p1, p2, p3)
+            SET ax TO element at position zero of p1
+            SET ay TO element at position one of p1
+            SET bx TO element at position zero of p2
+            SET by TO element at position one of p2
+            SET cx TO element at position zero of p3
+            SET cy TO element at position one of p3
+            SET d TO two MULTIPLIED BY (ax MULTIPLIED BY (by MINUS cy) PLUS bx MULTIPLIED BY (cy MINUS ay) PLUS cx MULTIPLIED BY (ay MINUS by))
+            SET ux TO (((ax MULTIPLIED BY ax PLUS ay MULTIPLIED BY ay) MULTIPLIED BY (by MINUS cy)) PLUS ((bx MULTIPLIED BY bx PLUS by MULTIPLIED BY by) MULTIPLIED BY (cy MINUS ay)) PLUS ((cx MULTIPLIED BY cx PLUS cy MULTIPLIED BY cy) MULTIPLIED BY (ay MINUS by))) DIVIDED BY d
+            SET uy TO (((ax MULTIPLIED BY ax PLUS ay MULTIPLIED BY ay) MULTIPLIED BY (cx MINUS bx)) PLUS ((bx MULTIPLIED BY bx PLUS by MULTIPLIED BY by) MULTIPLIED BY (ax MINUS cx)) PLUS ((cx MULTIPLIED BY cx PLUS cy MULTIPLIED BY cy) MULTIPLIED BY (bx MINUS ax))) DIVIDED BY d
+            SET center_point TO list containing ux and uy
+            SET radius TO the SQUARE ROOT OF ((ux MINUS ax) MULTIPLIED BY (ux MINUS ax) PLUS (uy MINUS ay) MULTIPLIED BY (uy MINUS ay))
+            RETURN center_point and radius
+        END FUNCTION
+
+        FUNCTION welzl(points, boundary, n)
+            IF n EQUALS zero OR the LENGTH OF boundary EQUALS three
+                IF the LENGTH OF boundary EQUALS zero
+                    RETURN list containing zero and zero and zero
+                ELSE IF the LENGTH OF boundary EQUALS one
+                    RETURN element at position zero of boundary and zero
+                ELSE IF the LENGTH OF boundary EQUALS two
+                    SET center TO list containing ((element at position zero of element at position zero of boundary PLUS element at position zero of element at position one of boundary) DIVIDED BY two) AND ((element at position one of element at position zero of boundary PLUS element at position one of element at position one of boundary) DIVIDED BY two)
+                    SET radius TO the SQUARE ROOT OF dist_sq(element at position zero of boundary, element at position one of boundary) DIVIDED BY two
+                    RETURN center and radius
+                ELSE
+                    RETURN CALL circumcenter WITH elements unpacked from boundary
+                END IF
+            END IF
+
+            SET p TO element at position n MINUS one of points
+            SET center, radius TO CALL welzl WITH points, boundary, n MINUS one
+            IF dist_sq(center, p) LESS THAN OR EQUAL TO radius MULTIPLIED BY radius
+                RETURN center and radius
+            END IF
+
+            RETURN CALL welzl WITH points, boundary appended with p, n MINUS one
+        END FUNCTION
+
+        CALL random SHUFFLE WITH trees
+        SET center, radius TO CALL welzl WITH trees, empty list, the LENGTH OF trees
+        RETURN list containing element at position zero of center, element at position one of center, and radius
+    END FUNCTION
+END CLASS

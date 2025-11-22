@@ -1,0 +1,37 @@
+CLASS Solution
+    FUNCTION countPairs(n, edges, queries)
+        SET degree TO list of zeros with length n + 1
+        FOR each (u, v) IN edges
+            INCREMENT degree[u] BY 1
+            INCREMENT degree[v] BY 1
+        
+        SET shared TO empty map with default 0 values
+        FOR each (u, v) IN edges
+            IF u > v THEN
+                SWAP u AND v
+            INCREMENT shared[(u, v)] BY 1
+        
+        SET sorted_degree TO sorted list of degree
+        
+        SET answers TO empty list
+        FOR each q IN queries
+            SET count TO 0
+            SET left TO 1
+            SET right TO n
+            WHILE left < right
+                IF sorted_degree[left] + sorted_degree[right] > q THEN
+                    INCREMENT count BY (right - left)
+                    DECREMENT right BY 1
+                ELSE
+                    INCREMENT left BY 1
+            
+            FOR each (u, v), count_uv IN shared items
+                SET degree_uv TO degree[u] + degree[v]
+                IF degree_uv > q AND degree_uv - count_uv <= q THEN
+                    DECREMENT count BY 1
+            
+            APPEND count TO answers
+        
+        RETURN answers
+    END FUNCTION
+END CLASS

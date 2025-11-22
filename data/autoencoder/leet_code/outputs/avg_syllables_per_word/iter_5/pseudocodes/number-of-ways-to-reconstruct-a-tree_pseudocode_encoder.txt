@@ -1,0 +1,37 @@
+CLASS Solution  
+    FUNCTION checkWays(pairs)  
+        SET graph TO empty map with default value as empty set  
+        FOR each x, y IN pairs  
+            ADD y TO graph[x]  
+            ADD x TO graph[y]  
+        
+        SET max_degree TO node in graph with maximum size of graph[node]  
+        SET n TO size of graph  
+        
+        IF size of graph[max_degree] NOT EQUAL TO n MINUS 1  
+            RETURN 0  
+        
+        FUNCTION can_be_parent(u, v)  
+            FOR each neighbor IN graph[v]  
+                IF neighbor NOT IN graph[u] AND neighbor NOT EQUAL TO u  
+                    RETURN False  
+            RETURN True  
+        
+        SET ways TO 1  
+        
+        FOR each u IN graph  
+            IF u EQUALS max_degree  
+                CONTINUE  
+            SET parent TO None  
+            FOR each v IN graph[u]  
+                IF v IN graph AND size of graph[v] GREATER THAN OR EQUAL TO size of graph[u] AND can_be_parent(v, u)  
+                    IF parent IS None OR size of graph[v] LESS THAN size of graph[parent]  
+                        SET parent TO v  
+            IF parent IS None  
+                RETURN 0  
+            IF size of graph[parent] EQUALS size of graph[u]  
+                SET ways TO 2  
+        
+        RETURN ways  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,72 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, n)  
+        SET self.parent TO list of integers from 0 to n minus 1  
+        SET self.rank TO list of size n with all elements as 1  
+    END FUNCTION  
+  
+    FUNCTION find(self, u)  
+        IF self.parent at index u is not equal to u  
+            SET self.parent at index u TO self.find(self.parent at index u)  
+        RETURN self.parent at index u  
+    END FUNCTION  
+  
+    FUNCTION union(self, u, v)  
+        SET rootU TO self.find(u)  
+        SET rootV TO self.find(v)  
+  
+        IF rootU is not equal to rootV  
+            IF self.rank at rootU is greater than self.rank at rootV  
+                SET self.parent at rootV TO rootU  
+            ELSE IF self.rank at rootU is less than self.rank at rootV  
+                SET self.parent at rootU TO rootV  
+            ELSE  
+                SET self.parent at rootV TO rootU  
+                INCREMENT self.rank at rootU BY 1  
+            RETURN True  
+        RETURN False  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION findCriticalAndPseudoCriticalEdges(self, n, edges)  
+        FOR i, edge IN enumerate edges  
+            APPEND i TO edge  
+        
+        SORT edges BY weight element in each edge  
+  
+        FUNCTION mst(exclude = None, include = None)  
+            SET uf TO new UnionFind with n  
+            SET weight TO 0  
+  
+            IF include is not None  
+                uf.union(include element 0, include element 1)  
+                INCREMENT weight BY include element 2  
+  
+            FOR u, v, w, idx IN edges  
+                IF idx is equal to exclude  
+                    CONTINUE to next iteration  
+                IF uf.union(u, v) is True  
+                    INCREMENT weight BY w  
+  
+            SET root TO uf.find(0)  
+            FOR i IN range from 0 to n minus 1  
+                IF uf.find(i) is not equal to root  
+                    RETURN infinity value  
+  
+            RETURN weight  
+        END FUNCTION  
+  
+        SET mst_weight TO mst()  
+  
+        SET critical TO empty list  
+        SET pseudo_critical TO empty list  
+  
+        FOR u, v, w, idx IN edges  
+            IF mst with exclude equal to idx is greater than mst_weight  
+                APPEND idx TO critical  
+            ELSE IF mst with include equal to tuple (u, v, w) is equal to mst_weight  
+                APPEND idx TO pseudo_critical  
+  
+        RETURN list containing critical and pseudo_critical  
+    END FUNCTION  
+END CLASS

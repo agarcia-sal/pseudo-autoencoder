@@ -1,0 +1,30 @@
+CLASS Solution  
+    FUNCTION largestSumOfAverages(nums, k)  
+        SET n TO LENGTH OF nums  
+        SET prefix_sum TO list of zeros with length n PLUS 1  
+        
+        FOR i FROM 0 TO n MINUS 1  
+            SET prefix_sum at position i PLUS 1 TO prefix_sum at position i PLUS nums at position i  
+        
+        FUNCTION average(i, j)  
+            SET numerator TO prefix_sum at position j PLUS 1 MINUS prefix_sum at position i  
+            SET denominator TO j MINUS i PLUS 1  
+            SET result TO numerator DIVIDED BY denominator  
+            RETURN result  
+        END FUNCTION  
+        
+        SET dp TO two-dimensional list with n PLUS 1 rows and k PLUS 1 columns filled with zeros  
+        
+        FOR i FROM 0 TO n MINUS 1  
+            SET dp at position i and 1 TO CALL average WITH i, n MINUS 1  
+        
+        FOR i FROM n MINUS 1 DOWNTO 0  
+            FOR partitions FROM 2 TO k  
+                FOR j FROM i PLUS 1 TO n MINUS 1  
+                    SET candidate TO dp at position j and partitions MINUS 1 PLUS CALL average WITH i, j MINUS 1  
+                    IF candidate GREATER THAN dp at position i and partitions  
+                        SET dp at position i and partitions TO candidate  
+        
+        RETURN dp at position 0 and k  
+    END FUNCTION  
+END CLASS

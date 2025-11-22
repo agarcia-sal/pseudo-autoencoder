@@ -1,0 +1,67 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS None, right EQUALS None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN None  
+    END IF  
+    SET root TO new TreeNode with parameter element at position zero of values  
+    SET i TO one  
+    SET queue TO a new empty dequeue  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO remove first element FROM queue  
+        IF i LESS THAN length of values AND element at position i of values NOT EQUALS None  
+            SET node.left TO new TreeNode with parameter element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN length of values AND element at position i of values NOT EQUALS None  
+            SET node.right TO new TreeNode with parameter element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION longestConsecutive(self, root)  
+        IF root IS None  
+            RETURN zero  
+        END IF  
+
+        FUNCTION dfs(node, parent, current_length)  
+            IF node IS None  
+                RETURN current_length  
+            END IF  
+            IF parent IS NOT None AND node.val EQUALS parent PLUS one  
+                INCREMENT current_length BY one  
+            ELSE  
+                SET current_length TO one  
+            END IF  
+            SET left_length TO dfs(node.left, node.val, current_length)  
+            SET right_length TO dfs(node.right, node.val, current_length)  
+            RETURN the maximum of current_length, left_length, right_length  
+        END FUNCTION  
+
+        RETURN dfs(root, None, zero)  
+    END FUNCTION  
+END CLASS

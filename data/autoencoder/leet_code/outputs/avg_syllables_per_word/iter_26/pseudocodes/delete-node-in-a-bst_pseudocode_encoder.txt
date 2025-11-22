@@ -1,0 +1,72 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values)
+    IF values IS NONE OR values IS EMPTY
+        RETURN none
+    END IF
+    SET root TO NEW TreeNode WITH the element at position zero OF values
+    SET i TO one
+    SET queue TO a new empty double ended queue
+    APPEND root TO queue
+    WHILE queue IS NOT EMPTY
+        SET node TO the first element REMOVED FROM queue
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i OF values IS NOT none
+            SET node.left TO NEW TreeNode WITH the element at position i OF values
+            APPEND node.left TO queue
+        END IF
+        INCREMENT i BY one
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i OF values IS NOT none
+            SET node.right TO NEW TreeNode WITH the element at position i OF values
+            APPEND node.right TO queue
+        END IF
+        INCREMENT i BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS none AND q IS none
+        RETURN true
+    ELSE IF p IS none OR q IS none
+        RETURN false
+    ELSE IF p.val IS NOT EQUALS TO q.val
+        RETURN false
+    ELSE
+        RETURN is_same_tree(the left child of p, the left child of q) AND is_same_tree(the right child of p, the right child of q)
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION deleteNode(self, root, key)
+        IF root IS none
+            RETURN none
+        END IF
+        IF the value property OF root IS GREATER THAN key
+            SET root.left TO self.deleteNode(the left child of root, key)
+            RETURN root
+        END IF
+        IF the value property OF root IS LESS THAN key
+            SET root.right TO self.deleteNode(the right child of root, key)
+            RETURN root
+        END IF
+        IF the left child OF root IS none
+            RETURN the right child OF root
+        END IF
+        IF the right child OF root IS none
+            RETURN the left child OF root
+        END IF
+        SET node TO the right child OF root
+        WHILE the left child OF node IS NOT none
+            SET node TO the left child OF node
+        END WHILE
+        SET the left child OF node TO the left child OF root
+        SET root TO the right child OF root
+        RETURN root
+    END FUNCTION
+END CLASS

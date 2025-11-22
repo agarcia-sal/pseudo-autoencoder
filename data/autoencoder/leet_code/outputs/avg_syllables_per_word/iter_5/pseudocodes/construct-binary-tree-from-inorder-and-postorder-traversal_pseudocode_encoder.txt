@@ -1,0 +1,57 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val = 0, left = None, right = None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    END IF  
+    SET root TO NEW TreeNode WITH val AS values AT POSITION 0  
+    SET i TO 1  
+    SET queue TO NEW deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO REMOVE FIRST ELEMENT FROM queue  
+        IF i IS LESS THAN LENGTH OF values AND values AT POSITION i IS NOT None  
+            SET node.left TO NEW TreeNode WITH val AS values AT POSITION i  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY 1  
+        IF i IS LESS THAN LENGTH OF values AND values AT POSITION i IS NOT None  
+            SET node.right TO NEW TreeNode WITH val AS values AT POSITION i  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION buildTree(self, inorder, postorder)  
+        IF inorder IS EMPTY OR postorder IS EMPTY  
+            RETURN None  
+        END IF  
+        SET root_val TO REMOVE LAST ELEMENT FROM postorder  
+        SET root TO NEW TreeNode WITH val AS root_val  
+        SET root_index TO POSITION OF root_val IN inorder  
+        SET root.right TO self.buildTree(SECTION OF inorder FROM root_index PLUS 1 TO END, postorder)  
+        SET root.left TO self.buildTree(SECTION OF inorder FROM START TO root_index, postorder)  
+        RETURN root  
+    END FUNCTION  
+END CLASS

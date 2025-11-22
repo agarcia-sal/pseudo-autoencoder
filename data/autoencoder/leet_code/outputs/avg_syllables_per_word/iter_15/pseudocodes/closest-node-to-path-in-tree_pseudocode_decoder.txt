@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION closestNode WITH PARAMETERS n edges query  
+        ASSIGN pointer TO a new defaultdict of lists NAMED graph  
+        FOR each element u AND element v IN edges  
+            APPEND element v TO element at position u of graph  
+            APPEND element u TO element at position v of graph  
+        END FOR  
+
+        FUNCTION find_path WITH PARAMETERS start end  
+            ASSIGN pointer TO a new deque initialized with tuple consisting of start and a list containing start NAMED queue  
+            ASSIGN pointer TO a new set containing start NAMED visited  
+            WHILE queue holds  
+                REMOVE and ASSIGN the first element of queue TO node AND path  
+                IF node EQUALS end THEN  
+                    RETURN path  
+                END IF  
+                FOR each neighbor IN element at position node of graph  
+                    IF neighbor NOT IN visited THEN  
+                        ADD neighbor TO visited  
+                        APPEND tuple consisting of neighbor and concatenation of path AND list containing neighbor TO queue  
+                    END IF  
+                END FOR  
+            END WHILE  
+        END FUNCTION  
+
+        FUNCTION closest_node_on_path WITH PARAMETERS path node  
+            SET min_distance TO infinity  
+            SET closest_node TO null  
+            FOR each element p IN path  
+                SET distance TO the LENGTH OF find_path WITH PARAMETERS p AND node MINUS one  
+                IF distance LESS THAN min_distance THEN  
+                    SET min_distance TO distance  
+                    SET closest_node TO p  
+                END IF  
+            END FOR  
+            RETURN closest_node  
+        END FUNCTION  
+
+        ASSIGN pointer TO an empty list NAMED answer  
+        FOR each element start AND element end AND element node IN query  
+            SET path TO find_path WITH PARAMETERS start AND end  
+            APPEND closest_node_on_path WITH PARAMETERS path AND node TO answer  
+        END FOR  
+        RETURN answer  
+    END FUNCTION  
+END CLASS

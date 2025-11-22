@@ -1,0 +1,36 @@
+CLASS Solution  
+    FUNCTION minNumberOfSemesters(n number_of_courses WITH TYPE integer, relations list_of_list_of_integers, k maximum_courses_per_semester WITH TYPE integer) RETURNS integer  
+        SET graph TO a mapping from integer keys to list of integers with default empty list  
+        SET in_degree TO a list of zeros of length number_of_courses PLUS one  
+        
+        FOR each pair previous_course AND next_course IN relations  
+            APPEND next_course TO the list corresponding to previous_course in graph  
+            INCREMENT the element at position next_course of in_degree BY one  
+        END FOR  
+        
+        SET queue TO an empty double ended queue  
+        FOR each course FROM one TO number_of_courses  
+            IF the element at position course of in_degree EQUALS zero THEN  
+                APPEND course TO queue  
+            END IF  
+        END FOR  
+        
+        SET semesters TO zero  
+        
+        WHILE queue is not empty  
+            SET courses_this_semester TO the minimum value BETWEEN maximum_courses_per_semester AND the length of queue  
+            FOR count FROM one TO courses_this_semester  
+                REMOVE and RETURN the element from the front of queue as current_course  
+                FOR each next_course IN the list corresponding to current_course in graph  
+                    DECREMENT the element at position next_course of in_degree BY one  
+                    IF the element at position next_course of in_degree EQUALS zero THEN  
+                        APPEND next_course TO queue  
+                    END IF  
+                END FOR  
+            END FOR  
+            INCREMENT semesters BY one  
+        END WHILE  
+        
+        RETURN semesters  
+    END FUNCTION  
+END CLASS

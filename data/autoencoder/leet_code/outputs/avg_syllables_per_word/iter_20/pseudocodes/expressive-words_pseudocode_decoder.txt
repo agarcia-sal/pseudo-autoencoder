@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION expressiveWords(s AS string, words AS list of string) RETURNS integer  
+        FUNCTION compress(word AS string) RETURNS list  
+            IF word IS EMPTY  
+                RETURN empty list  
+            END IF  
+            SET count TO one  
+            SET compressed TO empty list  
+            FOR index FROM one TO LENGTH OF word MINUS one  
+                IF character at position index of word EQUALS character at position index MINUS one of word  
+                    INCREMENT count BY one  
+                ELSE  
+                    APPEND tuple of character at position index MINUS one of word AND count TO compressed  
+                    SET count TO one  
+                END IF  
+            END FOR  
+            APPEND tuple of character at last position of word AND count TO compressed  
+            RETURN compressed  
+        END FUNCTION  
+        
+        FUNCTION is_stretchy(s_compressed AS list, word_compressed AS list) RETURNS boolean  
+            IF LENGTH OF s_compressed NOT EQUALS LENGTH OF word_compressed  
+                RETURN false  
+            END IF  
+            FOR each pair (sc, sc_count) and (wc, wc_count) IN corresponding positions of s_compressed AND word_compressed  
+                IF sc NOT EQUALS wc  
+                    RETURN false  
+                END IF  
+                IF sc_count NOT EQUALS wc_count AND (sc_count LESS THAN three OR sc_count LESS THAN wc_count)  
+                    RETURN false  
+                END IF  
+            END FOR  
+            RETURN true  
+        END FUNCTION  
+        
+        SET s_compressed TO RESULT OF compress FUNCTION WITH s  
+        SET stretchy_count TO zero  
+        FOR each word IN words  
+            SET word_compressed TO RESULT OF compress FUNCTION WITH word  
+            IF RESULT OF is_stretchy FUNCTION WITH s_compressed AND word_compressed IS true  
+                INCREMENT stretchy_count BY one  
+            END IF  
+        END FOR  
+        RETURN stretchy_count  
+    END FUNCTION  
+END CLASS

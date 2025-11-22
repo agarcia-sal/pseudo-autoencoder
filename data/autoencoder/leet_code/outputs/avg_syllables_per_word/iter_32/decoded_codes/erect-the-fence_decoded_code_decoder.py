@@ -1,0 +1,41 @@
+from typing import List, Tuple
+
+class Solution:
+    def outerTrees(self, trees: List[List[int]]) -> List[List[int]]:
+        def cross(i: int, j: int, k: int) -> int:
+            a = trees[i]
+            b = trees[j]
+            c = trees[k]
+            # Cross product of vectors ab and bc:
+            # (b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0])
+            return (b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0])
+
+        n = len(trees)
+        if n < 4:
+            return trees
+
+        trees.sort()
+        vis = [False] * n
+        stk = [0]
+        vis[0] = True
+
+        for i in range(1, n):
+            while len(stk) > 1 and cross(stk[-2], stk[-1], i) < 0:
+                removed_index = stk.pop()
+                vis[removed_index] = False
+            vis[i] = True
+            stk.append(i)
+
+        m = len(stk)
+
+        for i in range(n - 2, -1, -1):
+            if vis[i]:
+                continue
+            while len(stk) > m and cross(stk[-2], stk[-1], i) < 0:
+                stk.pop()
+            stk.append(i)
+
+        stk.pop()
+
+        result = [trees[i] for i in stk]
+        return result

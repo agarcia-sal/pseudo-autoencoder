@@ -1,0 +1,51 @@
+CLASS Solution  
+    FUNCTION solveNQueens WITH PARAMETER n  
+        FUNCTION is_not_under_attack WITH PARAMETERS row AND col  
+            RETURN NOT the SUM of cols at position col PLUS hills at position row MINUS col PLUS dales at position row PLUS col  
+        END FUNCTION  
+
+        FUNCTION place_queen WITH PARAMETERS row AND col  
+            ADD the tuple of row AND col TO queens  
+            SET cols at position col TO one  
+            SET hills at position row MINUS col TO one  
+            SET dales at position row PLUS col TO one  
+        END FUNCTION  
+
+        FUNCTION remove_queen WITH PARAMETERS row AND col  
+            REMOVE the tuple of row AND col FROM queens  
+            SET cols at position col TO zero  
+            SET hills at position row MINUS col TO zero  
+            SET dales at position row PLUS col TO zero  
+        END FUNCTION  
+
+        FUNCTION add_solution  
+            SET solution TO an empty list  
+            FOR each tuple of arbitrary AND col IN queens sorted by row  
+                APPEND a string of col times concatenation of a period PLUS the letter Q PLUS a string of n MINUS col MINUS one times concatenation of a period TO solution  
+            END FOR  
+            APPEND solution TO output  
+        END FUNCTION  
+
+        FUNCTION backtrack WITH PARAMETER row defaulting to zero  
+            FOR col FROM zero TO n MINUS one  
+                IF is_not_under_attack with row AND col  
+                    CALL place_queen with row AND col  
+                    IF row PLUS one EQUALS n  
+                        CALL add_solution  
+                    ELSE  
+                        CALL backtrack with row PLUS one  
+                    END IF  
+                    CALL remove_queen with row AND col  
+                END IF  
+            END FOR  
+        END FUNCTION  
+
+        SET cols TO a list of zero repeated n times  
+        SET hills TO a list of zero repeated two times MULTIPLIED BY n MINUS one times  
+        SET dales TO a list of zero repeated two times MULTIPLIED BY n MINUS one times  
+        SET queens TO an empty set  
+        SET output TO an empty list  
+        CALL backtrack  
+        RETURN output  
+    END FUNCTION  
+END CLASS

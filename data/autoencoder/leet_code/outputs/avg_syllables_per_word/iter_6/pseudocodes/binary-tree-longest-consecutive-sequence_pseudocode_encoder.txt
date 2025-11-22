@@ -1,0 +1,58 @@
+CLASS TreeNode  
+    FUNCTION __init__(val EQUALS 0, left EQUALS None, right EQUALS None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN None  
+    SET root TO NEW TreeNode WITH val AS values AT index 0  
+    SET i TO 1  
+    INITIALIZE queue AS an empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO REMOVE first element FROM queue  
+        IF i LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.left TO NEW TreeNode WITH val AS values AT i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.right TO NEW TreeNode WITH val AS values AT i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN CALL is_same_tree WITH (p.left, q.left) AND CALL is_same_tree WITH (p.right, q.right)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION longestConsecutive(root)  
+        IF root IS None  
+            RETURN 0  
+        FUNCTION dfs(node, parent, current_length)  
+            IF node IS None  
+                RETURN current_length  
+            IF parent IS NOT None AND node.val EQUALS parent PLUS 1  
+                INCREMENT current_length BY 1  
+            ELSE  
+                SET current_length TO 1  
+            SET left_length TO CALL dfs WITH (node.left, node.val, current_length)  
+            SET right_length TO CALL dfs WITH (node.right, node.val, current_length)  
+            RETURN the maximum AMONG current_length, left_length, right_length  
+        END FUNCTION  
+        RETURN CALL dfs WITH (root, None, 0)  
+    END FUNCTION  
+END CLASS

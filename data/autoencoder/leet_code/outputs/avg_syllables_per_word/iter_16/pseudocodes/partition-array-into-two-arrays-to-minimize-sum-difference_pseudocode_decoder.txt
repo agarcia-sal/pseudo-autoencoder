@@ -1,0 +1,57 @@
+CLASS Solution  
+    FUNCTION minimumDifference(nums)  
+        SET n TO the LENGTH OF nums DIVIDED BY two  
+        SET total_sum TO the SUM OF nums  
+        SET target TO total_sum DIVIDED BY two  
+        SET min_diff TO positive infinity  
+        
+        SET left_half TO the SUBLIST of nums FROM position zero TO position n MINUS one  
+        SET right_half TO the SUBLIST of nums FROM position n TO the END of nums  
+        
+        SET left_sums TO a LIST containing empty DICTIONARIES for each integer FROM zero TO n INCLUSIVE  
+        SET right_sums TO a LIST containing empty DICTIONARIES for each integer FROM zero TO n INCLUSIVE  
+        
+        FOR i FROM zero TO n INCLUSIVE  
+            FOR each combination OF i ELEMENTS FROM left_half  
+                SET subset_sum TO the SUM OF the elements IN combination  
+                IF subset_sum IS NOT A KEY IN the DICTIONARY at position i of left_sums THEN  
+                    SET the VALUE at key subset_sum IN the DICTIONARY at position i of left_sums TO zero  
+                END IF  
+                INCREMENT the VALUE at key subset_sum IN the DICTIONARY at position i of left_sums BY one  
+            END FOR  
+            
+            FOR each combination OF i ELEMENTS FROM right_half  
+                SET subset_sum TO the SUM OF the elements IN combination  
+                IF subset_sum IS NOT A KEY IN the DICTIONARY at position i of right_sums THEN  
+                    SET the VALUE at key subset_sum IN the DICTIONARY at position i of right_sums TO zero  
+                END IF  
+                INCREMENT the VALUE at key subset_sum IN the DICTIONARY at position i of right_sums BY one  
+            END FOR  
+        END FOR  
+        
+        FOR i FROM zero TO n INCLUSIVE  
+            SET left_values TO the SORTED LIST OF KEYS IN the DICTIONARY at position i of left_sums  
+            SET right_values TO the SORTED LIST OF KEYS IN the DICTIONARY at position n MINUS i of right_sums  
+            
+            SET j TO zero  
+            SET k TO the LENGTH OF right_values MINUS one  
+            
+            WHILE j IS LESS THAN the LENGTH OF left_values AND k IS GREATER THAN OR EQUAL TO zero  
+                SET current_sum TO the VALUE at position j of left_values PLUS the VALUE at position k of right_values  
+                IF min_diff IS GREATER THAN the ABSOLUTE VALUE OF total_sum MINUS two TIMES current_sum THEN  
+                    SET min_diff TO the ABSOLUTE VALUE OF total_sum MINUS two TIMES current_sum  
+                END IF  
+                
+                IF current_sum IS LESS THAN target THEN  
+                    INCREMENT j BY one  
+                ELSE IF current_sum IS GREATER THAN target THEN  
+                    DECREMENT k BY one  
+                ELSE  
+                    RETURN zero  
+                END IF  
+            END WHILE  
+        END FOR  
+        
+        RETURN min_diff  
+    END FUNCTION  
+END CLASS

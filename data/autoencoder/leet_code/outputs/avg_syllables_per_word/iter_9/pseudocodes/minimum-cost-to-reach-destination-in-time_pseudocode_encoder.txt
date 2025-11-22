@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION minCost(self, maxTime, edges, passingFees)  
+        SET n TO length of passingFees  
+        
+        FUNCTION create empty adjacency list for n nodes  
+            CREATE graph as list containing n empty lists  
+            RETURN graph  
+        END FUNCTION  
+        
+        SET graph TO create empty adjacency list for n nodes  
+        
+        FOR each element consisting of x, y, time IN edges  
+            APPEND tuple consisting of y and time TO graph at index x  
+            APPEND tuple consisting of x and time TO graph at index y  
+        END FOR  
+        
+        CREATE priority queue pq initialized with tuple consisting of passingFees at index zero, zero, zero  
+        CREATE visited_time as list of size n filled with infinite value  
+        SET visited_time at index zero TO zero  
+        
+        WHILE pq is not empty  
+            REMOVE element with smallest first value FROM pq and unpack to current_cost, current_city, current_time  
+            
+            IF current_city EQUALS n minus one THEN  
+                RETURN current_cost  
+            END IF  
+            
+            FOR each element consisting of neighbor and travel_time IN graph at index current_city  
+                SET new_time TO current_time PLUS travel_time  
+                SET new_cost TO current_cost PLUS passingFees at index neighbor  
+                
+                IF new_time LESS THAN OR EQUAL TO maxTime AND (new_time LESS THAN visited_time at index neighbor OR new_cost LESS THAN current_cost) THEN  
+                    SET visited_time at index neighbor TO new_time  
+                    ADD tuple consisting of new_cost, neighbor, new_time TO pq  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN minus one  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,58 @@
+CLASS Solution
+    FUNCTION fullBloomFlowers(flowers, people)
+        SET start_times TO CALL get_start_times WITH PARAMETERS flowers
+        SET end_times TO CALL get_end_times WITH PARAMETERS flowers
+        SET result TO empty list
+        FOR each person IN people
+            SET started TO CALL bisect_right WITH PARAMETERS start_times AND person
+            SET ended TO CALL bisect_left WITH PARAMETERS end_times AND person
+            SET count_in_bloom TO started MINUS ended
+            APPEND count_in_bloom TO result
+        END FOR
+        RETURN result
+    END FUNCTION
+
+    FUNCTION get_start_times(flowers)
+        CREATE empty list start_times
+        FOR each pair start_and_end IN flowers
+            APPEND element at position zero OF start_and_end TO start_times
+        END FOR
+        RETURN start_times SORTED in ascending order
+    END FUNCTION
+
+    FUNCTION get_end_times(flowers)
+        CREATE empty list end_times
+        FOR each pair start_and_end IN flowers
+            APPEND element at position one OF start_and_end TO end_times
+        END FOR
+        RETURN end_times SORTED in ascending order
+    END FUNCTION
+
+    FUNCTION bisect_right(sorted_list, value)
+        SET low TO zero
+        SET high TO LENGTH OF sorted_list
+        WHILE low LESS THAN high HOLDS
+            SET mid TO low PLUS high DIVIDED BY two
+            IF element at position mid OF sorted_list LESS THAN OR EQUAL TO value
+                SET low TO mid PLUS one
+            ELSE
+                SET high TO mid
+            END IF
+        END WHILE
+        RETURN low
+    END FUNCTION
+
+    FUNCTION bisect_left(sorted_list, value)
+        SET low TO zero
+        SET high TO LENGTH OF sorted_list
+        WHILE low LESS THAN high HOLDS
+            SET mid TO low PLUS high DIVIDED BY two
+            IF element at position mid OF sorted_list LESS THAN value
+                SET low TO mid PLUS one
+            ELSE
+                SET high TO mid
+            END IF
+        END WHILE
+        RETURN low
+    END FUNCTION
+END CLASS

@@ -1,0 +1,60 @@
+CLASS Solution  
+    FUNCTION outerTrees(trees)  
+        FUNCTION dist_sq(p1, p2)  
+            SET horizontal_difference TO the first element of p1 MINUS the first element of p2  
+            SET vertical_difference TO the second element of p1 MINUS the second element of p2  
+            SET squared_horizontal_difference TO horizontal_difference MULTIPLIED BY horizontal_difference  
+            SET squared_vertical_difference TO vertical_difference MULTIPLIED BY vertical_difference  
+            SET distance_squared TO squared_horizontal_difference PLUS squared_vertical_difference  
+            RETURN distance_squared  
+        END FUNCTION  
+
+        FUNCTION circumcenter(p1, p2, p3)  
+            SET ax TO the first element of p1  
+            SET ay TO the second element of p1  
+            SET bx TO the first element of p2  
+            SET by TO the second element of p2  
+            SET cx TO the first element of p3  
+            SET cy TO the second element of p3  
+            SET d TO two MULTIPLIED BY (ax MULTIPLIED BY (by MINUS cy) PLUS bx MULTIPLIED BY (cy MINUS ay) PLUS cx MULTIPLIED BY (ay MINUS by))  
+            SET ux_numerator TO (ax MULTIPLIED BY ax PLUS ay MULTIPLIED BY ay) MULTIPLIED BY (by MINUS cy) PLUS (bx MULTIPLIED BY bx PLUS by MULTIPLIED BY by) MULTIPLIED BY (cy MINUS ay) PLUS (cx MULTIPLIED BY cx PLUS cy MULTIPLIED BY cy) MULTIPLIED BY (ay MINUS by)  
+            SET ux TO ux_numerator DIVIDED BY d  
+            SET uy_numerator TO (ax MULTIPLIED BY ax PLUS ay MULTIPLIED BY ay) MULTIPLIED BY (cx MINUS bx) PLUS (bx MULTIPLIED BY bx PLUS by MULTIPLIED BY by) MULTIPLIED BY (ax MINUS cx) PLUS (cx MULTIPLIED BY cx PLUS cy MULTIPLIED BY cy) MULTIPLIED BY (bx MINUS ax)  
+            SET uy TO uy_numerator DIVIDED BY d  
+            SET distance_x TO ux MINUS ax  
+            SET distance_y TO uy MINUS ay  
+            SET distance_x_squared TO distance_x MULTIPLIED BY distance_x  
+            SET distance_y_squared TO distance_y MULTIPLIED BY distance_y  
+            SET radius TO the square root of (distance_x_squared PLUS distance_y_squared)  
+            RETURN a list consisting of ux and uy, radius  
+        END FUNCTION  
+
+        FUNCTION welzl(points, boundary, n)  
+            IF n EQUALS zero OR the LENGTH OF boundary EQUALS three  
+                IF the LENGTH OF boundary EQUALS zero  
+                    RETURN a list consisting of zero and zero, zero  
+                ELSE IF the LENGTH OF boundary EQUALS one  
+                    RETURN the first element of boundary, zero  
+                ELSE IF the LENGTH OF boundary EQUALS two  
+                    SET center_x TO (the first element of the first element of boundary PLUS the first element of the second element of boundary) DIVIDED BY two  
+                    SET center_y TO (the second element of the first element of boundary PLUS the second element of the second element of boundary) DIVIDED BY two  
+                    SET center TO a list consisting of center_x and center_y  
+                    SET radius TO the square root of dist_sq(the first element of boundary, the second element of boundary) DIVIDED BY two  
+                    RETURN center, radius  
+                ELSE  
+                    RETURN circumcenter(the first element of boundary, the second element of boundary, the third element of boundary)  
+                END IF  
+            END IF  
+            SET p TO the element at position n MINUS one of points  
+            SET center, radius TO welzl(points, boundary, n MINUS one)  
+            IF dist_sq(center, p) LESS THAN OR EQUAL TO radius MULTIPLIED BY radius  
+                RETURN center, radius  
+            END IF  
+            RETURN welzl(points, boundary APPENDED WITH p, n MINUS one)  
+        END FUNCTION  
+
+        CALL a random shuffle on trees  
+        SET center, radius TO welzl(trees, an empty list, the LENGTH OF trees)  
+        RETURN a list consisting of the first element of center, the second element of center, radius  
+    END FUNCTION  
+END CLASS

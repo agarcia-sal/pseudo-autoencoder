@@ -1,0 +1,35 @@
+CLASS Solution  
+    FUNCTION maximalPathQuality(values nodes_valuesList OF integer, edges nodes_edgesList OF list OF integer, maxTime time_limit AS integer) AS integer  
+        SET graph_structure TO an empty mapping with default value as an empty list  
+        FOR each edge consisting of node_u destination_node_v travel_time IN nodes_edgesList  
+            APPEND the pair of destination_node_v AND travel_time TO the list at key node_u IN graph_structure  
+            APPEND the pair of node_u AND travel_time TO the list at key destination_node_v IN graph_structure  
+        END FOR  
+        
+        SET visited_nodes TO an empty set  
+        SET maximum_quality TO zero  
+        
+        FUNCTION dfs(current_node, remaining_time AS integer, accumulated_quality AS integer)  
+            IF current_node EQUALS zero  
+                SET maximum_quality TO the greater value BETWEEN maximum_quality AND accumulated_quality  
+            END IF  
+            
+            FOR each neighbor_node AND travel_time IN the list at key current_node IN graph_structure  
+                IF travel_time IS LESS THAN OR EQUAL TO remaining_time  
+                    IF neighbor_node IS NOT IN visited_nodes  
+                        ADD neighbor_node TO visited_nodes  
+                        CALL dfs with neighbor_node, remaining_time MINUS travel_time, accumulated_quality PLUS the element at position neighbor_node OF nodes_valuesList  
+                        REMOVE neighbor_node FROM visited_nodes  
+                    ELSE  
+                        CALL dfs with neighbor_node, remaining_time MINUS travel_time, accumulated_quality  
+                    END IF  
+                END IF  
+            END FOR  
+        END FUNCTION  
+        
+        ADD zero TO visited_nodes  
+        CALL dfs with zero, time_limit, the element at position zero OF nodes_valuesList  
+        
+        RETURN maximum_quality  
+    END FUNCTION  
+END CLASS

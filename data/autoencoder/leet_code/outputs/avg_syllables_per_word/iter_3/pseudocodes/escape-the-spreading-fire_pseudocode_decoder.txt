@@ -1,0 +1,63 @@
+CLASS Solution
+    FUNCTION maximumMinutes(grid)
+        SET m TO LENGTH OF grid
+        SET n TO LENGTH OF grid[0]
+        SET directions TO LIST OF (1, 0), (-1, 0), (0, 1), (0, -1)
+        
+        FUNCTION can_escape(wait)
+            SET fire_times TO 2D LIST OF size m by n FILLED WITH infinity
+            SET queue TO EMPTY DEQUE
+            
+            FOR i FROM 0 TO m - 1
+                FOR j FROM 0 TO n - 1
+                    IF grid[i][j] EQUALS 1 THEN
+                        APPEND (i, j, 0) TO queue
+                        SET fire_times[i][j] TO 0
+            
+            WHILE queue IS NOT EMPTY
+                SET (x, y, t) TO REMOVE FIRST ELEMENT OF queue
+                FOR EACH (dx, dy) IN directions
+                    SET nx TO x + dx
+                    SET ny TO y + dy
+                    IF nx BETWEEN 0 AND m - 1 AND ny BETWEEN 0 AND n - 1 AND grid[nx][ny] EQUALS 0 AND fire_times[nx][ny] IS infinity THEN
+                        SET fire_times[nx][ny] TO t + 1
+                        APPEND (nx, ny, t + 1) TO queue
+            
+            SET queue TO DEQUE CONTAINING (0, 0, wait)
+            SET visited TO SET CONTAINING (0, 0)
+            
+            WHILE queue IS NOT EMPTY
+                SET (x, y, t) TO REMOVE FIRST ELEMENT OF queue
+                FOR EACH (dx, dy) IN directions
+                    SET nx TO x + dx
+                    SET ny TO y + dy
+                    IF nx BETWEEN 0 AND m - 1 AND ny BETWEEN 0 AND n - 1 AND (nx, ny) NOT IN visited AND grid[nx][ny] EQUALS 0 THEN
+                        IF nx EQUALS m - 1 AND ny EQUALS n - 1 THEN
+                            IF fire_times[nx][ny] GREATER OR EQUAL TO t + 1 THEN
+                                RETURN True
+                            ELSE
+                                RETURN False
+                        IF fire_times[nx][ny] GREATER THAN t + 1 THEN
+                            ADD (nx, ny) TO visited
+                            APPEND (nx, ny, t + 1) TO queue
+            
+            RETURN False
+        
+        SET left TO 0
+        SET right TO m * n
+        SET result TO -1
+        
+        WHILE left LESS OR EQUAL TO right
+            SET mid TO (left + right) DIVIDED BY 2
+            IF can_escape(mid) THEN
+                SET result TO mid
+                SET left TO mid + 1
+            ELSE
+                SET right TO mid - 1
+        
+        IF result EQUALS m * n THEN
+            RETURN 1000000000
+        ELSE
+            RETURN result
+    END FUNCTION
+END CLASS

@@ -1,0 +1,61 @@
+CLASS Solution  
+    FUNCTION minimumDifference(nums)  
+        SET n TO the LENGTH OF nums DIVIDED BY two  
+        SET total_sum TO the SUM OF nums  
+        SET target TO total_sum DIVIDED BY two  
+        SET min_diff TO a value representing positive infinity  
+        
+        SET left_half TO the SUBLIST OF nums FROM the FIRST POSITION TO position n MINUS one  
+        SET right_half TO the SUBLIST OF nums FROM position n TO the LAST POSITION OF nums  
+        
+        SET left_sums TO a LIST OF empty MAPS with LENGTH n PLUS one  
+        SET right_sums TO a LIST OF empty MAPS with LENGTH n PLUS one  
+        
+        FOR each integer i FROM zero TO n INCLUSIVE  
+            FOR each combination combo OF length i FROM left_half  
+                SET subset_sum TO the SUM OF elements IN combo  
+                IF subset_sum IS NOT A KEY IN the MAP at position i OF left_sums THEN  
+                    SET the VALUE at key subset_sum IN the MAP at position i OF left_sums TO zero  
+                END IF  
+                INCREMENT the VALUE at key subset_sum IN the MAP at position i OF left_sums BY one  
+            END FOR  
+            
+            FOR each combination combo OF length i FROM right_half  
+                SET subset_sum TO the SUM OF elements IN combo  
+                IF subset_sum IS NOT A KEY IN the MAP at position i OF right_sums THEN  
+                    SET the VALUE at key subset_sum IN the MAP at position i OF right_sums TO zero  
+                END IF  
+                INCREMENT the VALUE at key subset_sum IN the MAP at position i OF right_sums BY one  
+            END FOR  
+        END FOR  
+        
+        FOR each integer i FROM zero TO n INCLUSIVE  
+            SET left_values TO the SORTED list of KEYS FROM the MAP at position i OF left_sums  
+            SET right_values TO the SORTED list of KEYS FROM the MAP at position n MINUS i OF right_sums  
+            
+            SET j TO zero  
+            SET k TO the LENGTH OF right_values MINUS one  
+            
+            WHILE j IS LESS THAN the LENGTH OF left_values AND k IS GREATER THAN OR EQUAL TO zero  
+                SET current_sum TO the ELEMENT at position j OF left_values PLUS the ELEMENT at position k OF right_values  
+                SET candidate_diff TO total_sum MINUS two MULTIPLIED BY current_sum  
+                IF candidate_diff IS LESS THAN zero THEN  
+                    SET candidate_diff TO the NEGATION of candidate_diff  
+                END IF  
+                IF candidate_diff IS LESS THAN min_diff THEN  
+                    SET min_diff TO candidate_diff  
+                END IF  
+                
+                IF current_sum IS LESS THAN target THEN  
+                    INCREMENT j BY one  
+                ELSE IF current_sum IS GREATER THAN target THEN  
+                    DECREMENT k BY one  
+                ELSE  
+                    RETURN zero  
+                END IF  
+            END WHILE  
+        END FOR  
+        
+        RETURN min_diff  
+    END FUNCTION  
+END CLASS

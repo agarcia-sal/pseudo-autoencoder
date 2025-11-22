@@ -1,0 +1,53 @@
+CLASS Solution  
+    FUNCTION shortestPathAllKeys(grid)  
+        SET directions TO list containing pairs of zero and one zero and negative one and zero one and negative one and zero zero and negative one  
+        SET number_of_rows TO the LENGTH OF grid  
+        SET number_of_columns TO the LENGTH OF the element at position zero of grid  
+        SET start_position TO no value assigned  
+        SET number_of_keys TO zero  
+        FOR index_i FROM zero TO number_of_rows MINUS one  
+            FOR index_j FROM zero TO number_of_columns MINUS one  
+                SET current_cell TO element at position index_i of grid THEN element at position index_j of that element  
+                IF current_cell EQUALS the character at position zero of string that is at position zero of the string of the at symbol  
+                    SET start_position TO pair of index_i and index_j  
+                ELSE IF current_cell IS A lowercase letter  
+                    INCREMENT number_of_keys BY one  
+                END IF  
+            END FOR  
+        END FOR  
+        SET queue TO a new double ended queue initialized with a tuple containing the first element of start_position the second element of start_position zero zero  
+        SET visited_states TO a new set initialized with a tuple containing the first element of start_position the second element of start_position zero  
+        WHILE queue IS NOT empty  
+            REMOVE the element from the front of queue and SET the unpacked values TO position_x position_y collected_keys steps_taken  
+            FOR each delta_x delta_y IN directions  
+                SET new_x TO position_x PLUS delta_x  
+                SET new_y TO position_y PLUS delta_y  
+                IF new_x IS GREATER THAN OR EQUAL TO zero AND new_x IS LESS THAN number_of_rows AND new_y IS GREATER THAN OR EQUAL TO zero AND new_y IS LESS THAN number_of_columns  
+                    SET next_cell TO element at position new_x of grid THEN element at position new_y of that element  
+                    IF next_cell EQUALS the character at position zero of string that is at position zero of the string of the hash symbol  
+                        CONTINUE to the next iteration of the FOR loop  
+                    END IF  
+                    IF next_cell IS AN uppercase letter  
+                        SET required_key_bitmask TO one SHIFT LEFT BY the difference between the Unicode code point of the lowercase version of next_cell AND the Unicode code point of the lowercase letter a  
+                        IF the bitwise AND of collected_keys AND required_key_bitmask EQUALS zero  
+                            CONTINUE to the next iteration of the FOR loop  
+                        END IF  
+                    END IF  
+                    IF next_cell IS A lowercase letter  
+                        SET new_collected_keys TO the bitwise OR of collected_keys AND one SHIFT LEFT BY the difference between the Unicode code point of next_cell AND the Unicode code point of the lowercase letter a  
+                        IF new_collected_keys EQUALS one SHIFT LEFT BY number_of_keys MINUS one  
+                            RETURN steps_taken PLUS one  
+                        END IF  
+                    ELSE  
+                        SET new_collected_keys TO collected_keys  
+                    END IF  
+                    IF the tuple containing new_x new_y new_collected_keys IS NOT IN visited_states  
+                        ADD the tuple containing new_x new_y new_collected_keys TO visited_states  
+                        APPEND the tuple containing new_x new_y new_collected_keys steps_taken PLUS one TO queue  
+                    END IF  
+                END IF  
+            END FOR  
+        END WHILE  
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

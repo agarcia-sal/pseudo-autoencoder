@@ -1,0 +1,30 @@
+CLASS Solution
+    FUNCTION minInterval(list_of_intervals, list_of_queries)
+        CALL intervals SORTED IN PLACE BY the element at position zero of each interval
+        SET sorted_queries TO the LIST OF tuples each CONSISTING OF query AND original_index FOR each query AND original_index IN ENUMERATE list_of_queries SORTED BY query
+        
+        SET min_heap TO empty list
+        SET result TO list FILLED WITH negative one WITH THE LENGTH OF list_of_queries
+        
+        SET interval_index TO zero
+        FOR each query AND original_index IN sorted_queries
+            WHILE interval_index LESS THAN the LENGTH OF list_of_intervals AND element at position zero of element at position interval_index of list_of_intervals LESS THAN OR EQUAL TO query holds
+                SET start TO element at position zero of element at position interval_index of list_of_intervals
+                SET end TO element at position one of element at position interval_index of list_of_intervals
+                SET interval_size TO end MINUS start PLUS one
+                CALL PUSH TO min_heap WITH tuple of interval_size AND end
+                INCREMENT interval_index BY one
+            END WHILE
+            
+            WHILE min_heap IS NOT empty AND the element at position one of the element at position zero of min_heap LESS THAN query holds
+                CALL POP FROM min_heap
+            END WHILE
+            
+            IF min_heap IS NOT empty
+                SET element at position original_index of result TO the element at position zero of the element at position zero of min_heap
+            END IF
+        END FOR
+        
+        RETURN result
+    END FUNCTION
+END CLASS

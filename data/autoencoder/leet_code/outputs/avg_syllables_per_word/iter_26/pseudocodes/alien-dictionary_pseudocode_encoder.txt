@@ -1,0 +1,48 @@
+CLASS Solution
+    FUNCTION alienOrder(words)
+        SET graph TO a mapping with default value as an empty set
+        SET indegree TO a mapping with default value as zero
+
+        SET all_chars TO the set of all characters contained in the concatenation of all words in the input list
+
+        FOR index FROM zero TO the LENGTH OF words MINUS one EXCLUSIVE
+            SET word1 TO element at position index OF words
+            SET word2 TO element at position index plus one OF words
+            SET min_length TO the smaller of the LENGTH OF word1 AND the LENGTH OF word2
+            SET found TO false
+            FOR position FROM zero TO min_length EXCLUSIVE
+                IF element at position position OF word1 NOT EQUALS element at position position OF word2
+                    IF element at position position OF word2 NOT IN the set mapped from element at position position OF word1 IN graph
+                        ADD element at position position OF word2 TO the set mapped from element at position position OF word1 IN graph
+                        INCREMENT the mapping value for element at position position OF word2 IN indegree BY one
+                    END IF
+                    SET found TO true
+                    BREAK out of the inner FOR loop
+                END IF
+            END FOR
+            IF found IS false AND the LENGTH OF word1 GREATER THAN the LENGTH OF word2
+                RETURN an empty string
+            END IF
+        END FOR
+
+        SET queue TO a double ended queue initialized with all characters in all_chars for which the value in indegree mapping EQUALS zero
+        SET result TO an empty list
+
+        WHILE queue HOLDS elements
+            SET char TO the element removed from the left end of queue
+            APPEND char TO result
+            FOR each neighbor IN the set mapped from char IN graph
+                DECREMENT the mapping value for neighbor IN indegree BY one
+                IF the mapping value for neighbor IN indegree EQUALS zero
+                    APPEND neighbor TO queue
+                END IF
+            END FOR
+        END WHILE
+
+        IF the LENGTH OF result NOT EQUALS the LENGTH OF all_chars
+            RETURN an empty string
+        END IF
+
+        RETURN the concatenation of elements in result AS a single string
+    END FUNCTION
+END CLASS

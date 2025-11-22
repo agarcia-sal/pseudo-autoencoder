@@ -1,0 +1,16 @@
+def genAbbr(word):
+    def bt(i, p, c):
+        if i == len(word):
+            if c > 0:
+                p += [str(c)]
+            res.append(''.join(p))
+        else:
+            if c > 0:
+                bt(i + 1, p + [str(c), word[i]], 0)
+            else:
+                bt(i + 1, p + [word[i]], 0)
+            bt(i + 1, p, c + 1)
+
+    res = []
+    bt(0, [], 0)
+    return res

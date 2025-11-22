@@ -1,0 +1,31 @@
+CLASS Solution  
+    FUNCTION countSmaller(nums AS List of integer) RETURNS List of integer  
+        SET sorted_nums TO the SORTED COLLECTION OF the UNIQUE ELEMENTS IN nums  
+        SET rank TO an EMPTY MAPPING FROM integer TO integer  
+        FOR each pair OF index AND val IN the ENUMERATION OF sorted_nums  
+            SET key in rank MAPPING AS val TO index PLUS one  
+        END FOR  
+        SET bit TO a LIST OF zeroes WITH the LENGTH OF sorted_nums PLUS one  
+        FUNCTION get_sum(idx AS integer) RETURNS integer  
+            SET res TO zero  
+            WHILE idx IS GREATER THAN zero  
+                INCREMENT res BY the element at position idx OF bit  
+                DECREMENT idx BY the result of idx AND NEGATION OF idx  
+            END WHILE  
+            RETURN res  
+        END FUNCTION  
+        FUNCTION update(idx AS integer, delta AS integer)  
+            WHILE idx IS LESS THAN the LENGTH OF bit  
+                INCREMENT the element at position idx OF bit BY delta  
+                INCREMENT idx BY the result of idx AND NEGATION OF idx  
+            END WHILE  
+        END FUNCTION  
+        SET counts TO an EMPTY LIST  
+        FOR each num IN the REVERSED COLLECTION OF nums  
+            SET r TO the element in rank MAPPING at key num  
+            APPEND the RESULT OF get_sum WITH argument r MINUS one TO counts  
+            CALL update WITH arguments r AND one  
+        END FOR  
+        RETURN the REVERSED COLLECTION OF counts  
+    END FUNCTION  
+END CLASS

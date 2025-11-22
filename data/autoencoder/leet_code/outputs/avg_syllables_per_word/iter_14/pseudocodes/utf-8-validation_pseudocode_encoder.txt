@@ -1,0 +1,35 @@
+CLASS Solution  
+    FUNCTION validUtf8 WITH PARAMETER data AS list of integers  
+        FUNCTION get_byte_count WITH PARAMETER byte AS integer  
+            IF byte SHIFTED RIGHT BY seven BITS IS EQUAL TO zero  
+                RETURN one  
+            ELSE IF byte SHIFTED RIGHT BY five BITS IS EQUAL TO binary one one zero  
+                RETURN two  
+            ELSE IF byte SHIFTED RIGHT BY four BITS IS EQUAL TO binary one one one zero  
+                RETURN three  
+            ELSE IF byte SHIFTED RIGHT BY three BITS IS EQUAL TO binary one one one one zero  
+                RETURN four  
+            ELSE  
+                RETURN negative one  
+            END IF  
+        END FUNCTION  
+        
+        SET i TO zero  
+        WHILE i IS LESS THAN the LENGTH OF data  
+            SET byte_count TO get_byte_count WITH ARGUMENT element at position i OF data  
+            IF byte_count IS EQUAL TO negative one  
+                RETURN False  
+            END IF  
+            IF i PLUS byte_count IS GREATER THAN the LENGTH OF data  
+                RETURN False  
+            END IF  
+            FOR j FROM i PLUS one TO i PLUS byte_count MINUS one  
+                IF element at position j OF data SHIFTED RIGHT BY six BITS IS NOT EQUAL TO binary one zero  
+                    RETURN False  
+                END IF  
+            END FOR  
+            INCREMENT i BY byte_count  
+        END WHILE  
+        RETURN True  
+    END FUNCTION  
+END CLASS

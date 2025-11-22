@@ -1,0 +1,45 @@
+CLASS Solution  
+    FUNCTION openLock(deadends, target)  
+        SET deadends_set TO CONVERT deadends TO set  
+        
+        IF "0000" IN deadends_set THEN  
+            RETURN -1  
+        END IF  
+        
+        IF target EQUALS "0000" THEN  
+            RETURN 0  
+        END IF  
+        
+        SET queue TO INITIALIZE deque WITH ("0000", 0)  
+        SET visited TO INITIALIZE set WITH "0000"  
+        
+        FUNCTION neighbors(state)  
+            SET result TO EMPTY list  
+            FOR i FROM 0 TO 3  
+                SET digit TO CONVERT character AT position i OF state TO integer  
+                FOR move IN [-1, 1]  
+                    SET new_digit TO (digit PLUS move) MODULO 10  
+                    SET new_state TO CONCATENATE substring OF state BEFORE i, STRING OF new_digit, substring OF state AFTER i  
+                    APPEND new_state TO result  
+                END FOR  
+            END FOR  
+            RETURN result  
+        END FUNCTION  
+        
+        WHILE queue IS NOT EMPTY  
+            SET current_state, steps TO REMOVE first element FROM queue  
+            
+            FOR neighbor IN neighbors(current_state)  
+                IF neighbor NOT IN visited AND neighbor NOT IN deadends_set THEN  
+                    IF neighbor EQUALS target THEN  
+                        RETURN steps PLUS 1  
+                    END IF  
+                    ADD neighbor TO visited  
+                    APPEND (neighbor, steps PLUS 1) TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN -1  
+    END FUNCTION  
+END CLASS

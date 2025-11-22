@@ -1,0 +1,61 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.parent TO list of integers FROM zero TO size MINUS one  
+    END FUNCTION  
+
+    FUNCTION find(self, u)  
+        IF element at position u of self.parent NOT EQUALS u THEN  
+            SET element at position u of self.parent TO result of self.find with argument element at position u of self.parent  
+        END IF  
+        RETURN element at position u of self.parent  
+    END FUNCTION  
+
+    FUNCTION union(self, u, v)  
+        SET root_u TO result of self.find with argument u  
+        SET root_v TO result of self.find with argument v  
+        IF root_u NOT EQUALS root_v THEN  
+            SET element at position root_u of self.parent TO root_v  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION matrixRankTransform(self, matrix)  
+        SET m TO the LENGTH OF matrix  
+        SET n TO the LENGTH OF element at position zero of matrix  
+        SET value_to_indices TO a new dictionary where each key returns an empty list by default  
+        
+        FOR r FROM zero TO m MINUS one  
+            FOR c FROM zero TO n MINUS one  
+                APPEND the pair of r AND c TO list at key element at position r of matrix at position c of value_to_indices  
+            END FOR  
+        END FOR  
+        
+        SET row_rank TO a list of zeros with LENGTH m  
+        SET col_rank TO a list of zeros with LENGTH n  
+        SET result TO a list with m elements where each element is a list of zeros with LENGTH n  
+        
+        FOR each value IN keys of value_to_indices sorted in ascending order  
+            SET uf TO a new instance of UnionFind with argument m PLUS n  
+            SET rank TO a new dictionary where each key returns integer zero by default  
+            
+            FOR each pair r AND c IN list at key value of value_to_indices  
+                CALL uf.union with arguments r AND c PLUS m  
+            END FOR  
+            
+            FOR each pair r AND c IN list at key value of value_to_indices  
+                SET root TO result of uf.find with argument r  
+                SET rank at key root TO the maximum of current value at rank key root AND the maximum of element at position r of row_rank AND element at position c of col_rank PLUS one  
+            END FOR  
+            
+            FOR each pair r AND c IN list at key value of value_to_indices  
+                SET root TO result of uf.find with argument r  
+                SET element at position r AND c of result TO value at rank key root  
+                SET element at position r of row_rank TO value at rank key root  
+                SET element at position c of col_rank TO value at rank key root  
+            END FOR  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

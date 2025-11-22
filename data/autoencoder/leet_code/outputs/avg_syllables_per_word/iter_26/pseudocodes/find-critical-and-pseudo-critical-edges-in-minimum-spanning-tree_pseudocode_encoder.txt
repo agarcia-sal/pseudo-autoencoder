@@ -1,0 +1,85 @@
+CLASS UnionFind
+    FUNCTION __init__(self, number_of_elements)
+        SET self.parent TO list of elements representing positions from zero TO number_of_elements MINUS one
+        SET self.rank TO list where each element IS one WITH total length number_of_elements
+    END FUNCTION
+
+    FUNCTION find(self, element_u)
+        IF element at position element_u OF self.parent IS NOT EQUAL TO element_u THEN
+            SET element at position element_u OF self.parent TO self.find(element at position element_u OF self.parent)
+        END IF
+        RETURN element at position element_u OF self.parent
+    END FUNCTION
+
+    FUNCTION union(self, element_u, element_v)
+        SET rootU TO self.find(element_u)
+        SET rootV TO self.find(element_v)
+
+        IF rootU IS NOT EQUAL TO rootV THEN
+            IF element at position rootU OF self.rank IS GREATER THAN element at position rootV OF self.rank THEN
+                SET element at position rootV OF self.parent TO rootU
+            ELSE IF element at position rootU OF self.rank IS LESS THAN element at position rootV OF self.rank THEN
+                SET element at position rootU OF self.parent TO rootV
+            ELSE
+                SET element at position rootV OF self.parent TO rootU
+                INCREMENT element at position rootU OF self.rank BY one
+            END IF
+            RETURN True
+        END IF
+        RETURN False
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION findCriticalAndPseudoCriticalEdges(self, number_of_vertices, list_of_edges)
+        FOR index_position, current_edge IN enumeration of list_of_edges
+            APPEND index_position TO current_edge
+        END FOR
+
+        SORT list_of_edges BY element at position two OF each edge IN ascending order
+
+        FUNCTION mst(exclude_edge = none_value, include_edge = none_value)
+            SET uf TO new UnionFind instance WITH number_of_vertices
+            SET total_weight TO zero
+
+            IF include_edge IS NOT none_value THEN
+                CALL uf.union WITH the first element OF include_edge AND the second element OF include_edge
+                INCREMENT total_weight BY the third element OF include_edge
+            END IF
+
+            FOR each edge_u, edge_v, edge_weight, edge_index IN list_of_edges
+                IF edge_index IS EQUAL TO exclude_edge THEN
+                    CONTINUE to next iteration
+                END IF
+                IF uf.union(edge_u, edge_v) RETURNS True THEN
+                    INCREMENT total_weight BY edge_weight
+                END IF
+            END FOR
+
+            SET root_of_zero TO uf.find(zero)
+
+            FOR index FROM zero TO number_of_vertices MINUS one INCLUSIVE
+                IF uf.find(index) IS NOT EQUAL TO root_of_zero THEN
+                    RETURN infinite quantity
+                END IF
+            END FOR
+
+            RETURN total_weight
+        END FUNCTION
+
+        SET minimum_spanning_tree_weight TO result of calling mst with default arguments
+
+        SET list_of_critical_edges TO empty list
+        SET list_of_pseudo_critical_edges TO empty list
+
+        FOR each edge_u, edge_v, edge_weight, edge_index IN list_of_edges
+            IF result of calling mst WITH exclude_edge EQUAL TO edge_index IS GREATER THAN minimum_spanning_tree_weight THEN
+                APPEND edge_index TO list_of_critical_edges
+            ELSE IF result of calling mst WITH include_edge EQUAL TO tuple OF edge_u, edge_v, edge_weight IS EQUAL TO minimum_spanning_tree_weight THEN
+                APPEND edge_index TO list_of_pseudo_critical_edges
+            END IF
+        END FOR
+
+        RETURN a list containing list_of_critical_edges and list_of_pseudo_critical_edges
+    END FUNCTION
+END CLASS

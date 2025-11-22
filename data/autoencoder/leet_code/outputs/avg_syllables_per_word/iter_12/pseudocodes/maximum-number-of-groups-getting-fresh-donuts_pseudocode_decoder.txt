@@ -1,0 +1,41 @@
+CLASS Solution  
+    FUNCTION maxHappyGroups(batchSize, groups)  
+        IF batchSize EQUALS one  
+            RETURN the LENGTH OF groups  
+        END IF  
+        
+        SET remainder_count TO a list of zero repeated batchSize times  
+        FOR each group IN groups  
+            INCREMENT element at position (group MINUS (group DIVIDED BY batchSize MULTIPLIED BY batchSize)) OF remainder_count BY one  
+        END FOR  
+        
+        FUNCTION dp(remainder, remainder_count_parameters)  
+            SET remainder_count TO remainder_count_parameters CONVERTED TO a list  
+            SET max_happy TO zero  
+            
+            FOR i FROM zero TO batchSize MINUS one  
+                IF element at position i OF remainder_count EQUALS zero  
+                    CONTINUE to next iteration  
+                END IF  
+                
+                DECREMENT element at position i OF remainder_count BY one  
+                SET new_remainder TO remainder MINUS i PLUS batchSize THEN MODULO batchSize  
+                
+                IF remainder EQUALS zero  
+                    SET happy_groups TO one PLUS dp(new_remainder, elements of remainder_count)  
+                ELSE  
+                    SET happy_groups TO dp(new_remainder, elements of remainder_count)  
+                END IF  
+                
+                IF happy_groups GREATER THAN max_happy  
+                    SET max_happy TO happy_groups  
+                END IF  
+                
+                INCREMENT element at position i OF remainder_count BY one  
+            END FOR  
+            
+            RETURN max_happy  
+        END FUNCTION  
+        
+        RETURN dp(zero, elements of remainder_count)  
+END CLASS

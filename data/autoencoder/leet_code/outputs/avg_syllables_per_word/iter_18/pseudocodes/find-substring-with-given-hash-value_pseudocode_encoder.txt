@@ -1,0 +1,35 @@
+CLASS Solution  
+    FUNCTION subStrHash(s AS string power AS integer modulo AS integer k AS integer hashValue AS integer) RETURNS string  
+        FUNCTION val(c AS character) RETURNS integer  
+            RETURN the Unicode code point of character c MINUS the Unicode code point of lowercase letter a PLUS one  
+        END FUNCTION  
+
+        SET n TO the LENGTH OF string s  
+        SET current_hash TO zero  
+        SET p_pow TO one  
+
+        FOR each index i FROM n MINUS k TO n MINUS one  
+            SET current_hash TO the REMAINDER AFTER DIVIDING the SUM of current_hash AND the PRODUCT of val(character at position i of s) AND p_pow BY modulo  
+            IF index i LESS THAN n MINUS one THEN  
+                SET p_pow TO the REMAINDER AFTER DIVIDING the PRODUCT of p_pow AND power BY modulo  
+            END IF  
+        END FOR  
+
+        SET start_index TO n MINUS k  
+        IF current_hash EQUALS hashValue THEN  
+            RETURN the SUBSTRING of s STARTING AT start_index  
+        END IF  
+
+        SET p_pow_k_minus_1 TO p_pow  
+
+        FOR each index i FROM n MINUS k MINUS one DOWN TO zero  
+            SET current_hash TO the REMAINDER AFTER DIVIDING the DIFFERENCE of current_hash AND the PRODUCT of val(character at position i PLUS k of s) AND p_pow_k_minus_1 BY modulo  
+            SET current_hash TO the REMAINDER AFTER DIVIDING the SUM of the PRODUCT of current_hash AND power AND val(character at position i of s) BY modulo  
+            IF current_hash EQUALS hashValue THEN  
+                SET start_index TO i  
+            END IF  
+        END FOR  
+
+        RETURN the SUBSTRING of s STARTING AT start_index WITH LENGTH k  
+    END FUNCTION  
+END CLASS

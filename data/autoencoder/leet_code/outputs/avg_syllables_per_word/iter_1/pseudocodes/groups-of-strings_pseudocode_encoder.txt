@@ -1,0 +1,40 @@
+``` 
+init UnionFind(n): parent = [0..n-1], rank=[0]*n, size=[1]*n
+UF.find(u): while parent[u] != u: parent[u] = parent[parent[u]]; u = parent[u]; return u
+UF.union(u,v):
+  ru, rv = find(u), find(v)
+  if ru != rv:
+    if rank[ru] > rank[rv]: parent[rv] = ru; size[ru]+=size[rv]
+    elif rank[ru] < rank[rv]: parent[ru] = rv; size[rv]+=size[ru]
+    else: parent[rv] = ru; size[ru]+=size[rv]; rank[ru]+=1
+
+bitmask(w): m=0; for c in w: m |= 1 << (ord(c)-ord('a')); return m
+
+groupStrings(words):
+  n=len(words)
+  uf=UnionFind(n)
+  wm=defaultdict(list)
+  for i,w in enumerate(words): wm[bitmask(w)].append(i)
+
+  for i,w in enumerate(words):
+    m=bitmask(w)
+    for j in 0..25:
+      # delete letter j
+      nm = m ^ (1 << j)
+      if nm in wm: for k in wm[nm]: uf.union(i,k)
+      # add letter j
+      if (m & (1 << j)) == 0:
+        nm = m | (1 << j)
+        if nm in wm: for k in wm[nm]: uf.union(i,k)
+      # replace letter j with k
+      if m & (1 << j):
+        for k in 0..25:
+          if (m & (1 << k)) == 0:
+            nm = (m ^ (1 << j)) | (1 << k)
+            if nm in wm: for l in wm[nm]: uf.union(i,l)
+
+  roots=defaultdict(int)
+  for i in 0..n-1: roots[uf.find(i)] += 1
+
+  return [len(roots), max(roots.values())]
+```

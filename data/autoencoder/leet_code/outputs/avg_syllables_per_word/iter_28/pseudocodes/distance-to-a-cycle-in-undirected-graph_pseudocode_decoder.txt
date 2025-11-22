@@ -1,0 +1,61 @@
+CLASS Solution  
+    FUNCTION distanceToCycle(n, edges)  
+        SET graph TO an empty default dictionary where each key maps to an empty list  
+        FOR each pair of elements u and v IN edges  
+            APPEND element v TO the list corresponding to key u in graph  
+            APPEND element u TO the list corresponding to key v in graph  
+        END FOR  
+        
+        FUNCTION dfs(node, parent, path, visited)  
+            IF element node IN visited THEN  
+                SET cycle_start TO the position of first occurrence of node in path  
+                RETURN the sublist of path from position cycle_start TO the end of path  
+            END IF  
+            ADD element node TO visited  
+            APPEND element node TO path  
+            FOR each neighbor IN the list corresponding to key node in graph  
+                IF neighbor NOT EQUALS parent THEN  
+                    SET cycle TO the result of calling dfs with parameters neighbor, node, path, and visited  
+                    IF cycle is not null THEN  
+                        RETURN cycle  
+                    END IF  
+                END IF  
+            END FOR  
+            REMOVE the last element from path  
+            RETURN null  
+        END FUNCTION  
+        
+        SET visited TO an empty set  
+        SET cycle TO null  
+        FOR each integer node FROM zero TO the value n MINUS one  
+            IF node NOT IN visited THEN  
+                SET cycle TO the result of calling dfs with parameters node, negative one, an empty list, and visited  
+                IF cycle is not null THEN  
+                    STOP the loop  
+                END IF  
+            END IF  
+        END FOR  
+        
+        SET distance TO a list of length n where each element is zero  
+        SET queue TO a deque initialized with the elements in cycle  
+        SET visited TO a set initialized with the elements in cycle  
+        
+        SET level TO zero  
+        WHILE queue is not empty DO  
+            SET iteration_count TO the number of elements currently in queue  
+            FOR each integer from zero TO iteration_count MINUS one  
+                REMOVE and retrieve the leftmost element of queue into variable node  
+                SET element at position node in distance TO level  
+                FOR each neighbor IN the list corresponding to key node in graph  
+                    IF neighbor NOT IN visited THEN  
+                        ADD element neighbor TO visited  
+                        APPEND element neighbor TO queue  
+                    END IF  
+                END FOR  
+            END FOR  
+            INCREMENT level BY one  
+        END WHILE  
+        
+        RETURN distance  
+    END FUNCTION  
+END CLASS

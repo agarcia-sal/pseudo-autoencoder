@@ -1,0 +1,11 @@
+special = [offer for offer in special if sum(offer[:-1]) > 0 and offer[-1] < sum(p * n for p, n in zip(price, offer[:-1]))]
+
+def dfs(needs):
+    min_cost = sum(p * n for p, n in zip(price, needs))
+    for offer in special:
+        new_needs = [n - o for n, o in zip(needs, offer[:-1])]
+        if all(n >= 0 for n in new_needs):
+            min_cost = min(min_cost, offer[-1] + dfs(tuple(new_needs)))
+    return min_cost
+
+return dfs(tuple(needs))

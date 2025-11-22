@@ -1,0 +1,65 @@
+CLASS Solution  
+    FUNCTION numPoints(darts, r)  
+        FUNCTION distance(p1, p2)  
+            SET delta_x TO element at position zero OF p1 MINUS element at position zero OF p2  
+            SET delta_y TO element at position one OF p1 MINUS element at position one OF p2  
+            SET square_delta_x TO delta_x MULTIPLIED BY delta_x  
+            SET square_delta_y TO delta_y MULTIPLIED BY delta_y  
+            SET sum_of_squares TO square_delta_x PLUS square_delta_y  
+            SET result TO square root of sum_of_squares  
+            RETURN result  
+        END FUNCTION  
+  
+        FUNCTION circle_center(p1, p2, r)  
+            SET d TO distance of p1 and p2  
+            IF d GREATER THAN two MULTIPLIED BY r  
+                RETURN None  
+            END IF  
+            SET a TO square root of r MULTIPLIED BY r MINUS d DIVIDED BY two MULTIPLIED BY d DIVIDED BY two  
+            SET midpoint_x TO element at position zero OF p1 PLUS element at position zero OF p2 DIVIDED BY two  
+            SET midpoint_y TO element at position one OF p1 PLUS element at position one OF p2 DIVIDED BY two  
+            SET dx TO element at position one OF p2 MINUS element at position one OF p1 MULTIPLIED BY a DIVIDED BY d  
+            SET dy TO element at position zero OF p2 MINUS element at position zero OF p1 MULTIPLIED BY a DIVIDED BY d  
+            SET center_one TO pair of midpoint_x MINUS dx AND midpoint_y PLUS dy  
+            SET center_two TO pair of midpoint_x PLUS dx AND midpoint_y MINUS dy  
+            RETURN list containing center_one AND center_two  
+        END FUNCTION  
+  
+        FUNCTION is_inside(circle, point, r)  
+            SET dist TO distance of circle AND point  
+            IF dist LESS THAN OR EQUAL TO r  
+                RETURN True  
+            ELSE  
+                RETURN False  
+            END IF  
+        END FUNCTION  
+  
+        SET n TO LENGTH OF darts  
+        IF n EQUALS one  
+            RETURN one  
+        END IF  
+  
+        SET max_count TO one  
+  
+        FOR i FROM zero TO n MINUS one  
+            FOR j FROM i PLUS one TO n MINUS one  
+                SET centers TO circle_center of element at position i OF darts AND element at position j OF darts AND r  
+                IF centers NOT EQUALS None  
+                    FOR each center IN centers  
+                        SET count TO zero  
+                        FOR each dart IN darts  
+                            IF is_inside of center AND dart AND r  
+                                INCREMENT count BY one  
+                            END IF  
+                        END FOR  
+                        IF count GREATER THAN max_count  
+                            SET max_count TO count  
+                        END IF  
+                    END FOR  
+                END IF  
+            END FOR  
+        END FOR  
+  
+        RETURN max_count  
+    END FUNCTION  
+END CLASS

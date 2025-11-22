@@ -1,0 +1,60 @@
+CLASS Solution  
+    FUNCTION medianSlidingWindow(nums, k)  
+        SET lo TO empty list  
+        SET hi TO empty list  
+
+        FUNCTION balance_heaps()  
+            IF LENGTH OF lo GREATER THAN LENGTH OF hi PLUS 1  
+                MOVE top element FROM lo TO hi WITH inverted sign  
+            ELSE IF LENGTH OF hi GREATER THAN LENGTH OF lo  
+                MOVE top element FROM hi TO lo WITH inverted sign  
+            END IF  
+        END FUNCTION  
+
+        FUNCTION add_num(num)  
+            IF lo IS empty OR num LESS THAN OR EQUAL TO inverted top element OF lo  
+                ADD inverted num TO lo  
+            ELSE  
+                ADD num TO hi  
+            END IF  
+            CALL balance_heaps()  
+        END FUNCTION  
+
+        FUNCTION remove_num(num)  
+            IF num LESS THAN OR EQUAL TO inverted top element OF lo  
+                REMOVE inverted num FROM lo  
+                IF lo IS NOT empty  
+                    REARRANGE lo INTO HEAP  
+                END IF  
+            ELSE  
+                REMOVE num FROM hi  
+                IF hi IS NOT empty  
+                    REARRANGE hi INTO HEAP  
+                END IF  
+            END IF  
+            CALL balance_heaps()  
+        END FUNCTION  
+
+        FUNCTION get_median()  
+            IF LENGTH OF lo GREATER THAN LENGTH OF hi  
+                RETURN inverted top element OF lo  
+            ELSE  
+                RETURN AVERAGE OF inverted top element OF lo AND top element OF hi  
+            END IF  
+        END FUNCTION  
+
+        FOR i FROM 0 TO k MINUS 1  
+            CALL add_num WITH nums AT i  
+        END FOR  
+
+        SET medians TO LIST WITH get_median()  
+
+        FOR i FROM k TO LENGTH OF nums MINUS 1  
+            CALL add_num WITH nums AT i  
+            CALL remove_num WITH nums AT i MINUS k  
+            APPEND get_median() TO medians  
+        END FOR  
+
+        RETURN medians  
+    END FUNCTION  
+END CLASS

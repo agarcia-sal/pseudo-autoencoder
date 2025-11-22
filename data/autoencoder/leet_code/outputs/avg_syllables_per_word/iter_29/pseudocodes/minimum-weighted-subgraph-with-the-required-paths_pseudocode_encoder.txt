@@ -1,0 +1,57 @@
+CLASS Solution  
+    FUNCTION minimumWeight(number_of_nodes number_of_edges source_node_one source_node_two destination_node)  
+        FUNCTION dijkstra(graph_structure start_node)  
+            SET distances_to_all_nodes TO a list containing number_of_nodes instances of infinitely large value  
+            SET the element at position start_node of distances_to_all_nodes TO zero  
+            SET priority_queue TO a list containing a pair of zero and start_node  
+            
+            WHILE priority_queue is not empty  
+                REMOVE and RETURN the pair with the smallest first element from priority_queue ASSIGN TO current_distance and current_node  
+                
+                IF current_distance IS GREATER THAN the element at position current_node of distances_to_all_nodes THEN  
+                    CONTINUE to next iteration of the WHILE loop  
+                END IF  
+                
+                FOR each neighbor and edge_weight IN the element at position current_node of graph_structure  
+                    SET computed_distance TO current_distance PLUS edge_weight  
+                    
+                    IF computed_distance IS LESS THAN the element at position neighbor of distances_to_all_nodes THEN  
+                        SET the element at position neighbor of distances_to_all_nodes TO computed_distance  
+                        ADD the pair of computed_distance and neighbor TO priority_queue  
+                    END IF  
+                END FOR  
+            END WHILE  
+            
+            RETURN distances_to_all_nodes  
+        END FUNCTION  
+        
+        SET graph TO a list of number_of_nodes empty lists  
+        SET reverse_graph TO a list of number_of_nodes empty lists  
+        
+        FOR each start_vertex end_vertex and weight_value IN number_of_edges  
+            APPEND the pair of end_vertex and weight_value TO the element at position start_vertex of graph  
+            APPEND the pair of start_vertex and weight_value TO the element at position end_vertex of reverse_graph  
+        END FOR  
+        
+        SET distances_from_source_one TO the result of calling dijkstra with graph and source_node_one  
+        SET distances_from_source_two TO the result of calling dijkstra with graph and source_node_two  
+        SET distances_to_destination TO the result of calling dijkstra with reverse_graph and destination_node  
+        
+        SET minimum_total_weight TO an infinitely large value  
+        
+        FOR index FROM zero TO number_of_nodes MINUS one  
+            IF the element at position index of distances_from_source_one IS NOT EQUAL TO an infinitely large value AND the element at position index of distances_from_source_two IS NOT EQUAL TO an infinitely large value AND the element at position index of distances_to_destination IS NOT EQUAL TO an infinitely large value THEN  
+                SET combined_distance TO the sum of the element at position index of distances_from_source_one PLUS the element at position index of distances_from_source_two PLUS the element at position index of distances_to_destination  
+                IF combined_distance IS LESS THAN minimum_total_weight THEN  
+                    SET minimum_total_weight TO combined_distance  
+                END IF  
+            END IF  
+        END FOR  
+        
+        IF minimum_total_weight IS EQUAL TO an infinitely large value THEN  
+            RETURN negative one  
+        ELSE  
+            RETURN minimum_total_weight  
+        END IF  
+    END FUNCTION  
+END CLASS

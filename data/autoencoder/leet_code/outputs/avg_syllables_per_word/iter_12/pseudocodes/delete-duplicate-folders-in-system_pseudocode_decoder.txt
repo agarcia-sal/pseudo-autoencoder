@@ -1,0 +1,55 @@
+CLASS TrieNode  
+    FUNCTION __init__()  
+        SET children TO a mapping with default value being a new TrieNode  
+        SET deleted TO False  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION deleteDuplicateFolder(paths)  
+        SET ans TO empty list  
+        SET root TO new TrieNode  
+        SET subtreeToNodes TO a mapping with default value being an empty list  
+
+        FOR each path IN paths sorted in ascending order  
+            SET node TO root  
+            FOR each s IN path  
+                SET node TO the child in node.children corresponding to s  
+            END FOR  
+        END FOR  
+
+        FUNCTION buildSubtreeToRoots(node)  
+            SET subtree TO the string concatenation of open parenthesis PLUS  
+                the concatenation for each s in node.children, in the order of keys, of s PLUS buildSubtreeToRoots(node.children[s])  
+                PLUS close parenthesis  
+            IF subtree NOT EQUALS open parenthesis PLUS close parenthesis  
+                APPEND node TO subtreeToNodes[subtree]  
+            END IF  
+            RETURN subtree  
+        END FUNCTION  
+
+        CALL buildSubtreeToRoots WITH root  
+
+        FOR each nodes IN the values of subtreeToNodes  
+            IF the LENGTH OF nodes GREATER THAN one  
+                FOR each node IN nodes  
+                    SET node.deleted TO True  
+                END FOR  
+            END IF  
+        END FOR  
+
+        FUNCTION constructPath(node, path)  
+            FOR each s and child IN the items of node.children  
+                IF child.deleted EQUALS False  
+                    CALL constructPath WITH child AND the list path APPENDED WITH s  
+                END IF  
+            END FOR  
+            IF the LENGTH OF path GREATER THAN zero  
+                APPEND path TO ans  
+            END IF  
+        END FUNCTION  
+
+        CALL constructPath WITH root AND empty list  
+        RETURN ans  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,60 @@
+CLASS Solution
+    FUNCTION numDecodings(s AS string) RETURNS integer
+        SET MOD TO ten RAISED TO THE POWER OF nine PLUS seven
+        
+        # dp AT index i WILL REPRESENT the number of ways TO decode the substring OF s FROM start UP TO BUT NOT INCLUDING position i
+        SET dp TO a list OF zeros WITH size EQUAL TO the LENGTH OF s PLUS one
+        SET element at position zero OF dp TO one  # There is exactly one way TO decode an empty string
+        
+        FUNCTION ways_to_decode_single(char AS character) RETURNS integer
+            IF char EQUALS the character star
+                RETURN nine  # The star CHARACTER CAN represent ANY digit from one TO nine
+            ELSE IF char EQUALS the character zero
+                RETURN zero  # Zero CANNOT be decoded ON its own
+            ELSE
+                RETURN one  # Any other digit CAN be decoded AS a SINGLE numeral
+            END IF
+        END FUNCTION
+        
+        FUNCTION ways_to_decode_pair(char1 AS character, char2 AS character) RETURNS integer
+            IF char1 EQUALS the character star AND char2 EQUALS the character star
+                RETURN fifteen  # Double star CAN represent eleven TO nineteen AND twenty one TO twenty six
+            ELSE IF char1 EQUALS the character star
+                IF char2 IS LESS THAN OR EQUAL TO the character six
+                    RETURN two  # Star FOLLOWED BY character LESS THAN OR EQUAL TO six CAN represent one FOLLOWED BY that character OR two FOLLOWED BY that character
+                ELSE
+                    RETURN one  # Star FOLLOWED BY character GREATER THAN six CAN ONLY represent one FOLLOWED BY that character
+                END IF
+            ELSE IF char2 EQUALS the character star
+                IF char1 EQUALS the character one
+                    RETURN nine  # One FOLLOWED BY star CAN represent eleven TO nineteen
+                ELSE IF char1 EQUALS the character two
+                    RETURN six  # Two FOLLOWED BY star CAN represent twenty one TO twenty six
+                ELSE
+                    RETURN zero  # Other digits CANNOT be followed BY star FOR two character decoding
+                END IF
+            ELSE
+                SET numeric_value TO the integer REPRESENTATION OF the concatenation OF char1 FOLLOWED BY char2
+                IF numeric_value IS GREATER THAN OR EQUAL TO ten AND numeric_value IS LESS THAN OR EQUAL TO twenty six
+                    RETURN one  # Valid two character number
+                ELSE
+                    RETURN zero  # Invalid two character number
+                END IF
+            END IF
+        END FUNCTION
+        
+        FOR index FROM one TO the LENGTH OF s INCLUSIVE
+            SET value_single TO ways_to_decode_single(element at position index MINUS one OF s)
+            INCREMENT element at position index OF dp BY the product OF element at position index MINUS one OF dp AND value_single
+            SET element at position index OF dp TO element at position index OF dp MODULO MOD
+            
+            IF index IS GREATER THAN one
+                SET value_pair TO ways_to_decode_pair(element at position index MINUS two OF s, element at position index MINUS one OF s)
+                INCREMENT element at position index OF dp BY the product OF element at position index MINUS two OF dp AND value_pair
+                SET element at position index OF dp TO element at position index OF dp MODULO MOD
+            END IF
+        END FOR
+        
+        RETURN element at the last position OF dp
+    END FUNCTION
+END CLASS

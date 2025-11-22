@@ -1,0 +1,39 @@
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+def list_node(vals):
+    if not vals:
+        return None
+    head = ListNode(vals[0])
+    p = head
+    for v in vals[1:]:
+        p.next = ListNode(v)
+        p = p.next
+    return head
+
+def is_same_list(p1, p2):
+    if p1 is None and p2 is None:
+        return True
+    if not p1 or not p2:
+        return False
+    return p1.val == p2.val and is_same_list(p1.next, p2.next)
+
+class Solution:
+    def addTwoNumbers(self, l1, l2):
+        dummy = ListNode(0)
+        cur = dummy
+        carry = 0
+        while l1 or l2 or carry:
+            v1 = l1.val if l1 else 0
+            v2 = l2.val if l2 else 0
+            s = v1 + v2 + carry
+            carry = s // 10
+            cur.next = ListNode(s % 10)
+            cur = cur.next
+            if l1:
+                l1 = l1.next
+            if l2:
+                l2 = l2.next
+        return dummy.next

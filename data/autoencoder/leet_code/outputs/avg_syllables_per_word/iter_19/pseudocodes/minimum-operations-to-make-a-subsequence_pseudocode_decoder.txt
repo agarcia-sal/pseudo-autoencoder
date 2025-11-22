@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION minOperations(target AS List OF INTEGER, arr AS List OF INTEGER) RETURNS INTEGER  
+        SET index_map TO CALL build_index_map WITH target  
+        SET transformed_arr TO CALL transform_array WITH arr AND index_map  
+        SET lis TO CALL find_longest_increasing_subsequence WITH transformed_arr  
+        SET lcs_length TO the LENGTH OF lis  
+        RETURN the LENGTH OF target MINUS lcs_length  
+    END FUNCTION  
+
+    FUNCTION build_index_map(target AS List OF INTEGER) RETURNS DICTIONARY  
+        SET map_result TO empty dictionary  
+        FOR each index FROM zero TO the LENGTH OF target MINUS one  
+            SET the element at position target at index OF map_result TO index  
+        END FOR  
+        RETURN map_result  
+    END FUNCTION  
+
+    FUNCTION transform_array(arr AS List OF INTEGER, index_map AS DICTIONARY) RETURNS List OF INTEGER  
+        SET result_list TO empty list  
+        FOR each value IN arr  
+            IF the value IS IN index_map  
+                APPEND the element at position value of index_map TO result_list  
+            END IF  
+        END FOR  
+        RETURN result_list  
+    END FUNCTION  
+
+    FUNCTION find_longest_increasing_subsequence(numbers AS List OF INTEGER) RETURNS List OF INTEGER  
+        SET lis TO empty list  
+        FOR each number IN numbers  
+            SET pos TO the POSITION TO INSERT number IN lis TO MAINTAIN NON-DECREASING ORDER FOUND BY BINARY SEARCH OF lowest index WITH element at position index OF lis GREATER THAN OR EQUAL TO number  
+            IF pos EQUALS the LENGTH OF lis  
+                APPEND number TO lis  
+            ELSE  
+                SET the element at position pos OF lis TO number  
+            END IF  
+        END FOR  
+        RETURN lis  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,49 @@
+CLASS Solution  
+    FUNCTION checkWays(pairs)  
+        SET graph TO the result of calling auxiliary FUNCTION create_defaultdict_set()  
+        FOR each element pair IN pairs  
+            SET x TO element at position zero of pair  
+            SET y TO element at position one of pair  
+            ADD y TO set associated with x in graph  
+            ADD x TO set associated with y in graph  
+        END FOR  
+        
+        SET max_degree TO element IN graph WITH maximum LENGTH OF set associated with element  
+        SET n TO LENGTH OF graph  
+        
+        IF LENGTH OF set associated with max_degree IN graph NOT EQUALS n MINUS one  
+            RETURN zero  
+        END IF  
+        
+        FUNCTION can_be_parent(u, v)  
+            RETURN the result of checking FOR each neighbor IN set associated with v in graph WHETHER neighbor is IN set associated with u in graph OR neighbor EQUALS u  
+        END FUNCTION  
+        
+        SET ways TO one  
+        
+        FOR each u IN graph  
+            IF u EQUALS max_degree  
+                CONTINUE TO the next iteration  
+            END IF  
+            
+            SET parent TO None  
+            FOR each v IN set associated with u in graph  
+                IF v IN graph AND LENGTH OF set associated with v in graph GREATER THAN OR EQUAL TO LENGTH OF set associated with u in graph AND can_be_parent(v, u)  
+                    IF parent IS None OR LENGTH OF set associated with v in graph LESS THAN LENGTH OF set associated with parent in graph  
+                        SET parent TO v  
+                    END IF  
+                END IF  
+            END FOR  
+            
+            IF parent IS None  
+                RETURN zero  
+            END IF  
+            
+            IF LENGTH OF set associated with parent in graph EQUALS LENGTH OF set associated with u in graph  
+                SET ways TO two  
+            END IF  
+        END FOR  
+        
+        RETURN ways  
+    END FUNCTION  
+END CLASS

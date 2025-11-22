@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION largestPathValue(self, colors, edges)  
+        SET n TO length of colors  
+        SET graph TO a mapping from keys to empty lists  
+        SET in_degree TO list of zeros of length n  
+        
+        FOR each pair u, v IN edges  
+            APPEND v TO graph at key u  
+            INCREMENT in_degree at index v BY one  
+        END FOR  
+        
+        SET queue TO a double-ended queue containing all indices i FROM zero TO n MINUS one WHERE in_degree at i EQUALS zero  
+        SET dp TO a list of n elements, each element is a list of 26 zeros  
+        SET visited TO zero  
+        SET max_color_value TO zero  
+        
+        WHILE queue is not empty  
+            REMOVE first element FROM queue and SET to node  
+            INCREMENT dp at node and index corresponding to character code of colors at node MINUS character code of letter 'a' BY one  
+            SET max_color_value TO the maximum of max_color_value and dp at node and index corresponding to character code of colors at node MINUS character code of letter 'a'  
+            INCREMENT visited BY one  
+            
+            FOR each neighbor IN graph at node  
+                FOR each c FROM zero TO twenty-five  
+                    SET dp at neighbor and index c TO the maximum of dp at neighbor and index c and dp at node and index c  
+                END FOR  
+                DECREMENT in_degree at neighbor BY one  
+                IF in_degree at neighbor EQUALS zero THEN  
+                    APPEND neighbor TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        IF visited EQUALS n THEN  
+            RETURN max_color_value  
+        ELSE  
+            RETURN minus one  
+        END IF  
+    END FUNCTION  
+END CLASS

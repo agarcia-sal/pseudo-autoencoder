@@ -1,0 +1,84 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, n)  
+        SET self.parent TO CONVERT the SEQUENCE OF integers FROM zero TO n MINUS one INTO a LIST  
+        SET self.rank TO a LIST containing the integer one REPEATED n TIMES  
+    END FUNCTION  
+  
+    FUNCTION find(self, u)  
+        IF element at position u OF self.parent NOT EQUALS u THEN  
+            SET element at position u OF self.parent TO CALL self.find WITH PARAMETERS element at position u OF self.parent  
+        END IF  
+        RETURN element at position u OF self.parent  
+    END FUNCTION  
+  
+    FUNCTION union(self, u, v)  
+        SET rootU TO CALL self.find WITH PARAMETERS u  
+        SET rootV TO CALL self.find WITH PARAMETERS v  
+        
+        IF rootU NOT EQUALS rootV THEN  
+            IF element at position rootU OF self.rank GREATER THAN element at position rootV OF self.rank THEN  
+                SET element at position rootV OF self.parent TO rootU  
+            ELSE IF element at position rootU OF self.rank LESS THAN element at position rootV OF self.rank THEN  
+                SET element at position rootU OF self.parent TO rootV  
+            ELSE  
+                SET element at position rootV OF self.parent TO rootU  
+                INCREMENT element at position rootU OF self.rank BY one  
+            END IF  
+            RETURN true  
+        END IF  
+        RETURN false  
+    END FUNCTION  
+END CLASS  
+  
+CLASS Solution  
+    FUNCTION findCriticalAndPseudoCriticalEdges(self, n, edges)  
+        FOR each index i AND element edge IN the ENUMERATION OF edges  
+            APPEND i TO edge  
+        END FOR  
+  
+        CALL edges.sort WITH PARAMETERS key AS a FUNCTION which for input x RETURNS element at position two OF x  
+  
+        FUNCTION mst(exclude EQUALS none, include EQUALS none)  
+            SET uf TO a NEW INSTANCE OF UnionFind WITH PARAMETER n  
+            SET weight TO zero  
+            
+            IF include IS NOT none THEN  
+                CALL uf.union WITH PARAMETERS element at position zero OF include AND element at position one OF include  
+                INCREMENT weight BY element at position two OF include  
+            END IF  
+            
+            FOR each u, v, w, idx IN edges  
+                IF idx EQUALS exclude THEN  
+                    CONTINUE TO next iteration  
+                END IF  
+                IF CALL uf.union WITH PARAMETERS u AND v RETURNS true THEN  
+                    INCREMENT weight BY w  
+                END IF  
+            END FOR  
+            
+            SET root TO CALL uf.find WITH PARAMETERS zero  
+            FOR each integer i FROM zero TO n MINUS one  
+                IF CALL uf.find WITH PARAMETERS i NOT EQUALS root THEN  
+                    RETURN positive infinity  
+                END IF  
+            END FOR  
+            
+            RETURN weight  
+        END FUNCTION  
+  
+        SET mst_weight TO CALL mst WITH NO PARAMETERS  
+  
+        SET critical TO an EMPTY LIST  
+        SET pseudo_critical TO an EMPTY LIST  
+  
+        FOR each u, v, w, idx IN edges  
+            IF CALL mst WITH PARAMETERS exclude EQUALS idx GREATER THAN mst_weight THEN  
+                APPEND idx TO critical  
+            ELSE IF CALL mst WITH PARAMETERS include EQUALS the TUPLE OF u, v, w EQUALS mst_weight THEN  
+                APPEND idx TO pseudo_critical  
+            END IF  
+        END FOR  
+  
+        RETURN a LIST CONTAINING critical FOLLOWED BY pseudo_critical  
+    END FUNCTION  
+END CLASS

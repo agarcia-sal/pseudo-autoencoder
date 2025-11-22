@@ -1,0 +1,36 @@
+CLASS Solution  
+    FUNCTION numDistinctIslands2(grid)  
+        FUNCTION dfs(x, y, island)  
+            IF x LESS THAN 0 OR x GREATER THAN OR EQUAL TO LENGTH OF grid OR y LESS THAN 0 OR y GREATER THAN OR EQUAL TO LENGTH OF grid AT 0 OR grid AT x AT y EQUALS 0 THEN  
+                RETURN  
+            SET grid AT x AT y TO 0  
+            APPEND tuple (x, y) TO island  
+            CALL dfs WITH x PLUS 1, y, island  
+            CALL dfs WITH x MINUS 1, y, island  
+            CALL dfs WITH x, y PLUS 1, island  
+            CALL dfs WITH x, y MINUS 1, island  
+        END FUNCTION  
+
+        FUNCTION normalize(island)  
+            SET shapes TO empty list  
+            FOR each dx, dy IN list of tuples (1, 1), (1, MINUS 1), (MINUS 1, 1), (MINUS 1, MINUS 1)  
+                SET new_island TO list OF tuples (x MULTIPLIED BY dx, y MULTIPLIED BY dy) FOR each x, y IN island  
+                SORT new_island  
+                SET min_x TO MINIMUM x FROM new_island  
+                SET min_y TO MINIMUM y FROM new_island  
+                APPEND tuple OF tuples (x MINUS min_x, y MINUS min_y) FOR each x, y IN new_island TO shapes  
+            FOR i FROM 0 TO LENGTH OF shapes MINUS 1  
+                APPEND tuple OF tuples (y, NEGATIVE x) FOR each x, y IN shapes AT i TO shapes  
+            RETURN MINIMUM tuple IN shapes  
+        END FUNCTION  
+
+        SET islands TO empty set  
+        FOR i FROM 0 TO LENGTH OF grid MINUS 1  
+            FOR j FROM 0 TO LENGTH OF grid AT 0 MINUS 1  
+                IF grid AT i AT j EQUALS 1 THEN  
+                    SET island TO empty list  
+                    CALL dfs WITH i, j, island  
+                    ADD CALL normalize WITH island TO islands  
+        RETURN SIZE OF islands  
+    END FUNCTION  
+END CLASS

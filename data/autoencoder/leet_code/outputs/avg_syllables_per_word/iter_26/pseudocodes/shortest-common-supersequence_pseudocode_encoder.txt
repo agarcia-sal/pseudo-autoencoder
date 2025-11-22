@@ -1,0 +1,56 @@
+CLASS Solution
+    FUNCTION shortestCommonSupersequence(str1, str2)
+        SET m TO the LENGTH OF str1
+        SET n TO the LENGTH OF str2
+
+        # CREATE a DP TABLE to STORE lengths OF Longest Common Subsequence
+        SET dp TO a list containing elements each BEING a list of zeroes with the COUNT OF the LENGTH OF str2 PLUS one, repeated the COUNT OF the LENGTH OF str1 PLUS one times
+
+        # FILL the DP TABLE
+        FOR i FROM one TO m INCLUSIVE
+            FOR j FROM one TO n INCLUSIVE
+                IF the element at position i MINUS one OF str1 EQUALS the element at position j MINUS one OF str2 THEN
+                    SET the element at position i of dp TO the element at position j of that inner list TO the element at position i MINUS one of dp in the element at position j MINUS one of that inner list PLUS one
+                ELSE
+                    SET the element at position i of dp TO the element at position j of that inner list TO the GREATER OF the element at position i MINUS one of dp in the element at position j of that inner list AND the element at position i of dp in the element at position j MINUS one of that inner list
+                END IF
+            END FOR
+        END FOR
+
+        # RECONSTRUCT the Shortest Common Supersequence FROM the DP TABLE
+        SET i TO m
+        SET j TO n
+        SET scs TO an empty list
+
+        WHILE i GREATER THAN zero AND j GREATER THAN zero HOLDS
+            IF the element at position i MINUS one OF str1 EQUALS the element at position j MINUS one OF str2 THEN
+                APPEND the element at position i MINUS one OF str1 TO scs
+                DECREMENT i BY one
+                DECREMENT j BY one
+            ELSE IF the element at position i MINUS one of dp in the element at position j OF that inner list GREATER THAN the element at position i of dp in the element at position j MINUS one of that inner list THEN
+                APPEND the element at position i MINUS one OF str1 TO scs
+                DECREMENT i BY one
+            ELSE
+                APPEND the element at position j MINUS one OF str2 TO scs
+                DECREMENT j BY one
+            END IF
+        END WHILE
+
+        # IF there are REMAINING characters IN str1
+        WHILE i GREATER THAN zero HOLDS
+            APPEND the element at position i MINUS one OF str1 TO scs
+            DECREMENT i BY one
+        END WHILE
+
+        # IF there are REMAINING characters IN str2
+        WHILE j GREATER THAN zero HOLDS
+            APPEND the element at position j MINUS one OF str2 TO scs
+            DECREMENT j BY one
+        END WHILE
+
+        # REVERSE the scs list to get the correct order
+        REVERSE the list scs
+
+        RETURN the concatenation OF all elements IN scs AS a single string
+    END FUNCTION
+END CLASS

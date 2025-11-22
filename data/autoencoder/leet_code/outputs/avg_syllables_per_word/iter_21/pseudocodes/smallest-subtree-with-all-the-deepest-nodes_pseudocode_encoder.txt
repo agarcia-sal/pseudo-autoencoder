@@ -1,0 +1,63 @@
+CLASS TreeNode  
+    FUNCTION __init__(val EQUALS zero, left EQUALS None, right EQUALS None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN None  
+    END IF  
+    SET root TO A NEW TreeNode WITH val EQUALS element at position zero OF values  
+    SET i TO one  
+    SET queue TO AN EMPTY DOUBLE-ENDED QUEUE  
+    APPEND root TO queue  
+    WHILE queue HOLDS  
+        SET node TO THE FIRST ELEMENT REMOVED FROM queue  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i OF values IS NOT None  
+            SET node.left TO A NEW TreeNode WITH val EQUALS element at position i OF values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN THE LENGTH OF values AND element at position i OF values IS NOT None  
+            SET node.right TO A NEW TreeNode WITH val EQUALS element at position i OF values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUALS TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION subtreeWithAllDeepest(root)  
+        FUNCTION dfs(node)  
+            IF node IS None  
+                RETURN node, zero  
+            END IF  
+            SET left_node, left_depth TO CALL dfs WITH PARAMETERS node.left  
+            SET right_node, right_depth TO CALL dfs WITH PARAMETERS node.right  
+            IF left_depth IS GREATER THAN right_depth  
+                RETURN left_node, left_depth PLUS one  
+            ELSE IF right_depth IS GREATER THAN left_depth  
+                RETURN right_node, right_depth PLUS one  
+            ELSE  
+                RETURN node, left_depth PLUS one  
+            END IF  
+        END FUNCTION  
+        RETURN THE FIRST ELEMENT OF THE RESULT OF CALLING dfs WITH PARAMETERS root  
+    END FUNCTION  
+END CLASS

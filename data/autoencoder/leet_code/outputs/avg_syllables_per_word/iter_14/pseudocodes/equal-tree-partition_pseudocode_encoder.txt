@@ -1,0 +1,77 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val SET TO zero left SET TO none right SET TO none  
+        SET self dot val TO val  
+        SET self dot left TO left  
+        SET self dot right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO new TreeNode WITH PARAMETER element at position zero OF values  
+    SET i TO one  
+    SET queue TO empty double-ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO first element REMOVED FROM queue  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i OF values IS NOT none  
+            SET node dot left TO new TreeNode WITH PARAMETER element at position i OF values  
+            APPEND node dot left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND element at position i OF values IS NOT none  
+            SET node dot right TO new TreeNode WITH PARAMETER element at position i OF values  
+            APPEND node dot right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN True  
+    ELSE IF p IS none OR q IS none  
+        RETURN False  
+    ELSE IF p dot val IS NOT EQUAL TO q dot val  
+        RETURN False  
+    ELSE  
+        RETURN RESULT OF is_same_tree WITH PARAMETERS p dot left q AND AND RESULT OF is_same_tree WITH PARAMETERS p dot right q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION checkEqualTree WITH PARAMETERS self root  
+        FUNCTION subtree_sum WITH PARAMETER node  
+            IF node IS none  
+                RETURN zero  
+            END IF  
+            RETURN node dot val PLUS subtree_sum WITH PARAMETER node dot left PLUS subtree_sum WITH PARAMETER node dot right  
+        END FUNCTION  
+        
+        SET total_sum TO subtree_sum WITH PARAMETER root  
+        
+        IF total_sum MODULO two IS NOT EQUAL TO zero  
+            RETURN False  
+        END IF  
+        
+        SET target TO total_sum DIVIDED BY two  
+        SET found TO list CONTAINING False  
+        
+        FUNCTION can_split WITH PARAMETER node  
+            IF node IS none  
+                RETURN zero  
+            END IF  
+            SET current_sum TO node dot val PLUS can_split WITH PARAMETER node dot left PLUS can_split WITH PARAMETER node dot right  
+            IF current_sum IS EQUAL TO target AND node IS NOT root  
+                SET element at position zero OF found TO True  
+            END IF  
+            RETURN current_sum  
+        END FUNCTION  
+        
+        CALL can_split WITH PARAMETER root  
+        RETURN element at position zero OF found  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,28 @@
+from typing import List
+
+class Solution:
+    def longestLine(self, mat: List[List[int]]) -> int:
+        if mat is None or len(mat) == 0 or mat[0] is None:
+            return 0
+        m = len(mat)
+        n = len(mat[0])
+        directions = [(0,1), (1,0), (1,1), (1,-1)]
+        max_length = 0
+
+        def check(x: int, y: int, dx: int, dy: int) -> int:
+            length = 0
+            while 0 <= x < m and 0 <= y < n and mat[x][y] == 1:
+                length += 1
+                x += dx
+                y += dy
+            return length
+
+        for i in range(m):
+            for j in range(n):
+                if mat[i][j] == 1:
+                    for dx, dy in directions:
+                        prev_x = i - dx
+                        prev_y = j - dy
+                        if prev_x < 0 or prev_y < 0 or prev_y >= n or mat[prev_x][prev_y] == 0:
+                            max_length = max(max_length, check(i, j, dx, dy))
+        return max_length

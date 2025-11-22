@@ -1,0 +1,64 @@
+CLASS TreeNode  
+    FUNCTION __init__ (val left right)  
+        SET val OF self TO val  
+        SET left OF self TO left  
+        SET right OF self TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node (values)  
+    IF values EQUALS empty  
+        RETURN none  
+    END IF  
+    SET root TO new TreeNode with value element at position one of values  
+    SET i TO one  
+    SET queue TO new empty double ended queue  
+    APPEND root TO queue  
+    WHILE queue is not empty  
+        SET node TO element removed from the left end of queue  
+        IF i LESS THAN the length of values AND element at position i of values NOT EQUALS none  
+            SET left OF node TO new TreeNode with value element at position i of values  
+            APPEND left OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN the length of values AND element at position i of values NOT EQUALS none  
+            SET right OF node TO new TreeNode with value element at position i of values  
+            APPEND right OF node TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree (p q)  
+    IF p EQUALS none AND q EQUALS none  
+        RETURN true  
+    ELSE IF p EQUALS none OR q EQUALS none  
+        RETURN false  
+    ELSE IF val OF p NOT EQUALS val OF q  
+        RETURN false  
+    ELSE  
+        RETURN is_same_tree(left OF p left OF q) AND is_same_tree(right OF p right OF q)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION findLeaves (root)  
+        FUNCTION collectLeaves (node)  
+            IF node EQUALS none  
+                RETURN negative one  
+            END IF  
+            SET left_height TO collectLeaves(left OF node)  
+            SET right_height TO collectLeaves(right OF node)  
+            SET current_height TO the maximum of left_height AND right_height PLUS one  
+            IF current_height GREATER THAN OR EQUAL TO the length of result  
+                APPEND empty list TO result  
+            END IF  
+            APPEND val OF node TO element at position current_height of result  
+            RETURN current_height  
+        END FUNCTION  
+        SET result TO empty list  
+        CALL collectLeaves WITH root  
+        RETURN result  
+    END FUNCTION  
+END CLASS

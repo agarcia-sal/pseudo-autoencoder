@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION ipToCIDR(ip parameter ip OF TYPE string parameter n OF TYPE integer) RETURNS list of strings  
+      
+        FUNCTION ip_to_int(parameter ip OF TYPE string) RETURNS integer  
+            SET parts TO the list obtained by converting each section of ip separated by the dot character TO an integer  
+            SET res TO zero  
+            FOR each part IN parts  
+                SET res TO res MULTIPLIED BY two HUNDRED FIFTY SIX PLUS part  
+            END FOR  
+            RETURN res  
+        END FUNCTION  
+      
+        FUNCTION int_to_ip(parameter num OF TYPE integer) RETURNS string  
+            SET parts TO empty list  
+            FOR index FROM three TO zero DECREMENT BY one  
+                SET part TO the remainder of num DIVIDED BY two HUNDRED FIFTY SIX after DIVIDING num BY two HUNDRED FIFTY SIX RAISED TO THE POWER index  
+                APPEND the string representation of part TO parts  
+            END FOR  
+            RETURN the concatenation of parts joined BY the dot character  
+        END FUNCTION  
+      
+        FUNCTION largest_cidr_size(parameter start OF TYPE integer parameter n OF TYPE integer) RETURNS integer  
+            IF the remainder of start DIVIDED BY two EQUALS one  
+                RETURN one  
+            END IF  
+            SET x TO one  
+            WHILE x IS LESS THAN OR EQUAL TO n AND the result of bitwise AND operation of start AND the subtraction of x BY one EQUALS zero  
+                SET x TO x MULTIPLIED BY two  
+            END WHILE  
+            RETURN the integer division of x BY two  
+        END FUNCTION  
+      
+        SET result TO empty list  
+        SET start_ip TO the result of ip_to_int with argument ip  
+      
+        WHILE n IS GREATER THAN zero  
+            SET size TO the result of largest_cidr_size with arguments start_ip AND n  
+            SET cidr_suffix TO thirty-two MINUS the subtraction of the bit length of size BY one  
+            APPEND the concatenation of the result of int_to_ip with argument start_ip THEN the slash character THEN the string representation of cidr_suffix TO result  
+            SET start_ip TO start_ip PLUS size  
+            SET n TO n MINUS size  
+        END WHILE  
+      
+        RETURN result  
+    END FUNCTION  
+END CLASS

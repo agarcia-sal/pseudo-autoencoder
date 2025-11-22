@@ -1,0 +1,35 @@
+CLASS Solution
+    FUNCTION loudAndRich(richer, quiet)
+        CALL build_graph WITH richer RETURNING graph
+
+        SET n TO the LENGTH OF quiet
+        SET answer TO list OF n elements each SET TO negative one
+
+        FUNCTION dfs(person)
+            IF element at position person of answer EQUALS negative one
+                SET element at position person of answer TO person
+                FOR each neighbor IN element at position person of graph
+                    SET candidate TO CALL dfs WITH neighbor
+                    IF element at position candidate of quiet LESS THAN element at position element at position person of answer of quiet
+                        SET element at position person of answer TO candidate
+                    END IF
+                END FOR
+            END IF
+            RETURN element at position person of answer
+        END FUNCTION
+
+        FOR index FROM zero TO n MINUS one
+            CALL dfs WITH index
+        END FOR
+
+        RETURN answer
+    END FUNCTION
+
+    FUNCTION build_graph(richer)
+        SET graph TO a new mapping with default value as empty list
+        FOR each pair a, b IN richer
+            APPEND a TO element at position b of graph
+        END FOR
+        RETURN graph
+    END FUNCTION
+END CLASS

@@ -1,0 +1,64 @@
+CLASS Solution  
+    FUNCTION countCombinations(pieces, positions)  
+        SET directions TO a MAPPING OF  
+            "rook" TO a LIST OF PAIR (ONE, ZERO) AND PAIR (MINUS ONE, ZERO) AND PAIR (ZERO, ONE) AND PAIR (ZERO, MINUS ONE)  
+            "queen" TO a LIST OF PAIR (ONE, ZERO) AND PAIR (MINUS ONE, ZERO) AND PAIR (ZERO, ONE) AND PAIR (ZERO, MINUS ONE) AND PAIR (ONE, ONE) AND PAIR (MINUS ONE, ONE) AND PAIR (ONE, MINUS ONE) AND PAIR (MINUS ONE, MINUS ONE)  
+            "bishop" TO a LIST OF PAIR (ONE, ONE) AND PAIR (MINUS ONE, ONE) AND PAIR (ONE, MINUS ONE) AND PAIR (MINUS ONE, MINUS ONE)  
+        
+        SET positions TO a LIST WHERE EACH element IS A PAIR OF first element MINUS ONE AND second element MINUS ONE FROM positions
+        
+        FUNCTION get_destinations(start, piece_type)  
+            SET r TO first element OF start  
+            SET c TO second element OF start  
+            SET dests TO a LIST CONTAINING start  
+            FOR each pair dr_dc IN directions AT KEY piece_type  
+                SET dr TO first element OF dr_dc  
+                SET dc TO second element OF dr_dc  
+                SET nr TO r PLUS dr  
+                SET nc TO c PLUS dc  
+                WHILE nr GREATER THAN OR EQUAL TO ZERO AND nr LESS THAN EIGHT AND nc GREATER THAN OR EQUAL TO ZERO AND nc LESS THAN EIGHT HOLDS  
+                    APPEND PAIR (nr, nc) TO dests  
+                    INCREMENT nr BY dr  
+                    INCREMENT nc BY dc  
+                END WHILE  
+            END FOR  
+            RETURN dests  
+        END FUNCTION  
+        
+        SET all_destinations TO a LIST WHERE EACH element IS THE RESULT OF CALLING get_destinations WITH PARAMETERS pos AND piece FOR pos AND piece IN THE ZIP OF positions AND pieces  
+        
+        FUNCTION is_valid_combination(combination)  
+            SET pos TO a COPY OF positions  
+            SET n TO the LENGTH OF pos  
+            WHILE TRUE HOLDS  
+                IF the LENGTH OF the SET OF pos LESS THAN n THEN  
+                    RETURN FALSE  
+                END IF  
+                SET all_reached TO TRUE  
+                FOR index FROM zero TO n MINUS ONE  
+                    IF element at position index OF pos EQUALS element at position index OF combination THEN  
+                        CONTINUE TO NEXT iteration  
+                    END IF  
+                    SET all_reached TO FALSE  
+                    SET r TO first element OF element at position index OF pos  
+                    SET c TO second element OF element at position index OF pos  
+                    SET dr TO ONE IF element at position index, first element OF combination GREATER THAN r ELSE (MINUS ONE IF element at position index, first element OF combination LESS THAN r ELSE ZERO)  
+                    SET dc TO ONE IF element at position index, second element OF combination GREATER THAN c ELSE (MINUS ONE IF element at position index, second element OF combination LESS THAN c ELSE ZERO)  
+                    SET element at position index OF pos TO PAIR OF r PLUS dr AND c PLUS dc  
+                END FOR  
+                IF all_reached THEN  
+                    RETURN TRUE  
+                END IF  
+            END WHILE  
+        END FUNCTION  
+        
+        SET valid_count TO zero  
+        FOR each combination IN the CARTESIAN PRODUCT OF all_destinations  
+            IF CALL is_valid_combination WITH PARAMETERS combination THEN  
+                INCREMENT valid_count BY one  
+            END IF  
+        END FOR  
+        
+        RETURN valid_count  
+    END FUNCTION  
+END CLASS

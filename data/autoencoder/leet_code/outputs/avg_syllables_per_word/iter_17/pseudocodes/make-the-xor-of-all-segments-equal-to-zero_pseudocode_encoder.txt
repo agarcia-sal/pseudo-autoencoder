@@ -1,0 +1,36 @@
+CLASS Solution
+    FUNCTION minChanges(nums, k)
+        SET groups TO CALL defaultdict WITH list
+        FOR index FROM zero TO the LENGTH OF nums MINUS one
+            APPEND element at position index of nums TO groups element at position index MODULO k
+        END FOR
+        
+        SET freq TO CALL auxiliary FUNCTION create_frequency_list WITH parameter k
+        SET min_size TO CALL auxiliary FUNCTION create_list_with_value WITH parameters math_inf AND k
+        FOR index FROM zero TO k MINUS one
+            FOR each number IN element at position index of groups
+                INCREMENT element at position index of freq AT key number BY one
+            END FOR
+            SET element at position index of min_size TO the LENGTH OF element at position index of groups
+        END FOR
+        
+        SET dp TO CALL auxiliary FUNCTION create_list_with_value WITH parameters math_inf AND two RAISED TO THE power OF ten
+        SET element at position zero of dp TO zero
+        
+        FOR index FROM zero TO k MINUS one
+            SET new_dp TO CALL auxiliary FUNCTION create_list_with_value WITH parameters math_inf AND two RAISED TO THE power OF ten
+            SET min_dp TO the MINIMUM value IN dp
+            FOR integer FROM zero TO two RAISED TO THE power OF ten MINUS one
+                SET element at position integer of new_dp TO min_dp PLUS element at position index of min_size
+                FOR each key_value_pair IN element at position index of freq
+                    SET number TO key_value_pair KEY
+                    SET count TO key_value_pair VALUE
+                    SET element at position integer of new_dp TO the MINIMUM OF element at position integer of new_dp AND element at position integer EXCLUSIVE OR number of dp PLUS element at position index of min_size MINUS count
+                END FOR
+            END FOR
+            SET dp TO new_dp
+        END FOR
+        
+        RETURN element at position zero of dp
+    END FUNCTION
+END CLASS

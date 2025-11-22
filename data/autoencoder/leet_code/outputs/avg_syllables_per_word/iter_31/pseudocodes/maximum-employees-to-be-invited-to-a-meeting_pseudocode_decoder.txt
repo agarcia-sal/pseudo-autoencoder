@@ -1,0 +1,86 @@
+CLASS Solution  
+    FUNCTION maximumInvitations(favorite)  
+        SET n TO the LENGTH OF favorite  
+        SET graph TO a mapping from integer to list initialized with empty lists  
+        SET in_degree TO a list of zeros of size n  
+        
+        FOR index i FROM zero TO n MINUS one  
+            APPEND element i TO the list at position element at position i of favorite in graph  
+            INCREMENT element at position element at position i of favorite in in_degree BY one  
+        END FOR  
+        
+        SET mutual_chains TO zero  
+        SET visited TO a list of FALSE values of size n  
+        
+        FOR index i FROM zero TO n MINUS one  
+            IF element at position element at position i of favorite EQUALS i AND i LESS THAN element at position i of favorite THEN  
+                SET a TO i  
+                SET b TO element at position i of favorite  
+                SET chain_a TO the RESULT OF the FUNCTION find_chain_length WITH PARAMETERS a graph visited  
+                SET chain_b TO the RESULT OF the FUNCTION find_chain_length WITH PARAMETERS b graph visited  
+                INCREMENT mutual_chains BY chain_a PLUS chain_b  
+            END IF  
+        END FOR  
+        
+        SET longest_cycle TO zero  
+        SET visited TO a list of FALSE values of size n  
+        
+        FOR index i FROM zero TO n MINUS one  
+            IF element at position i of visited IS FALSE THEN  
+                SET cycle_length TO the RESULT OF the FUNCTION find_cycle_length WITH PARAMETERS i graph visited favorite  
+                IF cycle_length GREATER THAN longest_cycle THEN  
+                    SET longest_cycle TO cycle_length  
+                END IF  
+            END IF  
+        END FOR  
+        
+        IF mutual_chains GREATER THAN longest_cycle THEN  
+            RETURN mutual_chains  
+        ELSE  
+            RETURN longest_cycle  
+        END IF  
+    END FUNCTION  
+    
+    FUNCTION find_chain_length(start graph visited)  
+        SET length TO zero  
+        SET queue TO a double ended queue initialized with start  
+        SET element at position start of visited TO TRUE  
+        
+        WHILE queue IS NOT empty  
+            REMOVE element from the front of queue AND ASSIGN to current  
+            FOR each neighbor IN the list at position current of graph  
+                IF element at position neighbor of visited IS FALSE THEN  
+                    SET element at position neighbor of visited TO TRUE  
+                    APPEND neighbor TO queue  
+                    INCREMENT length BY one  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN length  
+    END FUNCTION  
+    
+    FUNCTION find_cycle_length(start graph visited favorite)  
+        IF element at position start of visited IS TRUE THEN  
+            RETURN zero  
+        END IF  
+        
+        SET stack TO an empty list  
+        SET current TO start  
+        
+        WHILE element at position current of visited IS FALSE  
+            SET element at position current of visited TO TRUE  
+            APPEND current TO stack  
+            SET current TO element at position current of favorite  
+        END WHILE  
+        
+        IF current NOT IN stack THEN  
+            RETURN zero  
+        END IF  
+        
+        SET cycle_start_index TO the position of current in stack  
+        SET cycle_length TO the LENGTH OF stack MINUS cycle_start_index  
+        
+        RETURN cycle_length  
+    END FUNCTION  
+END CLASS

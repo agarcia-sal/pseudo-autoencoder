@@ -1,0 +1,84 @@
+CLASS UnionFind
+    FUNCTION __init__(self, n)
+        SET self.parent TO list of integers from 0 to n - 1
+        SET self.rank TO list of n elements each equal to 1
+    END FUNCTION
+
+    FUNCTION find(self, u)
+        IF self.parent[u] IS NOT u THEN
+            SET self.parent[u] TO self.find(self.parent[u])
+        END IF
+        RETURN self.parent[u]
+    END FUNCTION
+
+    FUNCTION union(self, u, v)
+        SET rootU TO self.find(u)
+        SET rootV TO self.find(v)
+
+        IF rootU IS NOT rootV THEN
+            IF self.rank[rootU] > self.rank[rootV] THEN
+                SET self.parent[rootV] TO rootU
+            ELSE IF self.rank[rootU] < self.rank[rootV] THEN
+                SET self.parent[rootU] TO rootV
+            ELSE
+                SET self.parent[rootV] TO rootU
+                INCREMENT self.rank[rootU] BY 1
+            END IF
+            RETURN True
+        END IF
+        RETURN False
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION findCriticalAndPseudoCriticalEdges(self, n, edges)
+        FOR each index i and edge IN edges
+            APPEND i TO edge
+        END FOR
+
+        SORT edges BY edge weight (third element)
+
+        FUNCTION mst(exclude = None, include = None)
+            SET uf TO new UnionFind(n)
+            SET weight TO 0
+
+            IF include IS NOT None THEN
+                CALL uf.union(include[0], include[1])
+                INCREMENT weight BY include[2]
+            END IF
+
+            FOR each u, v, w, idx IN edges
+                IF idx IS exclude THEN
+                    CONTINUE
+                END IF
+                IF uf.union(u, v) THEN
+                    INCREMENT weight BY w
+                END IF
+            END FOR
+
+            SET root TO uf.find(0)
+            FOR i FROM 0 TO n - 1
+                IF uf.find(i) IS NOT root THEN
+                    RETURN infinity
+                END IF
+            END FOR
+
+            RETURN weight
+        END FUNCTION
+
+        SET mst_weight TO mst()
+
+        SET critical TO empty list
+        SET pseudo_critical TO empty list
+
+        FOR each u, v, w, idx IN edges
+            IF mst(exclude=idx) > mst_weight THEN
+                APPEND idx TO critical
+            ELSE IF mst(include=(u, v, w)) == mst_weight THEN
+                APPEND idx TO pseudo_critical
+            END IF
+        END FOR
+
+        RETURN list containing critical and pseudo_critical
+    END FUNCTION
+END CLASS

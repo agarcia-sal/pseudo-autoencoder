@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION ipToCIDR(ip, n)  
+        FUNCTION ip_to_int(ip)  
+            SET parts TO list OF integer values FROM splitting ip BY the character point  
+            SET res TO zero  
+            FOR each part IN parts  
+                SET res TO res MULTIPLIED BY two TO THE POWER OF eight PLUS part  
+            END FOR  
+            RETURN res  
+        END FUNCTION  
+
+        FUNCTION int_to_ip(num)  
+            INITIALIZE a list named segments AS empty list  
+            FOR i FROM three DOWN TO zero  
+                SET segment_value TO num DIVIDED BY two TO THE POWER OF (eight MULTIPLIED BY i) MODULO two hundred fifty six  
+                APPEND segment_value converted TO string TO segments  
+            END FOR  
+            RETURN string formed BY joining segments SEPARATED BY the character point  
+        END FUNCTION  
+
+        FUNCTION largest_cidr_size(start, n)  
+            IF start BITWISE AND one EQUALS one  
+                RETURN one  
+            END IF  
+            SET x TO one  
+            WHILE x LESS THAN OR EQUAL TO n AND start BITWISE AND (x MINUS one) EQUALS zero  
+                SET x TO x MULTIPLIED BY two  
+            END WHILE  
+            RETURN x DIVIDED BY two  
+        END FUNCTION  
+
+        INITIALIZE result AS empty list  
+        SET start_ip TO CALL ip_to_int WITH PARAMETERS ip  
+
+        WHILE n GREATER THAN zero  
+            SET size TO CALL largest_cidr_size WITH PARAMETERS start_ip AND n  
+            SET prefix_length TO thirty two MINUS (number OF bits REQUIRED TO REPRESENT size MINUS one)  
+            SET cidr_block TO string formed BY concatenating CALL int_to_ip WITH PARAMETERS start_ip, character slash, AND prefix_length converted TO string  
+            APPEND cidr_block TO result  
+            INCREMENT start_ip BY size  
+            DECREMENT n BY size  
+        END WHILE  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

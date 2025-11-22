@@ -1,0 +1,36 @@
+CLASS Solution  
+    FUNCTION wordSquares(words)  
+        CREATE prefix_to_words AS empty dictionary WITH default value AS empty list  
+        
+        FOR each word IN words  
+            FOR index FROM zero TO LENGTH OF word MINUS one  
+                SET prefix TO substring of word FROM start TO index  
+                APPEND word TO list AT prefix IN prefix_to_words  
+            END FOR  
+        END FOR  
+        
+        CREATE results AS empty list  
+        
+        FUNCTION backtrack(square)  
+            IF LENGTH OF square EQUALS LENGTH OF word at position zero in words THEN  
+                APPEND square TO results  
+                RETURN  
+            END IF  
+            
+            SET prefix TO empty string  
+            FOR each word_element IN square  
+                SET prefix TO prefix CONCATENATED WITH character at position LENGTH OF square in word_element  
+            END FOR  
+            
+            FOR each candidate IN prefix_to_words AT prefix  
+                CALL backtrack WITH square APPENDED WITH candidate  
+            END FOR  
+        END FUNCTION  
+        
+        FOR each word IN words  
+            CALL backtrack WITH list containing word  
+        END FOR  
+        
+        RETURN results  
+    END FUNCTION  
+END CLASS

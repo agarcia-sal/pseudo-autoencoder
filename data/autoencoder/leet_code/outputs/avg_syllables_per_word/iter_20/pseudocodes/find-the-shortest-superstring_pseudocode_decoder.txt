@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION shortestSuperstring WITH PARAMETER words  
+        SET n TO the LENGTH OF words  
+        
+        FUNCTION overlap WITH PARAMETERS i AND j  
+            FOR k FROM the MINIMUM OF the LENGTH OF the element at position i of words AND the LENGTH OF the element at position j of words DOWN TO one STEP minus one  
+                IF the substring of the element at position i of words from the LENGTH OF the element at position i of words MINUS k PLUS one TO the LENGTH OF the element at position i of words EQUALS the substring of the element at position j of words from one TO k  
+                    RETURN k  
+                END IF  
+            END FOR  
+            RETURN zero  
+        END FUNCTION  
+        
+        FUNCTION dp WITH PARAMETERS mask AND i  
+            IF mask EQUALS the result of one LEFT SHIFTED BY n MINUS one  
+                RETURN the tuple zero AND empty string  
+            END IF  
+            
+            SET min_len TO infinity  
+            SET best_path TO empty string  
+            FOR j FROM zero TO n MINUS one  
+                IF the bitwise AND of mask AND the result of one LEFT SHIFTED BY j EQUALS zero  
+                    SET length AND path TO the result of calling dp WITH the bitwise OR of mask AND the result of one LEFT SHIFTED BY j AND j  
+                    SET length TO length PLUS the LENGTH OF the element at position j of words MINUS the result of calling overlap WITH i AND j  
+                    IF length LESS THAN min_len  
+                        SET min_len TO length  
+                        SET best_path TO the substring of the element at position j of words from the result of calling overlap WITH i AND j PLUS one TO the LENGTH OF the element at position j of words CONCATENATED WITH path  
+                    END IF  
+                END IF  
+            END FOR  
+            
+            RETURN the tuple min_len AND best_path  
+        END FUNCTION  
+        
+        SET min_len TO infinity  
+        SET shortest_path TO empty string  
+        FOR i FROM zero TO n MINUS one  
+            SET length AND path TO the result of calling dp WITH the result of one LEFT SHIFTED BY i AND i  
+            SET length TO length PLUS the LENGTH OF the element at position i of words  
+            IF length LESS THAN min_len  
+                SET min_len TO length  
+                SET shortest_path TO the element at position i of words CONCATENATED WITH path  
+            END IF  
+        END FOR  
+        
+        RETURN shortest_path  
+    END FUNCTION  
+END CLASS

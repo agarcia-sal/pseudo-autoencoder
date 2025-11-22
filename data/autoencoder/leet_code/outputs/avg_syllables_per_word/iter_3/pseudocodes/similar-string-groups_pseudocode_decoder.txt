@@ -1,0 +1,42 @@
+CLASS Solution
+    FUNCTION numSimilarGroups(strs)
+        FUNCTION are_similar(s1, s2)
+            SET diff TO empty list
+            FOR i FROM 0 TO LENGTH OF s1 MINUS 1
+                IF s1[i] NOT EQUAL TO s2[i]
+                    APPEND i TO diff
+            IF LENGTH OF diff EQUALS 0
+                RETURN true
+            ELSE IF LENGTH OF diff EQUALS 2
+                RETURN s1[diff[0]] EQUALS s2[diff[1]] AND s1[diff[1]] EQUALS s2[diff[0]]
+            ELSE
+                RETURN false
+        END FUNCTION
+
+        FUNCTION dfs(node, visited)
+            ADD node TO visited
+            FOR each neighbor IN graph[node]
+                IF neighbor NOT IN visited
+                    CALL dfs(neighbor, visited)
+        END FUNCTION
+
+        SET n TO LENGTH OF strs
+        SET graph TO DICTIONARY WITH KEYS FROM 0 TO n MINUS 1 MAPPING TO EMPTY LIST
+
+        FOR i FROM 0 TO n MINUS 1
+            FOR j FROM i PLUS 1 TO n MINUS 1
+                IF are_similar(strs[i], strs[j]) IS true
+                    APPEND j TO graph[i]
+                    APPEND i TO graph[j]
+
+        SET visited TO empty set
+        SET num_groups TO 0
+
+        FOR i FROM 0 TO n MINUS 1
+            IF i NOT IN visited
+                CALL dfs(i, visited)
+                INCREMENT num_groups BY 1
+
+        RETURN num_groups
+    END FUNCTION
+END CLASS

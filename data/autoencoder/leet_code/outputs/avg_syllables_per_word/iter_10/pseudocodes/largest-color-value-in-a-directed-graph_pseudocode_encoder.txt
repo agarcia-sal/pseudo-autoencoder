@@ -1,0 +1,55 @@
+CLASS Solution  
+    FUNCTION largestPathValue(colors, edges)  
+        SET n TO the LENGTH OF colors  
+        SET graph TO an empty map with default empty list  
+        SET in_degree TO a list of zero repeated n times  
+        
+        FOR each pair u comma v IN edges  
+            APPEND v TO the list at key u in graph  
+            INCREMENT the value at position v in in_degree BY one  
+        END FOR  
+        
+        SET queue TO an empty deque  
+        FOR index FROM zero TO n MINUS one  
+            IF the value at position index in in_degree EQUALS zero  
+                APPEND index TO queue  
+            END IF  
+        END FOR  
+        
+        FUNCTION initialize_dp(size1, size2)  
+            CREATE a two dimensional list with size1 rows and size2 columns all set to zero  
+            RETURN the created list  
+        END FUNCTION  
+        
+        SET dp TO initialize_dp of n and twenty six  
+        SET visited TO zero  
+        SET max_color_value TO zero  
+        
+        WHILE queue is not empty  
+            REMOVE first element FROM queue AND SET it TO node  
+            INCREMENT the value in dp at row node and column (the ASCII code of the character at position node in colors MINUS the ASCII code of letter a) BY one  
+            IF the value in dp at row node and column (the ASCII code of the character at position node in colors MINUS the ASCII code of letter a) GREATER THAN max_color_value  
+                SET max_color_value TO that value in dp  
+            END IF  
+            INCREMENT visited BY one  
+            
+            FOR each neighbor IN the list at key node in graph  
+                FOR c FROM zero TO twenty five  
+                    IF the value in dp at row node and column c GREATER THAN the value in dp at row neighbor and column c  
+                        SET the value in dp at row neighbor and column c TO the value in dp at row node and column c  
+                    END IF  
+                END FOR  
+                DECREMENT the value at position neighbor in in_degree BY one  
+                IF the value at position neighbor in in_degree EQUALS zero  
+                    APPEND neighbor TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        IF visited EQUALS n  
+            RETURN max_color_value  
+        ELSE  
+            RETURN minus one  
+        END IF  
+    END FUNCTION  
+END CLASS

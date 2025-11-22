@@ -1,0 +1,85 @@
+CLASS TrieNode  
+    FUNCTION __init__  
+        SET children TO a new mapping that returns TrieNode instances by default  
+        SET count TO zero  
+    END FUNCTION  
+END CLASS
+
+CLASS Solution  
+    FUNCTION maxGeneticDifference WITH parameters parents AND queries  
+        SET tree TO a new mapping that returns empty lists by default  
+        FOR each index i AND element parent IN parents  
+            IF parent NOT EQUALS negative one THEN  
+                APPEND i TO the list at key parent in tree  
+            END IF  
+        END FOR
+
+        SET node_queries TO a new mapping that returns empty lists by default  
+        FOR each element node AND element val IN queries  
+            APPEND val TO the list at key node in node_queries  
+        END FOR
+
+        CREATE root AS a new TrieNode instance  
+
+        SET result TO a new list of zeros with the LENGTH of queries  
+
+        FUNCTION dfs WITH parameter node  
+            CALL insert WITH arguments trie_root assigned to root AND value assigned to node
+
+            FOR each val IN the list at key node in node_queries  
+                SET the element in result at the index found by looking up the pair node AND val in query_idx TO the returned value from calling max_xor WITH arguments trie_root assigned to root AND value assigned to val  
+            END FOR
+
+            FOR each child IN the list at key node in tree  
+                CALL dfs WITH argument child  
+            END FOR
+
+            CALL erase WITH arguments trie_root assigned to root AND value assigned to node  
+        END FUNCTION
+
+        FUNCTION insert WITH parameters trie_root AND value  
+            SET node TO trie_root  
+            FOR i FROM seventeen DOWNTO zero  
+                SET bit TO the bit at position i of value interpreted as value shifted right by i AND one  
+                SET node TO the child node in node.children at key bit  
+                INCREMENT node.count BY one  
+            END FOR  
+        END FUNCTION
+
+        FUNCTION erase WITH parameters trie_root AND value  
+            SET node TO trie_root  
+            FOR i FROM seventeen DOWNTO zero  
+                SET bit TO the bit at position i of value interpreted as value shifted right by i AND one  
+                SET node TO the child node in node.children at key bit  
+                DECREMENT node.count BY one  
+            END FOR  
+        END FUNCTION
+
+        FUNCTION max_xor WITH parameters trie_root AND value  
+            SET node TO trie_root  
+            SET max_xor_val TO zero  
+            FOR i FROM seventeen DOWNTO zero  
+                SET bit TO the bit at position i of value interpreted as value shifted right by i AND one  
+                SET toggled_bit TO one MINUS bit  
+                IF toggled_bit IS a key in node.children AND the count property of node.children at key toggled_bit IS GREATER THAN zero THEN  
+                    SET max_xor_val TO max_xor_val OR the value of one shifted left by i  
+                    SET node TO node.children at key toggled_bit  
+                ELSE  
+                    SET node TO node.children at key bit  
+                END IF  
+            END FOR  
+            RETURN max_xor_val  
+        END FUNCTION
+
+        SET query_idx TO a new mapping from each pair of node AND val in queries to its index position in queries  
+
+        FOR each index i AND element parent IN parents  
+            IF parent EQUALS negative one THEN  
+                CALL dfs WITH argument i  
+                STOP looping  
+            END IF  
+        END FOR
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

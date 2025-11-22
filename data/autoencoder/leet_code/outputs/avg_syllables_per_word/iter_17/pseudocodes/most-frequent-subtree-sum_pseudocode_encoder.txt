@@ -1,0 +1,63 @@
+CLASS TreeNode
+    FUNCTION __init__(val EQUALS zero, left EQUALS None, right EQUALS None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values_list)
+    IF values_list IS empty
+        RETURN None
+    END IF
+    SET root TO CALL TreeNode WITH the element at position zero of values_list
+    SET i TO one
+    INITIALIZE queue AS a new double ended queue
+    APPEND root TO queue
+    WHILE queue IS NOT empty
+        SET node TO the element removed from the front of queue
+        IF i IS LESS THAN the LENGTH OF values_list AND the element at position i of values_list IS NOT None
+            SET node.left TO CALL TreeNode WITH the element at position i of values_list
+            APPEND node.left TO queue
+        END IF
+        INCREMENT i BY one
+        IF i IS LESS THAN the LENGTH OF values_list AND the element at position i of values_list IS NOT None
+            SET node.right TO CALL TreeNode WITH the element at position i of values_list
+            APPEND node.right TO queue
+        END IF
+        INCREMENT i BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(node_p, node_q)
+    IF node_p IS None AND node_q IS None
+        RETURN True
+    ELSE IF node_p IS None OR node_q IS None
+        RETURN False
+    ELSE IF the value attribute of node_p IS NOT EQUALS the value attribute of node_q
+        RETURN False
+    ELSE
+        RETURN CALL is_same_tree WITH parameters the left attribute of node_p AND the left attribute of node_q
+            AND CALL is_same_tree WITH parameters the right attribute of node_p AND the right attribute of node_q
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION findFrequentTreeSum(root_node)
+        FUNCTION subtree_sum(node)
+            IF node IS None
+                RETURN zero
+            END IF
+            SET current_sum TO the value attribute of node PLUS CALL subtree_sum WITH the left attribute of node PLUS CALL subtree_sum WITH the right attribute of node
+            INCREMENT count at current_sum BY one
+            RETURN current_sum
+        END FUNCTION
+
+        INITIALIZE count AS a new default dictionary with default integer zero
+        CALL subtree_sum WITH root_node
+        SET max_freq TO the maximum value of the values in count with default zero
+        SET result TO a new list of keys in count WHERE the frequency EQUALS max_freq
+        RETURN result
+    END FUNCTION
+END CLASS

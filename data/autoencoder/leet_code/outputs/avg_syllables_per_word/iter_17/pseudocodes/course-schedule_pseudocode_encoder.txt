@@ -1,0 +1,36 @@
+CLASS Solution
+    FUNCTION canFinish(numCourses, prerequisites)
+        CALL initialize_graph_and_indegree WITH numCourses PARAMETERS graph, indegree
+
+        FOR each pair consisting of course AND prereq IN prerequisites
+            APPEND course TO the list at key prereq IN graph
+            INCREMENT element at position course OF indegree BY one
+        END FOR
+
+        CALL initialize_queue_with_zero_indegree_courses WITH graph, indegree, numCourses PARAMETER queue
+
+        WHILE queue IS NOT empty
+            CALL remove_leftmost_element_of queue ASSIGN TO current_course
+            DECREMENT numCourses BY one
+
+            FOR each next_course IN the list at key current_course IN graph
+                DECREMENT element at position next_course OF indegree BY one
+
+                IF element at position next_course OF indegree EQUALS zero
+                    APPEND next_course TO queue
+                END IF
+            END FOR
+        END WHILE
+
+        RETURN numCourses EQUALS zero
+    END FUNCTION
+
+    FUNCTION initialize_graph_and_indegree(numCourses) RETURNS graph, indegree
+        CALL auxiliary_functions_to_create_default_dict_of_lists RETURN graph
+        CREATE indegree AS list of zeros OF length numCourses
+    END FUNCTION
+
+    FUNCTION initialize_queue_with_zero_indegree_courses(graph, indegree, numCourses) RETURNS queue
+        CREATE queue AS deque CONTAINING all course IN range FROM zero TO numCourses MINUS one WHERE element at position course OF indegree EQUALS zero
+    END FUNCTION
+END CLASS

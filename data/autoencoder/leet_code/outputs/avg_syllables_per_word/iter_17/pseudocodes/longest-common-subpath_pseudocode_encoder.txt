@@ -1,0 +1,56 @@
+CLASS Solution
+    FUNCTION longestCommonSubpath(number_of_cities, list_of_paths)
+        FUNCTION hash_subpaths(single_path, subpath_length)
+            SET base_prime TO one hundred thirteen
+            SET modulus TO one billion PLUS seven
+            SET hash_value TO zero
+            SET power TO one
+            
+            FOR index FROM zero TO subpath_length MINUS one
+                SET hash_value TO hash_value MULTIPLIED BY base_prime PLUS element at position index of single_path
+                SET hash_value TO hash_value MODULUS modulus
+                SET power TO power MULTIPLIED BY base_prime
+                SET power TO power MODULUS modulus
+            END FOR
+            
+            SET set_of_hashes TO a set containing hash_value
+            FOR index FROM subpath_length TO LENGTH OF single_path MINUS one
+                SET leading_element TO element at position index MINUS subpath_length of single_path
+                SET trailing_element TO element at position index of single_path
+                SET hash_value TO hash_value MULTIPLIED BY base_prime PLUS trailing_element MINUS leading_element MULTIPLIED BY power
+                SET hash_value TO hash_value MODULUS modulus
+                ADD hash_value TO set_of_hashes
+            END FOR
+            
+            RETURN set_of_hashes
+        END FUNCTION
+        
+        FUNCTION check_common_subpath(subpath_length)
+            IF subpath_length EQUALS zero
+                RETURN true
+            END IF
+            SET common_hashes TO CALL hash_subpaths WITH the first element of list_of_paths AND subpath_length
+            FOR each path IN list_of_paths FROM second element TO last element
+                SET current_hashes TO CALL hash_subpaths WITH path AND subpath_length
+                SET common_hashes TO the intersection of common_hashes AND current_hashes
+                IF common_hashes IS empty
+                    RETURN false
+                END IF
+            END FOR
+            RETURN true
+        END FUNCTION
+        
+        SET left TO zero
+        SET right TO the minimum over LENGTH OF each path IN list_of_paths
+        WHILE left LESS THAN right
+            SET middle TO left PLUS right PLUS one DIVIDED BY two
+            IF CALL check_common_subpath WITH middle IS true
+                SET left TO middle
+            ELSE
+                SET right TO right MINUS one
+            END IF
+        END WHILE
+        
+        RETURN left
+    END FUNCTION
+END CLASS

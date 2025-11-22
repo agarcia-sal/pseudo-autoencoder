@@ -1,0 +1,47 @@
+CLASS Solution  
+    FUNCTION minSwapsCouples WITH PARAMETER row AS List of integer  
+        // Create a mapping from each person to their position in the row  
+        SET position TO CALL helper_create_position_mapping WITH PARAMETER row  
+        SET swaps TO zero  
+        
+        FOR index FROM zero TO the LENGTH OF row MINUS one IN STEPS OF two  
+            SET correct_pair TO CALL helper_find_correct_pair FOR person AT position index OF row  
+            
+            IF element at position index PLUS one OF row IS NOT EQUAL TO correct_pair  
+                SET swap_idx TO element at key correct_pair OF position  
+                
+                // Swap the person next to current with the correct pair person  
+                CALL helper_swap_positions IN row WITH positions index PLUS one AND swap_idx  
+                
+                // Update the positions of swapped persons in the position mapping  
+                SET element at key element at position swap_idx OF row OF position TO swap_idx  
+                SET element at key element at position index PLUS one OF row OF position TO index PLUS one  
+                
+                INCREMENT swaps BY one  
+            END IF  
+        END FOR  
+        
+        RETURN swaps  
+    END FUNCTION  
+    
+    FUNCTION helper_create_position_mapping WITH PARAMETER row AS List of integer  
+        SET mapping TO empty mapping  
+        SET index TO zero  
+        FOR each person IN row  
+            SET element at key person OF mapping TO index  
+            INCREMENT index BY one  
+        END FOR  
+        RETURN mapping  
+    END FUNCTION  
+    
+    FUNCTION helper_find_correct_pair WITH PARAMETER person AS integer  
+        // Return the correct pair for the given person using XOR with one  
+        RETURN person BITWISE EXCLUSIVE OR WITH one  
+    END FUNCTION  
+    
+    FUNCTION helper_swap_positions IN row WITH PARAMETERS position_one AS integer AND position_two AS integer  
+        SET temp TO element at position position_one OF row  
+        SET element at position position_one OF row TO element at position position_two OF row  
+        SET element at position position_two OF row TO temp  
+    END FUNCTION  
+END CLASS

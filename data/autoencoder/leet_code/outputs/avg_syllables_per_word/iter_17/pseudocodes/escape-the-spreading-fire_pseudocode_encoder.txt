@@ -1,0 +1,77 @@
+CLASS Solution
+    FUNCTION maximumMinutes(grid)
+        SET m TO the LENGTH OF grid
+        SET n TO the LENGTH OF element at position zero of grid
+        SET directions TO list containing tuples of one zero, MINUS one zero, zero one, zero MINUS one
+
+        FUNCTION can_escape(wait)
+            SET fire_times TO two dimensional list of size m by n FILLED WITH infinity
+            SET queue TO new deque
+
+            FOR i FROM zero TO m MINUS one
+                FOR j FROM zero TO n MINUS one
+                    IF element at position i of grid AT position j EQUALS one
+                        APPEND tuple of i, j, zero TO queue
+                        SET element at position i of fire_times AT position j TO zero
+                    END IF
+                END FOR
+            END FOR
+
+            WHILE queue is not empty
+                CALL queue TO POP the LEFTMOST element AND ASSIGN TO x, y, t
+                FOR each dx, dy IN directions
+                    SET nx TO x PLUS dx
+                    SET ny TO y PLUS dy
+                    IF nx GREATER THAN OR EQUAL TO zero AND nx LESS THAN m AND ny GREATER THAN OR EQUAL TO zero AND ny LESS THAN n AND element at position nx of grid AT position ny EQUALS zero AND element at position nx of fire_times AT position ny EQUALS infinity
+                        SET element at position nx of fire_times AT position ny TO t PLUS one
+                        APPEND tuple of nx, ny, t PLUS one TO queue
+                    END IF
+                END FOR
+            END WHILE
+
+            SET queue TO new deque containing tuple of zero, zero, wait
+            SET visited TO set containing tuple of zero, zero
+
+            WHILE queue is not empty
+                CALL queue TO POP the LEFTMOST element AND ASSIGN TO x, y, t
+                FOR each dx, dy IN directions
+                    SET nx TO x PLUS dx
+                    SET ny TO y PLUS dy
+                    IF nx GREATER THAN OR EQUAL TO zero AND nx LESS THAN m AND ny GREATER THAN OR EQUAL TO zero AND ny LESS THAN n AND tuple of nx, ny NOT IN visited AND element at position nx of grid AT position ny EQUALS zero
+                        IF nx EQUALS m MINUS one AND ny EQUALS n MINUS one
+                            IF element at position nx of fire_times AT position ny GREATER THAN OR EQUAL TO t PLUS one
+                                RETURN True
+                            ELSE
+                                RETURN False
+                            END IF
+                        END IF
+                        IF element at position nx of fire_times AT position ny GREATER THAN t PLUS one
+                            ADD tuple of nx, ny TO visited
+                            APPEND tuple of nx, ny, t PLUS one TO queue
+                        END IF
+                    END IF
+                END FOR
+            END WHILE
+
+            RETURN False
+        END FUNCTION
+
+        SET left TO zero
+        SET right TO m MULTIPLIED BY n
+        SET result TO MINUS one
+        WHILE left LESS THAN OR EQUAL TO right
+            SET mid TO the INTEGER DIVISION OF left PLUS right BY two
+            IF call can_escape WITH mid RETURNS True
+                SET result TO mid
+                SET left TO mid PLUS one
+            ELSE
+                SET right TO mid MINUS one
+            END IF
+        END WHILE
+        IF result EQUALS m MULTIPLIED BY n
+            RETURN one BILLION
+        ELSE
+            RETURN result
+        END IF
+    END FUNCTION
+END CLASS

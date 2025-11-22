@@ -1,0 +1,61 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val WITH DEFAULT 0, left WITH DEFAULT None, right WITH DEFAULT None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN None  
+    END IF  
+    SET root TO TreeNode WITH val AS values AT position 0  
+    SET i TO 1  
+    SET queue TO new empty queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO queue REMOVED FROM front  
+        IF i IS LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.left TO TreeNode WITH val AS values AT i  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY 1  
+        IF i IS LESS THAN LENGTH OF values AND values AT i IS NOT None  
+            SET node.right TO TreeNode WITH val AS values AT i  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION
+
+CLASS Solution  
+    FUNCTION buildTree(self, preorder, inorder)  
+        IF preorder IS empty OR inorder IS empty  
+            RETURN None  
+        END IF  
+        
+        SET root_val TO preorder AT position 0  
+        SET root TO TreeNode WITH val AS root_val  
+        
+        SET root_index_inorder TO POSITION OF root_val IN inorder  
+        
+        SET root.left TO self.buildTree(SUBLIST OF preorder FROM position 1 TO root_index_inorder INCLUSIVE, SUBLIST OF inorder FROM start TO root_index_inorder EXCLUSIVE)  
+        SET root.right TO self.buildTree(SUBLIST OF preorder FROM position root_index_inorder + 1 TO END, SUBLIST OF inorder FROM position root_index_inorder + 1 TO END)  
+        
+        RETURN root  
+    END FUNCTION  
+END CLASS

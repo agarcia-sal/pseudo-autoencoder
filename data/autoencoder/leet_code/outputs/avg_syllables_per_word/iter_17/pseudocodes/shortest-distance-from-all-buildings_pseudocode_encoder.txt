@@ -1,0 +1,90 @@
+CLASS Solution
+    FUNCTION shortestDistance(grid)
+        IF grid IS empty OR element at position zero of grid IS empty
+            RETURN negative one
+        END IF
+
+        SET m TO the LENGTH OF grid
+        SET n TO the LENGTH OF element at position zero of grid
+
+        CALL initializeMatrix WITH parameters zero, m, n RETURNING total_distance
+        CALL initializeMatrix WITH parameters zero, m, n RETURNING reach_count
+
+        SET building_count TO zero
+
+        CALL defineDirections WITH no parameters RETURNING directions
+
+        FUNCTION bfs(start_x, start_y)
+            CALL initializeQueue WITH parameter tuple of start_x AND start_y RETURNING queue
+            CALL initializeMatrix WITH parameters False, m, n RETURNING visited
+
+            SET distance TO zero
+            SET reachable TO zero
+
+            WHILE queue IS NOT empty
+                SET size TO the LENGTH OF queue
+                INCREMENT distance BY one
+
+                FOR index FROM one TO size
+                    CALL popLeft FROM queue RETURNING x, y
+                    FOR each dx, dy IN directions
+                        SET nx TO x PLUS dx
+                        SET ny TO y PLUS dy
+                        IF nx GREATER THAN OR EQUAL TO zero AND nx LESS THAN m
+                           AND ny GREATER THAN OR EQUAL TO zero AND ny LESS THAN n
+                           AND element at position nx of visited at position ny IS False
+                           AND element at position nx of grid at position ny EQUALS zero
+                            SET element at position nx of visited at position ny TO True
+                            CALL append tuple of nx AND ny TO queue
+                            SET element at position nx of total_distance at position ny TO element at position nx of total_distance at position ny PLUS distance
+                            SET element at position nx of reach_count at position ny TO element at position nx of reach_count at position ny PLUS one
+                            INCREMENT reachable BY one
+                        END IF
+                    END FOR
+                END FOR
+            END WHILE
+
+            RETURN reachable
+        END FUNCTION
+
+        FOR i FROM zero TO m MINUS one
+            FOR j FROM zero TO n MINUS one
+                IF element at position i of grid at position j EQUALS one
+                    INCREMENT building_count BY one
+                    IF CALL bfs WITH parameters i, j LESS THAN building_count MINUS one
+                        RETURN negative one
+                    END IF
+                END IF
+            END FOR
+        END FOR
+
+        SET min_distance TO infinity
+
+        FOR i FROM zero TO m MINUS one
+            FOR j FROM zero TO n MINUS one
+                IF element at position i of grid at position j EQUALS zero
+                   AND element at position i of reach_count at position j EQUALS building_count
+                    SET min_distance TO the MINIMUM OF min_distance AND element at position i of total_distance at position j
+                END IF
+            END FOR
+        END FOR
+
+        IF min_distance EQUALS infinity
+            RETURN negative one
+        ELSE
+            RETURN min_distance
+        END IF
+    END FUNCTION
+
+    FUNCTION initializeMatrix(initial_value, rows, columns)
+        AUXILIARY FUNCTION TO initialize two dimensional list with initial_value
+    END FUNCTION
+
+    FUNCTION defineDirections()
+        RETURN list of tuples one zero, negative one zero, zero one, zero negative one
+    END FUNCTION
+
+    FUNCTION initializeQueue(initial_elements)
+        AUXILIARY FUNCTION TO initialize queue with initial_elements
+    END FUNCTION
+END CLASS

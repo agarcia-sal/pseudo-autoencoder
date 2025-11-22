@@ -1,0 +1,87 @@
+CLASS Solution  
+    FUNCTION isSolvable(words parameter, result parameter)  
+        SET unique_chars TO a set of all characters contained in all elements of words parameter and also in result parameter  
+        IF the length of unique_chars is GREATER THAN ten THEN  
+            RETURN False  
+        END IF  
+        
+        SET non_zero_chars TO a set containing the first character of each element in words parameter that has length GREATER THAN one combined with the first character of result parameter if its length is GREATER THAN one otherwise an empty string  
+        
+        SET char_to_digit TO an empty dictionary  
+        SET digit_to_char TO an empty dictionary  
+        
+        FUNCTION can_assign(char parameter, digit parameter)  
+            RETURN char parameter is NOT in char_to_digit AND (digit parameter is NOT in digit_to_char OR digit_to_char element at digit parameter EQUALS char parameter)  
+        END FUNCTION  
+        
+        FUNCTION assign(char parameter, digit parameter)  
+            SET element at key char parameter in char_to_digit TO digit parameter  
+            SET element at key digit parameter in digit_to_char TO char parameter  
+        END FUNCTION  
+        
+        FUNCTION unassign(char parameter, digit parameter)  
+            REMOVE element at key char parameter FROM char_to_digit  
+            REMOVE element at key digit parameter FROM digit_to_char  
+        END FUNCTION  
+        
+        FUNCTION word_value(word parameter)  
+            SET total_value TO zero  
+            FOR each pair of index and character obtained by enumerating the characters of word parameter in reverse order  
+                INCREMENT total_value BY the digit mapped to character in char_to_digit MULTIPLIED BY ten RAISED TO the power of index  
+            END FOR  
+            RETURN total_value  
+        END FUNCTION  
+        
+        FUNCTION backtrack(index parameter, col parameter, sum_col parameter)  
+            IF col parameter is GREATER THAN OR EQUAL TO the maximum length of any element in words parameter AND col parameter is GREATER THAN OR EQUAL TO the length of result parameter THEN  
+                RETURN sum_col parameter EQUALS zero  
+            END IF  
+            
+            IF index parameter EQUALS the length of words parameter THEN  
+                IF col parameter is LESS THAN the length of result parameter THEN  
+                    SET digit_char TO the element at position length of result parameter MINUS one MINUS col parameter of result parameter  
+                    IF digit_char is in char_to_digit THEN  
+                        IF the digit mapped to digit_char in char_to_digit EQUALS sum_col parameter MODULO ten THEN  
+                            RETURN the result of backtrack with index parameter set to zero, col parameter INCREMENTED BY one, and sum_col parameter INTEGER DIVIDED BY ten  
+                        ELSE  
+                            RETURN False  
+                        END IF  
+                    ELSE IF can_assign called with digit_char and sum_col parameter MODULO ten RETURNS True AND (sum_col parameter MODULO ten is NOT zero OR digit_char is NOT in non_zero_chars) THEN  
+                        CALL assign with digit_char and sum_col parameter MODULO ten  
+                        IF backtrack called with index parameter set to zero, col parameter INCREMENTED BY one, and sum_col parameter INTEGER DIVIDED BY ten RETURNS True THEN  
+                            RETURN True  
+                        END IF  
+                        CALL unassign with digit_char and sum_col parameter MODULO ten  
+                    END IF  
+                ELSE  
+                    RETURN sum_col parameter EQUALS zero  
+                END IF  
+                RETURN False  
+            END IF  
+            
+            SET current_word TO the element at position index parameter of words parameter  
+            IF col parameter is GREATER THAN OR EQUAL TO the length of current_word THEN  
+                RETURN backtrack called with index parameter INCREMENTED BY one, col parameter, and sum_col parameter  
+            END IF  
+            
+            SET current_char TO the element at position length of current_word MINUS one MINUS col parameter of current_word  
+            IF current_char is in char_to_digit THEN  
+                RETURN backtrack called with index parameter INCREMENTED BY one, col parameter, and sum_col parameter PLUS the digit mapped to current_char in char_to_digit  
+            END IF  
+            
+            FOR digit FROM zero TO nine  
+                IF can_assign called with current_char and digit RETURNS True AND (digit is NOT zero OR current_char is NOT in non_zero_chars) THEN  
+                    CALL assign with current_char and digit  
+                    IF backtrack called with index parameter INCREMENTED BY one, col parameter, and sum_col parameter PLUS digit RETURNS True THEN  
+                        RETURN True  
+                    END IF  
+                    CALL unassign with current_char and digit  
+                END IF  
+            END FOR  
+            
+            RETURN False  
+        END FUNCTION  
+        
+        RETURN the result of backtrack called with zero for index parameter, zero for col parameter, and zero for sum_col parameter  
+    END FUNCTION  
+END CLASS

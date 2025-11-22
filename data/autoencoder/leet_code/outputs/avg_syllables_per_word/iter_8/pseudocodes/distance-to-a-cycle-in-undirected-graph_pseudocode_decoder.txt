@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION distanceToCycle(n, edges)  
+        SET graph TO an empty mapping from node to list of nodes  
+        FOR each pair (u, v) IN edges  
+            APPEND v TO graph at u  
+            APPEND u TO graph at v  
+        
+        FUNCTION dfs(node, parent, path, visited)  
+            IF node IS IN visited  
+                SET cycle_start TO index of node IN path  
+                RETURN slice of path FROM cycle_start TO end  
+            ADD node TO visited  
+            APPEND node TO path  
+            FOR each neighbor IN graph at node  
+                IF neighbor IS NOT parent  
+                    SET cycle TO dfs(neighbor, node, path, visited)  
+                    IF cycle IS NOT none  
+                        RETURN cycle  
+            REMOVE last element FROM path  
+            RETURN none  
+        
+        SET visited TO an empty set  
+        SET cycle TO none  
+        FOR node FROM 0 TO n minus 1  
+            IF node IS NOT IN visited  
+                SET cycle TO dfs(node, minus 1, empty list, visited)  
+                IF cycle IS NOT none  
+                    BREAK  
+        
+        SET distance TO list of zeros OF length n  
+        SET queue TO a deque initialized with cycle  
+        SET visited TO a set initialized with cycle  
+        
+        SET level TO 0  
+        WHILE queue IS NOT empty  
+            SET count TO length of queue  
+            FOR _ FROM 1 TO count  
+                REMOVE node FROM front of queue  
+                SET distance at node TO level  
+                FOR each neighbor IN graph at node  
+                    IF neighbor IS NOT IN visited  
+                        ADD neighbor TO visited  
+                        APPEND neighbor TO queue  
+            INCREMENT level BY 1  
+        
+        RETURN distance  
+    END FUNCTION  
+END CLASS

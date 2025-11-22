@@ -1,0 +1,45 @@
+CLASS Solution  
+    FUNCTION openLock(deadends, target)  
+        SET deadends_set TO CONVERT_LIST_TO_SET WITH PARAMETERS deadends  
+        
+        IF element AT POSITION zero TO three OF string "0000" IS IN deadends_set  
+            RETURN negative one  
+        END IF  
+        
+        IF target EQUALS string "0000"  
+            RETURN zero  
+        END IF  
+        
+        SET queue TO CONVERT_LIST_TO_DEQUE WITH PARAMETERS list containing tuple of string "0000" AND zero  
+        SET visited TO CONVERT_STRING_TO_SET WITH PARAMETERS string "0000"  
+        
+        FUNCTION neighbors(state)  
+            SET result TO empty list  
+            FOR index FROM zero TO three  
+                SET digit TO CONVERT_CHARACTER_TO_INTEGER WITH PARAMETERS element AT POSITION index OF state  
+                FOR move IN list containing negative one AND one  
+                    SET new_digit TO remainder AFTER DIVIDING sum of digit AND move BY ten  
+                    SET new_state TO concatenation of substring from position zero TO index MINUS one OF state, STRING REPRESENTATION OF new_digit, substring from position index PLUS one TO end OF state  
+                    APPEND new_state TO result  
+                END FOR  
+            END FOR  
+            RETURN result  
+        END FUNCTION  
+        
+        WHILE queue HOLDS elements  
+            SET current_state AND steps TO REMOVE FIRST ELEMENT FROM queue  
+            
+            FOR neighbor IN CALL neighbors WITH PARAMETERS current_state  
+                IF neighbor IS NOT IN visited AND neighbor IS NOT IN deadends_set  
+                    IF neighbor EQUALS target  
+                        RETURN steps PLUS one  
+                    END IF  
+                    ADD neighbor TO visited  
+                    APPEND tuple of neighbor AND steps PLUS one TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN negative one  
+    END FUNCTION  
+END CLASS

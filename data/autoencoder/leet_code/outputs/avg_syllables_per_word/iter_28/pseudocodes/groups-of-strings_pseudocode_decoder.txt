@@ -1,0 +1,98 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.parent TO list of integers from zero TO size MINUS one  
+        SET self.rank TO list of zeros with length size  
+        SET self.size TO list of ones with length size  
+    END FUNCTION  
+
+    FUNCTION find(self, u)  
+        IF element at position u of self.parent NOT EQUALS u  
+            SET element at position u of self.parent TO the result of calling find on element at position u of self.parent  
+        END IF  
+        RETURN element at position u of self.parent  
+    END FUNCTION  
+
+    FUNCTION union(self, u, v)  
+        SET rootU TO result of calling find on u  
+        SET rootV TO result of calling find on v  
+        IF rootU NOT EQUALS rootV  
+            IF element at position rootU of self.rank GREATER THAN element at position rootV of self.rank  
+                SET element at position rootV of self.parent TO rootU  
+                INCREMENT element at position rootU of self.size BY element at position rootV of self.size  
+            ELSE IF element at position rootU of self.rank LESS THAN element at position rootV of self.rank  
+                SET element at position rootU of self.parent TO rootV  
+                INCREMENT element at position rootV of self.size BY element at position rootU of self.size  
+            ELSE  
+                SET element at position rootV of self.parent TO rootU  
+                INCREMENT element at position rootU of self.size BY element at position rootV of self.size  
+                INCREMENT element at position rootU of self.rank BY one  
+            END IF  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION groupStrings(self, words)  
+        FUNCTION bitmask(word)  
+            SET mask TO zero  
+            FOR each character IN word  
+                SET mask TO mask OR binary one SHIFTED LEFT BY the ASCII value of character MINUS ASCII value of character a  
+            END FOR  
+            RETURN mask  
+        END FUNCTION  
+
+        SET word_map TO a default dictionary with list as default type  
+        SET n TO the length of words  
+        SET uf TO new instance of UnionFind with size n  
+
+        FOR each index i AND word IN words  
+            SET mask TO result of calling bitmask on word  
+            APPEND i TO list at key mask in word_map  
+        END FOR  
+
+        FOR each index i AND word IN words  
+            SET mask TO result of calling bitmask on word  
+            FOR each integer j FROM zero TO twenty five  
+                SET new_mask TO mask XOR binary one SHIFTED LEFT BY j  
+                IF new_mask IS A key IN word_map  
+                    FOR each element k IN list at key new_mask in word_map  
+                        CALL union on uf with i AND k  
+                    END FOR  
+                END IF  
+
+                IF binary one SHIFTED LEFT BY j AND mask EQUALS zero  
+                    SET new_mask TO mask OR binary one SHIFTED LEFT BY j  
+                    IF new_mask IS A key IN word_map  
+                        FOR each element k IN list at key new_mask in word_map  
+                            CALL union on uf with i AND k  
+                        END FOR  
+                    END IF  
+                END IF  
+
+                IF binary one SHIFTED LEFT BY j AND mask NOT EQUALS zero  
+                    FOR each integer k FROM zero TO twenty five  
+                        IF binary one SHIFTED LEFT BY k AND mask EQUALS zero  
+                            SET new_mask TO mask XOR binary one SHIFTED LEFT BY j OR binary one SHIFTED LEFT BY k  
+                            IF new_mask IS A key IN word_map  
+                                FOR each element l IN list at key new_mask in word_map  
+                                    CALL union on uf with i AND l  
+                                END FOR  
+                            END IF  
+                        END IF  
+                    END FOR  
+                END IF  
+            END FOR  
+        END FOR  
+
+        SET root_sizes TO a default dictionary with integer as default type  
+        FOR each integer i FROM zero TO n MINUS one  
+            SET root TO result of calling find on uf with i  
+            INCREMENT element at key root in root_sizes BY one  
+        END FOR  
+
+        SET max_group_size TO the maximum value among all values in root_sizes  
+        SET num_groups TO the number of keys in root_sizes  
+
+        RETURN list consisting of num_groups AND max_group_size  
+    END FUNCTION  
+END CLASS

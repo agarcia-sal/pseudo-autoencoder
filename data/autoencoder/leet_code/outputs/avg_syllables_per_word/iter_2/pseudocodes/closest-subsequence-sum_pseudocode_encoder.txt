@@ -1,0 +1,40 @@
+CLASS Solution
+    FUNCTION minAbsDifference(nums: List[int], goal: int)
+        SET n TO LENGTH OF nums
+        SET mid TO n DIVIDED BY 2
+
+        SET left_sums TO LIST CONTAINING 0
+        FOR each num IN SUBLIST OF nums FROM START TO mid (excluded)
+            SET new_sums TO EMPTY LIST
+            FOR each s IN left_sums
+                APPEND s + num TO new_sums
+            EXTEND left_sums BY new_sums
+
+        SET right_sums TO LIST CONTAINING 0
+        FOR each num IN SUBLIST OF nums FROM mid TO END
+            SET new_sums TO EMPTY LIST
+            FOR each s IN right_sums
+                APPEND s + num TO new_sums
+            EXTEND right_sums BY new_sums
+
+        SORT right_sums
+
+        SET min_diff TO POSITIVE_INFINITY
+
+        FOR each left_sum IN left_sums
+            SET target TO goal MINUS left_sum
+            SET pos TO RESULT OF BINARY SEARCH FOR target IN right_sums (LEFTMOST POSITION)
+
+            IF pos IS LESS THAN LENGTH OF right_sums
+                SET candidate_diff TO ABSOLUTE VALUE OF (left_sum + right_sums[pos] MINUS goal)
+                IF candidate_diff IS LESS THAN min_diff
+                    SET min_diff TO candidate_diff
+
+            IF pos IS GREATER THAN 0
+                SET candidate_diff TO ABSOLUTE VALUE OF (left_sum + right_sums[pos - 1] MINUS goal)
+                IF candidate_diff IS LESS THAN min_diff
+                    SET min_diff TO candidate_diff
+
+        RETURN min_diff
+    END FUNCTION
+END CLASS

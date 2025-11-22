@@ -1,0 +1,76 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val, left, right)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values EQUALS empty list THEN  
+        RETURN None  
+    END IF  
+    SET root TO new TreeNode with the element at position one of values  
+    SET i TO one  
+    SET queue TO new empty double ended queue  
+    APPEND root TO queue  
+    WHILE queue is not empty DO  
+        SET node TO the element removed from the front of queue  
+        IF i LESS THAN the length of values AND the element at position i of values NOT EQUALS None THEN  
+            SET node.left TO new TreeNode with the element at position i of values  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN the length of values AND the element at position i of values NOT EQUALS None THEN  
+            SET node.right TO new TreeNode with the element at position i of values  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p EQUALS None AND q EQUALS None THEN  
+        RETURN True  
+    ELSE IF p EQUALS None OR q EQUALS None THEN  
+        RETURN False  
+    ELSE IF the val attribute of p NOT EQUALS the val attribute of q THEN  
+        RETURN False  
+    ELSE  
+        RETURN the result of is_same_tree with the left attribute of p and the left attribute of q  
+        AND the result of is_same_tree with the right attribute of p and the right attribute of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION zigzagLevelOrder(self, root)  
+        IF root EQUALS None THEN  
+            RETURN empty list  
+        END IF  
+        SET result TO new empty list  
+        SET queue TO new double ended queue containing root  
+        SET left_to_right TO True  
+        WHILE queue is not empty DO  
+            SET level_size TO the length of queue  
+            SET current_level TO new empty double ended queue  
+            FOR underscore FROM one TO level_size DO  
+                SET node TO the element removed from the front of queue  
+                IF left_to_right EQUALS True THEN  
+                    APPEND the val attribute of node TO current_level  
+                ELSE  
+                    APPEND the val attribute of node TO the front of current_level  
+                END IF  
+                IF the left attribute of node NOT EQUALS None THEN  
+                    APPEND the left attribute of node TO queue  
+                END IF  
+                IF the right attribute of node NOT EQUALS None THEN  
+                    APPEND the right attribute of node TO queue  
+                END IF  
+            END FOR  
+            APPEND the conversion of current_level to list TO result  
+            SET left_to_right TO NOT left_to_right  
+        END WHILE  
+        RETURN result  
+    END FUNCTION  
+END CLASS

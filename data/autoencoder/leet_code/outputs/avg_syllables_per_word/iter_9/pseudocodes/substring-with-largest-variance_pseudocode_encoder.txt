@@ -1,0 +1,47 @@
+CLASS Solution  
+    FUNCTION largestVariance(self, s)  
+        FUNCTION calculate_variance(substring, char_a, char_b)  
+            SET max_variance TO zero  
+            SET count_a TO zero  
+            SET count_b TO zero  
+            SET has_b TO false  
+            SET first_b TO false  
+            
+            FOR each char IN substring  
+                IF char EQUALS char_a THEN  
+                    INCREMENT count_a BY one  
+                ELSE IF char EQUALS char_b THEN  
+                    INCREMENT count_b BY one  
+                    SET has_b TO true  
+                END IF  
+                
+                IF count_b GREATER THAN zero THEN  
+                    SET max_variance TO maximum of max_variance AND count_a MINUS count_b  
+                ELSE IF count_b EQUALS zero AND first_b THEN  
+                    SET max_variance TO maximum of max_variance AND count_a MINUS one  
+                END IF  
+                
+                IF count_b GREATER THAN count_a THEN  
+                    SET count_a TO zero  
+                    SET count_b TO zero  
+                    SET first_b TO has_b  
+                END IF  
+            END FOR  
+            
+            RETURN max_variance  
+        END FUNCTION  
+        
+        SET max_variance TO zero  
+        SET unique_chars TO set of all characters in s  
+        
+        FOR each pair (char_a, char_b) IN all ordered pairs of unique_chars of length two  
+            IF char_a EQUALS char_b THEN  
+                CONTINUE to next iteration  
+            END IF  
+            SET candidate_variance TO result of calculate_variance applied to s, char_a, char_b  
+            SET max_variance TO maximum of max_variance AND candidate_variance  
+        END FOR  
+        
+        RETURN max_variance  
+    END FUNCTION  
+END CLASS

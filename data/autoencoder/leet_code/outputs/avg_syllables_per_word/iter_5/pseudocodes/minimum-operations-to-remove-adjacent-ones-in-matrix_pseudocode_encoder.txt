@@ -1,0 +1,61 @@
+CLASS Solution  
+    FUNCTION minimumOperations(grid)  
+        FUNCTION bfs()  
+            INITIALIZE queue AS empty deque  
+            FOR each u FROM 0 TO n MINUS 1  
+                IF match AT u EQUALS -1  
+                    SET dist AT u TO 0  
+                    APPEND u TO queue  
+                ELSE  
+                    SET dist AT u TO infinity  
+            SET dist AT -1 TO infinity  
+            WHILE queue IS NOT empty  
+                REMOVE first element FROM queue AND SET TO u  
+                IF dist AT u IS LESS THAN dist AT -1  
+                    FOR each v IN graph AT u  
+                        IF dist AT match AT v EQUALS infinity  
+                            SET dist AT match AT v TO dist AT u PLUS 1  
+                            APPEND match AT v TO queue  
+            RETURN dist AT -1 IS LESS THAN infinity  
+        END FUNCTION  
+        
+        FUNCTION dfs(u)  
+            IF u IS NOT EQUAL TO -1  
+                FOR each v IN graph AT u  
+                    IF dist AT match AT v EQUALS dist AT u PLUS 1  
+                        IF dfs(match AT v) IS True  
+                            SET match AT v TO u  
+                            SET match AT u TO v  
+                            RETURN True  
+                SET dist AT u TO infinity  
+                RETURN False  
+            RETURN True  
+        END FUNCTION  
+        
+        SET rows TO LENGTH OF grid  
+        SET cols TO LENGTH OF grid AT 0  
+        SET n TO rows MULTIPLIED BY cols  
+        INITIALIZE graph AS list OF empty sets WITH LENGTH n PLUS 1  
+        INITIALIZE match AS list FILLED WITH -1 OF LENGTH n PLUS 1  
+        INITIALIZE dist AS list FILLED WITH 0 OF LENGTH n PLUS 1  
+        
+        FOR r FROM 0 TO rows MINUS 1  
+            FOR c FROM 0 TO cols MINUS 1  
+                IF grid AT r AT c EQUALS 1  
+                    SET u TO r MULTIPLIED BY cols PLUS c  
+                    FOR each pair (dr, dc) IN list OF (-1,0), (1,0), (0,-1), (0,1)  
+                        SET nr TO r PLUS dr  
+                        SET nc TO c PLUS dc  
+                        IF nr GREATER THAN OR EQUAL TO 0 AND nr LESS THAN rows AND nc GREATER THAN OR EQUAL TO 0 AND nc LESS THAN cols AND grid AT nr AT nc EQUALS 1  
+                            SET v TO nr MULTIPLIED BY cols PLUS nc  
+                            ADD v TO graph AT u  
+        
+        SET matching TO 0  
+        WHILE bfs() IS True  
+            FOR u FROM 0 TO n MINUS 1  
+                IF match AT u EQUALS -1 AND dfs(u) IS True  
+                    INCREMENT matching BY 1  
+        
+        RETURN matching  
+    END FUNCTION  
+END CLASS

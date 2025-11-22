@@ -1,0 +1,61 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET parent TO list of integers FROM zero TO size MINUS one  
+    END FUNCTION  
+
+    FUNCTION find(self, u)  
+        IF element at position u of parent IS NOT EQUAL TO u  
+            SET element at position u of parent TO the result of find with element at position u of parent of parent  
+        END IF  
+        RETURN element at position u of parent  
+    END FUNCTION  
+
+    FUNCTION union(self, u, v)  
+        SET root_u TO the result of find with u  
+        SET root_v TO the result of find with v  
+        IF root_u IS NOT EQUAL TO root_v  
+            SET element at position root_u of parent TO root_v  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION matrixRankTransform(self, matrix)  
+        SET m TO the LENGTH OF matrix  
+        SET n TO the LENGTH OF element at position zero of matrix  
+        CREATE value_to_indices AS a map DEFAULTING to empty list  
+        
+        FOR each r FROM zero TO m MINUS one  
+            FOR each c FROM zero TO n MINUS one  
+                APPEND the pair of r and c TO the list in value_to_indices for key element at position r of matrix AT position c  
+            END FOR  
+        END FOR  
+        
+        SET row_rank TO list of zero repeated m times  
+        SET col_rank TO list of zero repeated n times  
+        SET result TO list of lists of zero repeated n times FOR m times  
+        
+        FOR each value IN the sorted keys of value_to_indices  
+            SET uf TO a new UnionFind with the parameter m PLUS n  
+            CREATE rank AS a map DEFAULTING to zero  
+            
+            FOR each pair r and c IN value_to_indices at key value  
+                CALL union on uf with parameters r and c PLUS m  
+            END FOR  
+            
+            FOR each pair r and c IN value_to_indices at key value  
+                SET root TO the result of find on uf with parameter r  
+                SET rank at key root TO the maximum of current rank at key root AND the maximum of element at position r of row_rank AND element at position c of col_rank PLUS one  
+            END FOR  
+            
+            FOR each pair r and c IN value_to_indices at key value  
+                SET root TO the result of find on uf with parameter r  
+                SET element at position r and c of result TO rank at key root  
+                SET element at position r of row_rank TO rank at key root  
+                SET element at position c of col_rank TO rank at key root  
+            END FOR  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,63 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val LEFT right  
+        SET self dot val TO val  
+        SET self dot left TO left  
+        SET self dot right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values EQUALS empty  
+        RETURN none  
+    END IF  
+    SET root TO new TreeNode initialized with the element at position zero of values  
+    SET i TO one  
+    SET queue TO a new deque collection  
+    APPEND root TO queue  
+    WHILE the LENGTH OF queue IS GREATER THAN zero  
+        SET node TO the element removed from the left end of queue  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT none  
+            SET node dot left TO new TreeNode initialized with the element at position i of values  
+            APPEND node dot left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT none  
+            SET node dot right TO new TreeNode initialized with the element at position i of values  
+            APPEND node dot right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p EQUALS none AND q EQUALS none  
+        RETURN True  
+    ELSE IF p EQUALS none OR q EQUALS none  
+        RETURN False  
+    ELSE IF the value at p DOES NOT EQUAL the value at q  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree called with the left child of p AND the left child of q AND is_same_tree called with the right child of p AND the right child of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION countUnivalSubtrees WITH PARAMETERS self root  
+        FUNCTION helper WITH PARAMETER node  
+            IF node EQUALS none  
+                RETURN True AND zero  
+            END IF  
+            SET is_left_unival COMMA left_count TO helper called with the left child of node  
+            SET is_right_unival COMMA right_count TO helper called with the right child of node  
+            IF is_left_unival AND is_right_unival  
+                IF (the left child of node EQUALS none OR the value at the left child of node EQUALS the value at node) AND (the right child of node EQUALS none OR the value at the right child of node EQUALS the value at node)  
+                    RETURN True AND left_count PLUS right_count PLUS one  
+                END IF  
+            END IF  
+            RETURN False AND left_count PLUS right_count  
+        END FUNCTION  
+        SET underscore COMMA count TO helper called with root  
+        RETURN count  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,62 @@
+CLASS TreeNode
+    FUNCTION __init__(val = 0, left = None, right = None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values)
+    IF values IS EMPTY
+        RETURN None
+    SET root TO NEW TreeNode(values[0])
+    SET i TO 1
+    SET queue TO NEW deque()
+    APPEND root TO queue
+    WHILE queue IS NOT EMPTY
+        SET node TO POP LEFT FROM queue
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.left TO NEW TreeNode(values[i])
+            APPEND node.left TO queue
+        INCREMENT i BY 1
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.right TO NEW TreeNode(values[i])
+            APPEND node.right TO queue
+        INCREMENT i BY 1
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val != q.val
+        RETURN False
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+END FUNCTION
+
+CLASS Solution
+    FUNCTION findFrequentTreeSum(root)
+        FUNCTION subtree_sum(node)
+            IF node IS None
+                RETURN 0
+            SET current_sum TO node.val + subtree_sum(node.left) + subtree_sum(node.right)
+            INCREMENT count[current_sum] BY 1
+            RETURN current_sum
+        END FUNCTION
+
+        SET count TO A DEFAULT DICTIONARY WITH DEFAULT VALUE 0
+        CALL subtree_sum(root)
+
+        SET max_freq TO MAXIMUM VALUE IN count.values() OR 0 IF EMPTY
+        SET result TO EMPTY LIST
+        FOR EACH key, freq IN count.items()
+            IF freq EQUALS max_freq
+                APPEND key TO result
+        END FOR
+        RETURN result
+    END FUNCTION
+END CLASS

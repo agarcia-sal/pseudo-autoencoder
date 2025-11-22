@@ -1,0 +1,64 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS none, right EQUALS none)  
+        SET self dot val TO val  
+        SET self dot left TO left  
+        SET self dot right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF the list values IS empty  
+        RETURN none  
+    END IF  
+    SET root TO a new TreeNode initialized with the element at position zero of values  
+    SET i TO one  
+    SET queue TO an empty double-ended queue  
+    APPEND root TO queue  
+    WHILE queue is not empty  
+        SET node TO the element removed from the front of queue  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT none  
+            SET node dot left TO a new TreeNode initialized with the element at position i of values  
+            APPEND node dot left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT none  
+            SET node dot right TO a new TreeNode initialized with the element at position i of values  
+            APPEND node dot right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF p dot val IS NOT EQUALS q dot val  
+        RETURN false  
+    ELSE  
+        RETURN the logical AND of the call to is_same_tree with arguments the left child of p and the left child of q AND the call to is_same_tree with arguments the right child of p and the right child of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION minCameraCover(self, root)  
+        FUNCTION dfs(node)  
+            IF node IS none  
+                RETURN a triple with the first element zero the second element zero and the third element positive infinity  
+            END IF  
+            SET left_no_camera, left_monitored, left_camera TO the triple returned by the call to dfs with the left child of node  
+            SET right_no_camera, right_monitored, right_camera TO the triple returned by the call to dfs with the right child of node  
+            SET no_camera TO left_monitored PLUS right_monitored  
+            SET monitored TO the minimum of three values  
+                THE first value IS left_camera PLUS the minimum of right_monitored AND right_camera  
+                THE second value IS right_camera PLUS the minimum of left_monitored AND left_camera  
+                THE third value IS left_camera PLUS right_camera  
+            SET camera TO one PLUS the minimum of left_no_camera, left_monitored, AND left_camera PLUS the minimum of right_no_camera, right_monitored, AND right_camera  
+            RETURN the triple composed of no_camera, monitored, AND camera  
+        END FUNCTION  
+        SET root_no_camera, root_monitored, root_camera TO the triple returned by the call to dfs with root  
+        RETURN the minimum of root_monitored AND root_camera  
+    END FUNCTION  
+END CLASS

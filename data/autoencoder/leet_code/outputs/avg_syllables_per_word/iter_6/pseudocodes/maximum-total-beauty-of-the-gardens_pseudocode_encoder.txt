@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION maximumBeauty(flowers, newFlowers, target, full, partial)  
+        CALL flowers.sort()  
+        SET n TO LENGTH OF flowers  
+        SET max_beauty TO 0  
+        
+        SET prefix_sum TO list of zeros with length n PLUS 1  
+        FOR i FROM 0 TO n MINUS 1  
+            SET prefix_sum AT i PLUS 1 TO prefix_sum AT i PLUS flowers AT i  
+        
+        SET complete_gardens TO 0  
+        FOR i FROM n MINUS 1 TO 0 STEP MINUS 1  
+            IF flowers AT i GREATER THAN OR EQUAL TO target THEN  
+                INCREMENT complete_gardens BY 1  
+            ELSE  
+                BREAK  
+        
+        SET remaining_flowers TO newFlowers  
+        SET max_incomplete_flowers TO 0  
+        
+        FOR i FROM complete_gardens TO n  
+            IF i GREATER THAN 0 THEN  
+                DECREMENT remaining_flowers BY (target MINUS flowers AT (n MINUS i))  
+                IF remaining_flowers LESS THAN 0 THEN  
+                    BREAK  
+            
+            SET left TO 0  
+            SET right TO n MINUS i MINUS 1  
+            WHILE left LESS THAN OR EQUAL TO right  
+                SET mid TO (left PLUS right) DIVIDED BY 2  
+                SET cost TO (flowers AT mid MULTIPLIED BY (mid PLUS 1)) MINUS prefix_sum AT (mid PLUS 1)  
+                IF cost GREATER THAN remaining_flowers THEN  
+                    SET right TO mid MINUS 1  
+                ELSE  
+                    SET left TO mid PLUS 1  
+            
+            IF right GREATER THAN OR EQUAL TO 0 THEN  
+                SET max_incomplete_flowers TO flowers AT right PLUS (remaining_flowers MINUS ((flowers AT right MULTIPLIED BY (right PLUS 1)) MINUS prefix_sum AT (right PLUS 1))) DIVIDED BY (right PLUS 1)  
+            ELSE  
+                SET max_incomplete_flowers TO 0  
+            
+            SET total_beauty TO (i MULTIPLIED BY full) PLUS (MINIMUM OF max_incomplete_flowers AND (target MINUS 1) MULTIPLIED BY partial)  
+            IF total_beauty GREATER THAN max_beauty THEN  
+                SET max_beauty TO total_beauty  
+        
+        RETURN max_beauty  
+    END FUNCTION  
+END CLASS

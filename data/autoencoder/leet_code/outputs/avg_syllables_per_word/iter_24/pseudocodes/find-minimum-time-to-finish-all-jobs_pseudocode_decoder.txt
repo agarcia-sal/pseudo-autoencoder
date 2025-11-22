@@ -1,0 +1,29 @@
+CLASS Solution  
+    FUNCTION minimumTimeRequired(jobs, k)  
+        SET n TO the LENGTH OF jobs  
+        SET subset_sums TO a list of LENGTH equal to TWO RAISED TO THE POWER OF n with all elements SET TO zero  
+        FOR i FROM zero TO n MINUS one  
+            FOR mask FROM zero TO TWO RAISED TO THE POWER OF i MINUS one  
+                SET subset_sums at the POSITION that is the BITWISE OR of mask and TWO RAISED TO THE POWER OF i TO the SUM of subset_sums at mask PLUS the element at position i of jobs  
+            END FOR  
+        END FOR  
+        
+        FUNCTION dp(k, mask)  
+            IF k EQUALS one THEN  
+                RETURN subset_sums at mask  
+            END IF  
+            SET res TO infinity  
+            SET submask TO mask  
+            WHILE submask HOLDS  
+                SET candidate_time TO the MAXIMUM of dp with parameters k MINUS one and the result of BITWISE XOR of mask and submask AND subset_sums at submask  
+                IF candidate_time LESS THAN res THEN  
+                    SET res TO candidate_time  
+                END IF  
+                SET submask TO the BITWISE AND of submask MINUS one and mask  
+            END WHILE  
+            RETURN res  
+        END FUNCTION  
+        
+        RETURN dp with parameters k and TWO RAISED TO THE POWER OF n MINUS one  
+    END FUNCTION  
+END CLASS

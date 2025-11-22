@@ -1,0 +1,11 @@
+def multiply_strings(num1, num2):
+    if num1 == "0" or num2 == "0":
+        return "0"
+    res = [0] * (len(num1) + len(num2))
+    n1, n2 = num1[::-1], num2[::-1]
+    for i in range(len(n1)):
+        for j in range(len(n2)):
+            mul = (ord(n1[i]) - 48) * (ord(n2[j]) - 48)
+            sum_ = mul + res[i + j]
+            res[i + j], res[i + j + 1] = sum_ % 10, res[i + j + 1] + sum_ // 10
+    return ''.join(map(str, res[::-1])).lstrip('0')

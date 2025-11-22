@@ -1,0 +1,24 @@
+from typing import List
+
+class Solution:
+    def maxTotalFruits(self, fruits: List[List[int]], startPos: int, k: int) -> int:
+        max_fruits = 0
+        total_fruits = 0
+        left = 0
+
+        for right in range(len(fruits)):
+            position = fruits[right][0]
+            amount = fruits[right][1]
+            total_fruits += amount
+
+            while left <= right and not (
+                startPos - k <= fruits[left][0] <= startPos + k and
+                startPos - k <= fruits[right][0] <= startPos + k and
+                min(abs(fruits[right][0] - startPos), abs(fruits[left][0] - startPos)) + (fruits[right][0] - fruits[left][0]) <= k
+            ):
+                total_fruits -= fruits[left][1]
+                left += 1
+
+            max_fruits = max(max_fruits, total_fruits)
+
+        return max_fruits

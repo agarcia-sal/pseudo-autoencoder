@@ -1,0 +1,57 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val SET TO zero left SET TO none right SET TO none  
+        SET self dot val TO val  
+        SET self dot left TO left  
+        SET self dot right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF values IS NOT PRESENT  
+        RETURN none  
+    END IF  
+    SET root TO NEW TreeNode INITIALIZED WITH element at position zero OF values  
+    SET i TO one  
+    SET queue TO NEW double ended queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO element REMOVED FROM FRONT OF queue  
+        IF i IS LESS THAN LENGTH OF values AND element at position i OF values IS NOT none  
+            SET node dot left TO NEW TreeNode INITIALIZED WITH element at position i OF values  
+            APPEND node dot left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN LENGTH OF values AND element at position i OF values IS NOT none  
+            SET node dot right TO NEW TreeNode INITIALIZED WITH element at position i OF values  
+            APPEND node dot right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS NOT PRESENT AND q IS NOT PRESENT  
+        RETURN True  
+    ELSE IF p IS NOT PRESENT OR q IS NOT PRESENT  
+        RETURN False  
+    ELSE IF p dot val IS NOT EQUAL TO q dot val  
+        RETURN False  
+    ELSE  
+        RETURN THE RESULT OF is_same_tree WITH PARAMETERS p dot left AND q dot left AND THE RESULT OF is_same_tree WITH PARAMETERS p dot right AND q dot right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION pruneTree WITH PARAMETERS self root  
+        IF root IS NOT PRESENT  
+            RETURN none  
+        END IF  
+        SET root dot left TO self dot pruneTree CALLED WITH root dot left  
+        SET root dot right TO self dot pruneTree CALLED WITH root dot right  
+        IF root dot val IS EQUAL TO zero AND root dot left IS NOT PRESENT AND root dot right IS NOT PRESENT  
+            RETURN none  
+        END IF  
+        RETURN root  
+    END FUNCTION  
+END CLASS

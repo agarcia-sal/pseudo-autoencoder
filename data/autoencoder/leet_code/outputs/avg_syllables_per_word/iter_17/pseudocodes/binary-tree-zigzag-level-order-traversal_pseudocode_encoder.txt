@@ -1,0 +1,75 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val EQUALS zero, left EQUALS None, right EQUALS None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values LIST)
+    IF values IS empty
+        RETURN None
+    END IF
+    SET root TO A NEW TreeNode WITH parameter value ELEMENT AT position zero OF values
+    SET i TO one
+    SET queue TO A NEW deque
+    CALL APPEND root TO queue
+    WHILE queue IS NOT empty
+        SET node TO THE FIRST ELEMENT REMOVED FROM queue
+        IF i IS LESS THAN THE LENGTH OF values AND ELEMENT AT position i OF values IS NOT None
+            SET node.left TO A NEW TreeNode WITH parameter value ELEMENT AT position i OF values
+            CALL APPEND node.left TO queue
+        END IF
+        INCREMENT i BY one
+        IF i IS LESS THAN THE LENGTH OF values AND ELEMENT AT position i OF values IS NOT None
+            SET node.right TO A NEW TreeNode WITH parameter value ELEMENT AT position i OF values
+            CALL APPEND node.right TO queue
+        END IF
+        INCREMENT i BY one
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val NOT EQUALS q.val
+        RETURN False
+    ELSE
+        RETURN CALL is_same_tree WITH p.left AND q.left AND CALL is_same_tree WITH p.right AND q.right
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION zigzagLevelOrder(self, root)
+        IF root IS None
+            RETURN AN EMPTY LIST
+        END IF
+        SET result TO AN EMPTY LIST
+        SET queue TO A NEW deque WITH root AS THE ONLY ELEMENT
+        SET left_to_right TO True
+        WHILE queue IS NOT empty
+            SET level_size TO THE LENGTH OF queue
+            SET current_level TO A NEW EMPTY deque
+            FOR index FROM zero TO level_size MINUS one
+                SET node TO THE FIRST ELEMENT REMOVED FROM queue
+                IF left_to_right IS True
+                    CALL APPEND node.val TO current_level
+                ELSE
+                    CALL APPEND node.val TO THE LEFT OF current_level
+                END IF
+                IF node.left IS NOT None
+                    CALL APPEND node.left TO queue
+                END IF
+                IF node.right IS NOT None
+                    CALL APPEND node.right TO queue
+                END IF
+            END FOR
+            CALL APPEND THE LIST CONVERSION OF current_level TO result
+            SET left_to_right TO NOT left_to_right
+        END WHILE
+        RETURN result
+    END FUNCTION
+END CLASS

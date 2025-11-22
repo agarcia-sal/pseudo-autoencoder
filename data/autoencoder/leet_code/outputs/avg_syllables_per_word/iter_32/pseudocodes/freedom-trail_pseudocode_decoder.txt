@@ -1,0 +1,39 @@
+CLASS Solution  
+    FUNCTION findRotateSteps(ring parameter, key parameter) RETURNS integer  
+        SET char_positions TO an empty dictionary that maps characters to list of positions  
+        SET index TO zero  
+        FOR each character IN ring  
+            APPEND index TO the list in char_positions at character  
+            INCREMENT index BY one  
+        END FOR  
+        
+        SET n TO the length of ring  
+        
+        FUNCTION dp(i parameter, prev_pos parameter) RETURNS integer  
+            IF i EQUALS the length of key THEN  
+                RETURN zero  
+            END IF  
+            
+            SET min_steps TO a very large number representing infinity  
+            SET pos_index TO zero  
+            FOR each position IN the list at char_positions at the character at position i of key  
+                SET clockwise TO position MINUS prev_pos MODULO n  
+                SET anticlockwise TO prev_pos MINUS position MODULO n  
+                IF clockwise LESS THAN anticlockwise THEN  
+                    SET distance TO clockwise  
+                ELSE  
+                    SET distance TO anticlockwise  
+                END IF  
+                SET steps TO distance PLUS one PLUS the result of function dp with parameters i PLUS one and position  
+                IF steps LESS THAN min_steps THEN  
+                    SET min_steps TO steps  
+                END IF  
+                INCREMENT pos_index BY one  
+            END FOR  
+            
+            RETURN min_steps  
+        END FUNCTION  
+        
+        RETURN the result of function dp with parameters zero and zero  
+    END FUNCTION  
+END CLASS

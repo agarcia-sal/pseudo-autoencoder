@@ -1,0 +1,30 @@
+CLASS Solution
+    FUNCTION isEscapePossible(blocked, source, target)
+        IF blocked IS EMPTY
+            RETURN True
+        
+        SET blocked_set TO SET OF TUPLES FROM blocked
+        SET n TO LENGTH OF blocked
+        SET max_steps TO n MULTIPLIED BY (n MINUS 1) DIVIDED BY 2
+        
+        FUNCTION bfs(start, end)
+            SET queue TO DEQUE WITH TUPLE OF start
+            SET visited TO SET CONTAINING TUPLE OF start
+            
+            WHILE queue IS NOT EMPTY
+                SET x, y TO REMOVE FIRST ELEMENT FROM queue
+                
+                IF SIZE OF visited GREATER THAN max_steps OR (x EQUALS end[0] AND y EQUALS end[1])
+                    RETURN True
+                
+                FOR EACH (dx, dy) IN LIST OF (0,1), (0,-1), (1,0), (-1,0)
+                    SET nx TO x PLUS dx
+                    SET ny TO y PLUS dy
+                    IF nx BETWEEN 0 AND 10^6 MINUS 1 AND ny BETWEEN 0 AND 10^6 MINUS 1 AND (nx, ny) NOT IN blocked_set AND (nx, ny) NOT IN visited
+                        ADD (nx, ny) TO visited
+                        APPEND (nx, ny) TO queue
+            
+            RETURN False
+        
+        RETURN bfs(source, target) AND bfs(target, source)
+END CLASS

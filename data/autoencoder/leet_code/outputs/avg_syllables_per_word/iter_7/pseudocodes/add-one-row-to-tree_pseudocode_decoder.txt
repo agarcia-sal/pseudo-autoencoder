@@ -1,0 +1,76 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val = 0, left = None, right = None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    END IF  
+
+    SET root TO TreeNode(values at index 0)  
+    SET i TO 1  
+    SET queue TO empty queue  
+    APPEND root TO queue  
+
+    WHILE queue IS NOT EMPTY  
+        SET node TO queue REMOVE FIRST ELEMENT  
+
+        IF i IS LESS THAN LENGTH OF values AND values at index i IS NOT None  
+            SET node.left TO TreeNode(values at index i)  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY 1  
+
+        IF i IS LESS THAN LENGTH OF values AND values at index i IS NOT None  
+            SET node.right TO TreeNode(values at index i)  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY 1  
+    END WHILE  
+
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION addOneRow(self, root, val, depth)  
+        IF depth IS EQUAL TO 1  
+            RETURN TreeNode(val, left = root)  
+        END IF  
+
+        SET queue TO a queue containing tuple (root, 1)  
+
+        WHILE queue IS NOT EMPTY  
+            SET node, level TO queue REMOVE FIRST ELEMENT  
+
+            IF level IS EQUAL TO depth MINUS 1  
+                SET node.left TO TreeNode(val, left = node.left)  
+                SET node.right TO TreeNode(val, right = node.right)  
+            ELSE IF level IS LESS THAN depth MINUS 1  
+                IF node.left IS NOT None  
+                    APPEND (node.left, level PLUS 1) TO queue  
+                END IF  
+                IF node.right IS NOT None  
+                    APPEND (node.right, level PLUS 1) TO queue  
+                END IF  
+            END IF  
+        END WHILE  
+
+        RETURN root  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,61 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.parent TO list of integers from zero TO size MINUS one  
+    END FUNCTION  
+
+    FUNCTION find(self, u)  
+        IF self.parent at position u NOT EQUALS u THEN  
+            SET self.parent at position u TO CALL find WITH argument self.parent at position u  
+        END IF  
+        RETURN self.parent at position u  
+    END FUNCTION  
+
+    FUNCTION union(self, u, v)  
+        SET root_u TO CALL find WITH argument u  
+        SET root_v TO CALL find WITH argument v  
+        IF root_u NOT EQUALS root_v THEN  
+            SET self.parent at position root_u TO root_v  
+        END IF  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION matrixRankTransform(self, matrix)  
+        SET m TO LENGTH OF matrix  
+        SET n TO LENGTH OF first element IN matrix  
+        SET value_to_indices TO new empty mapping with default list  
+
+        FOR r FROM 0 TO m MINUS one  
+            FOR c FROM 0 TO n MINUS one  
+                APPEND tuple (r, c) TO value_to_indices at key matrix at position r at c  
+            END FOR  
+        END FOR  
+
+        SET row_rank TO list of zeros with length m  
+        SET col_rank TO list of zeros with length n  
+        SET result TO two-dimensional list of zeros with dimensions m BY n  
+
+        FOR each value IN keys of value_to_indices in ascending order  
+            SET uf TO new UnionFind with size m PLUS n  
+            SET rank TO new empty mapping with default integer zero  
+
+            FOR each (r, c) IN value_to_indices at value  
+                CALL uf.union WITH arguments r AND c PLUS m  
+            END FOR  
+
+            FOR each (r, c) IN value_to_indices at value  
+                SET root TO CALL uf.find WITH argument r  
+                SET rank at root TO maximum of rank at root AND maximum of row_rank at r AND col_rank at c PLUS one  
+            END FOR  
+
+            FOR each (r, c) IN value_to_indices at value  
+                SET root TO CALL uf.find WITH argument r  
+                SET result at position r at c TO rank at root  
+                SET row_rank at r TO rank at root  
+                SET col_rank at c TO rank at root  
+            END FOR  
+        END FOR  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

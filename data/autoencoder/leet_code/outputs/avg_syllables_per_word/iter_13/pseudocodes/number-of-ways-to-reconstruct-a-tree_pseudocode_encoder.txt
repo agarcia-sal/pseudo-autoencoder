@@ -1,0 +1,44 @@
+CLASS Solution  
+    FUNCTION checkWays(pairs)  
+        SET graph TO an empty mapping from keys to empty sets  
+        FOR each element x AND each element y IN pairs  
+            APPEND y TO the set at key x IN graph  
+            APPEND x TO the set at key y IN graph  
+        END FOR  
+        
+        SET max_degree TO the key in graph with maximum size of the set at that key  
+        SET n TO the number of keys in graph  
+        
+        IF the size of the set at key max_degree IN graph DOES NOT EQUAL n MINUS one  
+            RETURN zero  
+        END IF  
+        
+        FUNCTION can_be_parent(u, v)  
+            RETURN for every element neighbor IN the set at key v IN graph the element neighbor IS IN the set at key u IN graph OR the element neighbor EQUALS u  
+        END FUNCTION  
+        
+        SET ways TO one  
+        
+        FOR each element u IN graph  
+            IF u EQUALS max_degree  
+                CONTINUE  
+            END IF  
+            SET parent TO none  
+            FOR each element v IN the set at key u IN graph  
+                IF v IS IN graph AND the size of the set at key v IN graph IS GREATER THAN OR EQUAL TO the size of the set at key u IN graph AND can_be_parent(v, u) IS true  
+                    IF parent IS none OR the size of the set at key v IN graph IS LESS THAN the size of the set at key parent IN graph  
+                        SET parent TO v  
+                    END IF  
+                END IF  
+            END FOR  
+            IF parent IS none  
+                RETURN zero  
+            END IF  
+            IF the size of the set at key parent IN graph EQUALS the size of the set at key u IN graph  
+                SET ways TO two  
+            END IF  
+        END FOR  
+        
+        RETURN ways  
+    END FUNCTION  
+END CLASS

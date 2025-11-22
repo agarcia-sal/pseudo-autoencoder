@@ -1,0 +1,47 @@
+CLASS Solution  
+    FUNCTION validArrangement(pairs)  
+        SET graph TO CALL defaultdict WITH PARAMETERS list  
+        SET out_degree TO CALL Counter WITH NO PARAMETERS  
+        SET in_degree TO CALL Counter WITH NO PARAMETERS  
+        
+        FOR each element u AND v IN pairs  
+            CALL append WITH PARAMETERS v TO the list at position u OF graph  
+            INCREMENT the value at position u OF out_degree BY one  
+            INCREMENT the value at position v OF in_degree BY one  
+        END FOR  
+        
+        SET start_node TO None  
+        FOR each node IN graph  
+            IF the value at position node OF out_degree EQUALS the value at position node OF in_degree PLUS one  
+                SET start_node TO node  
+                BREAK the loop  
+            END IF  
+        END FOR  
+        IF start_node EQUALS None  
+            SET start_node TO the first element returned by the iterator of graph  
+        END IF  
+        
+        SET path TO an empty list  
+        SET stack TO a list containing start_node  
+        
+        WHILE the length of stack GREATER THAN zero HOLDS  
+            SET u TO the element at the last position OF stack  
+            IF the list at position u OF graph IS NOT empty  
+                SET v TO the last element OF the list at position u OF graph  
+                CALL remove the last element FROM the list at position u OF graph  
+                CALL append WITH PARAMETERS v TO stack  
+            ELSE  
+                CALL append WITH PARAMETERS the last element popped FROM stack TO path  
+            END IF  
+        END WHILE  
+        
+        CALL reverse ON path  
+        
+        SET result TO an empty list  
+        FOR i FROM zero TO the LENGTH OF path MINUS one MINUS one  
+            CALL append WITH PARAMETERS a list containing the element at position i OF path AND the element at position i PLUS one OF path TO result  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

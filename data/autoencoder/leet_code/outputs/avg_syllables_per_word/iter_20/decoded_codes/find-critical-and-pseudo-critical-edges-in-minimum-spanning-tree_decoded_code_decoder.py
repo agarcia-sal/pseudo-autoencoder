@@ -1,0 +1,71 @@
+from math import inf
+from typing import List, Optional
+
+
+class UnionFind:
+    def __init__(self, n: int):
+        self.parent = list(range(n))
+        self.rank = [1] * n
+
+    def find(self, u: int) -> int:
+        if self.parent[u] != u:
+            self.parent[u] = self.find(self.parent[u])
+        return self.parent[u]
+
+    def union(self, u: int, v: int) -> bool:
+        rootU = self.find(u)
+        rootV = self.find(v)
+        if rootU != rootV:
+            if self.rank[rootU] > self.rank[rootV]:
+                self.parent[rootV] = rootU
+            elif self.rank[rootU] < self.rank[rootV]:
+                self.parent[rootU] = rootV
+            else:
+                self.parent[rootV] = rootU
+                self.rank[rootU] += 1
+            return True
+        return False
+
+
+class Solution:
+    def findCriticalAndPseudoCriticalEdges(self, n: int, edges: List[List[int]]) -> List[List[int]]:
+        # Append original index to each edge to keep track
+        for i, edge in enumerate(edges):
+            edge.append(i)
+
+        edges.sort(key=lambda x: x[2])
+
+        def mst(exclude: Optional[int] = None, include: Optional[List[int]] = None) -> int:
+            uf = UnionFind(n)
+            weight = 0
+
+            if include is not None:
+                u, v, w = include[0], include[1], include[2]
+                uf.union(u, v)
+                weight += w
+
+            for u, v, w, idx in edges:
+                if idx == exclude:
+                    continue
+                if uf.union(u, v):
+                    weight += w
+
+            root = uf.find(0)
+            for i in range(n):
+                if uf.find(i) != root:
+                    return inf
+            return weight
+
+        mst_weight = mst()
+        critical = []
+        pseudo_critical = []
+
+        for u, v, w, idx in edges:
+            # If MST weight without this edge is greater, edge is critical
+            if mst(exclude=idx) > mst_weight:
+                critical.append(idx)
+            # Else if MST weight with this edge forced included equals MST, edge is pseudo-critical
+            elif mst(include=[u, v, w]) == mst_weight:
+                pseudo_critical.append(idx)
+
+        return [critical, pseudo_critical]

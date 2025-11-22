@@ -1,0 +1,45 @@
+CLASS Solution  
+    FUNCTION countPairs(self, n, edges, queries)  
+        SET degree TO list of zeros with length n PLUS one  
+        FOR each pair u, v IN edges  
+            INCREMENT degree at index u BY one  
+            INCREMENT degree at index v BY one  
+        END FOR  
+
+        SET shared TO a default dictionary with integer default  
+        FOR each pair u, v IN edges  
+            IF u GREATER THAN v THEN  
+                SWAP u AND v  
+            END IF  
+            INCREMENT shared at key (u, v) BY one  
+        END FOR  
+
+        SET sorted_degree TO degree sorted in ascending order  
+
+        SET answers TO empty list  
+        FOR each q IN queries  
+            SET count TO zero  
+            SET left TO one  
+            SET right TO n  
+            WHILE left LESS THAN right  
+                IF sorted_degree at index left PLUS sorted_degree at index right GREATER THAN q THEN  
+                    INCREMENT count BY right MINUS left  
+                    DECREMENT right BY one  
+                ELSE  
+                    INCREMENT left BY one  
+                END IF  
+            END WHILE  
+
+            FOR each key (u, v) AND value count_uv IN shared  
+                SET degree_uv TO degree at index u PLUS degree at index v  
+                IF degree_uv GREATER THAN q AND degree_uv MINUS count_uv LESS THAN OR EQUAL TO q THEN  
+                    DECREMENT count BY one  
+                END IF  
+            END FOR  
+
+            APPEND count TO answers  
+        END FOR  
+
+        RETURN answers  
+    END FUNCTION  
+END CLASS

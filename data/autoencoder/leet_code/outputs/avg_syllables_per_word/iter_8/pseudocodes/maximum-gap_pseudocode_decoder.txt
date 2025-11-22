@@ -1,0 +1,56 @@
+CLASS Solution  
+    FUNCTION maximumGap(nums)  
+        IF LENGTH OF nums LESS THAN 2  
+            RETURN 0  
+        END IF  
+        
+        FUNCTION countingSort(arr, exp)  
+            SET n TO LENGTH OF arr  
+            CREATE output AS list OF size n FILLED WITH 0  
+            CREATE count AS list OF size 10 FILLED WITH 0  
+            
+            FOR i FROM 0 TO n MINUS 1  
+                SET index TO arr AT i DIVIDED BY exp  
+                INCREMENT count AT index MODULO 10 BY 1  
+            END FOR  
+            
+            FOR i FROM 1 TO 9  
+                INCREMENT count AT i BY count AT i MINUS 1  
+            END FOR  
+            
+            SET i TO n MINUS 1  
+            WHILE i GREATER THAN OR EQUAL TO 0  
+                SET index TO arr AT i DIVIDED BY exp  
+                SET output AT count AT index MODULO 10 MINUS 1 TO arr AT i  
+                DECREMENT count AT index MODULO 10 BY 1  
+                DECREMENT i BY 1  
+            END WHILE  
+            
+            FOR i FROM 0 TO n MINUS 1  
+                SET arr AT i TO output AT i  
+            END FOR  
+        END FUNCTION  
+        
+        FUNCTION radixSort(arr)  
+            SET max1 TO MAXIMUM VALUE IN arr  
+            
+            SET exp TO 1  
+            WHILE max1 DIVIDED BY exp GREATER THAN 0  
+                CALL countingSort WITH arr AND exp  
+                SET exp TO exp MULTIPLIED BY 10  
+            END WHILE  
+        END FUNCTION  
+        
+        CALL radixSort WITH nums  
+        
+        SET max_diff TO 0  
+        FOR i FROM 1 TO LENGTH OF nums MINUS 1  
+            SET difference TO nums AT i MINUS nums AT i MINUS 1  
+            IF difference GREATER THAN max_diff  
+                SET max_diff TO difference  
+            END IF  
+        END FOR  
+        
+        RETURN max_diff  
+    END FUNCTION  
+END CLASS

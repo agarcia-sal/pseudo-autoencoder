@@ -1,0 +1,42 @@
+CLASS Solution
+    FUNCTION maxNumOfSubstrings(s STRING) RETURNS LIST OF STRING
+        SET first TO an empty mapping from character TO position
+        SET last TO an empty mapping from character TO position
+        FOR each index AND character IN enumeration of s
+            IF character NOT IN first
+                SET first at character TO index
+            END IF
+            SET last at character TO index
+        END FOR
+
+        SET intervals TO an empty list of pairs of positions
+        FOR each character IN keys of first
+            SET start TO first at character
+            SET end TO last at character
+            SET i TO start
+            WHILE i LESS THAN OR EQUAL TO end HOLDS
+                IF first at element at position i OF s LESS THAN start
+                    BREAK the WHILE
+                END IF
+                SET end TO the GREATER OF end AND last at element at position i OF s
+                INCREMENT i BY one
+            END WHILE
+            IF WHILE completed without BREAK
+                APPEND the pair of start AND end TO intervals
+            END IF
+        END FOR
+
+        SORT intervals BY the second element of each pair in ascending order
+
+        SET result TO an empty list of strings
+        SET prev_end TO a position representing one LESS THAN the smallest valid index
+        FOR each pair start AND end IN intervals
+            IF start GREATER THAN prev_end
+                APPEND the substring FROM position start TO position end INCLUSIVE OF s TO result
+                SET prev_end TO end
+            END IF
+        END FOR
+
+        RETURN result
+    END FUNCTION
+END CLASS

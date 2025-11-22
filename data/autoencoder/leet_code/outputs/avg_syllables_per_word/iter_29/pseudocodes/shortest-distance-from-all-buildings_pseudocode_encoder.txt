@@ -1,0 +1,70 @@
+CLASS Solution  
+    FUNCTION shortestDistance(grid)  
+        IF grid IS empty OR element at position zero of grid IS empty THEN  
+            RETURN negative one  
+        END IF  
+        
+        SET number_of_rows TO the LENGTH OF grid  
+        SET number_of_columns TO the LENGTH OF element at position zero of grid  
+        SET total_distance TO a new two dimensional list with number_of_rows rows each containing number_of_columns zeros  
+        SET reach_count TO a new two dimensional list with number_of_rows rows each containing number_of_columns zeros  
+        SET building_count TO zero  
+        
+        SET directions TO a list containing a tuple of one and zero a tuple of negative one and zero a tuple of zero and one and a tuple of zero and negative one  
+        
+        FUNCTION bfs(start_x, start_y)  
+            SET queue TO a new double ended queue containing a tuple of start_x and start_y  
+            SET visited TO a new two dimensional list with number_of_rows rows each containing number_of_columns false values  
+            SET distance TO zero  
+            SET reachable TO zero  
+            
+            WHILE the queue IS NOT empty  
+                SET size TO the LENGTH OF queue  
+                INCREMENT distance BY one  
+                FOR a counter FROM zero TO size minus one  
+                    REMOVE the first element from queue AND ASSIGN TO x and y  
+                    FOR each tuple dx and dy IN directions  
+                        SET nx TO x PLUS dx  
+                        SET ny TO y PLUS dy  
+                        IF nx IS GREATER THAN OR EQUAL TO zero AND nx IS LESS THAN number_of_rows AND ny IS GREATER THAN OR EQUAL TO zero AND ny IS LESS THAN number_of_columns AND element at position nx of visited at position ny IS false AND element at position nx of grid at position ny EQUALS zero THEN  
+                            SET element at position nx of visited at position ny TO true  
+                            APPEND a tuple of nx and ny TO queue  
+                            INCREMENT element at position nx of total_distance at position ny BY distance  
+                            INCREMENT element at position nx of reach_count at position ny BY one  
+                            INCREMENT reachable BY one  
+                        END IF  
+                    END FOR  
+                END FOR  
+            END WHILE  
+            RETURN reachable  
+        END FUNCTION  
+        
+        FOR i FROM zero TO number_of_rows minus one  
+            FOR j FROM zero TO number_of_columns minus one  
+                IF element at position i of grid at position j EQUALS one THEN  
+                    INCREMENT building_count BY one  
+                    IF bfs(i, j) IS LESS THAN building_count MINUS one THEN  
+                        RETURN negative one  
+                    END IF  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET min_distance TO infinity  
+        FOR i FROM zero TO number_of_rows minus one  
+            FOR j FROM zero TO number_of_columns minus one  
+                IF element at position i of grid at position j EQUALS zero AND element at position i of reach_count at position j EQUALS building_count THEN  
+                    IF element at position i of total_distance at position j IS LESS THAN min_distance THEN  
+                        SET min_distance TO element at position i of total_distance at position j  
+                    END IF  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        IF min_distance IS EQUAL TO infinity THEN  
+            RETURN negative one  
+        ELSE  
+            RETURN min_distance  
+        END IF  
+    END FUNCTION  
+END CLASS

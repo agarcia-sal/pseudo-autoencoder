@@ -1,0 +1,31 @@
+import math
+from typing import List
+
+class Solution:
+    def tilingRectangle(self, n: int, m: int) -> int:
+        min_moves = [math.inf]
+
+        def backtrack(heights: List[int], moves: int) -> None:
+            if all(height == n for height in heights):
+                if moves < min_moves[0]:
+                    min_moves[0] = moves
+                return
+            if moves >= min_moves[0]:
+                return
+
+            min_height = min(heights)
+            left = heights.index(min_height)
+            right = left
+            while right < m and heights[right] == min_height:
+                right += 1
+
+            max_size = right - left
+            for size in range(max_size, 0, -1):
+                if all(heights[left + i] + size <= n for i in range(size)):
+                    new_heights = heights[:]
+                    for i in range(size):
+                        new_heights[left + i] += size
+                    backtrack(new_heights, moves + 1)
+
+        backtrack([0] * m, 0)
+        return min_moves[0]

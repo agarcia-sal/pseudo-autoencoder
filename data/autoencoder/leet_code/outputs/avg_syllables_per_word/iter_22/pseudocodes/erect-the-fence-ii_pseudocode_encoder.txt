@@ -1,0 +1,59 @@
+CLASS Solution  
+    FUNCTION outerTrees(trees)  
+        FUNCTION dist_sq(p1, p2)  
+            SET difference of first element of p1 MINUS first element of p2 TO variable x_diff  
+            SET difference of second element of p1 MINUS second element of p2 TO variable y_diff  
+            SET square of x_diff PLUS square of y_diff TO variable result  
+            RETURN result  
+        END FUNCTION  
+
+        FUNCTION circumcenter(p1, p2, p3)  
+            SET first element of p1 TO ax  
+            SET second element of p1 TO ay  
+            SET first element of p2 TO bx  
+            SET second element of p2 TO by  
+            SET first element of p3 TO cx  
+            SET second element of p3 TO cy  
+
+            SET two MULTIPLIED BY the sum of ax MULTIPLIED BY (by MINUS cy) PLUS bx MULTIPLIED BY (cy MINUS ay) PLUS cx MULTIPLIED BY (ay MINUS by) TO d  
+
+            SET sum of ax SQUARED PLUS ay SQUARED MULTIPLIED BY (by MINUS cy) PLUS sum of bx SQUARED PLUS by SQUARED MULTIPLIED BY (cy MINUS ay) PLUS sum of cx SQUARED PLUS cy SQUARED MULTIPLIED BY (ay MINUS by) DIVIDED BY d TO ux  
+
+            SET sum of ax SQUARED PLUS ay SQUARED MULTIPLIED BY (cx MINUS bx) PLUS sum of bx SQUARED PLUS by SQUARED MULTIPLIED BY (ax MINUS cx) PLUS sum of cx SQUARED PLUS cy SQUARED MULTIPLIED BY (bx MINUS ax) DIVIDED BY d TO uy  
+
+            SET list containing ux and uy TO variable center  
+            SET square root of square of the difference of ux MINUS ax PLUS square of the difference of uy MINUS ay TO variable radius  
+
+            RETURN center, radius  
+        END FUNCTION  
+
+        FUNCTION welzl(points, boundary, n)  
+            IF n EQUALS zero OR the LENGTH OF boundary EQUALS three THEN  
+                IF the LENGTH OF boundary EQUALS zero THEN  
+                    RETURN list containing zero and zero, zero  
+                ELSE IF the LENGTH OF boundary EQUALS one THEN  
+                    RETURN first element of boundary, zero  
+                ELSE IF the LENGTH OF boundary EQUALS two THEN  
+                    SET list containing sum of first elements of first and second elements of boundary DIVIDED BY two and sum of second elements of first and second elements of boundary DIVIDED BY two TO center  
+                    SET square root of dist_sq of first and second elements of boundary DIVIDED BY two TO radius  
+                    RETURN center, radius  
+                ELSE  
+                    RETURN circumcenter with elements of boundary unpacked as arguments  
+                END IF  
+            END IF  
+
+            SET element at position n MINUS one of points TO p  
+            SET result of welzl with points, boundary, and n MINUS one TO center and radius  
+
+            IF dist_sq of center and p LESS THAN OR EQUAL TO radius MULTIPLIED BY radius THEN  
+                RETURN center, radius  
+            END IF  
+
+            RETURN welzl with points, boundary appended with p, and n MINUS one  
+        END FUNCTION  
+
+        PERFORM random shuffle on trees  
+        SET result of welzl with trees, empty list, and LENGTH OF trees TO center and radius  
+        RETURN list containing first element of center, second element of center, radius  
+    END FUNCTION  
+END CLASS

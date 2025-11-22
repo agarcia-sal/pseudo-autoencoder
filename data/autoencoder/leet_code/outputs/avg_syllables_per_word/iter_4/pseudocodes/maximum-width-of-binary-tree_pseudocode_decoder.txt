@@ -1,0 +1,59 @@
+CLASS TreeNode
+    FUNCTION __init__(self, val = 0, left = None, right = None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values: list)
+    IF values IS empty
+        RETURN None
+    SET root TO TreeNode(values[0])
+    SET i TO 1
+    INITIALIZE queue AS a deque
+    APPEND root TO queue
+    WHILE queue IS NOT empty
+        SET node TO queue.popleft()
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.left TO TreeNode(values[i])
+            APPEND node.left TO queue
+        INCREMENT i BY 1
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.right TO TreeNode(values[i])
+            APPEND node.right TO queue
+        INCREMENT i BY 1
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val IS NOT EQUAL TO q.val
+        RETURN False
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+END FUNCTION
+
+CLASS Solution
+    FUNCTION widthOfBinaryTree(self, root)
+        IF root IS None
+            RETURN 0
+        INITIALIZE queue AS deque containing tuple (root, 0)
+        SET max_width TO 0
+        WHILE queue IS NOT empty
+            SET level_length TO LENGTH OF queue
+            SET first_index TO queue[0][1]
+            FOR counter FROM 0 TO level_length - 1
+                SET node, index TO queue.popleft()
+                IF counter IS EQUAL TO level_length - 1
+                    SET max_width TO MAXIMUM OF max_width AND (index - first_index + 1)
+                IF node.left EXISTS
+                    APPEND (node.left, 2 * index) TO queue
+                IF node.right EXISTS
+                    APPEND (node.right, 2 * index + 1) TO queue
+        RETURN max_width
+    END FUNCTION
+END CLASS

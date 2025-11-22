@@ -1,0 +1,52 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.parent TO list of integers from zero TO size MINUS one  
+        SET self.rank TO list of size elements each EQUAL TO one  
+    END FUNCTION  
+
+    FUNCTION find(self, p)  
+        IF element at position p of self.parent IS NOT EQUAL TO p  
+            SET element at position p of self.parent TO self.find(element at position p of self.parent)  
+        END IF  
+        RETURN element at position p of self.parent  
+    END FUNCTION  
+
+    FUNCTION union(self, p, q)  
+        SET rootP TO self.find(p)  
+        SET rootQ TO self.find(q)  
+        IF rootP EQUALS rootQ  
+            RETURN false  
+        END IF  
+        IF element at position rootP of self.rank GREATER THAN element at position rootQ of self.rank  
+            SET element at position rootQ of self.parent TO rootP  
+        ELSE IF element at position rootP of self.rank LESS THAN element at position rootQ of self.rank  
+            SET element at position rootP of self.parent TO rootQ  
+        ELSE  
+            SET element at position rootQ of self.parent TO rootP  
+            INCREMENT element at position rootP of self.rank BY one  
+        END IF  
+        RETURN true  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION gcdSort(self, nums)  
+        SET sorted_nums TO nums IN ascending order  
+        SET max_val TO greatest element of nums  
+        SET uf TO new instance of UnionFind initialized with max_val PLUS one  
+        FOR each num IN nums  
+            FOR each factor FROM two TO the integer part of the square root of num PLUS one  
+                IF num MODULO factor EQUALS zero  
+                    CALL uf.union with arguments num and factor  
+                    CALL uf.union with arguments num and num DIVIDED BY factor  
+                END IF  
+            END FOR  
+        END FOR  
+        FOR each index FROM zero TO the length of nums MINUS one  
+            IF uf.find(element at position index of nums) IS NOT EQUAL TO uf.find(element at position index of sorted_nums)  
+                RETURN false  
+            END IF  
+        END FOR  
+        RETURN true  
+    END FUNCTION  
+END CLASS

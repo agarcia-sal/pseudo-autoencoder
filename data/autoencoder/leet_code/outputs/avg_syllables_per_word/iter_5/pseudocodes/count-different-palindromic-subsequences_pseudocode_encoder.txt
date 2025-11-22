@@ -1,0 +1,55 @@
+CLASS Solution  
+    FUNCTION countPalindromicSubsequences(s)  
+        SET MOD TO 10 POWER 9 PLUS 7  
+        SET n TO LENGTH OF s  
+        
+        SET next_occurrence TO 2D LIST of size 4 BY n FILLED WITH -1  
+        SET prev_occurrence TO 2D LIST of size 4 BY n FILLED WITH -1  
+        
+        FOR c FROM 0 TO 3  
+            SET char TO character REPRESENTED BY ASCII OF 'a' PLUS c  
+            SET last TO -1  
+            FOR i FROM 0 TO n MINUS 1  
+                IF s AT i EQUALS char THEN  
+                    SET last TO i  
+                END IF  
+                SET prev_occurrence AT c AT i TO last  
+            END FOR  
+            
+            SET last TO -1  
+            FOR i FROM n MINUS 1 DOWNTO 0  
+                IF s AT i EQUALS char THEN  
+                    SET last TO i  
+                END IF  
+                SET next_occurrence AT c AT i TO last  
+            END FOR  
+        END FOR  
+        
+        SET dp TO 2D LIST of size n BY n FILLED WITH 0  
+        
+        FOR i FROM 0 TO n MINUS 1  
+            SET dp AT i AT i TO 1  
+        END FOR  
+        
+        FOR length FROM 2 TO n  
+            FOR i FROM 0 TO n MINUS length  
+                SET j TO i PLUS length MINUS 1  
+                FOR c FROM 0 TO 3  
+                    SET char TO character REPRESENTED BY ASCII OF 'a' PLUS c  
+                    SET left TO next_occurrence AT c AT i  
+                    SET right TO prev_occurrence AT c AT j  
+                    
+                    IF left GREATER THAN j OR right LESS THAN i THEN  
+                        CONTINUE TO NEXT c  
+                    ELSE IF left EQUALS right THEN  
+                        SET dp AT i AT j TO (dp AT i AT j PLUS 1) MODULO MOD  
+                    ELSE  
+                        SET dp AT i AT j TO (dp AT i AT j PLUS dp AT left PLUS 1 AT right MINUS 1 PLUS 2) MODULO MOD  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+        
+        RETURN dp AT 0 AT n MINUS 1  
+    END FUNCTION  
+END CLASS

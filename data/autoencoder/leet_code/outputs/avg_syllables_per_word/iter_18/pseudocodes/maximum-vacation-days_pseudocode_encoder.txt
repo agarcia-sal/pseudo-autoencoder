@@ -1,0 +1,45 @@
+CLASS Solution  
+    FUNCTION maxVacationDays(flights AS List OF List OF integer, days AS List OF List OF integer) RETURNS integer  
+        SET n TO the LENGTH OF flights  
+        SET k TO the LENGTH OF the element at position zero of days  
+        
+        INITIALIZE dp AS a list OF n elements each SET TO negative one  
+        SET element at position zero of dp TO zero  
+        
+        INITIALIZE graph AS a mapping FROM each integer i FROM zero TO n MINUS one TO an empty list  
+        FOR each integer i FROM zero TO n MINUS one  
+            FOR each integer j FROM zero TO n MINUS one  
+                IF element at position j of element at position i of flights EQUALS one  
+                    APPEND j TO the list at key i in graph  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        FOR each week FROM zero TO k MINUS one  
+            INITIALIZE new_dp AS a list OF n elements each SET TO negative one  
+            FOR each integer i FROM zero TO n MINUS one  
+                IF element at position i of dp EQUALS negative one  
+                    CONTINUE  
+                END IF  
+                IF element at position i of new_dp LESS THAN element at position i of dp PLUS element at position week of element at position i of days  
+                    SET element at position i of new_dp TO element at position i of dp PLUS element at position week of element at position i of days  
+                END IF  
+                FOR each j IN the list at key i in graph  
+                    IF element at position j of new_dp LESS THAN element at position i of dp PLUS element at position week of element at position j of days  
+                        SET element at position j of new_dp TO element at position i of dp PLUS element at position week of element at position j of days  
+                    END IF  
+                END FOR  
+            END FOR  
+            SET dp TO new_dp  
+        END FOR  
+        
+        SET max_value TO negative infinity represented by the smallest practical number  
+        FOR each value IN dp  
+            IF value GREATER THAN max_value  
+                SET max_value TO value  
+            END IF  
+        END FOR  
+        
+        RETURN max_value  
+    END FUNCTION  
+END CLASS

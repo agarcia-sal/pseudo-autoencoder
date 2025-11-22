@@ -1,0 +1,68 @@
+CLASS TreeNode
+    FUNCTION __init__(val = 0, left = None, right = None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values: list)
+    IF values IS EMPTY
+        RETURN None
+    END IF
+    SET root TO NEW TreeNode(values[0])
+    SET i TO 1
+    INITIALIZE queue AS empty deque
+    APPEND root TO queue
+    WHILE queue IS NOT EMPTY
+        SET node TO queue REMOVE FIRST ELEMENT
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.left TO NEW TreeNode(values[i])
+            APPEND node.left TO queue
+        END IF
+        INCREMENT i BY 1
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.right TO NEW TreeNode(values[i])
+            APPEND node.right TO queue
+        END IF
+        INCREMENT i BY 1
+    END WHILE
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val IS NOT EQUAL TO q.val
+        RETURN False
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+    END IF
+END FUNCTION
+
+CLASS Solution
+    FUNCTION minCameraCover(root: Optional[TreeNode]) RETURNS int
+        FUNCTION dfs(node)
+            IF node IS None
+                RETURN (0, 0, infinity)  # (no camera, monitored, camera)
+            END IF
+            
+            SET left_no_camera, left_monitored, left_camera TO dfs(node.left)
+            SET right_no_camera, right_monitored, right_camera TO dfs(node.right)
+            
+            SET no_camera TO left_monitored + right_monitored
+            SET monitored TO MINIMUM OF
+                (left_camera + MINIMUM OF (right_monitored, right_camera)),
+                (right_camera + MINIMUM OF (left_monitored, left_camera)),
+                (left_camera + right_camera)
+            SET camera TO 1 + MINIMUM OF (left_no_camera, left_monitored, left_camera) + MINIMUM OF (right_no_camera, right_monitored, right_camera)
+            
+            RETURN (no_camera, monitored, camera)
+        END FUNCTION
+        
+        SET root_no_camera, root_monitored, root_camera TO dfs(root)
+        RETURN MINIMUM OF (root_monitored, root_camera)
+    END FUNCTION
+END CLASS

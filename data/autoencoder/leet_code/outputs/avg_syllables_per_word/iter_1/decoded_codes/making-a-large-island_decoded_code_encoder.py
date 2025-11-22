@@ -1,0 +1,38 @@
+def largestIsland(grid):
+    if not grid:
+        return 0
+    n = len(grid)
+    dirs = [(0,1),(1,0),(0,-1),(-1,0)]
+
+    def valid(x,y):
+        return 0 <= x < n and 0 <= y < n
+
+    def dfs(x,y,i):
+        area = 1
+        grid[x][y] = i
+        for dx, dy in dirs:
+            nx, ny = x + dx, y + dy
+            if valid(nx, ny) and grid[nx][ny] == 1:
+                area += dfs(nx, ny, i)
+        return area
+
+    areas = {}
+    idx = 2
+    for i in range(n):
+        for j in range(n):
+            if grid[i][j] == 1:
+                areas[idx] = dfs(i, j, idx)
+                idx += 1
+
+    if not areas:
+        return 1
+    res = max(areas.values())
+
+    for i in range(n):
+        for j in range(n):
+            if grid[i][j] == 0:
+                nei = {grid[i+dx][j+dy] for dx,dy in dirs if valid(i+dx,j+dy) and grid[i+dx][j+dy] > 1}
+                size = 1 + sum(areas[x] for x in nei)
+                res = max(res, size)
+
+    return res

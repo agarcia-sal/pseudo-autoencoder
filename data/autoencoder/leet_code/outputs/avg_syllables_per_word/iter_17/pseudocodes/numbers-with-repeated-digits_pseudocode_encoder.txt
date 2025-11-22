@@ -1,0 +1,46 @@
+CLASS Solution
+    FUNCTION numDupDigitsAtMostN(n)
+        FUNCTION count_unique_digits(x)
+            SET string_representation TO THE STRING REPRESENTATION OF x
+            SET length TO the LENGTH OF string_representation
+            
+            SET count TO zero
+            FOR digit_count FROM one TO length MINUS one
+                INCREMENT count BY nine MULTIPLIED BY CALL perm WITH PARAMETERS nine COMMA digit_count MINUS one
+            END FOR
+            
+            SET seen_digits TO an EMPTY SET
+            FOR index FROM zero TO length MINUS one
+                SET digit_character TO element at position index of string_representation
+                SET digit_value TO THE INTEGER REPRESENTATION OF digit_character
+                FOR candidate_digit FROM (zero IF index EQUALS zero ELSE zero) TO digit_value MINUS one
+                    IF candidate_digit IS NOT IN seen_digits
+                        INCREMENT count BY CALL perm WITH PARAMETERS nine MINUS index COMMA length MINUS index MINUS one
+                    END IF
+                END FOR
+                IF digit_value IS IN seen_digits
+                    BREAK THE LOOP
+                END IF
+                ADD digit_value TO seen_digits
+            END FOR
+            IF loop COMPLETED WITHOUT BREAK
+                INCREMENT count BY one
+            END IF
+            
+            RETURN count
+        END FUNCTION
+        
+        RETURN n MINUS CALL count_unique_digits WITH PARAMETER n
+    END FUNCTION
+
+    FUNCTION perm(m COMMA n)
+        IF n EQUALS zero
+            RETURN one
+        END IF
+        SET result TO one
+        FOR i FROM zero TO n MINUS one
+            SET result TO result MULTIPLIED BY m MINUS i
+        END FOR
+        RETURN result
+    END FUNCTION
+END CLASS

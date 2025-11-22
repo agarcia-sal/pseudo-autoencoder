@@ -1,0 +1,30 @@
+```
+n = len(colors)
+graph = defaultdict(list)
+in_degree = [0]*n
+
+for u,v in edges:
+    graph[u].append(v)
+    in_degree[v]+=1
+
+queue = deque(i for i in range(n) if in_degree[i]==0)
+dp = [[0]*26 for _ in range(n)]
+visited = 0
+max_val = 0
+
+while queue:
+    node = queue.popleft()
+    cidx = ord(colors[node]) - ord('a')
+    dp[node][cidx] += 1
+    max_val = max(max_val, dp[node][cidx])
+    visited += 1
+
+    for nei in graph[node]:
+        for c in range(26):
+            dp[nei][c] = max(dp[nei][c], dp[node][c])
+        in_degree[nei] -= 1
+        if in_degree[nei] == 0:
+            queue.append(nei)
+
+return max_val if visited == n else -1
+```

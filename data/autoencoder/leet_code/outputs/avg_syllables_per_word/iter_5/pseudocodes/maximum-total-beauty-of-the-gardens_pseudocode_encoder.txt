@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION maximumBeauty(flowers, newFlowers, target, full, partial)  
+        SORT flowers  
+        SET n TO LENGTH OF flowers  
+        SET max_beauty TO 0  
+
+        SET prefix_sum TO LIST OF ZEROS WITH LENGTH n PLUS 1  
+        FOR i FROM 0 TO n MINUS 1  
+            SET prefix_sum[i PLUS 1] TO prefix_sum[i] PLUS flowers[i]  
+
+        SET complete_gardens TO 0  
+        FOR i FROM n MINUS 1 DOWNTO 0  
+            IF flowers[i] GREATER THAN OR EQUAL TO target  
+                INCREMENT complete_gardens BY 1  
+            ELSE  
+                BREAK  
+
+        SET remaining_flowers TO newFlowers  
+        SET max_incomplete_flowers TO 0  
+
+        FOR i FROM complete_gardens TO n  
+            IF i GREATER THAN 0  
+                SET remaining_flowers TO remaining_flowers MINUS (target MINUS flowers[n MINUS i])  
+                IF remaining_flowers LESS THAN 0  
+                    BREAK  
+
+            SET left TO 0  
+            SET right TO n MINUS i MINUS 1  
+            WHILE left LESS THAN OR EQUAL TO right  
+                SET mid TO (left PLUS right) DIVIDED BY 2  
+                SET cost TO (flowers[mid] TIMES (mid PLUS 1)) MINUS prefix_sum[mid PLUS 1]  
+                IF cost GREATER THAN remaining_flowers  
+                    SET right TO mid MINUS 1  
+                ELSE  
+                    SET left TO mid PLUS 1  
+
+            IF right GREATER THAN OR EQUAL TO 0  
+                SET cost TO (flowers[right] TIMES (right PLUS 1)) MINUS prefix_sum[right PLUS 1]  
+                SET max_incomplete_flowers TO flowers[right] PLUS ((remaining_flowers MINUS cost) DIVIDED BY (right PLUS 1))  
+            ELSE  
+                SET max_incomplete_flowers TO 0  
+
+            SET total_beauty TO (i TIMES full) PLUS (MINIMUM OF max_incomplete_flowers AND (target MINUS 1) TIMES partial)  
+            SET max_beauty TO MAXIMUM OF max_beauty AND total_beauty  
+
+        RETURN max_beauty  
+    END FUNCTION  
+END CLASS

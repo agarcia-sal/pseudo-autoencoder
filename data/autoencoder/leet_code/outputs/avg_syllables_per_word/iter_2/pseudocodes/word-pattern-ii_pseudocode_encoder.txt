@@ -1,0 +1,31 @@
+CLASS Solution
+    FUNCTION wordPatternMatch(pattern, s)
+        FUNCTION backtrack(pattern_index, string_index, mapping, used)
+            IF pattern_index EQUALS LENGTH OF pattern AND string_index EQUALS LENGTH OF s
+                RETURN True
+            IF pattern_index EQUALS LENGTH OF pattern OR string_index EQUALS LENGTH OF s
+                RETURN False
+            
+            SET current_char TO pattern AT pattern_index
+            IF current_char IN mapping
+                SET word TO mapping[current_char]
+                IF SUBSTRING OF s FROM string_index TO string_index PLUS LENGTH OF word NOT EQUAL TO word
+                    RETURN False
+                IF backtrack(pattern_index PLUS 1, string_index PLUS LENGTH OF word, mapping, used)
+                    RETURN True
+            ELSE
+                FOR end FROM string_index PLUS 1 TO LENGTH OF s PLUS 1
+                    SET word TO SUBSTRING OF s FROM string_index TO end
+                    IF word IN used
+                        CONTINUE
+                    SET mapping[current_char] TO word
+                    ADD word TO used
+                    IF backtrack(pattern_index PLUS 1, end, mapping, used)
+                        RETURN True
+                    REMOVE mapping[current_char]
+                    REMOVE word FROM used
+            
+            RETURN False
+        
+        RETURN backtrack(0, 0, EMPTY DICTIONARY, EMPTY SET)
+END CLASS

@@ -1,0 +1,47 @@
+CLASS TrieNode
+    FUNCTION __init__()
+        SET children TO new default dictionary with TrieNode as default factory
+        SET deleted TO False
+    END FUNCTION
+END CLASS
+
+CLASS Solution
+    FUNCTION deleteDuplicateFolder(paths: List of List of String) RETURNS List of List of String
+        SET ans TO empty list
+        SET root TO new TrieNode
+        SET subtreeToNodes TO new default dictionary with list as default factory
+
+        FOR each path IN paths sorted lexicographically
+            SET node TO root
+            FOR each s IN path
+                SET node TO node.children[s]
+        
+        FUNCTION buildSubtreeToRoots(node: TrieNode) RETURNS String
+            SET subtree TO '(' 
+            FOR each s IN node.children keys sorted lexicographically
+                SET subtree TO subtree CONCATENATED WITH s CONCATENATED WITH buildSubtreeToRoots(node.children[s])
+            SET subtree TO subtree CONCATENATED WITH ')'
+            IF subtree IS NOT '()' THEN
+                APPEND node TO subtreeToNodes[subtree]
+            RETURN subtree
+        END FUNCTION
+
+        CALL buildSubtreeToRoots(root)
+
+        FOR each nodes IN subtreeToNodes values
+            IF LENGTH OF nodes GREATER THAN 1 THEN
+                FOR each node IN nodes
+                    SET node.deleted TO True
+
+        FUNCTION constructPath(node: TrieNode, path: List of String)
+            FOR each (s, child) IN node.children items sorted lexicographically by key
+                IF NOT child.deleted THEN
+                    CALL constructPath(child, path APPENDED WITH s)
+            IF LENGTH OF path GREATER THAN 0 THEN
+                APPEND path TO ans
+        END FUNCTION
+
+        CALL constructPath(root, empty list)
+        RETURN ans
+    END FUNCTION
+END CLASS

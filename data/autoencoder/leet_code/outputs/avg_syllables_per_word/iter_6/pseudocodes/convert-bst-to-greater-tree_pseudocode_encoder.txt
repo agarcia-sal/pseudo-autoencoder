@@ -1,0 +1,56 @@
+CLASS TreeNode  
+    FUNCTION __init__(val EQUALS 0, left EQUALS None, right EQUALS None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET root TO new TreeNode WITH val EQUALS values AT INDEX 0  
+    SET i TO 1  
+    SET queue TO new empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO REMOVE FIRST ELEMENT FROM queue  
+        IF i LESS THAN LENGTH OF values AND values AT INDEX i IS NOT None  
+            SET node.left TO new TreeNode WITH val EQUALS values AT INDEX i  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i LESS THAN LENGTH OF values AND values AT INDEX i IS NOT None  
+            SET node.right TO new TreeNode WITH val EQUALS values AT INDEX i  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN CALL is_same_tree WITH p.left AND q.left AND CALL is_same_tree WITH p.right AND q.right  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION convertBST(root)  
+        SET self.sum TO 0  
+
+        FUNCTION traverse(node)  
+            IF node IS None  
+                RETURN  
+            CALL traverse WITH node.right  
+            INCREMENT self.sum BY node.val  
+            SET node.val TO self.sum  
+            CALL traverse WITH node.left  
+        END FUNCTION  
+
+        CALL traverse WITH root  
+        RETURN root  
+    END FUNCTION  
+END CLASS

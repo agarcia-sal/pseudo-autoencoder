@@ -1,0 +1,33 @@
+import bisect
+
+class Solution:
+    def kthSmallestProduct(self, nums1, nums2, k):
+        nums2.sort()
+        n = len(nums2)
+
+        def count(p):
+            cnt = 0
+            for x in nums1:
+                if x > 0:
+                    # number of elements <= p // x
+                    cnt += bisect.bisect_right(nums2, p // x)
+                elif x < 0:
+                    # number of elements > p // x
+                    cnt += n - bisect.bisect_left(nums2, (p + (-1 if p % x else 0)) // x)
+                else:
+                    # if x == 0, product == 0; contributes if p >= 0
+                    cnt += n if p >= 0 else 0
+            return cnt
+
+        max_abs1 = max(abs(nums1[0]), abs(nums1[-1]))
+        max_abs2 = max(abs(nums2[0]), abs(nums2[-1]))
+        mx = max_abs1 * max_abs2
+
+        left, right = -mx, mx + 1
+        while left < right:
+            mid = (left + right) // 2
+            if count(mid) >= k:
+                right = mid
+            else:
+                left = mid + 1
+        return left

@@ -1,0 +1,56 @@
+CLASS Solution
+    FUNCTION countPalindromicSubsequences(string s)
+        SET MODULO TO ten POWERED BY nine PLUS seven
+        SET length_n TO the LENGTH OF string s
+
+        SET next_occurrence TO a two dimensional list of size four BY length_n FILLED WITH negative one
+        SET previous_occurrence TO a two dimensional list of size four BY length_n FILLED WITH negative one
+
+        FOR each character_index FROM zero TO three
+            CALL char AS a FUNCTION TO CONVERT character_index TO corresponding character FROM a
+            SET last_position TO negative one
+
+            FOR index_i FROM zero TO length_n MINUS one
+                IF the element at position index_i of string s EQUALS char
+                    SET last_position TO index_i
+                END IF
+                SET element at position index_i of list at position character_index of previous_occurrence TO last_position
+            END FOR
+
+            SET last_position TO negative one
+            FOR index_i FROM length_n MINUS one DOWN TO zero
+                IF the element at position index_i of string s EQUALS char
+                    SET last_position TO index_i
+                END IF
+                SET element at position index_i of list at position character_index of next_occurrence TO last_position
+            END FOR
+        END FOR
+
+        SET dp TO a two dimensional list of size length_n BY length_n FILLED WITH zero
+
+        FOR index_i FROM zero TO length_n MINUS one
+            SET element at position index_i of list at position index_i of dp TO one
+        END FOR
+
+        FOR substring_length FROM two TO length_n
+            FOR start_index FROM zero TO length_n MINUS substring_length
+                SET end_index TO start_index PLUS substring_length MINUS one
+                FOR character_index FROM zero TO three
+                    CALL char AS a FUNCTION TO CONVERT character_index TO corresponding character FROM a
+                    SET left_position TO element at position start_index of list at position character_index of next_occurrence
+                    SET right_position TO element at position end_index of list at position character_index of previous_occurrence
+
+                    IF left_position IS GREATER THAN end_index OR right_position IS LESS THAN start_index
+                        CONTINUE to next iteration
+                    ELSE IF left_position EQUALS right_position
+                        SET element at position start_index of list at position end_index of dp TO the REMAINDER OF element at position start_index of list at position end_index of dp PLUS one DIVIDED BY MODULO
+                    ELSE
+                        SET element at position start_index of list at position end_index of dp TO the REMAINDER OF element at position start_index of list at position end_index of dp PLUS element at position left_position PLUS one of list at position right_position MINUS one of dp PLUS two DIVIDED BY MODULO
+                    END IF
+                END FOR
+            END FOR
+        END FOR
+
+        RETURN element at position zero of list at position length_n MINUS one of dp
+    END FUNCTION
+END CLASS

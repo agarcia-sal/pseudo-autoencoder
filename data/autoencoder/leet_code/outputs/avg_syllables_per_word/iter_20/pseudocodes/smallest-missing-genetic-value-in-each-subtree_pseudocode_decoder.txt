@@ -1,0 +1,59 @@
+CLASS Solution  
+    FUNCTION smallestMissingValueSubtree(parents, nums)  
+        SET n TO the LENGTH OF parents  
+        SET tree TO a new mapping of lists  
+        
+        FOR index FROM one TO n MINUS one  
+            APPEND index TO the element at position parents at index of tree  
+        END FOR  
+        
+        SET node_with_one TO negative one  
+        FOR index FROM zero TO n MINUS one  
+            IF the element at position index of nums EQUALS one  
+                SET node_with_one TO index  
+                BREAK the loop  
+            END IF  
+        END FOR  
+        
+        IF node_with_one EQUALS negative one  
+            SET result TO a new list of ones with length n  
+            RETURN result  
+        END IF  
+        
+        SET result TO a new list of ones with length n  
+        SET visited TO an empty set  
+        
+        FUNCTION dfs(node)  
+            ADD node TO visited  
+            SET genetic_values TO a new set containing the element at position node of nums  
+            FOR each child IN the element at position node of tree  
+                IF child is NOT IN visited  
+                    SET child_values TO dfs(child)  
+                    UNION genetic_values WITH child_values  
+                END IF  
+            END FOR  
+            SET smallest_missing TO one  
+            WHILE smallest_missing IS IN genetic_values  
+                INCREMENT smallest_missing BY one  
+            END WHILE  
+            SET the element at position node of result TO smallest_missing  
+            RETURN genetic_values  
+        END FUNCTION  
+        
+        SET path TO an empty list  
+        SET current TO node_with_one  
+        WHILE current NOT EQUALS negative one  
+            APPEND current TO path  
+            SET current TO the element at position current of parents  
+        END WHILE  
+        
+        FOR each node IN the elements of path in reversed order  
+            IF node IS IN visited  
+                CONTINUE to next iteration  
+            END IF  
+            CALL dfs with node  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

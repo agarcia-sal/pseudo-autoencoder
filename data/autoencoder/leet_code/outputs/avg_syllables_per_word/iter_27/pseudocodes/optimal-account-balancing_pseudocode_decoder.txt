@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION minTransfers WITH PARAMETER transactions  
+        SET balance TO an empty dictionary  
+        FOR each transaction IN transactions  
+            ASSIGN frm TO the first element of transaction  
+            ASSIGN to TO the second element of transaction  
+            ASSIGN amount TO the third element of transaction  
+            SET balance at key frm TO balance at key frm IF EXISTS OTHERWISE zero MINUS amount  
+            SET balance at key to TO balance at key to IF EXISTS OTHERWISE zero PLUS amount  
+        END FOR  
+        
+        SET balances TO an empty list  
+        FOR each net IN all values of balance  
+            IF net NOT EQUALS zero  
+                APPEND net TO balances  
+            END IF  
+        END FOR  
+        
+        IF the LENGTH OF balances EQUALS zero  
+            RETURN zero  
+        END IF  
+        
+        FUNCTION settle WITH PARAMETERS start AND cnt  
+            WHILE start LESS THAN the LENGTH OF balances AND the element at position start of balances EQUALS zero  
+                INCREMENT start BY one  
+            END WHILE  
+            
+            IF start EQUALS the LENGTH OF balances  
+                RETURN cnt  
+            END IF  
+            
+            SET min_cnt TO positive infinity  
+            FOR i FROM start PLUS one TO the LENGTH OF balances MINUS one  
+                IF the element at position start of balances MULTIPLIED BY the element at position i of balances LESS THAN zero  
+                    SET the element at position i of balances TO the element at position i of balances PLUS the element at position start of balances  
+                    SET min_cnt TO the smaller value BETWEEN min_cnt AND settle WITH ARGUMENTS start PLUS one AND cnt PLUS one  
+                    SET the element at position i of balances TO the element at position i of balances MINUS the element at position start of balances  
+                END IF  
+            END FOR  
+            
+            RETURN min_cnt  
+        END FUNCTION  
+        
+        RETURN settle WITH ARGUMENTS zero AND zero  
+    END FUNCTION  
+END CLASS

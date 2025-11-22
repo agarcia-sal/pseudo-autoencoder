@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION numDistinctIslands2(grid)  
+        FUNCTION dfs(x, y, island)  
+            IF x LESS THAN zero OR x GREATER THAN OR EQUAL TO LENGTH OF grid OR y LESS THAN zero OR y GREATER THAN OR EQUAL TO LENGTH OF element at position zero of grid OR element at position x of grid at position y EQUALS zero  
+                RETURN  
+            END IF  
+            SET element at position x of grid at position y TO zero  
+            APPEND tuple of x and y TO island  
+            CALL dfs WITH x PLUS one, y, island  
+            CALL dfs WITH x MINUS one, y, island  
+            CALL dfs WITH x, y PLUS one, island  
+            CALL dfs WITH x, y MINUS one, island  
+        END FUNCTION  
+
+        FUNCTION normalize(island)  
+            SET shapes TO empty list  
+            FOR each tuple dx, dy IN list of tuples of one and one, one and MINUS one, MINUS one and one, MINUS one and MINUS one  
+                SET new_island TO empty list  
+                FOR each x, y IN island  
+                    APPEND tuple of x MULTIPLIED BY dx and y MULTIPLIED BY dy TO new_island  
+                END FOR  
+                SORT new_island in ascending order  
+                SET min_x TO minimum of all x values in new_island  
+                SET min_y TO minimum of all y values in new_island  
+                APPEND tuple of each x MINUS min_x and y MINUS min_y FOR each x, y IN new_island TO shapes  
+            END FOR  
+            FOR index FROM zero TO LENGTH OF shapes MINUS one  
+                APPEND tuple of y and MINUS x FOR each x, y IN element at position index of shapes TO shapes  
+            END FOR  
+            RETURN minimum element in shapes  
+        END FUNCTION  
+
+        SET islands TO empty set  
+        FOR i FROM zero TO LENGTH OF grid MINUS one  
+            FOR j FROM zero TO LENGTH OF element at position zero of grid MINUS one  
+                IF element at position i of grid at position j EQUALS one  
+                    SET island TO empty list  
+                    CALL dfs WITH i, j, island  
+                    ADD result of normalize called with island TO islands  
+                END IF  
+            END FOR  
+        END FOR  
+
+        RETURN LENGTH OF islands  
+    END FUNCTION  
+END CLASS

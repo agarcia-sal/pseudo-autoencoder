@@ -1,0 +1,36 @@
+CLASS Solution
+    FUNCTION minCost(maxTime, edges, passingFees)
+        SET n TO the LENGTH OF passingFees
+        SET graph TO an EMPTY LIST OF EMPTY LISTS WITH LENGTH n
+        FOR each triple OF values x, y, time IN edges
+            APPEND the PAIR of y AND time TO the element at position x OF graph
+            APPEND the PAIR of x AND time TO the element at position y OF graph
+        END FOR
+
+        SET pq TO a LIST containing the TRIPLE of the element at position zero OF passingFees, zero, zero
+        SET visited_time TO a LIST of INFINITE values WITH LENGTH n
+        SET the element at position zero OF visited_time TO zero
+
+        WHILE pq HOLDS
+            EXTRACT AND REMOVE the MINIMUM element FROM pq INTO current_cost, current_city, current_time
+
+            IF current_city EQUALS n MINUS one
+                RETURN current_cost
+            END IF
+
+            FOR each PAIR neighbor, travel_time IN the element at position current_city OF graph
+                SET new_time TO current_time PLUS travel_time
+                SET new_cost TO current_cost PLUS the element at position neighbor OF passingFees
+
+                IF new_time LESS THAN OR EQUAL TO maxTime AND
+                   (new_time LESS THAN the element at position neighbor OF visited_time OR
+                    new_cost LESS THAN current_cost)
+                    SET the element at position neighbor OF visited_time TO new_time
+                    INSERT the TRIPLE of new_cost, neighbor, new_time INTO pq MAINTAINING ORDER
+                END IF
+            END FOR
+        END WHILE
+
+        RETURN MINUS one
+    END FUNCTION
+END CLASS

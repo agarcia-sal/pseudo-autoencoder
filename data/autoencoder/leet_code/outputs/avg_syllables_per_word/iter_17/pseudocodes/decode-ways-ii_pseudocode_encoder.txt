@@ -1,0 +1,60 @@
+CLASS Solution
+    FUNCTION numDecodings(string_s)
+        SET MODULO TO one billion PLUS seven
+        SET dp_list TO a list of zeroes WITH the LENGTH OF string_s PLUS one
+        SET element at position zero of dp_list TO one
+
+        FUNCTION ways_to_decode_single(character_char)
+            IF character_char EQUALS star
+                RETURN nine
+            ELSE IF character_char EQUALS zero
+                RETURN zero
+            ELSE
+                RETURN one
+            END IF
+        END FUNCTION
+
+        FUNCTION ways_to_decode_pair(character_char1, character_char2)
+            IF character_char1 EQUALS star AND character_char2 EQUALS star
+                RETURN fifteen
+            ELSE IF character_char1 EQUALS star
+                IF character_char2 LESS THAN OR EQUAL TO six
+                    RETURN two
+                ELSE
+                    RETURN one
+                END IF
+            ELSE IF character_char2 EQUALS star
+                IF character_char1 EQUALS one
+                    RETURN nine
+                ELSE IF character_char1 EQUALS two
+                    RETURN six
+                ELSE
+                    RETURN zero
+                END IF
+            ELSE
+                SET number_value TO CALL ConvertCharsToInt WITH character_char1 AND character_char2
+                IF number_value GREATER THAN OR EQUAL TO ten AND number_value LESS THAN OR EQUAL TO twenty six
+                    RETURN one
+                ELSE
+                    RETURN zero
+                END IF
+            END IF
+        END FUNCTION
+
+        FOR index_i FROM one TO the LENGTH OF string_s
+            SET element at position index_i of dp_list TO element at position index_i of dp_list PLUS element at position index_i MINUS one of dp_list MULTIPLIED BY CALL ways_to_decode_single WITH element at position index_i MINUS one of string_s
+            SET element at position index_i of dp_list TO element at position index_i of dp_list MODULO MODULO
+
+            IF index_i GREATER THAN one
+                SET element at position index_i of dp_list TO element at position index_i of dp_list PLUS element at position index_i MINUS two of dp_list MULTIPLIED BY CALL ways_to_decode_pair WITH element at position index_i MINUS two of string_s AND element at position index_i MINUS one of string_s
+                SET element at position index_i of dp_list TO element at position index_i of dp_list MODULO MODULO
+            END IF
+        END FOR
+
+        RETURN element at the last position of dp_list
+    END FUNCTION
+
+    FUNCTION ConvertCharsToInt(character_char1, character_char2)
+        AUXILIARY FUNCTION to ABSTRACT integer conversion of two characters
+    END FUNCTION
+END CLASS

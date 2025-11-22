@@ -1,0 +1,45 @@
+CLASS Solution  
+    FUNCTION minimumWeight(n, edges, src1, src2, dest)  
+        FUNCTION dijkstra(graph, start)  
+            SET distances TO list of size n with all elements as infinity  
+            SET distances at index start TO 0  
+            SET heap TO list containing tuple of 0 and start  
+            
+            WHILE heap is not empty  
+                REMOVE tuple with smallest first element from heap and SET TO current_distance, current_node  
+                
+                IF current_distance is GREATER THAN distances at index current_node  
+                    CONTINUE to next iteration  
+                
+                FOR each neighbor, weight IN graph at index current_node  
+                    SET distance TO current_distance PLUS weight  
+                    
+                    IF distance is LESS THAN distances at index neighbor  
+                        SET distances at index neighbor TO distance  
+                        ADD tuple of distance and neighbor TO heap  
+            
+            RETURN distances  
+        
+        SET graph TO list of n empty lists  
+        SET reverse_graph TO list of n empty lists  
+        
+        FOR each u, v, w IN edges  
+            APPEND tuple of v and w TO graph at index u  
+            APPEND tuple of u and w TO reverse_graph at index v  
+        
+        SET dist_from_src1 TO RESULT OF dijkstra(graph, src1)  
+        SET dist_from_src2 TO RESULT OF dijkstra(graph, src2)  
+        SET dist_to_dest TO RESULT OF dijkstra(reverse_graph, dest)  
+        
+        SET min_weight TO infinity  
+        
+        FOR i FROM 0 TO n MINUS 1  
+            IF dist_from_src1 at index i is NOT infinity AND dist_from_src2 at index i is NOT infinity AND dist_to_dest at index i is NOT infinity  
+                SET min_weight TO MINIMUM OF min_weight AND sum of dist_from_src1 at i, dist_from_src2 at i, and dist_to_dest at i  
+        
+        IF min_weight is infinity  
+            RETURN negative 1  
+        ELSE  
+            RETURN min_weight  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,79 @@
+CLASS TreeNode  
+    FUNCTION __init__(val EQUALS zero, left EQUALS null, right EQUALS null)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS empty  
+        RETURN null  
+    END IF  
+
+    SET root TO new TreeNode WITH PARAMETER element at position zero OF values  
+    SET i TO one  
+    SET queue TO new deque object  
+    CALL queue.append WITH PARAMETER root  
+
+    WHILE queue HOLDS elements  
+        SET node TO result of queue.popleft  
+        IF i LESS THAN length of values AND element at position i OF values IS NOT null  
+            SET node.left TO new TreeNode WITH PARAMETER element at position i OF values  
+            CALL queue.append WITH PARAMETER node.left  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN length of values AND element at position i OF values IS NOT null  
+            SET node.right TO new TreeNode WITH PARAMETER element at position i OF values  
+            CALL queue.append WITH PARAMETER node.right  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS null AND q IS null  
+        RETURN True  
+    ELSE IF p IS null OR q IS null  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN result of is_same_tree WITH PARAMETERS p.left AND q.left  
+            AND result of is_same_tree WITH PARAMETERS p.right AND q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION levelOrder(root)  
+        IF root IS null  
+            RETURN empty list  
+        END IF  
+
+        SET result TO empty list  
+        SET queue TO new deque initialized with root  
+
+        WHILE queue HOLDS elements  
+            SET level_size TO length of queue  
+            SET current_level TO empty list  
+
+            FOR count FROM one TO level_size  
+                SET node TO result of queue.popleft  
+                CALL current_level.append WITH PARAMETER node.val  
+
+                IF node.left IS NOT null  
+                    CALL queue.append WITH PARAMETER node.left  
+                END IF  
+                IF node.right IS NOT null  
+                    CALL queue.append WITH PARAMETER node.right  
+                END IF  
+            END FOR  
+
+            CALL result.append WITH PARAMETER current_level  
+        END WHILE  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

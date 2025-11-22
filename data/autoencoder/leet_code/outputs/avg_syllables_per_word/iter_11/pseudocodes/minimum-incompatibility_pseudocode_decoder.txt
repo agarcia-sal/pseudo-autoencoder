@@ -1,0 +1,49 @@
+CLASS Solution  
+    FUNCTION minimumIncompatibility(nums, k)  
+        IMPORT Counter FROM collections  
+        SET n TO the LENGTH OF nums  
+        SET subset_size TO n DIVIDED BY k  
+        
+        IF there EXISTS a count IN the VALUES OF Counter(nums) SUCH THAT count GREATER THAN k  
+            RETURN negative one  
+        END IF  
+        
+        SET subset_incompatibility TO an empty dictionary  
+        FOR mask FROM zero TO two RAISED TO THE POWER OF n MINUS one  
+            SET count_ones TO the NUMBER OF ONES IN THE BINARY REPRESENTATION OF mask  
+            IF count_ones EQUALS subset_size  
+                SET elements TO an empty list  
+                FOR i FROM zero TO n MINUS one  
+                    IF the BITWISE AND OF mask AND two RAISED TO THE POWER OF i NOT EQUALS zero  
+                        APPEND element at position i OF nums TO elements  
+                    END IF  
+                END FOR  
+                IF the LENGTH OF the SET OF elements EQUALS subset_size  
+                    SET incompatibility TO the MAXIMUM OF elements MINUS the MINIMUM OF elements  
+                    SET subset_incompatibility AT KEY mask TO incompatibility  
+                END IF  
+            END IF  
+        END FOR  
+        
+        SET dp TO a list of LENGTH two RAISED TO THE POWER OF n FILLED WITH infinity  
+        SET the element at position zero OF dp TO zero  
+        
+        FOR mask FROM zero TO two RAISED TO THE POWER OF n MINUS one  
+            SET count_ones TO the NUMBER OF ONES IN THE BINARY REPRESENTATION OF mask  
+            IF count_ones MODULO subset_size NOT EQUALS zero  
+                CONTINUE to the next iteration  
+            END IF  
+            FOR each subset_mask IN the KEYS OF subset_incompatibility  
+                IF the BITWISE AND OF mask AND subset_mask EQUALS subset_mask  
+                    SET dp AT POSITION mask TO the MINIMUM OF dp AT POSITION mask AND the SUM OF dp AT POSITION BITWISE XOR OF mask AND subset_mask AND subset_incompatibility AT KEY subset_mask  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        IF dp AT POSITION two RAISED TO THE POWER OF n MINUS one NOT EQUALS infinity  
+            RETURN dp AT POSITION two RAISED TO THE POWER OF n MINUS one  
+        ELSE  
+            RETURN negative one  
+        END IF  
+    END FUNCTION  
+END CLASS

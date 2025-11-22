@@ -1,0 +1,45 @@
+CLASS Solution  
+    FUNCTION openLock(deadends, target)  
+        SET deadends_set TO the SET of elements IN deadends  
+        
+        IF the STRING composed of four zeros IS IN deadends_set  
+            RETURN the INTEGER minus one  
+        END IF  
+        
+        IF target EQUALS the STRING composed of four zeros  
+            RETURN the INTEGER zero  
+        END IF  
+        
+        SET queue TO a new double ended queue initialized WITH the TUPLE of the STRING composed of four zeros AND the INTEGER zero  
+        SET visited TO the SET containing the STRING composed of four zeros  
+        
+        FUNCTION neighbors(state)  
+            SET result TO an empty list  
+            FOR each index FROM zero TO three  
+                SET digit TO the INTEGER CONVERSION OF the element at position index OF state  
+                FOR each move IN the list containing the INTEGER minus one AND the INTEGER one  
+                    SET new_digit TO (digit PLUS move) MODULO ten  
+                    SET new_state TO the concatenation of the substring of state from position zero TO position index MINUS one PLUS the STRING CONVERSION OF new_digit PLUS the substring of state from position index PLUS one TO the end  
+                    APPEND new_state TO result  
+                END FOR  
+            END FOR  
+            RETURN result  
+        END FUNCTION  
+        
+        WHILE the queue is not empty  
+            SET current_state AND steps TO the result of removing the first element FROM queue  
+            
+            FOR each neighbor IN neighbors(current_state)  
+                IF neighbor NOT IN visited AND neighbor NOT IN deadends_set  
+                    IF neighbor EQUALS target  
+                        RETURN steps PLUS one  
+                    END IF  
+                    ADD neighbor TO visited  
+                    APPEND the TUPLE of neighbor AND steps PLUS one TO queue  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN the INTEGER minus one  
+    END FUNCTION  
+END CLASS

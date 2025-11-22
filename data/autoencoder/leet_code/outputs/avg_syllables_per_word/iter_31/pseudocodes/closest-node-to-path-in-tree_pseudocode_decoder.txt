@@ -1,0 +1,46 @@
+CLASS Solution  
+    FUNCTION closestNode(n, edges, query)  
+        SET graph TO a new default mapping from key to empty list  
+        FOR each pair u AND v IN edges  
+            APPEND v TO the list associated with key u IN graph  
+            APPEND u TO the list associated with key v IN graph  
+        END FOR  
+        
+        FUNCTION find_path(start, end)  
+            SET queue TO a new double ended queue containing the tuple of start AND list containing start  
+            SET visited TO a new set containing start  
+            WHILE the queue is not empty  
+                REMOVE the first element from queue AND ASSIGN TO node AND path  
+                IF node EQUALS end  
+                    RETURN path  
+                END IF  
+                FOR each neighbor IN the list associated with key node IN graph  
+                    IF neighbor NOT IN visited  
+                        ADD neighbor TO visited  
+                        APPEND the tuple of neighbor AND a new list formed by concatenating path PLUS neighbor TO queue  
+                    END IF  
+                END FOR  
+            END WHILE  
+        END FUNCTION  
+        
+        FUNCTION closest_node_on_path(path, node)  
+            SET min_distance TO positive infinity  
+            SET closest_node TO none  
+            FOR each element p IN path  
+                SET distance TO the length of find_path with p AND node MINUS one  
+                IF distance LESS THAN min_distance  
+                    SET min_distance TO distance  
+                    SET closest_node TO p  
+                END IF  
+            END FOR  
+            RETURN closest_node  
+        END FUNCTION  
+        
+        SET answer TO empty list  
+        FOR each set of start AND end AND node IN query  
+            SET path TO find_path called with start AND end  
+            APPEND the result of closest_node_on_path called with path AND node TO answer  
+        END FOR  
+        RETURN answer  
+    END FUNCTION  
+END CLASS

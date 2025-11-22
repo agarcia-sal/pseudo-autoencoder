@@ -1,0 +1,69 @@
+CLASS TreeNode  
+    FUNCTION __init__(self, val = 0, left = None, right = None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY  
+        RETURN None  
+    SET root TO TreeNode(values AT INDEX 0)  
+    SET i TO 1  
+    SET queue TO NEW empty queue  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO REMOVE first element FROM queue  
+        IF i IS LESS THAN LENGTH OF values AND values AT INDEX i IS NOT None  
+            SET node.left TO TreeNode(values AT INDEX i)  
+            APPEND node.left TO queue  
+        INCREMENT i BY 1  
+        IF i IS LESS THAN LENGTH OF values AND values AT INDEX i IS NOT None  
+            SET node.right TO TreeNode(values AT INDEX i)  
+            APPEND node.right TO queue  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None  
+        RETURN True  
+    ELSE IF p IS None OR q IS None  
+        RETURN False  
+    ELSE IF p.val IS NOT EQUAL TO q.val  
+        RETURN False  
+    ELSE  
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION verticalTraversal(self, root)  
+        IF root IS None  
+            RETURN empty list  
+        SET node_dict TO EMPTY dictionary WITH default empty list  
+        SET min_col TO 0  
+        SET max_col TO 0  
+
+        FUNCTION dfs(node, row, col)  
+            IF node IS None  
+                RETURN  
+            APPEND (row, node.val) TO node_dict AT KEY col  
+            SET min_col TO MINIMUM OF min_col AND col  
+            SET max_col TO MAXIMUM OF max_col AND col  
+            CALL dfs(node.left, row PLUS 1, col MINUS 1)  
+            CALL dfs(node.right, row PLUS 1, col PLUS 1)  
+        END FUNCTION  
+
+        CALL dfs(root, 0, 0)  
+
+        SET result TO EMPTY list  
+        FOR col FROM min_col TO max_col INCLUSIVE  
+            SET sorted_list TO node_dict AT KEY col SORTED BY row THEN node.val  
+            APPEND list OF values FROM sorted_list TO result  
+        END FOR  
+
+        RETURN result  
+    END FUNCTION  
+END CLASS

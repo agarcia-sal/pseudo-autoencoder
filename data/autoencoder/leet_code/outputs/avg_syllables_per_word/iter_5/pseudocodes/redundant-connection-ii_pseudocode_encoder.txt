@@ -1,0 +1,48 @@
+CLASS Solution  
+    FUNCTION findRedundantDirectedConnection(edges)  
+        FUNCTION find(parent, i)  
+            IF parent AT i IS NOT EQUAL TO i THEN  
+                SET parent AT i TO find(parent, parent AT i)  
+            RETURN parent AT i  
+        END FUNCTION  
+        
+        FUNCTION union(parent, rank, x, y)  
+            SET rootX TO find(parent, x)  
+            SET rootY TO find(parent, y)  
+            IF rootX IS NOT EQUAL TO rootY THEN  
+                IF rank AT rootX IS GREATER THAN rank AT rootY THEN  
+                    SET parent AT rootY TO rootX  
+                ELSE IF rank AT rootX IS LESS THAN rank AT rootY THEN  
+                    SET parent AT rootX TO rootY  
+                ELSE  
+                    SET parent AT rootY TO rootX  
+                    INCREMENT rank AT rootX BY 1  
+                RETURN True  
+            RETURN False  
+        END FUNCTION  
+        
+        SET n TO LENGTH OF edges  
+        SET parent TO list of integers from 0 TO n  
+        SET rank TO list of zeros with size n plus 1  
+        
+        SET candidate1 TO None  
+        SET candidate2 TO None  
+        SET last TO None  
+        
+        FOR each pair u, v IN edges  
+            IF parent AT v IS NOT EQUAL TO v THEN  
+                SET candidate1 TO list containing parent AT v AND v  
+                SET candidate2 TO list containing u AND v  
+            ELSE  
+                IF union(parent, rank, u, v) IS False THEN  
+                    SET last TO list containing u AND v  
+        
+        IF candidate1 IS None THEN  
+            RETURN last  
+        
+        IF last IS NOT None THEN  
+            RETURN candidate1  
+        
+        RETURN candidate2  
+    END FUNCTION  
+END CLASS

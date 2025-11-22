@@ -1,0 +1,60 @@
+CLASS Solution  
+    FUNCTION countPalindromicSubsequences(self, s)  
+        SET MOD TO one billion plus seven  
+        SET n TO length of s  
+        
+        FUNCTION initialize_matrix(rows, columns)  
+            CREATE a matrix with rows and columns filled with minus one  
+            RETURN the matrix  
+        END FUNCTION  
+        
+        SET next_occurrence TO initialize_matrix four by n  
+        SET prev_occurrence TO initialize_matrix four by n  
+        
+        FOR c FROM zero TO three  
+            SET char TO character represented by ASCII code of letter 'a' plus c  
+            SET last TO minus one  
+            FOR i FROM zero TO n minus one  
+                IF character at position i in s EQUALS char THEN  
+                    SET last TO i  
+                END IF  
+                SET prev_occurrence at row c column i TO last  
+            END FOR  
+            
+            SET last TO minus one  
+            FOR i FROM n minus one DOWN TO zero  
+                IF character at position i in s EQUALS char THEN  
+                    SET last TO i  
+                END IF  
+                SET next_occurrence at row c column i TO last  
+            END FOR  
+        END FOR  
+        
+        CREATE dp matrix of size n by n filled with zero  
+        
+        FOR i FROM zero TO n minus one  
+            SET dp at row i column i TO one  
+        END FOR  
+        
+        FOR length FROM two TO n  
+            FOR i FROM zero TO n minus length  
+                SET j TO i plus length minus one  
+                FOR c FROM zero TO three  
+                    SET char TO character represented by ASCII code of letter 'a' plus c  
+                    SET left TO next_occurrence at row c column i  
+                    SET right TO prev_occurrence at row c column j  
+                    
+                    IF left GREATER THAN j OR right LESS THAN i THEN  
+                        CONTINUE to next iteration  
+                    ELSE IF left EQUALS right THEN  
+                        SET dp at row i column j TO remainder of dp at row i column j plus one divided by MOD  
+                    ELSE  
+                        SET dp at row i column j TO remainder of dp at row i column j plus dp at row left plus one column right minus one plus two divided by MOD  
+                    END IF  
+                END FOR  
+            END FOR  
+        END FOR  
+        
+        RETURN dp at row zero column n minus one  
+    END FUNCTION  
+END CLASS

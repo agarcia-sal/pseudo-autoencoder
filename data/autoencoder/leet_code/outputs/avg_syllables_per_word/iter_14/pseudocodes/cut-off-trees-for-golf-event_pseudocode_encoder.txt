@@ -1,0 +1,65 @@
+CLASS Solution  
+    FUNCTION cutOffTree(forest)  
+        IF forest IS empty OR element at position zero OF forest IS empty  
+            RETURN negative one  
+        END IF  
+          
+        SET trees TO an empty list  
+        FOR each index i FROM zero TO the LENGTH OF forest MINUS one  
+            FOR each index j FROM zero TO the LENGTH OF element at position i OF forest MINUS one  
+                IF element at position j OF element at position i OF forest IS GREATER THAN one  
+                    APPEND a triple consisting of element at position j OF element at position i OF forest PLUS index i PLUS index j TO trees  
+                END IF  
+            END FOR  
+        END FOR  
+        SORT trees IN ascending order BY the first element of each triple  
+          
+        FUNCTION bfs(start, end)  
+            IF start IS EQUAL TO end  
+                RETURN zero  
+            END IF  
+            SET m TO the LENGTH OF forest  
+            SET n TO the LENGTH OF element at position zero OF forest  
+            SET queue TO a double ended queue initialized with start element  
+            SET visited TO a set initialized with start element  
+            SET steps TO zero  
+              
+            WHILE queue IS NOT empty  
+                SET current_level_length TO the LENGTH OF queue  
+                FOR index FROM zero TO current_level_length MINUS one  
+                    REMOVE the element at the front FROM queue AND ASSIGN TO x AND y  
+                    FOR each pair dx AND dy IN collection of pairs MINUS one AND zero PLUS one AND zero PLUS zero AND MINUS one PLUS zero AND PLUS one  
+                        SET nx TO x PLUS dx  
+                        SET ny TO y PLUS dy  
+                        IF nx IS GREATER THAN OR EQUAL TO zero AND nx IS LESS THAN m AND ny IS GREATER THAN OR EQUAL TO zero AND ny IS LESS THAN n AND pair nx AND ny IS NOT IN visited AND element at position ny OF element at position nx OF forest IS NOT EQUAL TO zero  
+                            IF pair nx AND ny IS EQUAL TO end  
+                                RETURN steps PLUS one  
+                            END IF  
+                            ADD pair nx AND ny TO visited  
+                            APPEND pair nx AND ny TO queue  
+                        END IF  
+                    END FOR  
+                END FOR  
+                INCREMENT steps BY one  
+            END WHILE  
+              
+            RETURN negative one  
+        END FUNCTION  
+          
+        SET x TO zero  
+        SET y TO zero  
+        SET total_steps TO zero  
+          
+        FOR each triple consisting of height AND tx AND ty IN trees  
+            SET steps TO bfs(pair x AND y, pair tx AND ty)  
+            IF steps IS EQUAL TO negative one  
+                RETURN negative one  
+            END IF  
+            INCREMENT total_steps BY steps  
+            SET x TO tx  
+            SET y TO ty  
+        END FOR  
+          
+        RETURN total_steps  
+    END FUNCTION  
+END CLASS

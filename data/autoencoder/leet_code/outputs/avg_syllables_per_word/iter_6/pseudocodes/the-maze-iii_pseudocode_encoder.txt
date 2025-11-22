@@ -1,0 +1,52 @@
+CLASS Solution  
+    FUNCTION findShortestWay(maze, ball, hole)  
+        SET directions TO list containing tuples:  
+            (0, 1, 'r')  
+            (1, 0, 'd')  
+            (0, -1, 'l')  
+            (-1, 0, 'u')  
+        SET m TO length of maze  
+        SET n TO length of first element of maze  
+        SET start TO tuple constructed from ball  
+        SET hole TO tuple constructed from hole  
+        SET pq TO list containing tuple: (0, empty string, start)  
+        SET visited TO empty set  
+        
+        WHILE pq IS NOT empty  
+            CALL heappop FROM pq AND SET result TO dist, path, (x, y)  
+            
+            IF (x, y) EQUALS hole THEN  
+                RETURN path  
+            END IF  
+            
+            IF (x, y) IN visited THEN  
+                CONTINUE  
+            END IF  
+            
+            ADD (x, y) TO visited  
+            
+            FOR each dx, dy, direction IN directions  
+                SET new_x TO x  
+                SET new_y TO y  
+                SET count TO 0  
+                
+                WHILE new_x PLUS dx GREATER THAN OR EQUAL TO 0 AND new_x PLUS dx LESS THAN m  
+                      AND new_y PLUS dy GREATER THAN OR EQUAL TO 0 AND new_y PLUS dy LESS THAN n  
+                      AND maze at position (new_x PLUS dx, new_y PLUS dy) EQUALS 0  
+                    SET new_x TO new_x PLUS dx  
+                    SET new_y TO new_y PLUS dy  
+                    INCREMENT count BY 1  
+                    IF (new_x, new_y) EQUALS hole THEN  
+                        BREAK  
+                    END IF  
+                END WHILE  
+                
+                IF (new_x, new_y) NOT IN visited THEN  
+                    CALL heappush ON pq WITH arguments (dist PLUS count, path CONCATENATED WITH direction, (new_x, new_y))  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN "impossible"  
+    END FUNCTION  
+END CLASS

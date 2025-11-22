@@ -1,0 +1,47 @@
+CLASS Solution
+    FUNCTION reachableNodes(edges LIST OF LIST OF INTEGER, maxMoves INTEGER, n INTEGER)
+        SET graph TO an EMPTY DICTIONARY MAPPING each INTEGER from zero TO n MINUS one TO an EMPTY LIST
+        FOR each edge consisting of variables u, v, cnt IN edges
+            APPEND the TUPLE of v and cnt TO the LIST at key u IN graph
+            APPEND the TUPLE of u and cnt TO the LIST at key v IN graph
+        END FOR
+
+        SET distances TO a LIST OF size n FILLED WITH positive INFINITY
+        SET the ELEMENT at position zero OF distances TO zero
+        SET priority_queue TO a LIST CONTAINING the TUPLE of zero distance and zero node
+
+        WHILE priority_queue HOLDS
+            EXTRACT and REMOVE the TUPLE of current_distance and current_node WITH the LOWEST DISTANCE FROM priority_queue
+            IF current_distance IS GREATER THAN distances AT position current_node
+                CONTINUE to the next iteration
+            END IF
+            FOR each neighbor and cnt IN the LIST at key current_node IN graph
+                SET new_distance TO current_distance PLUS cnt PLUS one
+                IF new_distance IS LESS THAN distances AT position neighbor
+                    SET distances AT position neighbor TO new_distance
+                    INSERT the TUPLE of new_distance and neighbor INTO priority_queue
+                END IF
+            END FOR
+        END WHILE
+
+        SET reachable_nodes TO zero
+
+        FOR each distance_value IN distances
+            IF distance_value IS LESS THAN OR EQUAL TO maxMoves
+                INCREMENT reachable_nodes BY one
+            END IF
+        END FOR
+
+        SET used_edges TO an EMPTY DICTIONARY
+
+        FOR each edge consisting of variables u, v, cnt IN edges
+            SET moves_from_u TO the MAXIMUM OF zero AND maxMoves MINUS distances AT position u
+            SET moves_from_v TO the MAXIMUM OF zero AND maxMoves MINUS distances AT position v
+            SET reachable_new_nodes TO the MINIMUM OF cnt AND moves_from_u PLUS moves_from_v
+            INCREMENT reachable_nodes BY reachable_new_nodes
+            ASSIGN used_edges AT key TUPLE of u and v TO reachable_new_nodes
+        END FOR
+
+        RETURN reachable_nodes
+    END FUNCTION
+END CLASS

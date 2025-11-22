@@ -1,0 +1,71 @@
+CLASS TreeNode  
+    FUNCTION __init__ WITH PARAMETERS self val EQUALS zero left EQUALS none right EQUALS none  
+        SET self val TO val  
+        SET self left TO left  
+        SET self right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node WITH PARAMETER values  
+    IF the LENGTH OF values EQUALS zero  
+        RETURN none  
+    END IF  
+    SET root TO A NEW TreeNode CREATED WITH the element at position zero of values  
+    SET i TO one  
+    CREATE queue AS A NEW deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT empty  
+        SET node TO THE FIRST element REMOVED FROM queue  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT none  
+            SET node left TO A NEW TreeNode CREATED WITH the element at position i of values  
+            APPEND node left TO queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i IS LESS THAN the LENGTH OF values AND the element at position i of values IS NOT none  
+            SET node right TO A NEW TreeNode CREATED WITH the element at position i of values  
+            APPEND node right TO queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree WITH PARAMETERS p q  
+    IF p IS none AND q IS none  
+        RETURN true  
+    ELSE IF p IS none OR q IS none  
+        RETURN false  
+    ELSE IF the property val of p IS NOT EQUALS the property val of q  
+        RETURN false  
+    ELSE  
+        RETURN the RESULT OF is_same_tree WITH PARAMETERS the property left of p AND the property left of q AND the RESULT OF is_same_tree WITH PARAMETERS the property right of p AND the property right of q  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION printTree WITH PARAMETERS self root  
+        FUNCTION getHeight WITH PARAMETER node  
+            IF node IS none  
+                RETURN zero  
+            END IF  
+            RETURN one PLUS THE GREATER OF getHeight WITH PARAMETER the property left of node AND getHeight WITH PARAMETER the property right of node  
+        END FUNCTION  
+        
+        SET height TO getHeight WITH PARAMETER root  
+        SET width TO the power of two RAISED TO THE height MINUS one  
+        CREATE res AS A LIST CONTAINING height NUMBER OF ELEMENTS EACH INITIALIZED TO A LIST OF width NUMBER OF EMPTY STRINGS  
+        
+        FUNCTION placeNode WITH PARAMETERS node row left right  
+            IF node IS none  
+                RETURN  
+            END IF  
+            SET mid TO the INTEGER DIVISION RESULT OF left PLUS right BY two  
+            SET the element at position mid of the element at position row of res TO THE string REPRESENTATION OF the property val of node  
+            CALL placeNode WITH PARAMETERS the property left of node row PLUS one left mid  
+            CALL placeNode WITH PARAMETERS the property right of node row PLUS one mid right  
+        END FUNCTION  
+        
+        CALL placeNode WITH PARAMETERS root zero zero width  
+        RETURN res  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,50 @@
+CLASS UnionFind  
+    FUNCTION __init__(self, size)  
+        SET self.parent TO list of integers from zero TO size MINUS one  
+        SET self.rank TO list of ones with length size  
+    END FUNCTION  
+
+    FUNCTION find(self, p)  
+        IF self.parent at position p NOT EQUALS p  
+            SET self.parent at position p TO CALL find WITH self.parent at position p  
+        RETURN self.parent at position p  
+    END FUNCTION  
+
+    FUNCTION union(self, p, q)  
+        SET rootP TO CALL find WITH p  
+        SET rootQ TO CALL find WITH q  
+        IF rootP EQUALS rootQ  
+            RETURN False  
+        IF self.rank at rootP GREATER THAN self.rank at rootQ  
+            SET self.parent at rootQ TO rootP  
+        ELSE IF self.rank at rootP LESS THAN self.rank at rootQ  
+            SET self.parent at rootP TO rootQ  
+        ELSE  
+            SET self.parent at rootQ TO rootP  
+            INCREMENT self.rank at rootP BY one  
+        RETURN True  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION distanceLimitedPathsExist(self, n, edgeList, queries)  
+        CALL sort ON edgeList BY third element of each item  
+        SET indexedQueries TO list of tuples formed by limit, p, q, and original index FROM queries  
+        CALL sort ON indexedQueries BY first element of each tuple  
+        SET uf TO new instance of UnionFind WITH size n  
+        SET edgeIndex TO zero  
+        SET numEdges TO length of edgeList  
+        SET results TO list of False values with length of queries  
+
+        FOR each limit, p, q, originalIndex IN indexedQueries  
+            WHILE edgeIndex LESS THAN numEdges AND third value of edgeList at edgeIndex LESS THAN limit  
+                SET u TO first value of edgeList at edgeIndex  
+                SET v TO second value of edgeList at edgeIndex  
+                CALL union ON uf WITH u AND v  
+                INCREMENT edgeIndex BY one  
+            IF CALL find ON uf WITH p EQUALS CALL find ON uf WITH q  
+                SET results at originalIndex TO True  
+
+        RETURN results  
+    END FUNCTION  
+END CLASS

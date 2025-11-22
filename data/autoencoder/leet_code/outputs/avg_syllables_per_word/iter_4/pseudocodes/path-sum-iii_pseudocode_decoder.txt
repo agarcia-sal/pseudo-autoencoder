@@ -1,0 +1,57 @@
+CLASS TreeNode
+    FUNCTION __init__(val = 0, left = None, right = None)
+        SET self.val TO val
+        SET self.left TO left
+        SET self.right TO right
+    END FUNCTION
+END CLASS
+
+FUNCTION tree_node(values: list)
+    IF values IS empty
+        RETURN None
+    SET root TO TreeNode(values[0])
+    SET i TO 1
+    SET queue TO empty deque
+    APPEND root TO queue
+    WHILE queue IS NOT empty
+        SET node TO queue.popleft()
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.left TO TreeNode(values[i])
+            APPEND node.left TO queue
+        INCREMENT i BY 1
+        IF i < LENGTH OF values AND values[i] IS NOT None
+            SET node.right TO TreeNode(values[i])
+            APPEND node.right TO queue
+        INCREMENT i BY 1
+    RETURN root
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)
+    IF p IS None AND q IS None
+        RETURN True
+    ELSE IF p IS None OR q IS None
+        RETURN False
+    ELSE IF p.val IS NOT EQUAL TO q.val
+        RETURN False
+    ELSE
+        RETURN is_same_tree(p.left, q.left) AND is_same_tree(p.right, q.right)
+END FUNCTION
+
+CLASS Solution
+    FUNCTION pathSum(root, targetSum)
+        FUNCTION helper(node, current_sum, prefix_sums)
+            IF node IS None
+                RETURN 0
+            SET current_sum TO current_sum + node.val
+            SET paths_to_here TO prefix_sums.GET(current_sum - targetSum, 0)
+            SET prefix_sums[current_sum] TO prefix_sums.GET(current_sum, 0) + 1
+            SET paths_in_left TO helper(node.left, current_sum, prefix_sums)
+            SET paths_in_right TO helper(node.right, current_sum, prefix_sums)
+            DECREMENT prefix_sums[current_sum] BY 1
+            RETURN paths_to_here + paths_in_left + paths_in_right
+        END FUNCTION
+
+        SET prefix_sums TO DICTIONARY WITH KEY 0 AND VALUE 1
+        RETURN helper(root, 0, prefix_sums)
+    END FUNCTION
+END CLASS

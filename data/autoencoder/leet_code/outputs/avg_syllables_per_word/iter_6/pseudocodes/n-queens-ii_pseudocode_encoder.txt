@@ -1,0 +1,40 @@
+CLASS Solution  
+    FUNCTION totalNQueens(n)  
+        FUNCTION is_not_under_attack(row, col)  
+            RETURN NOT (cols AT col PLUS hills AT (row MINUS col) PLUS dales AT (row PLUS col))  
+        END FUNCTION  
+
+        FUNCTION place_queen(row, col)  
+            SET cols AT col TO 1  
+            SET hills AT (row MINUS col) TO 1  
+            SET dales AT (row PLUS col) TO 1  
+        END FUNCTION  
+
+        FUNCTION remove_queen(row, col)  
+            SET cols AT col TO 0  
+            SET hills AT (row MINUS col) TO 0  
+            SET dales AT (row PLUS col) TO 0  
+        END FUNCTION  
+
+        FUNCTION backtrack(row, count)  
+            FOR col FROM 0 TO n MINUS 1  
+                IF is_not_under_attack(row, col) IS TRUE  
+                    CALL place_queen WITH row, col  
+                    IF row PLUS 1 EQUALS n  
+                        INCREMENT count BY 1  
+                    ELSE  
+                        SET count TO CALL backtrack WITH row PLUS 1, count  
+                    END IF  
+                    CALL remove_queen WITH row, col  
+                END IF  
+            END FOR  
+            RETURN count  
+        END FUNCTION  
+
+        SET cols TO list of zeros of length n  
+        SET hills TO list of zeros of length (2 MULTIPLIED BY n MINUS 1)  
+        SET dales TO list of zeros of length (2 MULTIPLIED BY n MINUS 1)  
+
+        RETURN CALL backtrack WITH 0, 0  
+    END FUNCTION  
+END CLASS

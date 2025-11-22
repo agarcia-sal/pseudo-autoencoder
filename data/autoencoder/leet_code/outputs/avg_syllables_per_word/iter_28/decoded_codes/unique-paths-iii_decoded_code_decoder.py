@@ -1,0 +1,32 @@
+from typing import List
+
+class Solution:
+    def uniquePathsIII(self, grid: List[List[int]]) -> int:
+        m, n = len(grid), len(grid[0])
+        start_x = start_y = 0
+        empty_squares = 1  # start square counted as empty path to cover
+
+        for i in range(m):
+            for j in range(n):
+                if grid[i][j] == 1:
+                    start_x, start_y = i, j
+                elif grid[i][j] == 0:
+                    empty_squares += 1
+
+        def dfs(x: int, y: int, steps: int) -> int:
+            if grid[x][y] == 2:
+                return steps == 0
+
+            original = grid[x][y]
+            grid[x][y] = -2  # mark visited
+            count = 0
+
+            for dx, dy in [(-1,0), (1,0), (0,-1), (0,1)]:
+                nx, ny = x + dx, y + dy
+                if 0 <= nx < m and 0 <= ny < n and grid[nx][ny] >= 0:
+                    count += dfs(nx, ny, steps - 1)
+
+            grid[x][y] = original  # backtrack
+            return count
+
+        return dfs(start_x, start_y, empty_squares)

@@ -1,0 +1,57 @@
+CLASS TreeNode  
+    FUNCTION __init__(val EQUALS 0, left EQUALS None, right EQUALS None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS  
+
+FUNCTION tree_node(values)  
+    IF values IS EMPTY THEN  
+        RETURN None  
+    END IF  
+    SET root TO new TreeNode WITH val EQUALS values AT position 0  
+    SET i TO 1  
+    SET queue TO empty deque  
+    APPEND root TO queue  
+    WHILE queue IS NOT EMPTY  
+        SET node TO POP LEFT FROM queue  
+        IF i LESS THAN LENGTH OF values AND values AT position i IS NOT None THEN  
+            SET node.left TO new TreeNode WITH val EQUALS values AT position i  
+            APPEND node.left TO queue  
+        END IF  
+        INCREMENT i BY 1  
+        IF i LESS THAN LENGTH OF values AND values AT position i IS NOT None THEN  
+            SET node.right TO new TreeNode WITH val EQUALS values AT position i  
+            APPEND node.right TO queue  
+        END IF  
+        INCREMENT i BY 1  
+    END WHILE  
+    RETURN root  
+END FUNCTION  
+
+FUNCTION is_same_tree(p, q)  
+    IF p IS None AND q IS None THEN  
+        RETURN True  
+    ELSE IF p IS None OR q IS None THEN  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val THEN  
+        RETURN False  
+    ELSE  
+        RETURN CALL is_same_tree WITH p.left AND q.left AND CALL is_same_tree WITH p.right AND q.right  
+    END IF  
+END FUNCTION  
+
+CLASS Solution  
+    FUNCTION constructMaximumBinaryTree(nums)  
+        IF nums IS EMPTY THEN  
+            RETURN None  
+        END IF  
+        SET max_val TO maximum value IN nums  
+        SET max_index TO position OF max_val IN nums  
+        SET root TO new TreeNode WITH val EQUALS max_val  
+        SET root.left TO CALL constructMaximumBinaryTree WITH sublist OF nums FROM start TO max_index MINUS 1  
+        SET root.right TO CALL constructMaximumBinaryTree WITH sublist OF nums FROM max_index PLUS 1 TO end  
+        RETURN root  
+    END FUNCTION  
+END CLASS

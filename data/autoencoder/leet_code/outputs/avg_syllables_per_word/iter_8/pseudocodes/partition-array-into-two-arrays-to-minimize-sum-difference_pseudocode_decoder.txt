@@ -1,0 +1,53 @@
+CLASS Solution  
+    FUNCTION minimumDifference(nums)  
+        SET n TO LENGTH OF nums DIVIDED BY 2  
+        SET total_sum TO SUM OF nums  
+        SET target TO total_sum DIVIDED BY 2  
+        SET min_diff TO positive infinity  
+        
+        SET left_half TO FIRST n ELEMENTS OF nums  
+        SET right_half TO REMAINING ELEMENTS OF nums AFTER n  
+        
+        SET left_sums TO LIST OF n PLUS 1 DICTIONARIES  
+        SET right_sums TO LIST OF n PLUS 1 DICTIONARIES  
+        
+        FOR i FROM 0 TO n INCLUSIVE  
+            FOR each combo IN ALL COMBINATIONS OF left_half TAKEN i  
+                SET subset_sum TO SUM OF combo  
+                IF subset_sum NOT IN left_sums AT INDEX i  
+                    SET left_sums AT INDEX i WITH KEY subset_sum TO 0  
+                INCREMENT left_sums AT INDEX i WITH KEY subset_sum BY 1  
+            END FOR  
+            
+            FOR each combo IN ALL COMBINATIONS OF right_half TAKEN i  
+                SET subset_sum TO SUM OF combo  
+                IF subset_sum NOT IN right_sums AT INDEX i  
+                    SET right_sums AT INDEX i WITH KEY subset_sum TO 0  
+                INCREMENT right_sums AT INDEX i WITH KEY subset_sum BY 1  
+            END FOR  
+        END FOR  
+        
+        FOR i FROM 0 TO n INCLUSIVE  
+            SET left_values TO SORTED LIST OF KEYS IN left_sums AT INDEX i  
+            SET right_values TO SORTED LIST OF KEYS IN right_sums AT INDEX n MINUS i  
+            
+            SET j TO 0  
+            SET k TO LENGTH OF right_values MINUS 1  
+            
+            WHILE j LESS THAN LENGTH OF left_values AND k GREATER THAN OR EQUAL TO 0  
+                SET current_sum TO left_values AT INDEX j PLUS right_values AT INDEX k  
+                SET min_diff TO MINIMUM OF min_diff AND ABSOLUTE VALUE OF total_sum MINUS 2 TIMES current_sum  
+                
+                IF current_sum LESS THAN target  
+                    INCREMENT j BY 1  
+                ELSE IF current_sum GREATER THAN target  
+                    DECREMENT k BY 1  
+                ELSE  
+                    RETURN 0  
+                END IF  
+            END WHILE  
+        END FOR  
+        
+        RETURN min_diff  
+    END FUNCTION  
+END CLASS

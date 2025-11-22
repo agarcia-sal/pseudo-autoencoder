@@ -1,0 +1,54 @@
+CLASS Solution
+    FUNCTION shortestDistance(grid)
+        IF grid IS EMPTY OR grid[0] IS EMPTY
+            RETURN -1
+        
+        SET m TO LENGTH OF grid
+        SET n TO LENGTH OF grid[0]
+        SET total_distance TO 2D list of zeros with dimensions m by n
+        SET reach_count TO 2D list of zeros with dimensions m by n
+        SET building_count TO 0
+        
+        SET directions TO list containing (1,0), (-1,0), (0,1), (0,-1)
+        
+        FUNCTION bfs(start_x, start_y)
+            SET queue TO deque containing (start_x, start_y)
+            SET visited TO 2D list of False with dimensions m by n
+            SET distance TO 0
+            SET reachable TO 0
+            
+            WHILE queue IS NOT EMPTY
+                SET size TO LENGTH OF queue
+                INCREMENT distance BY 1
+                FOR index FROM 1 TO size
+                    SET (x, y) TO REMOVE FIRST element from queue
+                    FOR EACH (dx, dy) IN directions
+                        SET nx TO x + dx
+                        SET ny TO y + dy
+                        IF nx IS BETWEEN 0 AND m - 1 AND ny IS BETWEEN 0 AND n - 1 AND visited[nx][ny] IS False AND grid[nx][ny] IS 0
+                            SET visited[nx][ny] TO True
+                            APPEND (nx, ny) TO queue
+                            INCREMENT total_distance[nx][ny] BY distance
+                            INCREMENT reach_count[nx][ny] BY 1
+                            INCREMENT reachable BY 1
+            RETURN reachable
+        
+        FOR i FROM 0 TO m - 1
+            FOR j FROM 0 TO n - 1
+                IF grid[i][j] IS 1
+                    INCREMENT building_count BY 1
+                    IF bfs(i, j) < building_count - 1
+                        RETURN -1
+        
+        SET min_distance TO infinity
+        FOR i FROM 0 TO m - 1
+            FOR j FROM 0 TO n - 1
+                IF grid[i][j] IS 0 AND reach_count[i][j] IS EQUAL TO building_count
+                    SET min_distance TO MINIMUM OF min_distance AND total_distance[i][j]
+        
+        IF min_distance IS infinity
+            RETURN -1
+        ELSE
+            RETURN min_distance
+    END FUNCTION
+END CLASS

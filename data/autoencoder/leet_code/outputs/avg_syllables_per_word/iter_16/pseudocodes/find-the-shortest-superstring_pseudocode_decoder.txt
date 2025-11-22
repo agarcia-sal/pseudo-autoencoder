@@ -1,0 +1,52 @@
+CLASS Solution  
+    FUNCTION shortestSuperstring WITH PARAMETER words  
+        SET n TO the LENGTH OF words  
+        
+        FUNCTION overlap WITH PARAMETERS i AND j  
+            FOR k FROM the MINIMUM OF the LENGTH OF element at position i of words AND the LENGTH OF element at position j of words DOWN TO one DECREMENTING BY one  
+                IF the SUBSTRING consisting of the last k characters of element at position i of words EQUALS the SUBSTRING consisting of the first k characters of element at position j of words  
+                    RETURN k  
+                END IF  
+            END FOR  
+            RETURN zero  
+        END FUNCTION  
+        
+        FUNCTION dp WITH PARAMETERS mask AND i  
+            IF mask EQUALS THE result of ONE LEFT SHIFTED BY n MINUS one  
+                RETURN a PAIR consisting of zero AND an EMPTY STRING  
+            END IF  
+            
+            SET min_len TO a value representing positive infinity  
+            SET best_path TO an EMPTY STRING  
+            FOR j FROM zero TO n MINUS one  
+                IF the BITWISE AND of mask AND the result of ONE LEFT SHIFTED BY j EQUALS zero  
+                    SET length_and_path TO the RESULT OF calling dp WITH ARGUMENTS the BITWISE OR of mask AND the result of ONE LEFT SHIFTED BY j AND j  
+                    SET length TO the FIRST ELEMENT OF length_and_path  
+                    SET path TO the SECOND ELEMENT OF length_and_path  
+                    SET length TO length PLUS the LENGTH OF element at position j of words MINUS the RESULT OF overlap WITH ARGUMENTS i AND j  
+                    IF length LESS THAN min_len  
+                        SET min_len TO length  
+                        SET best_path TO the SUBSTRING of element at position j of words FROM position RESULT OF overlap WITH ARGUMENTS i AND j TO the END CONCATENATED WITH path  
+                    END IF  
+                END IF  
+            END FOR  
+            
+            RETURN a PAIR consisting of min_len AND best_path  
+        END FUNCTION  
+        
+        SET min_len TO a value representing positive infinity  
+        SET shortest_path TO an EMPTY STRING  
+        FOR i FROM zero TO n MINUS one  
+            SET length_and_path TO the RESULT OF calling dp WITH ARGUMENTS the RESULT OF ONE LEFT SHIFTED BY i AND i  
+            SET length TO the FIRST ELEMENT OF length_and_path  
+            SET path TO the SECOND ELEMENT OF length_and_path  
+            SET length TO length PLUS the LENGTH OF element at position i of words  
+            IF length LESS THAN min_len  
+                SET min_len TO length  
+                SET shortest_path TO element at position i of words CONCATENATED WITH path  
+            END IF  
+        END FOR  
+        
+        RETURN shortest_path  
+    END FUNCTION  
+END CLASS

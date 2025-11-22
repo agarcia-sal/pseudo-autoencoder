@@ -1,0 +1,83 @@
+CLASS Solution  
+    FUNCTION sortItems(n, m, group, beforeItems)  
+        FOR i FROM zero TO n MINUS one  
+            IF element at position i OF group EQUALS minus one  
+                SET element at position i OF group TO m  
+                INCREMENT m BY one  
+            END IF  
+        END FOR  
+        
+        ASSIGN reference TO new empty mapping from group identifier TO list of items  
+        ASSIGN reference TO new empty mapping from group identifier TO list of dependent groups  
+        ASSIGN reference TO new empty mapping from item identifier TO list of dependent items  
+        ASSIGN reference TO new list of zeroes with length n AS item_in_degree  
+        ASSIGN reference TO new list of zeroes with length m AS group_in_degree  
+        
+        FOR i FROM zero TO n MINUS one  
+            APPEND i TO list at key element at position i OF group IN group_items  
+        END FOR  
+        
+        FOR i FROM zero TO n MINUS one  
+            FOR each before_element IN element at position i OF beforeItems  
+                IF element at position before_element OF group EQUALS element at position i OF group  
+                    APPEND i TO list at key before_element IN item_graph  
+                    INCREMENT element at position i OF item_in_degree BY one  
+                ELSE  
+                    APPEND element at position i OF group TO list at key element at position before_element OF group IN group_graph  
+                    INCREMENT element at position element at position i OF group OF group_in_degree BY one  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        FUNCTION topological_sort(graph, in_degree, items)  
+            ASSIGN reference TO new empty queue  
+            FOR each item IN items  
+                IF element at position item OF in_degree EQUALS zero  
+                    ADD item TO queue  
+                END IF  
+            END FOR  
+            ASSIGN reference TO new empty list AS result  
+            WHILE queue is not empty  
+                REMOVE front element FROM queue AS u  
+                APPEND u TO result  
+                FOR each v IN list at key u OF graph  
+                    DECREMENT element at position v OF in_degree BY one  
+                    IF element at position v OF in_degree EQUALS zero  
+                        ADD v TO queue  
+                    END IF  
+                END FOR  
+            END WHILE  
+            IF the LENGTH OF result EQUALS the LENGTH OF items  
+                RETURN result  
+            ELSE  
+                RETURN empty list  
+            END IF  
+        END FUNCTION  
+        
+        ASSIGN reference TO new empty list AS sorted_within_groups  
+        FOR each items IN the values OF group_items  
+            SET sorted_items TO result of topological_sort WITH item_graph, item_in_degree, items  
+            IF sorted_items IS empty  
+                RETURN empty list  
+            END IF  
+            EXTEND sorted_within_groups BY sorted_items  
+        END FOR  
+        
+        SET sorted_groups TO result of topological_sort WITH group_graph, group_in_degree, list from zero TO m MINUS one  
+        IF sorted_groups IS empty  
+            RETURN empty list  
+        END IF  
+        
+        ASSIGN reference TO new empty mapping from group identifier TO list of items AS group_to_items_map  
+        FOR each item IN sorted_within_groups  
+            APPEND item TO list at key element at position item OF group IN group_to_items_map  
+        END FOR  
+        
+        ASSIGN reference TO new empty list AS result  
+        FOR each group_element IN sorted_groups  
+            EXTEND result BY list at key group_element IN group_to_items_map  
+        END FOR  
+        
+        RETURN result  
+    END FUNCTION  
+END CLASS

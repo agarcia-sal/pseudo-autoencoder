@@ -1,0 +1,44 @@
+CLASS Solution  
+    FUNCTION movesToStamp(stamp STRING, target STRING) RETURNS list of integers  
+        SET length_of_stamp TO the LENGTH OF stamp  
+        SET length_of_target TO the LENGTH OF target  
+        SET indeg_list TO a new list of length length_of_target MINUS length_of_stamp PLUS one each element initialized to length_of_stamp  
+        SET queue_structure TO a new double ended queue  
+        SET graph_list TO a new list of length length_of_target each element initialized to an empty list  
+        FOR index_i FROM zero TO length_of_target MINUS length_of_stamp  
+            FOR index_j FROM zero TO length_of_stamp MINUS one  
+                SET character_c TO character at position index_j of stamp  
+                IF character at position index_i PLUS index_j of target EQUALS character_c  
+                    DECREMENT the element at position index_i of indeg_list BY one  
+                    IF the element at position index_i of indeg_list EQUALS zero  
+                        APPEND index_i TO queue_structure  
+                    END IF  
+                ELSE  
+                    APPEND index_i TO the element at position index_i PLUS index_j of graph_list  
+                END IF  
+            END FOR  
+        END FOR  
+        SET answer_list TO an empty list  
+        SET visited_list TO a new list of length length_of_target each element initialized to logical false  
+        WHILE queue_structure IS NOT empty  
+            REMOVE and RETURN the element from the left side of queue_structure and ASSIGN it TO variable index_i  
+            APPEND index_i TO answer_list  
+            FOR index_j FROM zero TO length_of_stamp MINUS one  
+                IF the element at position index_i PLUS index_j of visited_list IS logical false  
+                    SET the element at position index_i PLUS index_j of visited_list TO logical true  
+                    FOR each element index_k IN the element at position index_i PLUS index_j of graph_list  
+                        DECREMENT the element at position index_k of indeg_list BY one  
+                        IF the element at position index_k of indeg_list EQUALS zero  
+                            APPEND index_k TO queue_structure  
+                        END IF  
+                    END FOR  
+                END IF  
+            END FOR  
+        END WHILE  
+        IF all elements of visited_list ARE logical true  
+            RETURN the reverse of answer_list  
+        ELSE  
+            RETURN an empty list  
+        END IF  
+    END FUNCTION  
+END CLASS

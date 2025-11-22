@@ -1,0 +1,32 @@
+CLASS Solution  
+    FUNCTION customSortString(order AS string_parameter, s AS string_parameter) RETURNS string  
+        SET dictionary_of_character_to_index TO CALL create_character_index_mapping WITH order  
+        SET sorted_characters TO CALL sort_characters_by_custom_order WITH s AND dictionary_of_character_to_index  
+        SET result_string TO CALL join_characters INTO string FROM sorted_characters  
+        RETURN result_string  
+    END FUNCTION  
+
+    FUNCTION create_character_index_mapping(order AS string_parameter) RETURNS mapping  
+        SET character_index_mapping TO empty mapping  
+        SET current_index TO zero  
+        FOR each character IN order  
+            SET character_index_mapping at key character TO current_index  
+            INCREMENT current_index BY one  
+        END FOR  
+        RETURN character_index_mapping  
+    END FUNCTION  
+
+    FUNCTION sort_characters_by_custom_order(s AS string_parameter, character_index_mapping AS mapping) RETURNS list_of_characters  
+        SET character_list TO list of each character IN s  
+        SORT character_list BY the custom key where for each character IF character exists as key in character_index_mapping THEN USE the value at key character in character_index_mapping OTHERWISE USE zero  
+        RETURN character_list  
+    END FUNCTION  
+
+    FUNCTION join_characters INTO string FROM list_of_characters RETURNS string  
+        SET concatenated_string TO empty string  
+        FOR each character IN list_of_characters  
+            SET concatenated_string TO concatenated_string PLUS character  
+        END FOR  
+        RETURN concatenated_string  
+    END FUNCTION  
+END CLASS

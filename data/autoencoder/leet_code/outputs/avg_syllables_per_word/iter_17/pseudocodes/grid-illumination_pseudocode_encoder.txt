@@ -1,0 +1,67 @@
+CLASS Solution
+    FUNCTION gridIllumination(n, lamps, queries)
+        ASSIGN row_count TO CALL defaultdict WITH parameter integer
+        ASSIGN col_count TO CALL defaultdict WITH parameter integer
+        ASSIGN diag_count TO CALL defaultdict WITH parameter integer
+        ASSIGN anti_diag_count TO CALL defaultdict WITH parameter integer
+
+        ASSIGN lamp_positions TO CALL empty set
+
+        FOR each position_row_column IN lamps
+            ASSIGN r TO element at position zero of position_row_column
+            ASSIGN c TO element at position one of position_row_column
+            IF position_row_column IS NOT IN lamp_positions
+                APPEND position_row_column TO lamp_positions
+                INCREMENT element at position r OF row_count BY one
+                INCREMENT element at position c OF col_count BY one
+                INCREMENT element at position r MINUS c OF diag_count BY one
+                INCREMENT element at position r PLUS c OF anti_diag_count BY one
+            END IF
+        END FOR
+
+        ASSIGN directions TO CALL InitializeDirections
+
+        ASSIGN result TO empty list
+
+        FOR each query_row_column IN queries
+            ASSIGN r TO element at position zero of query_row_column
+            ASSIGN c TO element at position one of query_row_column
+
+            IF element at position r OF row_count GREATER THAN zero OR element at position c OF col_count GREATER THAN zero OR element at position r MINUS c OF diag_count GREATER THAN zero OR element at position r PLUS c OF anti_diag_count GREATER THAN zero
+                APPEND one TO result
+            ELSE
+                APPEND zero TO result
+            END IF
+
+            FOR each direction_row_column IN directions
+                ASSIGN dr TO element at position zero of direction_row_column
+                ASSIGN dc TO element at position one of direction_row_column
+                SET nr TO r PLUS dr
+                SET nc TO c PLUS dc
+
+                IF list containing nr and nc IS IN lamp_positions
+                    REMOVE list containing nr and nc FROM lamp_positions
+                    DECREMENT element at position nr OF row_count BY one
+                    DECREMENT element at position nc OF col_count BY one
+                    DECREMENT element at position nr MINUS nc OF diag_count BY one
+                    DECREMENT element at position nr PLUS nc OF anti_diag_count BY one
+                END IF
+            END FOR
+        END FOR
+
+        RETURN result
+    END FUNCTION
+
+    FUNCTION InitializeDirections
+        RETURN list of lists containing the elements
+            negative one negative one
+            negative one zero
+            negative one one
+            zero negative one
+            zero zero
+            zero one
+            one negative one
+            one zero
+            one one
+    END FUNCTION
+END CLASS

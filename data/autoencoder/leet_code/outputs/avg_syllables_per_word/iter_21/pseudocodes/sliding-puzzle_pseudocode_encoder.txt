@@ -1,0 +1,84 @@
+CLASS Solution  
+    FUNCTION slidingPuzzle(board)  
+        SET start TO CALL convert_board_to_tuple WITH PARAMETERS board  
+        SET target TO CALL define_target_state  
+        SET neighbors TO CALL define_neighbors  
+        
+        FOR i FROM zero TO one  
+            FOR j FROM zero TO two  
+                IF element at position j OF element at position i OF start EQUALS zero  
+                    SET zero_pos TO i MULTIPLIED BY three PLUS j  
+                END IF  
+            END FOR  
+        END FOR  
+        
+        SET queue TO CALL initialize_queue WITH PARAMETERS start zero_pos zero  
+        SET visited TO CALL initialize_visited WITH PARAMETERS start  
+        
+        WHILE queue IS NOT EMPTY  
+            CALL dequeue FROM queue AND ASSIGN TO state zero_pos moves  
+            
+            IF state EQUALS target  
+                RETURN moves  
+            END IF  
+            
+            FOR each neighbor IN element at position zero_pos OF neighbors  
+                SET new_state TO CALL deep_copy_state WITH PARAMETERS state  
+                SET i TO zero_pos DIVIDED BY three  
+                SET j TO zero_pos MODULO three  
+                SET ni TO neighbor DIVIDED BY three  
+                SET nj TO neighbor MODULO three  
+                
+                CALL swap_positions IN new_state WITH PARAMETERS i j ni nj  
+                SET new_tuple_state TO CALL convert_state_to_tuple WITH PARAMETERS new_state  
+                
+                IF new_tuple_state IS NOT IN visited  
+                    CALL add_element TO visited WITH PARAMETERS new_tuple_state  
+                    CALL enqueue TO queue WITH PARAMETERS new_tuple_state neighbor moves PLUS one  
+                END IF  
+            END FOR  
+        END WHILE  
+        
+        RETURN negative one  
+    END FUNCTION  
+    
+    FUNCTION convert_board_to_tuple(board)  
+        RETURN a tuple WHERE each element IS a tuple OF the row FROM board  
+    END FUNCTION  
+    
+    FUNCTION define_target_state  
+        RETURN a tuple of tuples representing one two three four five zero  
+    END FUNCTION  
+    
+    FUNCTION define_neighbors  
+        RETURN a dictionary mapping  
+            zero TO a set containing one three  
+            one TO a set containing zero two four  
+            two TO a set containing one five  
+            three TO a set containing zero four  
+            four TO a set containing one three five  
+            five TO a set containing two four  
+    END FUNCTION  
+    
+    FUNCTION initialize_queue WITH PARAMETERS start zero_pos moves  
+        RETURN a double ended queue initialized WITH a tuple containing start zero_pos moves  
+    END FUNCTION  
+    
+    FUNCTION initialize_visited WITH PARAMETERS start  
+        RETURN a set containing start  
+    END FUNCTION  
+    
+    FUNCTION deep_copy_state WITH PARAMETERS state  
+        RETURN a list WHERE each element IS a list OF the corresponding row FROM state  
+    END FUNCTION  
+    
+    FUNCTION swap_positions IN new_state WITH PARAMETERS i j ni nj  
+        SET temporary TO element at position j OF element at position i OF new_state  
+        SET element at position j OF element at position i OF new_state TO element at position nj OF element at position ni OF new_state  
+        SET element at position nj OF element at position ni OF new_state TO temporary  
+    END FUNCTION  
+    
+    FUNCTION convert_state_to_tuple WITH PARAMETERS new_state  
+        RETURN a tuple WHERE each element IS a tuple OF the corresponding row FROM new_state  
+    END FUNCTION  
+END CLASS

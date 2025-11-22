@@ -1,0 +1,156 @@
+CLASS Term  
+    FUNCTION __init__ WITH PARAMETERS coefficient AND variables  
+        SET coefficient PROPERTY TO coefficient  
+        SET variables PROPERTY TO variables  
+    END FUNCTION  
+
+    FUNCTION __lt__ WITH PARAMETERS other  
+        IF THE LENGTH OF self variables IS NOT EQUAL TO THE LENGTH OF other variables  
+            RETURN WHETHER THE LENGTH OF self variables IS GREATER THAN THE LENGTH OF other variables  
+        END IF  
+        RETURN WHETHER THE STRING OBTAINED BY JOINING self variables WITH ASTERISK IS LESS THAN THE STRING OBTAINED BY JOINING other variables WITH ASTERISK  
+    END FUNCTION  
+
+    FUNCTION __repr__  
+        IF self variables IS EMPTY  
+            RETURN STRING REPRESENTATION OF self coefficient  
+        END IF  
+        RETURN STRING REPRESENTATION OF self coefficient CONCATENATED WITH ASTERISK AND WITH ASTERISK JOINED self variables  
+    END FUNCTION  
+END CLASS  
+
+CLASS Expression  
+    FUNCTION __init__  
+        INITIALIZE self terms AS A DEFAULT DICTIONARY WITH DEFAULT VALUE ZERO  
+    END FUNCTION  
+
+    FUNCTION add_term WITH PARAMETER term  
+        SET key TO THE TUPLE OF SORTED term variables  
+        INCREMENT self terms AT key BY term coefficient  
+    END FUNCTION  
+
+    FUNCTION multiply WITH PARAMETER other  
+        SET result TO A NEW Expression  
+        FOR EACH vars1 AND coeff1 IN ITEMS OF self terms  
+            FOR EACH vars2 AND coeff2 IN ITEMS OF other terms  
+                SET combined_vars TO THE SORTED LIST THAT IS THE CONCATENATION OF vars1 AND vars2  
+                CALL add_term ON result WITH A NEW Term HAVING coefficient AS coeff1 MULTIPLIED BY coeff2 AND variables AS combined_vars  
+            END FOR  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+
+    FUNCTION add WITH PARAMETER other  
+        FOR EACH vars AND coeff IN ITEMS OF other terms  
+            CALL add_term ON self WITH A NEW Term HAVING coefficient AS coeff AND variables AS LIST OF vars  
+        END FOR  
+        RETURN self  
+    END FUNCTION  
+
+    FUNCTION subtract WITH PARAMETER other  
+        FOR EACH vars AND coeff IN ITEMS OF other terms  
+            CALL add_term ON self WITH A NEW Term HAVING coefficient AS NEGATIVE coeff AND variables AS LIST OF vars  
+        END FOR  
+        RETURN self  
+    END FUNCTION  
+
+    FUNCTION evaluate WITH PARAMETER var_map  
+        SET result TO A NEW Expression  
+        FOR EACH vars AND coeff IN ITEMS OF self terms  
+            INITIALIZE new_vars AS AN EMPTY LIST  
+            FOR EACH var IN vars  
+                IF var IS IN var_map  
+                    APPEND STRING REPRESENTATION OF THE VALUE AT var IN var_map TO new_vars  
+                ELSE  
+                    APPEND var TO new_vars  
+                END IF  
+            END FOR  
+            IF new_vars IS NOT EMPTY  
+                SET new_coeff TO THE EVALUATION OF THE CONCATENATION OF ELEMENTS OF new_vars INTERPRETED AS A MATHEMATICAL EXPRESSION  
+            ELSE  
+                SET new_coeff TO ONE  
+            END IF  
+            CALL add_term ON result WITH A NEW Term HAVING coefficient AS coeff MULTIPLIED BY new_coeff AND variables AS EMPTY LIST  
+        END FOR  
+        RETURN result  
+    END FUNCTION  
+
+    FUNCTION simplify  
+        SET simplified_terms TO THE LIST OF Term INSTANCES CREATED FROM PAIRS vars AND coeff IN self terms WHERE coeff IS NOT EQUAL TO ZERO WITH variables AS LIST OF vars AND coefficient AS coeff  
+        SORT simplified_terms BY APPLYING THE LESS THAN FUNCTION OF Term  
+        RETURN simplified_terms  
+    END FUNCTION  
+
+    FUNCTION __repr__  
+        RETURN THE STRING WHICH IS THE JOINING OF THE STRING REPRESENTATION OF EACH TERM IN THE RESULT OF THE CALL TO simplify SEPARATED BY SPACE PLUS SPACE  
+    END FUNCTION  
+END CLASS  
+
+CLASS Solution  
+    FUNCTION basicCalculatorIV WITH PARAMETERS expression AND evalvars AND evalints  
+        SET var_map TO A DICTIONARY MAPPING EVALUATION VARIABLES TO EVALUATION INTEGERS  
+        SET tokens TO THE LIST OF ELEMENTS FOUND BY REGULAR EXPRESSION MATCHING OPENING PARENTHESIS OR CLOSING PARENTHESIS OR PLUS SIGN OR MINUS SIGN OR ASTERISK OR ONE OR MORE DIGITS OR ONE OR MORE WORD CHARACTERS IN expression  
+        INITIALIZE output AS AN EMPTY LIST  
+        INITIALIZE operators AS AN EMPTY LIST  
+
+        FUNCTION apply_operator  
+            SET right TO THE LAST ELEMENT OF output REMOVED FROM output  
+            SET left TO THE LAST ELEMENT OF output REMOVED FROM output  
+            SET op TO THE LAST ELEMENT OF operators REMOVED FROM operators  
+            IF op IS PLUS SIGN  
+                APPEND TO output THE RESULT OF CALLING add ON left WITH right  
+            ELSE IF op IS MINUS SIGN  
+                APPEND TO output THE RESULT OF CALLING subtract ON left WITH right  
+            ELSE IF op IS ASTERISK  
+                APPEND TO output THE RESULT OF CALLING multiply ON left WITH right  
+            END IF  
+        END FUNCTION  
+
+        SET i TO ZERO  
+        WHILE i IS LESS THAN THE LENGTH OF tokens  
+            SET token TO THE ELEMENT AT POSITION i OF tokens  
+            IF token CONSISTS ONLY OF DIGITS  
+                APPEND A NEW Expression TO output  
+                CALL add_term ON THE LAST ELEMENT OF output WITH A NEW Term HAVING coefficient AS THE INTEGER VALUE OF token AND EMPTY variables  
+            ELSE IF token CONSISTS ONLY OF ALPHABETIC CHARACTERS  
+                APPEND A NEW Expression TO output  
+                SET coef TO THE VALUE IN var_map ASSOCIATED WITH token OR ONE IF NOT PRESENT  
+                IF coef IS EQUAL TO ONE  
+                    IF token IS NOT IN var_map  
+                        CALL add_term ON THE LAST ELEMENT OF output WITH A NEW Term HAVING coefficient ONE AND variables AS A SINGLE ELEMENT LIST CONTAINING token  
+                    ELSE  
+                        CALL add_term ON THE LAST ELEMENT OF output WITH A NEW Term HAVING coefficient ONE AND EMPTY variables  
+                    END IF  
+                ELSE  
+                    CALL add_term ON THE LAST ELEMENT OF output WITH A NEW Term HAVING coefficient coef AND EMPTY variables  
+                END IF  
+            ELSE IF token IS OPENING PARENTHESIS  
+                APPEND token TO operators  
+            ELSE IF token IS CLOSING PARENTHESIS  
+                WHILE operators IS NOT EMPTY AND THE LAST ELEMENT OF operators IS NOT OPENING PARENTHESIS  
+                    CALL apply_operator  
+                END WHILE  
+                REMOVE THE LAST ELEMENT FROM operators (THE OPENING PARENTHESIS)  
+            ELSE IF token IS ONE OF PLUS SIGN OR MINUS SIGN OR ASTERISK  
+                WHILE operators IS NOT EMPTY AND THE LAST ELEMENT OF operators IS NOT OPENING PARENTHESIS AND (token IS PLUS SIGN OR MINUS SIGN OR THE LAST ELEMENT OF operators IS ASTERISK)  
+                    CALL apply_operator  
+                END WHILE  
+                APPEND token TO operators  
+            END IF  
+            INCREMENT i BY ONE  
+        END WHILE  
+
+        WHILE operators IS NOT EMPTY  
+            CALL apply_operator  
+        END WHILE  
+
+        SET simplified_terms TO THE RESULT OF CALLING simplify ON THE FIRST ELEMENT OF output  
+        RETURN A LIST WHERE FOR EACH term IN simplified_terms  
+            IF term variables IS NOT EMPTY  
+                THE STRING FORM IS THE STRING REPRESENTATION OF term coefficient FOLLOWED BY ASTERISK FOLLOWED BY THE ASTERISK JOINING OF term variables  
+            ELSE  
+                THE STRING FORM IS THE STRING REPRESENTATION OF term coefficient  
+            END IF  
+        END LIST  
+    END FUNCTION  
+END CLASS

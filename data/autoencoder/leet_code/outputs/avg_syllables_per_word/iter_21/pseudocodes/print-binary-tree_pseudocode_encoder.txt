@@ -1,0 +1,84 @@
+CLASS TreeNode  
+    FUNCTION __init__(val EQUALS zero, left EQUALS None, right EQUALS None)  
+        SET self.val TO val  
+        SET self.left TO left  
+        SET self.right TO right  
+    END FUNCTION  
+END CLASS
+
+FUNCTION tree_node(values)  
+    IF the LENGTH OF values EQUALS zero  
+        RETURN None  
+    END IF  
+    SET root TO CALL TreeNode WITH PARAMETERS element at position zero OF values  
+    SET i TO one  
+    SET queue TO CALL deque WITH PARAMETERS no parameters  
+    CALL append WITH PARAMETERS root ON queue  
+    WHILE queue HOLDS  
+        SET node TO CALL popleft WITH PARAMETERS no parameters ON queue  
+        IF i LESS THAN the LENGTH OF values AND element at position i OF values NOT EQUAL TO None  
+            SET node.left TO CALL TreeNode WITH PARAMETERS element at position i OF values  
+            CALL append WITH PARAMETERS node.left ON queue  
+        END IF  
+        INCREMENT i BY one  
+        IF i LESS THAN the LENGTH OF values AND element at position i OF values NOT EQUAL TO None  
+            SET node.right TO CALL TreeNode WITH PARAMETERS element at position i OF values  
+            CALL append WITH PARAMETERS node.right ON queue  
+        END IF  
+        INCREMENT i BY one  
+    END WHILE  
+    RETURN root  
+END FUNCTION
+
+FUNCTION is_same_tree(p, q)  
+    IF p EQUALS None AND q EQUALS None  
+        RETURN True  
+    ELSE IF p EQUALS None OR q EQUALS None  
+        RETURN False  
+    ELSE IF p.val NOT EQUALS q.val  
+        RETURN False  
+    ELSE  
+        RETURN CALL is_same_tree WITH PARAMETERS p.left COMMA q.left AND CALL is_same_tree WITH PARAMETERS p.right COMMA q.right  
+    END IF  
+END FUNCTION
+
+CLASS Solution  
+    FUNCTION printTree(root)  
+        FUNCTION getHeight(node)  
+            IF node EQUALS None  
+                RETURN zero  
+            END IF  
+            RETURN one PLUS the MAXIMUM OF CALL getHeight WITH PARAMETERS node.left AND CALL getHeight WITH PARAMETERS node.right  
+        END FUNCTION
+
+        SET height TO CALL getHeight WITH PARAMETERS root  
+        SET width TO two RAISED TO THE POWER OF height MINUS one  
+
+        FUNCTION create_result_list(height, width)  
+            SET result TO empty list  
+            FOR each index_row FROM zero TO height MINUS one  
+                SET new_row TO empty list  
+                FOR each index_column FROM zero TO width MINUS one  
+                    APPEND empty string TO new_row  
+                END FOR  
+                APPEND new_row TO result  
+            END FOR  
+            RETURN result  
+        END FUNCTION
+
+        SET res TO CALL create_result_list WITH PARAMETERS height COMMA width  
+
+        FUNCTION placeNode(node, row, left, right)  
+            IF node EQUALS None  
+                RETURN  
+            END IF  
+            SET mid TO the INTEGER DIVISION OF the SUM OF left AND right BY two  
+            SET element at position mid OF element at position row OF res TO the STRING REPRESENTATION OF node.val  
+            CALL placeNode WITH PARAMETERS node.left COMMA row PLUS one COMMA left COMMA mid  
+            CALL placeNode WITH PARAMETERS node.right COMMA row PLUS one COMMA mid COMMA right  
+        END FUNCTION
+
+        CALL placeNode WITH PARAMETERS root COMMA zero COMMA zero COMMA width  
+        RETURN res  
+    END FUNCTION  
+END CLASS

@@ -1,0 +1,51 @@
+CLASS Solution  
+    FUNCTION longestCommonSubpath(n AS integer, paths AS list of list of integers) RETURNS integer  
+        FUNCTION hash_subpaths(path AS list of integers, length AS integer) RETURNS set of integers  
+            SET constant P TO one hundred thirteen  
+            SET constant MOD TO one billion plus seven  
+            SET hash_value TO zero  
+            SET power TO one  
+            FOR index FROM zero TO length minus one  
+                SET hash_value TO hash_value MULTIPLIED BY P PLUS element at position index of path  
+                SET hash_value TO hash_value MODULO MOD  
+                SET power TO power MULTIPLIED BY P  
+                SET power TO power MODULO MOD  
+            END FOR  
+            SET hashes TO a new set containing hash_value  
+            FOR index FROM length TO the LENGTH OF path minus one  
+                SET hash_value TO hash_value MULTIPLIED BY P PLUS element at position index of path  
+                SET hash_value TO hash_value MINUS element at position index minus length of path MULTIPLIED BY power  
+                SET hash_value TO hash_value MODULO MOD  
+                ADD hash_value TO hashes  
+            END FOR  
+            RETURN hashes  
+        END FUNCTION  
+        
+        FUNCTION check_common_subpath(length AS integer) RETURNS boolean  
+            IF length EQUALS zero THEN  
+                RETURN true  
+            END IF  
+            SET common_hashes TO hash_subpaths(element at position zero of paths, length)  
+            FOR each path IN slice of paths from position one to the end  
+                SET current_hashes TO hash_subpaths(path, length)  
+                SET common_hashes TO the intersection of common_hashes AND current_hashes  
+                IF common_hashes IS empty THEN  
+                    RETURN false  
+                END IF  
+            END FOR  
+            RETURN whether common_hashes IS NOT empty  
+        END FUNCTION  
+        
+        SET left TO zero  
+        SET right TO the MINIMUM OF the LENGTH OF each path IN paths  
+        WHILE left LESS THAN right  
+            SET mid TO the INTEGER DIVISION OF left PLUS right PLUS one BY two  
+            IF check_common_subpath(mid) THEN  
+                SET left TO mid  
+            ELSE  
+                SET right TO right MINUS one  
+            END IF  
+        END WHILE  
+        RETURN left  
+    END FUNCTION  
+END CLASS
