@@ -26,12 +26,6 @@ gzip -dk HumanEval.jsonl.gz
 gzip -dk LeetCodeDataset-v0.3.0-train.jsonl.gz
 ```
 
-To run, set the appropriate values in the cfg/config.yaml file and run:
-```bash
-python main.py
-```
-
-
 # Usage
 
 Set your OpenAI API key as an environment variable in an .env file:
@@ -52,6 +46,13 @@ When first running the code, uncomment the line below in the main function:
 ```
 
 The `preprocess_data` function will create train and test splits for the HumanEval dataset along with some reformatting as well as create a new, shorter version of the LeetCodeDataset-v0.3.0 that will will be a 50% split of medium difficulty and 50% split of hard difficulty instead of a mix of 'easy', 'medium', and 'hard'. The new version of the dataset will be called LeetCodeDataset-v0.3.5-train.jsonl and LeetCodeDataset-v0.3.5-test.jsonl
+
+To run, set the appropriate values in the cfg/config.yaml file and run:
+```bash
+python main.py
+```
+
+The sections below will cover in more detail how to run each pipeline individually.
 
 # Pipeline selection
 
