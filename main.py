@@ -6,9 +6,9 @@ import subprocess
 import pandas as pd
 import matplotlib.pyplot as plt
 import json
-import numpy as np
-import cProfile
-import pstats
+# import numpy as np
+# import cProfile
+# import pstats
 import traceback
 from utils.utils import init_client, file_to_string, set_up_dataset, preprocess_data, plot_pipeline, set_up_dataset, set_up_codebase
 from evaluation.utils import evaluate_classifier_prompt, get_cosmetic_dataset, get_classifier_dataset, write_dataset_to_file, write_error_strings_to_file, evaluate_classifier_prompt_test
@@ -47,8 +47,8 @@ def main(cfg):
         raise NotImplementedError
 
     # Uncomment below when first setting up
-    # set_up_codebase(ROOT_DIR)
-    # preprocess_data(ROOT_DIR) 
+    set_up_codebase(ROOT_DIR)
+    preprocess_data(ROOT_DIR) 
     
     # Main algorithm
 
