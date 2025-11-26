@@ -52,8 +52,8 @@ class Cosmetic(BasePipeline):
         # [ TO DO]: finish the following refactoring:
         # [TO DO]: check that the decoder prompt actually was written to a special outputs foldeer
         if self.cfg.use_timestamp:
-            if self.cfg.prev_iter_decoder is not None and self.previous_timestamp_autoencoder is not None:
-                self.decoder_prompt = file_to_string(os.path.join(self.src_dir, "outputs", "prompts", self.cfg.previous_timestamp_autoencoder, f"prompt_iter_{self.cfg.prev_iter_decoder}_decoder.txt"))
+            if self.cfg.prev_iter_decoder is not None and self.cfg.previous_autoencoder_label is not None:
+                self.decoder_prompt = file_to_string(os.path.join(self.src_dir, "outputs", "prompts", self.cfg.previous_cosmetic_label, f"prompt_iter_{self.cfg.prev_iter_decoder}_decoder.txt"))
             else:
                 self.decoder_prompt = file_to_string(os.path.join(self.src_dir, "prompts", "common", "trivial_decoder_prompt.txt"))
         else:
