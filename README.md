@@ -26,6 +26,12 @@ gzip -dk HumanEval.jsonl.gz
 gzip -dk LeetCodeDataset-v0.3.0-train.jsonl.gz
 ```
 
+To run, set the appropriate values in the cfg/config.yaml file and run:
+```bash
+python main.py
+```
+
+
 # Usage
 
 Set your OpenAI API key as an environment variable in an .env file:
@@ -47,7 +53,36 @@ When first running the code, uncomment the line below in the main function:
 
 The `preprocess_data` function will create train and test splits for the HumanEval dataset along with some reformatting as well as create a new, shorter version of the LeetCodeDataset-v0.3.0 that will will be a 50% split of medium difficulty and 50% split of hard difficulty instead of a mix of 'easy', 'medium', and 'hard'. The new version of the dataset will be called LeetCodeDataset-v0.3.5-train.jsonl and LeetCodeDataset-v0.3.5-test.jsonl
 
-To run, set values in cfg/config.yaml file or:
+# Pipeline selection
+
+There are 3 pipelines available to run: Autoencoder, Cosmetic, and Classifier. They can be run separately by loading in the timestamps of the previous pipeline or they can be run all at once. To run them individually:
+
+In the cfg/config.yaml file set the `evolving_encoder`, `evolving_decoder`, `evolving_cosmetic`, `evolving_classifier` flag to True depending on which pipeline you want to run. For the autoencoder pipeline, set the `evolving_encoder` flag to True and `evolving_decoder` flag to False to start off with. The flags will toggle as the autoencoder switches between these two stages.
+
+Also in the cfg/config.yaml file, set `pipeline` to either `autoencoder`, `cosmetic`, `classifier` and specify which dataset you are using by setting `dataset` to either `human_eval` or `leet_code`. Set `num_iterations` to however many iterations you want to run. Default is 32 for GreedyRefine and 2 for DirectAnswer. Set `rounds`, which is the number of iterations run before switching from encoder to decoder and vice versa. Default is 2 for GreedyRefine and 1 for DirectAnswer.
+
+Further, in the cfg/config.yaml file, set `autoencoder_version`, `cosmetic_version`, `classifier_version`. The `autoencoder_version` is the version of the LeetCodeDataset that will be used to start off with. The dataset that the cosmetic pipeline will use will be created throughout the workflow and the version name corresponds to the value set for `cosmetic_version`. The dataset that the classifier pipeline will use will also be created throughout the worfklow and the version name corresponds to the value set for `classifier_version`.
+
+# Autoencoder Pipeline
+
+See the cfg/config.yaml file for more options
+
+In the cfg/config.yaml file, set the following values:
+- `use_timestamp` to True which signifies individual pipeline runs
+- `split` to either `train` or `test`
+- `autoencoder_version` to whichever version of the LeetCodeDataset is being used, if `leet_code` is the chosen dataset. Default is `v0.3.5` which is the shorter, more difficult version of `v0.3.0`
+- `readability_metric` to either `avg_syllables_per_word` or `avg_word_length`. Default is `avg_syllables_per_word`
+- `evolving_encoder` to True
+- `evolving_decoder` to False
+
+For DirectAnswer, set the following values as well:
+- `previous_autoencoder_label` to timestamp of previous autoencoder run whose final encoder and decoder prompts are being fed to DirectAnswer. The final encoding and decoding prompts for timestamp `2025-09-18_21-00-18` are provided in the repository
+- `prev_iter_encoder` to the iteration number of the final scoring of the encoder prompt for the given autoencoder timestamp. For timestamp `2025-09-18_21-00-18`, the iteration number is 33
+- `prev_iter_decoder` to the iteration number of the final scoring of the decoder prompt for the given autoencoder timestamp. For timestamp `2025-09-18_21-00-18`, the iteration number is 34
+- `num_iterations` to 2, an iteration for the encoder and decoder stage each
+- `rounds` to 1
+
+You can also run a bash command as shown below for the LeetCodeDataset, using DirectAnswer, and the training split
 
 ```bash
 python main.py \
@@ -67,109 +102,6 @@ python main.py \
     plotting_pipeline=True
 ```
 See the cfg/config.yaml file for more options
-
-# Agent Implementations
-
-Agents are implemented in the `agents` module. Currently supported agents include: `GreedyRefine`, `DirectAnswer`
-
-in the cfg/config.yaml file, set `algorithm` to `greedy` or `direct_answer`, depending on which one you're using.
-
-Each agent implements the following functions:
-- `step()`: Returns the next candidate prompt for evaluation.
-- `feedback()`: Accepts evaluation results of previous candidate prompt and returns feedback for LLM prompt.
-- `finalize()`: Returns the final prompt.
-- `get_previous_best()`: Returns previous best Solution so far to store at each iteration of a pipeline
-- `load_previous()`: If a pipeline stops running prematurely, will return previous best solution up to that point so that the pipeline can continue running
-
-# Workflow for Sequential Run of the 3 Pipelines
-To run the entire workflow at once, set the following values in the config.yaml file:
-- `dataset` to `leet_code` or `human_eval`
-- `use_timestamp` to `False`. If running pipelines individually, set to True
-- `num_iterations`to the number of iterations for a pipeline. Default is 32
-- `rounds` the number of iterations before switching from encoder to decoder and vice versa. Default is 2.
-- `evolving_encoder` to True
-- `autoencoder_version` to the version of the LeetCodeDataset being used. Default is v0.3.5 which is the harder version of v0.3.0
-- `cosmetic_version` to v0.1.0 to start off. Uppdate this as more datasets for the cosmetic pipeline are created for each run
-- `classifier_version`: v0.1.0 to start off. Uppdate this as more datasets for the cosmetic pipeline are created for each run
-- `readability_metric` to `avg_syllables_per_word` or `avg_word_length`. Default is `avg_syllables_per_word`    
-- `near_miss_threshold` to passing rate threshold for a near miss. Default is 0.8
-
-Below is the code to run the entire worfklow at once:
-
-```python
-from agents import GreedyRefine, DirectAnswer
-from pipeline.experiment_runner import ExperimentRunner
-
-# Set greedy_refine in the cfg file
-client = init_client(cfg)
-
-if cfg.algorithm == "reevo":
-    from reevo import ReEvo as ga
-elif cfg.algorithm == "greedy":
-    from agents.greedy_refine import GreedyRefine as ga
-elif cfg.algorithm == "direct_answer":
-    from agents.direct_answer import DirectAnswer as ga
-else:
-    raise NotImplementedError
-
-# Uncomment below when first setting up
-# preprocess_data(ROOT_DIR) 
-# set_up_codebase(ROOT_DIR)
-
-# Main algorithm
-
-timestamp = hydra.core.hydra_config.HydraConfig.get().run.dir.split("/")[-1] # this should syncronize with hydra's timestamp
-
-# Run all 3 pipelines one after the other
-experiment_runner = ExperimentRunner(
-    client=client, 
-    src_dir=ROOT_DIR, 
-    cfg=cfg,
-    timestamp=timestamp,
-    ga=ga,
-)
-
-experiment_runner.run_main_evolution()
-```
-
-# Results
-
-Passing rates and readability metrics for each iteration will be displayed in a metrics.json file under `data/pipeline/dataset/metrics/timestamp_metrics.json` for the timestamp for that run.
-
-Below is the code to display values after individual runs:
-```python
-if cfg.plotting_pipeline:
-    autoencoder_timestamp = timestamp
-    plot_pipeline(cfg, ROOT_DIR, autoencoder_timestamp, "autoencoder")
-    plt.show()
-```
-
-# Pipeline selection
-
-There are 3 pipelines available to run: Autoencoder, Cosmetic, and Classifier. They can be run separately by loading in the timestamps of the previous pipeline or they can be run all at once. To run them individually:
-
-In the cfg/config.yaml file set the `evolving_encoder`, `evolving_decoder`, `evolving_cosmetic`, `evolving_classifier` flag to True depending on which pipeline you want to run. For the autoencoder pipeline, set the `evolving_encoder` flag to True and `evolving_decoder` flag to False to start off with. The flags will toggle as the autoencoder switches between these two stages.
-
-Also in the cfg/config.yaml file, set `pipeline` to either `autoencoder`, `cosmetic`, `classifier` and specify which dataset you are using by setting `dataset` to either `human_eval` or `leet_code`. Set `num_iterations` to however many iterations you want to run. Default is 32 for GreedyRefine and 2 for DirectAnswer. Set `rounds`, which is the number of iterations run before switching from encoder to decoder and vice versa. Default is 2 for GreedyRefine and 1 for DirectAnswer.
-
-Further, in the cfg/config.yaml file, set `autoencoder_version`, `cosmetic_version`, `classifier_version`. The `autoencoder_version` is the version of the LeetCodeDataset that will be used to start off with. The dataset that the cosmetic pipeline will use will be created throughout the workflow and the version name corresponds to the value set for `cosmetic_version`. The dataset that the classifier pipeline will use will also be created throughout the worfklow and the version name corresponds to the value set for `classifier_version`.
-
-# Autoencoder Pipeline
-
-In the cfg/config.yaml file, set the following values:
-- `use_timestamp` to True which signifies individual pipeline runs
-- `split` to either `train` or `test`
-- `autoencoder_version` to whichever version of the LeetCodeDataset is being used, if `leet_code` is the chosen dataset. Default is `v0.3.5` which is the shorter, more difficult version of `v0.3.0`
-- `readability_metric` to either `avg_syllables_per_word` or `avg_word_length`. Default is `avg_syllables_per_word`
-- `evolving_encoder` to True
-- `evolving_decoder` to False
-
-For DirectAnswer, set the following values as well:
-- `previous_autoencoder_label` to timestamp of previous autoencoder run whose final encoder and decoder prompts are being fed to DirectAnswer. The final encoding and decoding prompts for timestamp `2025-09-18_21-00-18` are provided in the repository
-- `prev_iter_encoder` to the iteration number of the final scoring of the encoder prompt for the given autoencoder timestamp. For timestamp `2025-09-18_21-00-18`, the iteration number is 33
-- `prev_iter_decoder` to the iteration number of the final scoring of the decoder prompt for the given autoencoder timestamp. For timestamp `2025-09-18_21-00-18`, the iteration number is 34
-- `num_iterations` to 2, an iteration for the encoder and decoder stage each
-- `rounds` to 1
 
 Below is code to run the autoencoder with *Greedy Refinement* agent for LeetCode dataset for 32 iterations. If running *Direct Answer* then pass in the timestamp for the decoder prompt generated by the autoencoder pipeline that should be used.
 ```python
@@ -233,7 +165,6 @@ if cfg.evolving_encoder or cfg.evolving_decoder:
         plt.show()
 ```
 
-
 # Cosmetic Changes Pipeline
 First, call `get_cosmetic_dataset()` to get the AutoEncoderLabels-{cfg.cosmetic_version}-{cfg.split}.jsonl that the cosmetic pipeline will use to run.
 
@@ -294,6 +225,7 @@ To run the pipeline, set these values in the cfg/config.yaml file:
 - `classifier_version` to v0.1.0 or whatever version of the dataset to be loaded in
 - `split` to `train`
 - `evolving_classifier` to True
+- `evolving_encoder`, `evolving_decoder`, `evolving_cosmetic` to False
 
 To load in a previously generated dataset, set the following values in the cfg/config.yaml file:
 - `load_previous_classifier_dataset` to True
@@ -311,7 +243,25 @@ If creating your own dataset through the autoencoder and cosmetic pipelines, set
 - `autoencoder_timestamp_test` to the timestamp of the autoencoder run for the test split that `get_classifier_dataset()` will use to create the classifier dataset
 - `cosmetic_timestamp_test` to the timestamp of the cosmetic run for the test split that `get_classifier_dataset()` will use to create the classifier dataset
 
-Then, call `get_classifier_dataset(split='train')` to get the Pseudocodes-{cfg.classifier_version}-train.jsonl that the classifier pipeline will use to run. Call `get_classifier_dataset(split='test')` to get the Pseudocodes-{cfg.classifier_version}-test.jsonl that the classifier pipeline will use to score final results.
+You can also run a bash command as shown below for the LeetCodeDataset, using DirectAnswer, and the training split.
+
+```bash
+python main.py \
+    algorithm=direct_answer \
+    dataset=leet_code \
+    pipeline=classifier \
+    split=train \
+    use_timestamp=True \
+    classifier_version=v0.1.0 \
+    previous_classifier_label=2025-09-26_15-07-49 \
+    prev_iter_classifier=33 \
+    num_iterations=1 \
+    evolving_encoder=False \
+    evolving_decoder=False \
+    evolving_classifier=True
+    plotting_pipeline=True
+```
+See the cfg/config.yaml file for more options
 
 Below is code to run the classifier pipeline with *Greedy Refinement* agent for LeetCode dataset for 32 iterations.
 
@@ -368,4 +318,65 @@ if cfg.evolving_classifier and cfg.use_timestamp:
         plt.show()
 ```
 
+# Workflow for Sequential Run of the 3 Pipelines
+To run the entire workflow at once, set the following values in the config.yaml file:
+- `dataset` to `leet_code` or `human_eval`
+- `use_timestamp` to `False`. If running pipelines individually, set to True
+- `num_iterations`to the number of iterations for a pipeline. Default is 32
+- `rounds` the number of iterations before switching from encoder to decoder and vice versa. Default is 2.
+- `evolving_encoder` to True
+- `autoencoder_version` to the version of the LeetCodeDataset being used. Default is v0.3.5 which is the harder version of v0.3.0
+- `cosmetic_version` to v0.1.0 to start off. Uppdate this as more datasets for the cosmetic pipeline are created for each run
+- `classifier_version`: v0.1.0 to start off. Uppdate this as more datasets for the cosmetic pipeline are created for each run
+- `readability_metric` to `avg_syllables_per_word` or `avg_word_length`. Default is `avg_syllables_per_word`    
+- `near_miss_threshold` to passing rate threshold for a near miss. Default is 0.8
 
+Below is the code to run the entire worfklow at once:
+
+```python
+from agents import GreedyRefine, DirectAnswer
+from pipeline.experiment_runner import ExperimentRunner
+
+# Set greedy_refine in the cfg file
+client = init_client(cfg)
+
+if cfg.algorithm == "reevo":
+    from reevo import ReEvo as ga
+elif cfg.algorithm == "greedy":
+    from agents.greedy_refine import GreedyRefine as ga
+elif cfg.algorithm == "direct_answer":
+    from agents.direct_answer import DirectAnswer as ga
+else:
+    raise NotImplementedError
+
+# Uncomment below when first setting up
+# preprocess_data(ROOT_DIR) 
+# set_up_codebase(ROOT_DIR)
+
+# Main algorithm
+
+timestamp = hydra.core.hydra_config.HydraConfig.get().run.dir.split("/")[-1] # this should syncronize with hydra's timestamp
+
+# Run all 3 pipelines one after the other
+experiment_runner = ExperimentRunner(
+    client=client, 
+    src_dir=ROOT_DIR, 
+    cfg=cfg,
+    timestamp=timestamp,
+    ga=ga,
+)
+
+experiment_runner.run_main_evolution()
+```
+
+# Results
+
+Passing rates and readability metrics for each iteration will be displayed in a metrics.json file under `data/pipeline/dataset/metrics/timestamp_metrics.json` for the timestamp for that run.
+
+Below is the code to display values after individual runs:
+```python
+if cfg.plotting_pipeline:
+    autoencoder_timestamp = timestamp
+    plot_pipeline(cfg, ROOT_DIR, autoencoder_timestamp, "autoencoder")
+    plt.show()
+```
