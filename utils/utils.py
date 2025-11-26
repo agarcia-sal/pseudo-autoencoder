@@ -341,7 +341,7 @@ def reformat_human_eval_file(file_name):
     for problem in read_jsonl(file_name):
         task_id = problem["task_id"]
         new_task_id = task_id.replace("/", "-")
-        problem["task_id"] = new_task_idf
+        problem["task_id"] = new_task_id
         results.append(problem)
 
     write_jsonl(file_name, results)
