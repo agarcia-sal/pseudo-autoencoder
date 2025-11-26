@@ -218,6 +218,13 @@ if cfg.evolving_cosmetic:
 ```
 
 # Classifier Pipeline
+
+Unzip the .gz files with:
+```bash
+gzip -dk data/classifier/human_eval/HumanEvalPseudocodes-v0.1.0-train.jsonl.gz data/classifier/human_eval/ data/classifier/human_eval/HumanEvalPseudocodes-v0.1.0-test.jsonl.gz 
+gzip -dk data/classifier/leet_code/LeetCodePseudocodes-v0.1.0-train.jsonl.gz data/classifier/leet_code/LeetCodePseudocodes-v0.1.0-dev.jsonl.gz data/classifier/leet_code/LeetCodePseudocodes-v0.1.0-test.jsonl.gz 
+```
+
 For the classifier, the pseudocode dataset can be generated through the workflow by running the autoencoder pipeline followed by the cosmetic pipeline. The pseudocode dataset can also be loaded in from a previous generation. Example LeetCode and HumanEval datasets are provided in the repository in the classifier folder.
 
 To run the pipeline, set these values in the cfg/config.yaml file:
