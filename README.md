@@ -1,8 +1,14 @@
 # Pseudo-Autoencoder: Large Language Models for Examining Pseudocode Validity
 
-**Data:** [LeetCodeDataset](https://github.com/newfacade/LeetCodeDataset) and [HumanEval](https://github.com/openai/human-eval)
 
+# Installation 
+
+```bash
+git clone https://github.com/agarcia-sal/pseudo-autoencoder.git 
+```
 # Download Data
+
+**Data:** [LeetCodeDataset](https://github.com/newfacade/LeetCodeDataset) and [HumanEval](https://github.com/openai/human-eval)
 
 When first running the code, uncomment the line below in the main function:
 
@@ -12,12 +18,12 @@ When first running the code, uncomment the line below in the main function:
 ```
 The `set_up_codebase` function will set up necessary folder structure.
 
-Download the raw data from [HumanEval](https://github.com/openai/human-eval) to the local directory `data/autoencoder/human_eval` and LeetCodeDataset-v0.3.0-train.jsonl and LeetCodeDataset-v0.3.0-test.jsonl from [LeetCodeDataset](https://github.com/newfacade/LeetCodeDataset) to the local directory `data/autoencoder/leet_code`
+Download the raw data from [HumanEval](https://github.com/openai/human-eval) to the local directory `data/autoencoder/human_eval` and LeetCodeDataset-v0.3.0-train.jsonl.gz and LeetCodeDataset-v0.3.0-test.jsonl.gz from [LeetCodeDataset](https://github.com/newfacade/LeetCodeDataset) to the local directory `data/autoencoder/leet_code`
 
-# Installation 
-
+Unzip the .gz files with:
 ```bash
-git clone https://github.com/agarcia-sal/pseudo-autoencoder.git 
+gzip -dk HumanEval.jsonl.gz
+gzip -dk LeetCodeDataset-v0.3.0-train.jsonl.gz
 ```
 
 # Usage
@@ -45,17 +51,17 @@ To run, set values in cfg/config.yaml file or:
 
 ```bash
 python main.py \
-    algorithm=direct_answer \ 
-    dataset=leet_code \ 
+    algorithm=direct_answer \
+    dataset=leet_code \
     pipeline=autoencoder \
     split=train \
-    use_timestamp=True \ 
+    use_timestamp=True \
     autoencoder_version=v0.3.5 \
-    readability_metric=avg_syllables_per_word \ 
-    near_miss_threshold=0.8
+    readability_metric=avg_syllables_per_word \
+    near_miss_threshold=0.8 \
     previous_autoencoder_label=2025-09-18_21-00-18 \
     num_iterations=2 \
-    rounds=1 \ 
+    rounds=1 \
     evolving_encoder=True \
     evolving_decoder=False \
     plotting_pipeline=True
