@@ -14,6 +14,12 @@ The `set_up_codebase` function will set up necessary folder structure.
 
 Download the raw data from [HumanEval](https://github.com/openai/human-eval) to the local directory `data/autoencoder/human_eval` and LeetCodeDataset-v0.3.0-train.jsonl and LeetCodeDataset-v0.3.0-test.jsonl from [LeetCodeDataset](https://github.com/newfacade/LeetCodeDataset) to the local directory `data/autoencoder/leet_code`
 
+# Installation 
+
+```bash
+git clone https://github.com/agarcia-sal/pseudo-autoencoder.git 
+```
+
 # Usage
 
 Set your OpenAI API key as an environment variable in an .env file:
@@ -24,6 +30,7 @@ OPENAI_API_KEY="<Your API key>"
 Create a new conda environment with the pseudo_env.yml file:
 ```bash
 conda env create -f pseudo_env.yml
+conda activate pseudo_env
 ```
 
 When first running the code, uncomment the line below in the main function:
@@ -38,12 +45,22 @@ To run, set values in cfg/config.yaml file or:
 
 ```bash
 python main.py \
-    algorithm=greedy \ # other options are "direct_answer"
-    dataset=leet_code \ # options: human_eval, leet_code
-    use_timestamp=False \ # for individual run of pipeline, set to True
-    readability_metric=avg_syllables_per_word \ # options are: avg_syllables_per_word and avg_word_length
+    algorithm=direct_answer \ 
+    dataset=leet_code \ 
+    pipeline=autoencoder \
+    split=train \
+    use_timestamp=True \ 
+    autoencoder_version=v0.3.5 \
+    readability_metric=avg_syllables_per_word \ 
     near_miss_threshold=0.8
+    previous_autoencoder_label=2025-09-18_21-00-18 \
+    num_iterations=2 \
+    rounds=1 \ 
+    evolving_encoder=True \
+    evolving_decoder=False \
+    plotting_pipeline=True
 ```
+See the cfg/config.yaml file for more options
 
 # Agent Implementations
 
